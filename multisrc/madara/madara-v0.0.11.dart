@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:bridge_lib/bridge_lib.dart';
 
 getPopularManga(MangaModel manga) async {
   final url = "${manga.baseUrl}/manga/page/${manga.page}/?m_orderby=views";
