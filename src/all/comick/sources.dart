@@ -2,7 +2,7 @@ import '../../../model/source.dart';
 
 const comickVersion = "0.0.1";
 const comickSourceCodeUrl =
-    "https://raw.githubusercontent.com/kodjodevf/External-source-test/main/src/all/comick/comick-v$comickVersion.dart";
+    "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/src/all/comick/comick-v$comickVersion.dart";
 
 const defaultDateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 const defaultDateFormatLocale = "en";
