@@ -16,6 +16,7 @@ getPopularManga(MangaModel manga) async {
   if (res.isEmpty) {
     return manga;
   }
+
   List<String> data = MBridge.listParse(
       MBridge.jsonPathToString(res, r'$.data[*]', '_.').split("_."), 0);
   List<String> urlList = [];
@@ -188,8 +189,10 @@ getMangaDetail(MangaModel manga) async {
   List<String> scanlators = [];
   List<String> chapterUrl = [];
   List<String> chapterDate = [];
+
   final list = getChapters(
       manga, MBridge.intParse("${chapterList.length}"), paginatedChapterList);
+
   chapterListA.add(list);
   var hasMoreResults = (limit + offset) < total;
   while (hasMoreResults) {
@@ -207,16 +210,35 @@ getMangaDetail(MangaModel manga) async {
     hasMoreResults = (limit + offset) < total;
   }
   for (var element in chapterListA) {
-    int index = 0;
     for (var name in element.names) {
       if (name.isEmpty) {
       } else {
         chapNames.add(name);
-        chapterUrl.add(element.urls[index]);
-        chapterDate.add(element.chaptersDateUploads[index]);
-        scanlators.add(element.chaptersScanlators[index]);
       }
-      index++;
+    }
+  }
+  for (var element in chapterListA) {
+    for (var url in element.urls) {
+      if (url.isEmpty) {
+      } else {
+        chapterUrl.add(url);
+      }
+    }
+  }
+  for (var element in chapterListA) {
+    for (var chapDate in element.chaptersDateUploads) {
+      if (chapDate.isEmpty) {
+      } else {
+        chapterDate.add(chapDate);
+      }
+    }
+  }
+  for (var element in chapterListA) {
+    for (var scanlator in element.chaptersScanlators) {
+      if (scanlator.isEmpty) {
+      } else {
+        scanlators.add(scanlator);
+      }
     }
   }
   manga.urls = chapterUrl;
