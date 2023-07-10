@@ -3,7 +3,7 @@ import '../../../model/source.dart';
 const apiUrl = 'https://api.mangadex.org';
 const baseUrl = 'https://mangadex.org';
 const isNsfw = true;
-const mangadexVersion = "0.0.1";
+const mangadexVersion = "0.0.11";
 const mangadexSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/src/all/mangadex/mangadex-v$mangadexVersion.dart";
 const iconUrl = '';
