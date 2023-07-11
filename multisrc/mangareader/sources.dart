@@ -1,6 +1,6 @@
 import '../../model/source.dart';
 
-const mangareaderVersion = "0.0.1";
+const mangareaderVersion = "0.0.11";
 const mangareaderSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/multisrc/mangareader/mangareader-v$mangareaderVersion.dart";
 const defaultDateFormat = "MMMM dd, yyyy";
@@ -311,6 +311,16 @@ List<Source> _mangareaderSourcesList = [
       iconUrl: '',
       dateFormat: defaultDateFormat,
       dateFormatLocale: defaultDateFormatLocale,
+      version: mangareaderVersion,
+      sourceCodeUrl: mangareaderSourceCodeUrl),
+  Source(
+      name: "Sushi-Scan.fr",
+      baseUrl: "https://sushiscan.fr",
+      lang: "fr",
+      iconUrl: '',
+      dateFormat: "MMMM dd, yyyy",
+      hasCloudflare: true,
+      dateFormatLocale: "fr",
       version: mangareaderVersion,
       sourceCodeUrl: mangareaderSourceCodeUrl),
   // Source(
