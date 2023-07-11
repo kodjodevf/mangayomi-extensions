@@ -147,7 +147,7 @@ getMangaDetail(MangaModel manga) async {
       .split("-.");
 
   manga.chaptersDateUploads = MBridge.listParseDateTime(
-      chaptersDateUploads, "MMMM dd, yyyy", manga.dateFormatLocale);
+      chaptersDateUploads, manga.dateFormat, manga.dateFormatLocale);
 
   return manga;
 }
