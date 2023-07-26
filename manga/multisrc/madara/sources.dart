@@ -1,8 +1,8 @@
-import '../../model/source.dart';
+import '../../../model/source.dart';
 
 const madaraVersion = "0.0.11";
 const madaraSourceCodeUrl =
-    "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/multisrc/madara/madara-v$madaraVersion.dart";
+    "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/madara-v$madaraVersion.dart";
 const defaultDateFormat = "MMMM dd, yyyy";
 const defaultDateFormatLocale = "en_US";
 List<Source> get madaraSourcesList => _madaraSourcesList;
