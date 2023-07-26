@@ -1,8 +1,8 @@
-import '../../model/source.dart';
+import '../../../model/source.dart';
 
 const mmrcmsVersion = "0.0.1";
 const mmrcmsSourceCodeUrl =
-    "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/multisrc/mmrcms/mmrcms-v$mmrcmsVersion.dart";
+    "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/mmrcms/mmrcms-v$mmrcmsVersion.dart";
 const defaultDateFormat = "d MMM. yyyy";
 const defaultDateFormatLocale = "en_US";
 

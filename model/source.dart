@@ -24,6 +24,8 @@ class Source {
 
   String? version;
 
+  bool? isManga;
+  
   Source({
     this.id = null,
     this.name = "",
@@ -38,6 +40,7 @@ class Source {
     this.sourceCodeUrl = "",
     this.apiUrl = "",
     this.version = "",
+    this.isManga = true,
   });
 
   Map<String, dynamic> toJson() {
@@ -54,7 +57,8 @@ class Source {
       "hasCloudflare": hasCloudflare,
       "sourceCodeUrl": sourceCodeUrl,
       "apiUrl": apiUrl,
-      "version": version
+      "version": version,
+      "isManga": isManga,
     };
   }
 }
