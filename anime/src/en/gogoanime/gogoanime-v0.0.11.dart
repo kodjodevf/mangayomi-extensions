@@ -105,7 +105,7 @@ getAnimeDetail(MangaModel anime) async {
   return anime;
 }
 
-getChapterUrl(MangaModel anime) async {
+getVideoList(MangaModel anime) async {
   final datas = {
     "url": "${anime.baseUrl}${anime.link}",
     "headers": null,

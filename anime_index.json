@@ -10,9 +10,9 @@
         "dateFormatLocale": null,
         "isNsfw": false,
         "hasCloudflare": false,
-        "sourceCodeUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/anime/src/en/gogoanime/gogoanime-v0.0.1.dart",
+        "sourceCodeUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/anime/src/en/gogoanime/gogoanime-v0.0.11.dart",
         "apiUrl": "",
-        "version": "0.0.1",
+        "version": "0.0.11",
         "isManga": false
     }
 ]

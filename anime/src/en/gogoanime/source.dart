@@ -1,7 +1,7 @@
 import '../../../../model/source.dart';
 
 Source get gogoanimeSource => _gogoanimeSource;
-const gogoanimeVersion = "0.0.1";
+const gogoanimeVersion = "0.0.11";
 const gogoanimeSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/anime/src/en/gogoanime/gogoanime-v$gogoanimeVersion.dart";
 Source _gogoanimeSource = Source(
