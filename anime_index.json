@@ -1,18 +1,1 @@
-[
-    {
-        "name": "Gogoanime",
-        "id": 1061885186,
-        "baseUrl": "https://gogoanime.tel",
-        "lang": "en",
-        "typeSource": "single",
-        "iconUrl": "",
-        "dateFormat": null,
-        "dateFormatLocale": null,
-        "isNsfw": false,
-        "hasCloudflare": false,
-        "sourceCodeUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/anime/src/en/gogoanime/gogoanime-v0.0.11.dart",
-        "apiUrl": "",
-        "version": "0.0.11",
-        "isManga": false
-    }
-]
+[{"name":"Gogoanime","id":1061885186,"baseUrl":"https://gogoanime.tel","lang":"en","typeSource":"single","iconUrl":"","dateFormat":null,"dateFormatLocale":null,"isNsfw":false,"hasCloudflare":false,"sourceCodeUrl":"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/anime/src/en/gogoanime/gogoanime-v0.0.12.dart","apiUrl":"","version":"0.0.12","isManga":false}]

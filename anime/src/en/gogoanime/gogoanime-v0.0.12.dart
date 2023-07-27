@@ -150,3 +150,22 @@ getVideoList(MangaModel anime) async {
 
   return videos;
 }
+
+searchAnime(MangaModel anime) async {
+  final url =
+      "${anime.baseUrl}/search.html?keyword=${anime.query}&page=${anime.page}";
+  final data = {"url": url, "headers": null, "sourceId": anime.sourceId};
+  final res = await MBridge.http(json.encode(data), 0);
+  if (res.isEmpty) {
+    return anime;
+  }
+  anime.urls =
+      MBridge.xpath(res, '//*[@class="img"]/a/@href', '._').split('._');
+
+  anime.names =
+      MBridge.xpath(res, '//*[@class="img"]/a/@title', '._').split('._');
+
+  anime.images =
+      MBridge.xpath(res, '//*[@class="img"]/a/img/@src', '._').split('._');
+  return anime;
+}
