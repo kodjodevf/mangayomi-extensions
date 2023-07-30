@@ -15,9 +15,9 @@ searchManga(MangaModel manga) async {
   List<String> urls = [];
   List<String> images = [];
   if (res.startsWith("{")) {
-    jsonList = MBridge.jsonPathToList(res, r'$.data[*]');
+    jsonList = MBridge.jsonPathToList(res, r'$.data[*]', 0);
   } else {
-    jsonList = MBridge.jsonDecodeToList(res);
+    jsonList = MBridge.jsonDecodeToList(res,0);
   }
   for (var a in jsonList) {
     final thumbnail = MBridge.getMapValue(a, "thumbnail", 0);
@@ -62,9 +62,9 @@ getPopularManga(MangaModel manga) async {
   List<String> urls = [];
   List<String> images = [];
   if (res.startsWith("{")) {
-    jsonList = MBridge.jsonPathToList(res, r'$.data[*]');
+    jsonList = MBridge.jsonPathToList(res, r'$.data[*]', 0);
   } else {
-    jsonList = MBridge.jsonDecodeToList(res);
+    jsonList = MBridge.jsonDecodeToList(res,0);
   }
   for (var a in jsonList) {
     final thumbnail = MBridge.getMapValue(a, "thumbnail", 0);
@@ -109,9 +109,9 @@ getLatestUpdatesManga(MangaModel manga) async {
   List<String> urls = [];
   List<String> images = [];
   if (res.startsWith("{")) {
-    jsonList = MBridge.jsonPathToList(res, r'$.data[*]');
+    jsonList = MBridge.jsonPathToList(res, r'$.data[*]', 0);
   } else {
-    jsonList = MBridge.jsonDecodeToList(res);
+    jsonList = MBridge.jsonDecodeToList(res,0);
   }
   for (var a in jsonList) {
     final thumbnail = MBridge.getMapValue(a, "thumbnail", 0);
@@ -147,7 +147,7 @@ getMangaDetail(MangaModel manga) async {
   manga.genre =
       MBridge.jsonPathToString(res, r"$.tags[*].name", "._").split("._");
 
-  final chapters = MBridge.jsonPathToList(res, r"$.chapters[*]");
+  final chapters = MBridge.jsonPathToList(res, r"$.chapters[*]", 0);
   List<String> chapterTitles = [];
   List<String> chapterUrls = [];
   List<String> chapterDates = [];
@@ -179,7 +179,7 @@ getChapterUrl(MangaModel manga) async {
   if (res.isEmpty) {
     return [];
   }
-  final pages = MBridge.jsonPathToList(res, r"$.content.images[*]");
+  final pages = MBridge.jsonPathToList(res, r"$.content.images[*]", 0);
   List<String> pageUrls = [];
   for (var u in pages) {
     final url = u.replaceAll('"', "");

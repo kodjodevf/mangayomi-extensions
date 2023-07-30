@@ -195,7 +195,7 @@ getChapterUrl(MangaModel manga) async {
   if (pages.length == 1) {
     final images =
         MBridge.regExp(res, "\"images\"\\s*:\\s*(\\[.*?])", "", 1, 1);
-    final pages = MBridge.jsonDecodeToList(images);
+    final pages = MBridge.jsonDecodeToList(images,0);
     for (var page in pages) {
       pagesUrl.add(page);
     }

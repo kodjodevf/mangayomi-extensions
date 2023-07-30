@@ -43,11 +43,11 @@ MangaModel getChapters(
   String chapDate = MBridge.stringParse("");
   String chapterUrl = MBridge.stringParse("");
   String paginatedChapterList = MBridge.stringParse(paginatedChapterListA);
-  final dataList = MBridge.jsonPathToList(paginatedChapterList, r'$.data[*]');
+  final dataList = MBridge.jsonPathToList(paginatedChapterList, r'$.data[*]',0);
   for (var res in dataList) {
     String scan = MBridge.stringParse("");
     final groups = MBridge.jsonPathToList(
-        res, r'$.relationships[?@.id!="00e03853-1b96-4f41-9542-c71b8692033b"]');
+        res, r'$.relationships[?@.id!="00e03853-1b96-4f41-9542-c71b8692033b"]',0);
     String chapName = MBridge.stringParse("");
     for (var element in groups) {
       final data = MBridge.getMapValue(element, "attributes", 1);

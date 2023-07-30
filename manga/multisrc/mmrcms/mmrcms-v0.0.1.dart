@@ -8,7 +8,7 @@ searchManga(MangaModel manga) async {
   if (res.isEmpty) {
     return manga;
   }
-  final jsonList = MBridge.jsonPathToList(res, r'$.suggestions[*]');
+  final jsonList = MBridge.jsonPathToList(res, r'$.suggestions[*]', 0);
   List<String> urls = [];
   List<String> names = [];
   List<String> images = [];
