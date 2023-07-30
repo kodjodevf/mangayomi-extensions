@@ -14,7 +14,8 @@
         "apiUrl": "",
         "version": "0.0.12",
         "isManga": false,
-        "isFullData": false
+        "isFullData": false,
+        "appMinVerReq": "0.0.21"
     },
     {
         "name": "FrAnime",
@@ -27,10 +28,11 @@
         "dateFormatLocale": null,
         "isNsfw": false,
         "hasCloudflare": false,
-        "sourceCodeUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/anime/src/fr/franime/franime-v0.0.11.dart",
+        "sourceCodeUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/anime/src/fr/franime/franime-v0.0.12.dart",
         "apiUrl": "https://api.franime.fr",
-        "version": "0.0.11",
+        "version": "0.0.12",
         "isManga": false,
-        "isFullData": true
+        "isFullData": true,
+        "appMinVerReq": "0.0.21"
     }
 ]
