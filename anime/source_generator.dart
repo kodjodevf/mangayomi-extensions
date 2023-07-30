@@ -3,9 +3,10 @@ import 'dart:developer';
 import 'dart:io';
 import '../model/source.dart';
 import 'src/en/gogoanime/source.dart';
+import 'src/fr/franime/source.dart';
 
 void main() {
-  List<Source> _sourcesList = [gogoanimeSource];
+  List<Source> _sourcesList = [gogoanimeSource, franimeSource];
   final List<Map<String, dynamic>> jsonList =
       _sourcesList.map((source) => source.toJson()).toList();
   final jsonString = jsonEncode(jsonList);

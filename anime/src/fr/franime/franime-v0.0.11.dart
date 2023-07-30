@@ -4,7 +4,7 @@ import 'package:bridge_lib/bridge_lib.dart';
 Future<String> dataBase(int sourceId) async {
   final data = {
     "url": "https://api.franime.fr/api/animes/",
-    "headers": {"Referer": "https://franime.fr/"},
+    "headers": {"Referer": "https://franime.fr"},
     "sourceId": sourceId
   };
   final res = await MBridge.http(json.encode(data), 0);
@@ -14,7 +14,7 @@ Future<String> dataBase(int sourceId) async {
 getPopularAnime(MangaModel anime) async {
   final data = {
     "url": "https://api.franime.fr/api/animes/",
-    "headers": {"Referer": "https://franime.fr/"},
+    "headers": {"Referer": "https://franime.fr"},
     "sourceId": anime.sourceId
   };
   final res = await MBridge.http(json.encode(data), 0);
