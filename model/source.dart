@@ -1,5 +1,6 @@
 class Source {
   String? id;
+
   String? name;
 
   String? baseUrl;
@@ -28,23 +29,25 @@ class Source {
 
   bool? isFullData;
 
-  Source({
-    this.id = null,
-    this.name = "",
-    this.baseUrl = "",
-    this.lang = "",
-    this.typeSource = "",
-    this.iconUrl = "",
-    this.dateFormat,
-    this.dateFormatLocale,
-    this.isNsfw = false,
-    this.hasCloudflare = false,
-    this.sourceCodeUrl = "",
-    this.apiUrl = "",
-    this.version = "",
-    this.isManga = true,
-    this.isFullData = false,
-  });
+  String? appMinVerReq;
+
+  Source(
+      {this.id = null,
+      this.name = "",
+      this.baseUrl = "",
+      this.lang = "",
+      this.typeSource = "",
+      this.iconUrl = "",
+      this.dateFormat,
+      this.dateFormatLocale,
+      this.isNsfw = false,
+      this.hasCloudflare = false,
+      this.sourceCodeUrl = "",
+      this.apiUrl = "",
+      this.version = "",
+      this.isManga = true,
+      this.isFullData = false,
+      this.appMinVerReq = "0.0.21"});
 
   Map<String, dynamic> toJson() {
     return {
@@ -62,7 +65,8 @@ class Source {
       "apiUrl": apiUrl,
       "version": version,
       "isManga": isManga,
-      "isFullData": isFullData
+      "isFullData": isFullData,
+      "appMinVerReq": appMinVerReq
     };
   }
 }

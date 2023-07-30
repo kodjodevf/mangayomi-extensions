@@ -4,7 +4,7 @@ import 'package:bridge_lib/bridge_lib.dart';
 Future<String> dataBase(int sourceId) async {
   final data = {
     "url": "https://api.franime.fr/api/animes/",
-    "headers": {"Referer": "https://franime.fr"},
+    "headers": {"Referer": "https://franime.fr/"},
     "sourceId": sourceId
   };
   final res = await MBridge.http(json.encode(data), 0);
@@ -14,52 +14,52 @@ Future<String> dataBase(int sourceId) async {
 getPopularAnime(MangaModel anime) async {
   final data = {
     "url": "https://api.franime.fr/api/animes/",
-    "headers": {"Referer": "https://franime.fr"},
+    "headers": {"Referer": "https://franime.fr/"},
     "sourceId": anime.sourceId
   };
   final res = await MBridge.http(json.encode(data), 0);
-
-  List<MangaModel> animeList = animePage(res);
   if (res.isEmpty) {
-    return anime;
+    return [];
   }
+  List<MangaModel> animeList = animeResList(res);
 
   return animeList;
 }
 
-List<MangaModel> animePage(String res) {
+List<MangaModel> animeResList(String res) {
   final statusList = [
     {"EN COURS": 0, "TERMINÉ": 1}
   ];
   List<MangaModel> animeList = [];
-  final genres = MBridge.jsonPathToList(res, r'$..themes', 1);
-  final images = MBridge.jsonPathToList(res, r'$..affiche', 0);
-  final descriptions = MBridge.jsonPathToList(res, r'$..description', 0);
-  final seasonss = MBridge.jsonPathToList(res, r'$..saisons', 1);
-  final statuss = MBridge.jsonPathToList(res, r'$..status', 0);
-  final titles = MBridge.jsonPathToList(res, r'$..title', 0);
-  final titleOs = MBridge.jsonPathToList(res, r'$..titleO', 0);
   final langs =
       MBridge.jsonPathToList(res, r'$..saisons[*].episodes[*].lang', 1);
   int index = 0;
-  for (var saisons in seasonss) {
+  List<String> jsonResList = MBridge.jsonDecodeToList(res, 1);
+  for (var animeJson in jsonResList) {
     MangaModel anime = MangaModel();
-    List<String> seasons = MBridge.jsonDecodeToList(saisons, 0);
-    final titleO = MBridge.listParse(titleOs, 0)[index];
+    List<String> seasons = MBridge.jsonDecodeToList(
+        MBridge.getMapValue(animeJson, "saisons", 1), 1);
+    final titleO = MBridge.getMapValue(animeJson, "titleO", 0);
     final vo = MBridge.getMapValue(MBridge.listParse(langs, 0)[index], "vo", 1);
     final vf = MBridge.getMapValue(MBridge.listParse(langs, 0)[index], "vf", 1);
     final hasVostfr = MBridge.isEmptyOrIsNotEmpty(
         MBridge.jsonDecodeToList(MBridge.getMapValue(vo, "lecteurs", 1), 0), 1);
     final hasVf = MBridge.isEmptyOrIsNotEmpty(
         MBridge.jsonDecodeToList(MBridge.getMapValue(vf, "lecteurs", 1), 0), 1);
+    String title = MBridge.getMapValue(animeJson, "title", 0);
+    final genre = MBridge.jsonDecodeToList(
+        MBridge.getMapValue(animeJson, "themes", 1), 0);
+    final description = MBridge.getMapValue(animeJson, "description", 0);
+    final status = MBridge.parseStatus(
+        MBridge.getMapValue(animeJson, "status", 0), statusList);
+    final imageUrl = MBridge.getMapValue(animeJson, "affiche", 0);
     if (hasVostfr) {
       for (int i = 0; i < seasons.length; i++) {
         int ind = i + 1;
-        String title = MBridge.listParse(titles, 0)[index].toString();
-        anime.genre =
-            MBridge.jsonDecodeToList(MBridge.listParse(genres, 0)[index], 0);
-        anime.description =
-            MBridge.listParse(descriptions, 0)[index].toString();
+
+        anime.genre = genre;
+
+        anime.description = description;
         String seasonTitle = title;
         if (seasons.length > 1) {
           seasonTitle += " S$ind";
@@ -67,10 +67,9 @@ List<MangaModel> animePage(String res) {
         if (hasVostfr) {
           seasonTitle += " VOSTFR";
         }
-        anime.status = MBridge.parseStatus(
-            MBridge.listParse(statuss, 0)[index], statusList);
+        anime.status = status;
         anime.name = seasonTitle;
-        anime.imageUrl = MBridge.listParse(images, 0)[index];
+        anime.imageUrl = imageUrl;
         anime.link =
             "/anime/${MBridge.regExp(titleO, "[^A-Za-z0-9 ]", "", 0, 0).replaceAll(" ", "-").toLowerCase()}?lang=vo&s=$ind";
         ind++;
@@ -78,11 +77,8 @@ List<MangaModel> animePage(String res) {
     } else if (hasVf) {
       for (int i = 0; i < seasons.length; i++) {
         int ind = i + 1;
-        String title = MBridge.listParse(titles, 0)[index].toString();
-        anime.genre =
-            MBridge.jsonDecodeToList(MBridge.listParse(genres, 0)[index], 0);
-        anime.description =
-            MBridge.listParse(descriptions, 0)[index].toString();
+        anime.genre = genre;
+        anime.description = description;
         String seasonTitle = title;
         if (seasons.length > 1) {
           seasonTitle += " S$ind";
@@ -90,10 +86,9 @@ List<MangaModel> animePage(String res) {
         if (hasVf) {
           seasonTitle += " VF";
         }
-        anime.status = MBridge.parseStatus(
-            MBridge.listParse(statuss, 0)[index], statusList);
+        anime.status = status;
         anime.name = seasonTitle;
-        anime.imageUrl = MBridge.listParse(images, 0)[index];
+        anime.imageUrl = imageUrl;
         anime.link =
             "/anime/${MBridge.regExp(titleO, "[^A-Za-z0-9 ]", "", 0, 0).replaceAll(" ", "-").toLowerCase()}?lang=vo&s=$ind";
         ind++;
@@ -106,6 +101,7 @@ List<MangaModel> animePage(String res) {
 }
 
 String databaseAnimeByTitleO(String res, String titleO) {
+  print(titleO);
   List<String> datas = MBridge.jsonDecodeToList(res, 1);
   for (var data in datas) {
     if (MBridge.regExp(MBridge.getMapValue(data, "titleO", 0), "[^A-Za-z0-9 ]",
@@ -116,12 +112,11 @@ String databaseAnimeByTitleO(String res, String titleO) {
       return data;
     }
   }
-  return "dffd";
+  return "";
 }
 
 getAnimeDetail(MangaModel anime) async {
   String language = "vo".toString();
-
   if (anime.link.contains("lang=")) {
     language = MBridge.listParse(
         MBridge.listParse(anime.link.split("lang="), 2)[0].split("&"), 1)[0];
@@ -130,7 +125,13 @@ getAnimeDetail(MangaModel anime) async {
   String stem = MBridge.listParse(
       MBridge.listParse(anime.link.split("/"), 2)[0].split("?"), 1)[0];
   final res = await dataBase(anime.sourceId);
+  if (res.isEmpty) {
+    return anime;
+  }
   final animeByTitleOJson = databaseAnimeByTitleO(res, stem);
+  if (animeByTitleOJson.isEmpty) {
+    return anime;
+  }
   String seasonsJson =
       MBridge.jsonPathToList(animeByTitleOJson, r'$..saisons', 1)[0];
   List<String> seasons = MBridge.jsonDecodeToList(seasonsJson, 1);
@@ -148,7 +149,6 @@ getAnimeDetail(MangaModel anime) async {
   List<String> episodesNames = [];
   List<String> episodesUrls = [];
   for (int i = 0; i < episodes.length; i++) {
-    print(i);
     String episode = MBridge.listParse(episodes, 0)[i];
     final lang = MBridge.getMapValue(episode, "lang", 1);
     final vo = MBridge.getMapValue(lang, "vo", 1);
@@ -169,9 +169,7 @@ getAnimeDetail(MangaModel anime) async {
       episodesNames.add(title.replaceAll('"', ""));
     }
   }
-  if (res.isEmpty) {
-    return anime;
-  }
+
   anime.urls = episodesUrls;
   anime.names = episodesNames;
   anime.chaptersDateUploads = [];
@@ -195,7 +193,7 @@ getLatestUpdatesAnime(MangaModel anime) async {
     }
     reversedJson += "$vg$va";
   }
-  List<MangaModel> animeList = animePage("[${reversedJson}]");
+  List<MangaModel> animeList = animeResList("[${reversedJson}]");
 
   return animeList;
 }
@@ -215,22 +213,16 @@ List<MangaModel> animeSeachFetch(String res, query) {
     {"EN COURS": 0, "TERMINÉ": 1}
   ];
   List<MangaModel> animeList = [];
-  final genres = MBridge.jsonPathToList(res, r'$..themes', 1);
-  final images = MBridge.jsonPathToList(res, r'$..affiche', 0);
-  final descriptions = MBridge.jsonPathToList(res, r'$..description', 0);
-  final seasonss = MBridge.jsonPathToList(res, r'$..saisons', 1);
-  final statuss = MBridge.jsonPathToList(res, r'$..status', 0);
-  final titles = MBridge.jsonPathToList(res, r'$..title', 0);
-  final titleOs = MBridge.jsonPathToList(res, r'$..titleO', 0);
-  final titlesAlt = MBridge.jsonPathToList(res, r'$..titles', 1);
   final langs =
       MBridge.jsonPathToList(res, r'$..saisons[*].episodes[*].lang', 1);
   int index = 0;
-  for (var saisons in seasonss) {
+  List<String> jsonResList = MBridge.jsonDecodeToList(res, 1);
+  for (var animeJson in jsonResList) {
     MangaModel anime = MangaModel();
-    List<String> seasons = MBridge.jsonDecodeToList(saisons, 0);
-    final titleO = MBridge.listParse(titleOs, 0)[index];
-    final titleAlt = MBridge.listParse(titlesAlt, 0)[index];
+
+    final titleO = MBridge.getMapValue(animeJson, "titleO", 0);
+
+    final titleAlt = MBridge.getMapValue(animeJson, "titles", 1);
     final enContains = MBridge.getMapValue(titleAlt, "en", 0)
         .toString()
         .toLowerCase()
@@ -258,6 +250,8 @@ List<MangaModel> animeSeachFetch(String res, query) {
       contains = true;
     }
     if (contains) {
+      List<String> seasons = MBridge.jsonDecodeToList(
+          MBridge.getMapValue(animeJson, "saisons", 1), 1);
       final vo =
           MBridge.getMapValue(MBridge.listParse(langs, 0)[index], "vo", 1);
       final vf =
@@ -268,14 +262,19 @@ List<MangaModel> animeSeachFetch(String res, query) {
       final hasVf = MBridge.isEmptyOrIsNotEmpty(
           MBridge.jsonDecodeToList(MBridge.getMapValue(vf, "lecteurs", 1), 0),
           1);
+      String title = MBridge.getMapValue(animeJson, "title", 0);
+      final genre = MBridge.jsonDecodeToList(
+          MBridge.getMapValue(animeJson, "themes", 1), 0);
+      final description = MBridge.getMapValue(animeJson, "description", 0);
+      final status = MBridge.parseStatus(
+          MBridge.getMapValue(animeJson, "status", 0), statusList);
+      final imageUrl = MBridge.getMapValue(animeJson, "affiche", 0);
       if (hasVostfr) {
         for (int i = 0; i < seasons.length; i++) {
           int ind = i + 1;
-          String title = MBridge.listParse(titles, 0)[index].toString();
-          anime.genre =
-              MBridge.jsonDecodeToList(MBridge.listParse(genres, 0)[index], 0);
-          anime.description =
-              MBridge.listParse(descriptions, 0)[index].toString();
+
+          anime.genre = genre;
+          anime.description = description;
           String seasonTitle = title;
           if (seasons.length > 1) {
             seasonTitle += " S$ind";
@@ -283,10 +282,9 @@ List<MangaModel> animeSeachFetch(String res, query) {
           if (hasVostfr) {
             seasonTitle += " VOSTFR";
           }
-          anime.status = MBridge.parseStatus(
-              MBridge.listParse(statuss, 0)[index], statusList);
+          anime.status = status;
           anime.name = seasonTitle;
-          anime.imageUrl = MBridge.listParse(images, 0)[index];
+          anime.imageUrl = imageUrl;
           anime.link =
               "/anime/${MBridge.regExp(titleO, "[^A-Za-z0-9 ]", "", 0, 0).replaceAll(" ", "-").toLowerCase()}?lang=vo&s=$ind";
           ind++;
@@ -294,11 +292,8 @@ List<MangaModel> animeSeachFetch(String res, query) {
       } else if (hasVf) {
         for (int i = 0; i < seasons.length; i++) {
           int ind = i + 1;
-          String title = MBridge.listParse(titles, 0)[index].toString();
-          anime.genre =
-              MBridge.jsonDecodeToList(MBridge.listParse(genres, 0)[index], 0);
-          anime.description =
-              MBridge.listParse(descriptions, 0)[index].toString();
+          anime.genre = genre;
+          anime.description = description;
           String seasonTitle = title;
           if (seasons.length > 1) {
             seasonTitle += " S$ind";
@@ -306,10 +301,9 @@ List<MangaModel> animeSeachFetch(String res, query) {
           if (hasVf) {
             seasonTitle += " VF";
           }
-          anime.status = MBridge.parseStatus(
-              MBridge.listParse(statuss, 0)[index], statusList);
+          anime.status = status;
           anime.name = seasonTitle;
-          anime.imageUrl = MBridge.listParse(images, 0)[index];
+          anime.imageUrl = imageUrl;
           anime.link =
               "/anime/${MBridge.regExp(titleO, "[^A-Za-z0-9 ]", "", 0, 0).replaceAll(" ", "-").toLowerCase()}?lang=vf&s=$ind";
           ind++;
