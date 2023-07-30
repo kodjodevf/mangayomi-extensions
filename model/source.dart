@@ -62,6 +62,7 @@ class Source {
       "apiUrl": apiUrl,
       "version": version,
       "isManga": isManga,
+      "isFullData": isFullData
     };
   }
 }
