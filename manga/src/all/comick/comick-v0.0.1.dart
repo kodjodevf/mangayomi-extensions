@@ -9,14 +9,14 @@ getLatestUpdatesManga(MangaModel manga) async {
   if (res.isEmpty) {
     return manga;
   }
-  manga.names = MBridge.jsonPathToList(res, r'$.title');
-  List<String> ids = MBridge.jsonPathToList(res, r'$.hid');
+  manga.names = MBridge.jsonPathToList(res, r'$.title', 0);
+  List<String> ids = MBridge.jsonPathToList(res, r'$.hid', 0);
   List<String> mangaUrls = [];
   for (var id in ids) {
     mangaUrls.add("/comic/$id/#");
   }
   manga.urls = mangaUrls;
-  manga.images = MBridge.jsonPathToList(res, r'$.cover_url');
+  manga.images = MBridge.jsonPathToList(res, r'$.cover_url', 0);
   return manga;
 }
 
@@ -88,14 +88,14 @@ getPopularManga(MangaModel manga) async {
   if (res.isEmpty) {
     return manga;
   }
-  manga.names = MBridge.jsonPathToList(res, r'$.title');
-  List<String> ids = MBridge.jsonPathToList(res, r'$.hid');
+  manga.names = MBridge.jsonPathToList(res, r'$.title', 0);
+  List<String> ids = MBridge.jsonPathToList(res, r'$.hid', 0);
   List<String> mangaUrls = [];
   for (var id in ids) {
     mangaUrls.add("/comic/$id/#");
   }
   manga.urls = mangaUrls;
-  manga.images = MBridge.jsonPathToList(res, r'$.cover_url');
+  manga.images = MBridge.jsonPathToList(res, r'$.cover_url', 0);
   return manga;
 }
 
@@ -106,14 +106,14 @@ searchManga(MangaModel manga) async {
   if (res.isEmpty) {
     return manga;
   }
-  manga.names = MBridge.jsonPathToList(res, r'$.title');
-  List<String> ids = MBridge.jsonPathToList(res, r'$.hid');
+  manga.names = MBridge.jsonPathToList(res, r'$.title', 0);
+  List<String> ids = MBridge.jsonPathToList(res, r'$.hid', 0);
   List<String> mangaUrls = [];
   for (var id in ids) {
     mangaUrls.add("/comic/$id/#");
   }
   manga.urls = mangaUrls;
-  manga.images = MBridge.jsonPathToList(res, r'$.cover_url');
+  manga.images = MBridge.jsonPathToList(res, r'$.cover_url', 0);
   return manga;
 }
 

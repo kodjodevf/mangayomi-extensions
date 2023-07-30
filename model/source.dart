@@ -25,7 +25,9 @@ class Source {
   String? version;
 
   bool? isManga;
-  
+
+  bool? isFullData;
+
   Source({
     this.id = null,
     this.name = "",
@@ -41,6 +43,7 @@ class Source {
     this.apiUrl = "",
     this.version = "",
     this.isManga = true,
+    this.isFullData = false,
   });
 
   Map<String, dynamic> toJson() {
