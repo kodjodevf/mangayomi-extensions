@@ -170,8 +170,8 @@ getAnimeDetail(MangaModel anime) async {
     }
   }
 
-  anime.urls = episodesUrls;
-  anime.names = episodesNames;
+  anime.urls = MBridge.listParse(episodesUrls, 5);
+  anime.names = MBridge.listParse(episodesNames, 5);
   anime.chaptersDateUploads = [];
   return anime;
 }
