@@ -1,9 +1,44 @@
 import 'dart:convert';
 import 'package:bridge_lib/bridge_lib.dart';
 
-getPopularAnime(MangaModel anime) async {
+getVideoList(MangaModel anime) async {
+  final datas = {
+    "url": anime.link,
+    "headers": null,
+    "sourceId": anime.sourceId
+  };
+
+  final res = await MBridge.http(json.encode(datas), 0);
+
+  if (res.isEmpty) {
+    return [];
+  }
+
+  final serverUrls = MBridge.xpath(
+          res, '//*[@class="entry-content"]/div/div/iframe/@src', '._')
+      .split("._");
+  List<VideoModel> videos = [];
+  for (var i = 0; i < serverUrls.length; i++) {
+    final url = MBridge.listParse(serverUrls, 0)[i].toString();
+    print(url);
+    List<VideoModel> a = [];
+    if (url.startsWith("https://filemoon.")) {
+    } else if (url.startsWith("https://doodstream.")) {
+      a = await MBridge.doodExtractor(url);
+    } else if (url.startsWith("https://streamtape.")) {
+      a = await MBridge.streamTapeExtractor(url);
+    } else if (url.contains("streamsb")) {}
+    for (var vi in a) {
+      videos.add(vi);
+    }
+  }
+
+  return videos;
+}
+
+getLatestUpdatesAnime(MangaModel anime) async {
   final data = {
-    "url": "${anime.baseUrl}/liste-des-animes-2/",
+    "url": "${anime.baseUrl}/page/${anime.page}/",
     "headers": null,
     "sourceId": anime.sourceId
   };
@@ -13,18 +48,15 @@ getPopularAnime(MangaModel anime) async {
   }
   anime.urls = MBridge.xpath(
           res,
-          '//*[@class="lcp_catlist" and contains(@id,"lcp_instance_")]/li/a/@href',
+          '//*[@class="recent-posts"]/li/div[@class="post-thumb"]/a/@href',
           '._')
       .split('._');
-
   anime.names = MBridge.xpath(
           res,
-          '//*[@class="lcp_catlist" and contains(@id,"lcp_instance_")]/li/a/text()',
+          '//*[@class="recent-posts"]/li/div[@class="post-thumb"]/a/@title',
           '._')
       .split('._');
-
   anime.images = [];
-
   return anime;
 }
 
@@ -60,9 +92,9 @@ getAnimeDetail(MangaModel anime) async {
   return anime;
 }
 
-getLatestUpdatesAnime(MangaModel anime) async {
+getPopularAnime(MangaModel anime) async {
   final data = {
-    "url": "${anime.baseUrl}/page/${anime.page}/",
+    "url": "${anime.baseUrl}/liste-des-animes-2/",
     "headers": null,
     "sourceId": anime.sourceId
   };
@@ -72,51 +104,19 @@ getLatestUpdatesAnime(MangaModel anime) async {
   }
   anime.urls = MBridge.xpath(
           res,
-          '//*[@class="recent-posts"]/li/div[@class="post-thumb"]/a/@href',
+          '//*[@class="lcp_catlist" and contains(@id,"lcp_instance_")]/li/a/@href',
           '._')
       .split('._');
+
   anime.names = MBridge.xpath(
           res,
-          '//*[@class="recent-posts"]/li/div[@class="post-thumb"]/a/@title',
+          '//*[@class="lcp_catlist" and contains(@id,"lcp_instance_")]/li/a/text()',
           '._')
       .split('._');
+
   anime.images = [];
+
   return anime;
-}
-
-getVideoList(MangaModel anime) async {
-  final datas = {
-    "url": anime.link,
-    "headers": null,
-    "sourceId": anime.sourceId
-  };
-
-  final res = await MBridge.http(json.encode(datas), 0);
-
-  if (res.isEmpty) {
-    return [];
-  }
-
-  final serverUrls = MBridge.xpath(
-          res, '//*[@class="entry-content"]/div/div/iframe/@src', '._')
-      .split("._");
-  List<VideoModel> videos = [];
-  for (var i = 0; i < serverUrls.length; i++) {
-    final url = MBridge.listParse(serverUrls, 0)[i].toString();
-    print(url);
-    List<VideoModel> a = [];
-    if (url.startsWith("https://filemoon.")) {
-    } else if (url.startsWith("https://doodstream.")) {
-      a = await MBridge.doodExtractor(url);
-    } else if (url.startsWith("https://streamtape.")) {
-      a = await MBridge.streamTapeExtractor(url);
-    } else if (url.contains("streamsb")) {}
-    for (var vi in a) {
-      videos.add(vi);
-    }
-  }
-
-  return videos;
 }
 
 searchAnime(MangaModel anime) async {
