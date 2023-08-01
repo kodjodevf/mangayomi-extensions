@@ -5,7 +5,7 @@ const otakufrVersion = "0.0.1";
 const otakufrCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/anime/src/fr/otakufr/otakufr-v$otakufrVersion.dart";
 Source _otakufr = Source(
-    name: "otakufr",
+    name: "OtakuFr",
     baseUrl: "https://otakufr.co",
     lang: "fr",
     typeSource: "single",
