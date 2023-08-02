@@ -388,7 +388,7 @@ getVideoList(MangaModel anime) async {
     final playerUrl = await MBridge.http(json.encode(data), 0);
     List<VideoModel> a = [];
     if (playerName.contains("franime_myvi")) {
-      a = MBridge.toVideos(playerUrl, "FRAnime", playerUrl, null);
+      videos.add(MBridge.toVideo(playerUrl, "FRAnime", playerUrl, null));
     } else if (playerName.contains("myvi")) {
       a = await MBridge.myTvExtractor(playerUrl);
     } else if (playerName.contains("sendvid")) {

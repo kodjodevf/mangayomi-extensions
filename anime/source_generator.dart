@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'dart:io';
 import '../model/source.dart';
 import 'src/en/gogoanime/source.dart';
+import 'src/en/wcostream/source.dart';
 import 'src/fr/franime/source.dart';
 import 'src/fr/otakufr/source.dart';
 import 'src/fr/universanime/source.dart';
@@ -12,7 +13,8 @@ void main() {
     gogoanimeSource,
     franimeSource,
     universanimeSource,
-    otakufr
+    otakufr,
+    wcostreamSource
   ];
   final List<Map<String, dynamic>> jsonList =
       _sourcesList.map((source) => source.toJson()).toList();

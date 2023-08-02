@@ -51,10 +51,10 @@ getPopularManga(MangaModel manga) async {
   for (var url in manga.urls) {
     if (manga.source == "Manga-FR") {
       images.add(
-          "${manga.baseUrl}/uploads/manga/${MBridge.listParse(MBridge.stringParse(url).split('/'), 2)[0]}.jpg");
+          "${manga.baseUrl}/uploads/manga/${MBridge.listParse(MBridge.stringParse(url, 0).split('/'), 2)[0]}.jpg");
     } else {
       images.add(
-          "${manga.baseUrl}/uploads/manga/${MBridge.listParse(MBridge.stringParse(url).split('/'), 2)[0]}/cover/cover_250x350.jpg");
+          "${manga.baseUrl}/uploads/manga/${MBridge.listParse(MBridge.stringParse(url, 0).split('/'), 2)[0]}/cover/cover_250x350.jpg");
     }
   }
   manga.images = images;
@@ -135,10 +135,10 @@ getLatestUpdatesManga(MangaModel manga) async {
   for (var url in manga.urls) {
     if (manga.source == "Manga-FR") {
       images.add(
-          "${manga.baseUrl}/uploads/manga/${MBridge.listParse(MBridge.stringParse(url).split('/'), 2)[0]}.jpg");
+          "${manga.baseUrl}/uploads/manga/${MBridge.listParse(MBridge.stringParse(url, 0).split('/'), 2)[0]}.jpg");
     } else {
       images.add(
-          "${manga.baseUrl}/uploads/manga/${MBridge.listParse(MBridge.stringParse(url).split('/'), 2)[0]}/cover/cover_250x350.jpg");
+          "${manga.baseUrl}/uploads/manga/${MBridge.listParse(MBridge.stringParse(url, 0).split('/'), 2)[0]}/cover/cover_250x350.jpg");
     }
   }
   manga.images = images;
