@@ -3,7 +3,8 @@ import 'dart:convert';
 
 String getMDXContentRating() {
   String ctnRating = MBridge.stringParse(
-      "&contentRating[]=suggestive&contentRating[]=safe&contentRating[]=erotica&contentRating[]=pornographic");
+      "&contentRating[]=suggestive&contentRating[]=safe&contentRating[]=erotica&contentRating[]=pornographic",
+      0);
   return ctnRating;
 }
 
@@ -38,34 +39,35 @@ getPopularManga(MangaModel manga) async {
 
 MangaModel getChapters(
     MangaModel manga, int length, String paginatedChapterListA) {
-  String scanlators = MBridge.stringParse("");
-  String chapNames = MBridge.stringParse("");
-  String chapDate = MBridge.stringParse("");
-  String chapterUrl = MBridge.stringParse("");
-  String paginatedChapterList = MBridge.stringParse(paginatedChapterListA);
-  final dataList = MBridge.jsonPathToList(paginatedChapterList, r'$.data[*]',0);
+  String scanlators = MBridge.stringParse("", 0);
+  String chapNames = MBridge.stringParse("", 0);
+  String chapDate = MBridge.stringParse("", 0);
+  String chapterUrl = MBridge.stringParse("", 0);
+  String paginatedChapterList = MBridge.stringParse(paginatedChapterListA, 0);
+  final dataList =
+      MBridge.jsonPathToList(paginatedChapterList, r'$.data[*]', 0);
   for (var res in dataList) {
-    String scan = MBridge.stringParse("");
-    final groups = MBridge.jsonPathToList(
-        res, r'$.relationships[?@.id!="00e03853-1b96-4f41-9542-c71b8692033b"]',0);
-    String chapName = MBridge.stringParse("");
+    String scan = MBridge.stringParse("", 0);
+    final groups = MBridge.jsonPathToList(res,
+        r'$.relationships[?@.id!="00e03853-1b96-4f41-9542-c71b8692033b"]', 0);
+    String chapName = MBridge.stringParse("", 0);
     for (var element in groups) {
       final data = MBridge.getMapValue(element, "attributes", 1);
       if (data.isEmpty) {
       } else {
         final name = MBridge.getMapValue(data, "name", 0);
-        scan += MBridge.stringParse("$name");
+        scan += MBridge.stringParse("$name", 0);
         final username = MBridge.getMapValue(data, "username", 0);
         if (username.isEmpty) {
         } else {
           if (scan.isEmpty) {
-            scan += MBridge.stringParse("Uploaded by $username");
+            scan += MBridge.stringParse("Uploaded by $username", 0);
           }
         }
       }
     }
     if (scan.isEmpty) {
-      scan = MBridge.stringParse("No Group");
+      scan = MBridge.stringParse("No Group", 0);
     }
     final dataRes = MBridge.getMapValue(res, "attributes", 1);
     if (dataRes.isEmpty) {
@@ -76,7 +78,7 @@ MangaModel getChapters(
       } else {
         if (volume == "null") {
         } else {
-          chapName = MBridge.stringParse("Vol.$volume ");
+          chapName = MBridge.stringParse("Vol.$volume ", 0);
         }
       }
       final chapter = MBridge.getMapValue(data, "chapter", 0);
@@ -84,7 +86,7 @@ MangaModel getChapters(
       } else {
         if (chapter == "null") {
         } else {
-          chapName += MBridge.stringParse("Ch.$chapter ");
+          chapName += MBridge.stringParse("Ch.$chapter ", 0);
         }
       }
       final title = MBridge.getMapValue(data, "title", 0);
@@ -94,13 +96,13 @@ MangaModel getChapters(
         } else {
           if (chapName.isEmpty) {
           } else {
-            chapName += MBridge.stringParse("- ");
+            chapName += MBridge.stringParse("- ", 0);
           }
-          chapName += MBridge.stringParse("$title");
+          chapName += MBridge.stringParse("$title", 0);
         }
       }
       if (chapName.isEmpty) {
-        chapName += MBridge.stringParse("Oneshot");
+        chapName += MBridge.stringParse("Oneshot", 0);
       }
       final date = MBridge.getMapValue(data, "publishAt", 0);
       final id = MBridge.getMapValue(res, "id", 0);
@@ -261,7 +263,7 @@ getLatestUpdatesManga(MangaModel manga) async {
       MBridge.jsonPathToString(ress, r'$.data[*].relationships[*].id', '.--')
           .split('.--'),
       3);
-  String mangaa = MBridge.stringParse("");
+  String mangaa = MBridge.stringParse("", 0);
   for (var id in mangaIds) {
     mangaa += "&ids[]=$id";
   }
@@ -383,7 +385,7 @@ String getCover(String dataRes, int mangaIndex, String mangaId) {
       MBridge.jsonPathToString(dataRes, expressionRelationAll, '_.')
           .split("_."),
       0);
-  String coverFileName = MBridge.stringParse("");
+  String coverFileName = MBridge.stringParse("", 0);
   for (var j = 0; j < relationDatas.length; j++) {
     final expressionData = MBridge.regExp(
         r'$.data[a].relationships[b]', r'\[a\]', "[$mangaIndex]", 0, 1);

@@ -164,7 +164,7 @@ getChapterUrl(MangaModel manga) async {
     for (int i = 1; i <= manga.status; i++) {
       String pageLink =
           "$pageBase/chapterfun.ashx?cid=$chapterId&page=$i&key=$secretKey";
-      String responseText = MBridge.stringParse("");
+      String responseText = MBridge.stringParse("", 0);
       for (int tr = 1; tr <= 3; tr++) {
         if (responseText.isEmpty) {
           final headers = {
@@ -177,7 +177,7 @@ getChapterUrl(MangaModel manga) async {
           };
           final data = {"url": pageLink, "headers": headers};
           final response = await MBridge.http(json.encode(data), 0);
-          responseText = MBridge.stringParse(response);
+          responseText = MBridge.stringParse(response, 0);
 
           if (responseText.isEmpty) {
             secretKey = "";
