@@ -2,25 +2,30 @@ import 'dart:convert';
 import 'package:bridge_lib/bridge_lib.dart';
 
 getPopularAnime(MangaModel anime) async {
-  return await getLatestUpdatesManga(anime);
+  return await getLatestUpdatesAnime(anime);
 }
 
-Future<MangaModel> getLatestUpdatesManga(MangaModel anime) async {
+Future<MangaModel> getLatestUpdatesAnime(MangaModel anime) async {
   final data = {
     "url": anime.baseUrl,
-    "headers": {"Referer": "https://wcostream.org/"},
+    "headers": {"referer": "https://wcostream.org/"},
     "sourceId": anime.sourceId
   };
   final res = await MBridge.http(json.encode(data), 0);
   if (res.isEmpty) {
     return anime;
   }
-  anime.urls = MBridge.xpath(
+  final urlss = MBridge.xpath(
           res,
-          '//*[@id="content"]/div/div[contains(text(),"Recent Releases")]/div/ul/li/div[@class="img"]/a/@href',
+          '//*[@id="content"]/div/div[contains(text(),"Recent Releases")]/div/ul/li/div[@class="img"]/a/img/@alt',
           '._')
       .split('._');
-
+  List<String> urls = [];
+  for (var url in MBridge.listParse(urlss, 0)) {
+    urls.add(
+        "/anime/${MBridge.regExp(url, "[^A-Za-z0-9 ]", "", 0, 0).replaceAll(" ", "-").toLowerCase()}/");
+  }
+  anime.urls = urls;
   final imagess = MBridge.xpath(
           res,
           '//*[@id="content"]/div/div[contains(text(),"Recent Releases")]/div/ul/li/div[@class="img"]/a/img/@src',
