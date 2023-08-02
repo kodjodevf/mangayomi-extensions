@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'package:bridge_lib/bridge_lib.dart';
 
 getPopularAnime(MangaModel anime) async {
-  return await getLatestUpdatesAnime(anime);
+  return await getLatestUpdatesManga(anime);
 }
 
-Future<MangaModel> getLatestUpdatesAnime(MangaModel anime) async {
+Future<MangaModel> getLatestUpdatesManga(MangaModel anime) async {
   final data = {
     "url": anime.baseUrl,
     "headers": {"Referer": "https://wcostream.org/"},
