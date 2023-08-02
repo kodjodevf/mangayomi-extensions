@@ -7,7 +7,7 @@ getPopularAnime(MangaModel anime) async {
 
 Future<MangaModel> getLatestUpdatesAnime(MangaModel anime) async {
   final data = {
-    "url": "https://www.wcostream.org",
+    "url": anime.baseUrl,
     "headers": {"Referer": "https://wcostream.org/"},
     "sourceId": anime.sourceId
   };
@@ -50,7 +50,7 @@ String fixUrl(String url) {
 }
 
 getAnimeDetail(MangaModel anime) async {
-  final url = 'https://www.wcostream.org${anime.link}';
+  final url = '${anime.baseUrl}${anime.link}';
   print(url);
   final data = {
     "url": url,
@@ -88,9 +88,9 @@ getAnimeDetail(MangaModel anime) async {
 
 searchAnime(MangaModel anime) async {
   final data = {
-    "url": "https://www.wcostream.org/search",
+    "url": "${anime.baseUrl}/search",
     "fields": {'catara': anime.query.replaceAll(" ", "+"), 'konuara': 'series'},
-    "headers": {"Referer": "https://www.wcostream.org/"},
+    "headers": {"Referer": "${anime.baseUrl}/"},
     "sourceId": anime.sourceId
   };
   final res = await MBridge.httpMultiparFormData(json.encode(data), 1);
@@ -154,7 +154,7 @@ getVideoList(MangaModel anime) async {
         'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
     'Connection': 'keep-alive',
     'Host': MBridge.listParse(iframeUrl.split('/'), 0)[2],
-    'Referer': 'https://www.wcostream.org/',
+    'Referer': '${anime.baseUrl}/',
     'Sec-Fetch-Dest': 'iframe',
     'Sec-Fetch-Mode': 'navigate',
     'Sec-Fetch-Site': 'cross-site',
