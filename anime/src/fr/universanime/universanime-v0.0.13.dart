@@ -23,6 +23,7 @@ getVideoList(MangaModel anime) async {
     print(url);
     List<VideoModel> a = [];
     if (url.startsWith("https://filemoon.")) {
+      a = await MBridge.filemoonExtractor(url, "");
     } else if (url.startsWith("https://doodstream.")) {
       a = await MBridge.doodExtractor(url);
     } else if (url.startsWith("https://streamtape.")) {
@@ -36,7 +37,7 @@ getVideoList(MangaModel anime) async {
   return videos;
 }
 
-getLatestUpdatesAnime(MangaModel anime) async {
+Future<MangaModel> getLatestUpdatesAnime(MangaModel anime) async {
   final data = {
     "url": "${anime.baseUrl}/page/${anime.page}/",
     "headers": null,
@@ -93,30 +94,7 @@ getAnimeDetail(MangaModel anime) async {
 }
 
 getPopularAnime(MangaModel anime) async {
-  final data = {
-    "url": "${anime.baseUrl}/liste-des-animes-2/",
-    "headers": null,
-    "sourceId": anime.sourceId
-  };
-  final res = await MBridge.http(json.encode(data), 0);
-  if (res.isEmpty) {
-    return anime;
-  }
-  anime.urls = MBridge.xpath(
-          res,
-          '//*[@class="lcp_catlist" and contains(@id,"lcp_instance_")]/li/a/@href',
-          '._')
-      .split('._');
-
-  anime.names = MBridge.xpath(
-          res,
-          '//*[@class="lcp_catlist" and contains(@id,"lcp_instance_")]/li/a/text()',
-          '._')
-      .split('._');
-
-  anime.images = [];
-
-  return anime;
+  return await getLatestUpdatesAnime(anime);
 }
 
 searchAnime(MangaModel anime) async {
