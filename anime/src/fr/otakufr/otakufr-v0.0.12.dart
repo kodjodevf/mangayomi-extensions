@@ -13,15 +13,15 @@ getPopularAnime(MangaModel anime) async {
   }
 
   anime.urls = MBridge.xpath(
-          res, '//*[@class="list"]/article/div/div/figure/a/@href', '._')
-      .split('._');
+          res, '//*[@class="list"]/article/div/div/figure/a/@href', '._.._.._')
+      .split('._.._.._');
 
-  anime.names = MBridge.xpath(
-          res, '//*[@class="list"]/article/div/div/figure/a/img/@title', '._')
-      .split('._');
-  anime.images = MBridge.xpath(
-          res, '//*[@class="list"]/article/div/div/figure/a/img/@src', '._')
-      .split('._');
+  anime.names = MBridge.xpath(res,
+          '//*[@class="list"]/article/div/div/figure/a/img/@title', '._.._.._')
+      .split('._.._.._');
+  anime.images = MBridge.xpath(res,
+          '//*[@class="list"]/article/div/div/figure/a/img/@src', '._.._.._')
+      .split('._.._.._');
   final nextPage = MBridge.xpath(res, '//a[@class="next page-link"]/@href', '');
   if (nextPage.isEmpty) {
     anime.hasNextPage = false;
@@ -43,10 +43,11 @@ getLatestUpdatesAnime(MangaModel anime) async {
   }
 
   anime.urls =
-      MBridge.xpath(res, '//*[@class="episode"]/div/a/@href', '._').split('._');
+      MBridge.xpath(res, '//*[@class="episode"]/div/a/@href', '._.._.._')
+          .split('._.._.._');
   List<String> namess =
-      MBridge.xpath(res, '//*[@class="episode"]/div/a/text()', '._')
-          .split('._');
+      MBridge.xpath(res, '//*[@class="episode"]/div/a/text()', '._.._.._')
+          .split('._.._.._');
   List<String> names = [];
   for (var name in MBridge.listParse(namess, 0)) {
     names.add(MBridge.regExp(
@@ -67,9 +68,11 @@ getLatestUpdatesAnime(MangaModel anime) async {
         .replaceAll(' (Vostfr)', ''));
   }
   anime.names = names;
-  anime.images =
-      MBridge.xpath(res, '//*[@class="episode"]/div/figure/a/img/@src', '._')
-          .split('._');
+  anime.images = MBridge.xpath(
+          res,
+          '//*[@class="episode"]/div/figure/a/img/@src',
+          '._.._.._.._.._.._.._.._.._')
+      .split('._.._.._.._.._.._.._.._.._');
   final nextPage = MBridge.xpath(res, '//a[@class="next page-link"]/@href', '');
   if (nextPage.isEmpty) {
     anime.hasNextPage = false;
@@ -115,18 +118,18 @@ getAnimeDetail(MangaModel anime) async {
   anime.genre = MBridge.xpath(
           res,
           '//*[@class="list-unstyled"]/li[contains(text(),"Genre")]/ul/li/a/text()',
-          '._')
-      .split('._');
+          '._.._.._')
+      .split('._.._.._');
 
-  anime.urls =
-      MBridge.xpath(res, '//*[@class="list-episodes list-group"]/a/@href', '._')
-          .split("._");
-  List<String> dates = MBridge.xpath(
-          res, '//*[@class="list-episodes list-group"]/a/span/text()', '._')
-      .split("._");
+  anime.urls = MBridge.xpath(
+          res, '//*[@class="list-episodes list-group"]/a/@href', '._.._.._')
+      .split("._.._.._");
+  List<String> dates = MBridge.xpath(res,
+          '//*[@class="list-episodes list-group"]/a/span/text()', '._.._.._')
+      .split("._.._.._");
   List<String> names = MBridge.xpath(
-          res, '//*[@class="list-episodes list-group"]/a/text()', '._')
-      .split("._");
+          res, '//*[@class="list-episodes list-group"]/a/text()', '._.._.._')
+      .split("._.._.._");
 
   List<String> episodes = [];
   for (var i = 0; i < names.length; i++) {
@@ -135,7 +138,6 @@ getAnimeDetail(MangaModel anime) async {
     episodes.add(
         "Episode ${MBridge.regExp(name.replaceAll(date, ""), r".* (\d*) [VvfF]{1,1}", '', 1, 1)}");
   }
-  print(episodes);
   anime.names = episodes;
   anime.chaptersDateUploads = MBridge.listParse(
       MBridge.listParseDateTime(dates, "dd MMMM yyyy", "fr"), 0);
@@ -155,15 +157,15 @@ searchAnime(MangaModel anime) async {
   }
 
   anime.urls = MBridge.xpath(
-          res, '//*[@class="list"]/article/div/div/figure/a/@href', '._')
-      .split('._');
+          res, '//*[@class="list"]/article/div/div/figure/a/@href', '._.._.._')
+      .split('._.._.._');
 
-  anime.names = MBridge.xpath(
-          res, '//*[@class="list"]/article/div/div/figure/a/img/@title', '._')
-      .split('._');
-  anime.images = MBridge.xpath(
-          res, '//*[@class="list"]/article/div/div/figure/a/img/@src', '._')
-      .split('._');
+  anime.names = MBridge.xpath(res,
+          '//*[@class="list"]/article/div/div/figure/a/img/@title', '._.._.._')
+      .split('._.._.._');
+  anime.images = MBridge.xpath(res,
+          '//*[@class="list"]/article/div/div/figure/a/img/@src', '._.._.._')
+      .split('._.._.._');
   final nextPage = MBridge.xpath(res, '//a[@class="next page-link"]/@href', '');
   if (nextPage.isEmpty) {
     anime.hasNextPage = false;
@@ -209,9 +211,7 @@ getVideoList(MangaModel anime) async {
     } else if (serverUrl.contains("https://voe.sx")) {
       a = await MBridge.voeExtractor(serverUrl, null);
     } else if (serverUrl.contains("https://ok.ru")) {
-      a = await MBridge.okruExtractor(
-        serverUrl,
-      );
+      a = await MBridge.okruExtractor(serverUrl);
     }
     for (var vi in a) {
       videos.add(vi);
