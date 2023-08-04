@@ -160,12 +160,12 @@ getMangaDetail(MangaModel manga) async {
     chapterTitles.add(chapterName);
     chapterDates.add(createdAt);
   }
-  manga.urls = chapterUrls;
-  manga.names = chapterTitles;
+  manga.urls = MBridge.listParse(chapterUrls,5);
+  manga.names = MBridge.listParse(chapterTitles,5);
   manga.chaptersDateUploads = MBridge.listParse(
       MBridge.listParseDateTime(
           chapterDates, manga.dateFormat, manga.dateFormatLocale),
-      0);
+      5);
   return manga;
 }
 
