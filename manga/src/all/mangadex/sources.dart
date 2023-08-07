@@ -8,7 +8,7 @@ const isNsfw = true;
 const mangadexVersion = "0.0.11";
 const mangadexSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/src/all/mangadex/mangadex-v$mangadexVersion.dart";
-const iconUrl = '';
+const iconUrl = 'https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/icon/mangayomi-all-mangadex.png';
 List<Source> get mangaDexSourcesList => _mangaDexSourcesList;
 List<Source> _mangaDexSourcesList = [
   Source(

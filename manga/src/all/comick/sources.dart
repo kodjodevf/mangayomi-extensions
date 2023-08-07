@@ -9,7 +9,7 @@ const defaultDateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 const defaultDateFormatLocale = "en";
 
 const iconUrl =
-    'https://comick.app/_next/image?url=%2Fstatic%2Ficons%2Funicorn-64.png&w=144&q=75';
+    'https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/icon/mangayomi-all-comickfun.png';
 const apiUrl = 'https://api.comick.fun';
 const baseUrl = 'https://comick.app';
 const isNsfw = true;
