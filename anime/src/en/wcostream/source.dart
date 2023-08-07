@@ -9,7 +9,7 @@ Source _wcostreamSource = Source(
     baseUrl: "https://www.wcostream.org",
     lang: "en",
     typeSource: "single",
-    iconUrl: '',
+    iconUrl: 'https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/icon/mangayomi-en-wcostream.png',
     sourceCodeUrl: wcostreamSourceCodeUrl,
     version: wcostreamVersion,
     isManga: false,

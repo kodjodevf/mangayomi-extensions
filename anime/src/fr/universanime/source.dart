@@ -9,7 +9,8 @@ Source _universanimeSource = Source(
     baseUrl: "https://www.universanime.co",
     lang: "fr",
     typeSource: "single",
-    iconUrl: '',
+    iconUrl:
+        'https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/icon/mangayomi-fr-universanime.png',
     sourceCodeUrl: universanimeSourceCodeUrl,
     version: universanimeVersion,
     isManga: false,

@@ -9,7 +9,8 @@ Source _otakufr = Source(
     baseUrl: "https://otakufr.co",
     lang: "fr",
     typeSource: "single",
-    iconUrl: '',
+    iconUrl:
+        'https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/icon/mangayomi-fr-otakufr.png',
     sourceCodeUrl: otakufrCodeUrl,
     version: otakufrVersion,
     isManga: false,
