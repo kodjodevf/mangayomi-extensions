@@ -9,7 +9,7 @@ Source _gogoanimeSource = Source(
     baseUrl: "https://gogoanime.tel",
     lang: "en",
     typeSource: "single",
-    iconUrl: '',
+    iconUrl: 'https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/icon/mangayomi-en-gogoanime.png',
     sourceCodeUrl: gogoanimeSourceCodeUrl,
     version: gogoanimeVersion,
     isManga: false);

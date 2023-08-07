@@ -10,7 +10,8 @@ Source _franimeSource = Source(
     apiUrl: "https://api.franime.fr",
     lang: "fr",
     typeSource: "single",
-    iconUrl: '',
+    iconUrl:
+        'https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/icon/mangayomi-fr-franime.png',
     sourceCodeUrl: franimeSourceCodeUrl,
     version: franimeVersion,
     isManga: false,

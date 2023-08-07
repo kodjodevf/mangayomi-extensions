@@ -206,7 +206,7 @@ getVideoList(MangaModel anime) async {
       a = await MBridge.streamWishExtractor(serverUrl, "StreamWish");
     } else if (serverUrl.contains("sibnet")) {
       a = await MBridge.sibnetExtractor(serverUrl);
-    } else if (serverUrl.contains("dooood")) {
+    } else if (serverUrl.contains("https://doo")) {
       a = await MBridge.doodExtractor(serverUrl);
     } else if (serverUrl.contains("https://voe.sx")) {
       a = await MBridge.voeExtractor(serverUrl, null);

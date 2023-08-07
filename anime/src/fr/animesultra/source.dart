@@ -9,7 +9,7 @@ Source _animesultraSource = Source(
     baseUrl: "https://ww.animesultra.net",
     lang: "fr",
     typeSource: "single",
-    iconUrl: '',
+    iconUrl: 'https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/icon/mangayomi-fr-animesultra.png',
     sourceCodeUrl: animesultraSourceCodeUrl,
     version: animesultraVersion,
     isManga: false,
