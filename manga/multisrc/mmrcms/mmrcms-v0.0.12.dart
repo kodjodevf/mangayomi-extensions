@@ -15,9 +15,10 @@ searchManga(MangaModel manga) async {
   for (var da in jsonList) {
     final value = MBridge.getMapValue(da, "value", 0);
     final data = MBridge.getMapValue(da, "data", 0);
-
     if (manga.source == 'Scan VF') {
       urls.add('${manga.baseUrl}/$data');
+    } else if (manga.source == 'Manga-FR') {
+      urls.add('${manga.baseUrl}/lecture-en-ligne/$data');
     } else {
       urls.add('${manga.baseUrl}/manga/$data');
     }

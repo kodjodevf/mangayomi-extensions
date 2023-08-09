@@ -1,6 +1,6 @@
 import '../../../model/source.dart';
 
-const mmrcmsVersion = "0.0.11";
+const mmrcmsVersion = "0.0.12";
 const mmrcmsSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/mmrcms/mmrcms-v$mmrcmsVersion.dart";
 const defaultDateFormat = "d MMM. yyyy";
@@ -13,7 +13,7 @@ List<Source> _mmrcmsSourcesList = [
     baseUrl: "https://www.scan-vf.net",
     lang: "fr",
     typeSource: "mmrcms",
-    iconUrl: '',
+    iconUrl: 'https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/icon/mangayomi-fr-scanvf.png',
     dateFormat: defaultDateFormat,
     dateFormatLocale: defaultDateFormatLocale,
     version: mmrcmsVersion,
@@ -24,7 +24,7 @@ List<Source> _mmrcmsSourcesList = [
     baseUrl: "https://www.komikid.com",
     lang: "id",
     typeSource: "mmrcms",
-    iconUrl: '',
+    iconUrl: 'https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/icon/mangayomi-id-komikid.png',
     dateFormat: defaultDateFormat,
     dateFormatLocale: defaultDateFormatLocale,
     version: mmrcmsVersion,
@@ -35,7 +35,7 @@ List<Source> _mmrcmsSourcesList = [
     baseUrl: "https://mangaid.click",
     lang: "id",
     typeSource: "mmrcms",
-    iconUrl: '',
+    iconUrl: 'https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/icon/mangayomi-id-mangaid.png',
     dateFormat: defaultDateFormat,
     dateFormatLocale: defaultDateFormatLocale,
     version: mmrcmsVersion,
@@ -46,7 +46,7 @@ List<Source> _mmrcmsSourcesList = [
     baseUrl: "https://jpmangas.cc",
     lang: "fr",
     typeSource: "mmrcms",
-    iconUrl: '',
+    iconUrl: 'https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/icon/mangayomi-fr-jpmangas.png',
     dateFormat: defaultDateFormat,
     dateFormatLocale: defaultDateFormatLocale,
     version: mmrcmsVersion,
@@ -58,7 +58,7 @@ List<Source> _mmrcmsSourcesList = [
     baseUrl: "https://onma.top",
     lang: "ar",
     typeSource: "mmrcms",
-    iconUrl: '',
+    iconUrl: 'https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/icon/mangayomi-ar-onma.png',
     dateFormat: defaultDateFormat,
     dateFormatLocale: defaultDateFormatLocale,
     version: mmrcmsVersion,
@@ -69,7 +69,7 @@ List<Source> _mmrcmsSourcesList = [
     baseUrl: "https://readcomicsonline.ru",
     lang: "en",
     typeSource: "mmrcms",
-    iconUrl: '',
+    iconUrl: 'https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/icon/mangayomi-en-readcomicsonline.png',
     dateFormat: defaultDateFormat,
     dateFormatLocale: defaultDateFormatLocale,
     version: mmrcmsVersion,
@@ -80,7 +80,7 @@ List<Source> _mmrcmsSourcesList = [
     baseUrl: "https://www.lelscanvf.cc/",
     lang: "fr",
     typeSource: "mmrcms",
-    iconUrl: '',
+    iconUrl: 'https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/icon/mangayomi-fr-lelscanvf.png',
     dateFormat: defaultDateFormat,
     dateFormatLocale: defaultDateFormatLocale,
     version: mmrcmsVersion,
@@ -92,7 +92,7 @@ List<Source> _mmrcmsSourcesList = [
     baseUrl: "https://manga-fr.me",
     lang: "fr",
     typeSource: "mmrcms",
-    iconUrl: '',
+    iconUrl: 'https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/icon/mangayomi-fr-mangafr.png',
     dateFormat: defaultDateFormat,
     dateFormatLocale: defaultDateFormatLocale,
     version: mmrcmsVersion,
