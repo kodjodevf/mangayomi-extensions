@@ -25,7 +25,7 @@ void main() {
       _sourcesList.map((source) => source.toJson()).toList();
   final jsonString = jsonEncode(jsonList);
 
-  final file = File('../index.json');
+  final file = File('index.json');
   file.writeAsStringSync(jsonString);
 
   log('JSON file created: ${file.path}');
