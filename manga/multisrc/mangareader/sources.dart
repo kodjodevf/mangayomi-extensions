@@ -1,6 +1,6 @@
 import '../../../model/source.dart';
 
-const mangareaderVersion = "0.0.15";
+const mangareaderVersion = "0.0.16";
 const mangareaderSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/mangareader/mangareader-v$mangareaderVersion.dart";
 const defaultDateFormat = "MMMM dd, yyyy";
@@ -9,7 +9,7 @@ List<Source> get mangareaderSourcesList => _mangareaderSourcesList;
 List<Source> _mangareaderSourcesList = [
   Source(
       name: "Asura Scans",
-      baseUrl: "https://www.asurascans.com",
+      baseUrl: "https://asura.nacm.xyz",
       lang: "en",
       iconUrl: '',
       dateFormat: "MMM d, yyyy",
