@@ -1,5 +1,5 @@
-
 import '../../../../model/source.dart';
+import '../../../../utils/utils.dart';
 
 const comickVersion = "0.0.11";
 const comickSourceCodeUrl =
@@ -8,8 +8,7 @@ const comickSourceCodeUrl =
 const defaultDateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 const defaultDateFormatLocale = "en";
 
-const iconUrl =
-    'https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/icon/mangayomi-all-comickfun.png';
+String iconUrl = getIconUrl("comickfun", "all");
 const apiUrl = 'https://api.comick.fun';
 const baseUrl = 'https://comick.app';
 const isNsfw = true;

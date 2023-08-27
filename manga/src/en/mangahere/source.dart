@@ -1,4 +1,5 @@
 import '../../../../model/source.dart';
+import '../../../../utils/utils.dart';
 
 Source get mangahereSource => _mangahereSource;
 const mangahereVersion = "0.0.11";
@@ -9,7 +10,7 @@ Source _mangahereSource = Source(
   baseUrl: "http://www.mangahere.cc",
   lang: "en",
   typeSource: "single",
-  iconUrl: '',
+  iconUrl: getIconUrl("mangahere", "en"),
   sourceCodeUrl: mangahereSourceCodeUrl,
   version: mangahereVersion,
   dateFormat: "MMM dd,yyyy",
