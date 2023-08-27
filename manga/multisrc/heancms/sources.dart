@@ -1,4 +1,5 @@
 import '../../../model/source.dart';
+import '../../../utils/utils.dart';
 
 const heancmsVersion = "0.0.11";
 const heancmsSourceCodeUrl =
@@ -14,7 +15,7 @@ List<Source> _heanCmsSourcesList = [
       lang: "es",
       typeSource: "heancms",
       isNsfw: true,
-      iconUrl: 'https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/icon/mangayomi-es-yugenmangas.png',
+      iconUrl: getIconUrl("yugenmangas", "es"),
       sourceCodeUrl: heancmsSourceCodeUrl,
       version: heancmsVersion,
       dateFormat: defaultDateFormat,
@@ -26,7 +27,7 @@ List<Source> _heanCmsSourcesList = [
       lang: "en",
       typeSource: "heancms",
       isNsfw: true,
-      iconUrl: 'https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/icon/mangayomi-en-omegascans.png',
+      iconUrl: getIconUrl("omegascans", "en"),
       sourceCodeUrl: heancmsSourceCodeUrl,
       version: heancmsVersion,
       dateFormat: defaultDateFormat,
