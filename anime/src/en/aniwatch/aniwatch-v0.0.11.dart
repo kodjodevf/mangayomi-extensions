@@ -3,7 +3,7 @@ import 'package:bridge_lib/bridge_lib.dart';
 
 getPopularAnime(MangaModel anime) async {
   final data = {
-    "url": "https://aniwatch.to/most-popular?page=${anime.page}",
+    "url": "${anime.baseUrl}/most-popular?page=${anime.page}",
     "headers": null,
     "sourceId": anime.sourceId
   };
@@ -17,7 +17,7 @@ getPopularAnime(MangaModel anime) async {
 
 getLatestUpdatesAnime(MangaModel anime) async {
   final data = {
-    "url": "https://aniwatch.to/top-airing?page=${anime.page}",
+    "url": "${anime.baseUrl}/top-airing?page=${anime.page}",
     "headers": null,
     "sourceId": anime.sourceId
   };
@@ -35,7 +35,7 @@ getAnimeDetail(MangaModel anime) async {
       "Finished Airing": 1,
     }
   ];
-  final url = "https://kaido.to${anime.link}";
+  final url = "${anime.baseUrl}${anime.link}";
   final data = {"url": url, "headers": null};
   final res = await MBridge.http(json.encode(data), 0);
   if (res.isEmpty) {
@@ -85,7 +85,7 @@ getAnimeDetail(MangaModel anime) async {
 
   final id = MBridge.subString(anime.link, '-', 1);
   final urlEp =
-      "https://kaido.to/ajax/${ajaxRoute('https://kaido.to')}/episode/list/$id";
+      "${anime.baseUrl}/ajax/${ajaxRoute('${anime.baseUrl}')}/episode/list/$id";
 
   final dataEp = {
     "url": urlEp,
@@ -121,7 +121,7 @@ getAnimeDetail(MangaModel anime) async {
 searchAnime(MangaModel anime) async {
   final data = {
     "url":
-        "https://aniwatch.to/search?keyword=${anime.query}&page=${anime.page}",
+        "${anime.baseUrl}/search?keyword=${anime.query}&page=${anime.page}",
     "headers": null,
     "sourceId": anime.sourceId
   };
@@ -132,13 +132,13 @@ searchAnime(MangaModel anime) async {
   return animeElementM(res, anime);
 }
 
-getVideoList(MangaModel episode) async {
-  final id = MBridge.subString(episode.link, '?ep=', 1);
+getVideoList(MangaModel anime) async {
+  final id = MBridge.subString(anime.link, '?ep=', 1);
   final datas = {
     "url":
-        "https://kaido.to/ajax${ajaxRoute('https://kaido.to')}/episode/servers?episodeId=$id",
-    "headers": {"referer": "https://kaido.to/${episode.link}"},
-    "sourceId": episode.sourceId
+        "${anime.baseUrl}/ajax${ajaxRoute('${anime.baseUrl}')}/episode/servers?episodeId=$id",
+    "headers": {"referer": "${anime.baseUrl}/${anime.link}"},
+    "sourceId": anime.sourceId
   };
 
   final res = await MBridge.http(json.encode(datas), 0);
@@ -166,9 +166,9 @@ getVideoList(MangaModel episode) async {
     final subDub = MBridge.listParse(subDubs, 0)[i].toString();
     final datasE = {
       "url":
-          "https://kaido.to/ajax${ajaxRoute('https://kaido.to')}/episode/sources?id=$id",
-      "headers": {"referer": "https://kaido.to/${episode.link}"},
-      "sourceId": episode.sourceId
+          "${anime.baseUrl}/ajax${ajaxRoute('${anime.baseUrl}')}/episode/sources?id=$id",
+      "headers": {"referer": "${anime.baseUrl}/${anime.link}"},
+      "sourceId": anime.sourceId
     };
 
     final resE = await MBridge.http(json.encode(datasE), 0);
