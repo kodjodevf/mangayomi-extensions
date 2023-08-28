@@ -1,7 +1,7 @@
 import '../../../../model/source.dart';
 
 Source get franimeSource => _franimeSource;
-const franimeVersion = "0.0.14";
+const franimeVersion = "0.0.15";
 const franimeSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/anime/src/fr/franime/franime-v$franimeVersion.dart";
 Source _franimeSource = Source(
@@ -15,4 +15,5 @@ Source _franimeSource = Source(
     sourceCodeUrl: franimeSourceCodeUrl,
     version: franimeVersion,
     isManga: false,
+    appMinVerReq: "0.0.4",
     isFullData: true);
