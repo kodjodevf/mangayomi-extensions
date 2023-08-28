@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import '../model/source.dart';
+import 'src/en/aniwatch/sources.dart';
 import 'src/en/gogoanime/source.dart';
 import 'src/en/wcostream/source.dart';
 import 'src/fr/animesultra/source.dart';
@@ -16,7 +17,8 @@ void main() {
     universanimeSource,
     otakufr,
     wcostreamSource,
-    animesultraSource
+    animesultraSource,
+    ...aniwatchSourcesList
   ];
   final List<Map<String, dynamic>> jsonList =
       _sourcesList.map((source) => source.toJson()).toList();
