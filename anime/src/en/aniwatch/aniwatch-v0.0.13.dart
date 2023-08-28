@@ -85,7 +85,7 @@ getAnimeDetail(MangaModel anime) async {
 
   final id = MBridge.subString(anime.link, '-', 1);
   final urlEp =
-      "${anime.baseUrl}/ajax/${ajaxRoute('${anime.baseUrl}')}/episode/list/$id";
+      "${anime.baseUrl}/ajax${ajaxRoute('${anime.baseUrl}')}/episode/list/$id";
 
   final dataEp = {
     "url": urlEp,
