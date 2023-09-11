@@ -119,10 +119,10 @@ List<String> languages = [
 List<Source> get batotoSourcesList => _batotoSourcesList;
 List<Source> _batotoSourcesList = languages
     .map((e) => Source(
-        name: 'Batoto',
+        name: 'Bato.to',
         baseUrl: baseUrl,
         lang: e,
-        typeSource: "batoto",
+        typeSource: "bato.to",
         iconUrl: _iconUrl,
         dateFormat: "MMM dd,yyyy",
         isNsfw: isNsfw,
