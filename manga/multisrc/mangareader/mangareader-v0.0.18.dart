@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'package:bridge_lib/bridge_lib.dart';
 
 getPopularManga(MangaModel manga) async {
-  final url = "${manga.baseUrl}/manga/?page=${manga.page}&order=popular";
+  final url =
+      "${manga.baseUrl}${getMangaUrlDirectory(manga.source)}/?page=${manga.page}&order=popular";
   final data = {"url": url, "headers": null, "sourceId": manga.sourceId};
   final res = await MBridge.http(json.encode(data), 0);
   if (res.isEmpty) {
@@ -21,7 +22,8 @@ getPopularManga(MangaModel manga) async {
 }
 
 getLatestUpdatesManga(MangaModel manga) async {
-  final url = "${manga.baseUrl}/manga/?page=${manga.page}&order=update";
+  final url =
+      "${manga.baseUrl}${getMangaUrlDirectory(manga.source)}/?page=${manga.page}&order=update";
   final data = {"url": url, "headers": null, "sourceId": manga.sourceId};
   final res = await MBridge.http(json.encode(data), 0);
   if (res.isEmpty) {
@@ -195,7 +197,7 @@ getChapterUrl(MangaModel manga) async {
   if (pages.length == 1) {
     final images =
         MBridge.regExp(res, "\"images\"\\s*:\\s*(\\[.*?])", "", 1, 1);
-    final pages = MBridge.jsonDecodeToList(images,0);
+    final pages = MBridge.jsonDecodeToList(images, 0);
     for (var page in pages) {
       pagesUrl.add(page);
     }
@@ -204,4 +206,11 @@ getChapterUrl(MangaModel manga) async {
   }
 
   return pagesUrl;
+}
+
+String getMangaUrlDirectory(String sourceName) {
+  if (sourceName == "Sushi-Scans") {
+    return "/catalogue";
+  }
+  return "/manga";
 }
