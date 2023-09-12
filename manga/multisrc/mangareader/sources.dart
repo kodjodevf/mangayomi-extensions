@@ -1,7 +1,7 @@
 import '../../../model/source.dart';
 import '../../../utils/utils.dart';
 
-const mangareaderVersion = "0.0.17";
+const mangareaderVersion = "0.0.18";
 const mangareaderSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/mangareader/mangareader-v$mangareaderVersion.dart";
 const defaultDateFormat = "MMMM dd, yyyy";
@@ -19,10 +19,11 @@ List<Source> _mangareaderSourcesList = [
       version: mangareaderVersion,
       sourceCodeUrl: mangareaderSourceCodeUrl),
   Source(
-      name: "Komik Lab",
+      id: "932554594",
+      name: "KomikLab Scans",
       baseUrl: "https://komiklab.com",
       lang: "en",
-      iconUrl: getIconUrl("komiklab", "en"),
+      iconUrl: getIconUrl("komiklab", "all"),
       dateFormat: defaultDateFormat,
       dateFormatLocale: defaultDateFormatLocale,
       version: mangareaderVersion,
@@ -324,16 +325,15 @@ List<Source> _mangareaderSourcesList = [
       dateFormatLocale: "fr",
       version: mangareaderVersion,
       sourceCodeUrl: mangareaderSourceCodeUrl),
-  // Source(
-  //     name: "Sushi-Scan",
-  //     baseUrl: "https://sushiscan.net",
-  //     lang: "fr",
-  //     iconUrl: getIconUrl("", ""),
-  //     dateFormat: defaultDateFormat,
-  //     hasCloudflare: true,
-  //     dateFormatLocale: "fr",
-  //     version: mangareaderVersion,
-  //     sourceCodeUrl: mangareaderSourceCodeUrl),
+  Source(
+      name: "Sushi-Scan",
+      baseUrl: "https://sushiscan.net",
+      lang: "fr",
+      iconUrl: getIconUrl("sushiscan", "fr"),
+      dateFormat: defaultDateFormat,
+      dateFormatLocale: "fr",
+      version: mangareaderVersion,
+      sourceCodeUrl: mangareaderSourceCodeUrl),
   Source(
       name: "Tarot Scans",
       baseUrl: "https://www.tarotscans.com",
