@@ -186,11 +186,6 @@ getChapterUrl(MangaModel manga) async {
   if (res.isEmpty) {
     return [];
   }
-  if (manga.source == "Sushi-Scan.fr") {
-    final pages = MBridge.xpath(res, '//*[@id="readerarea"]/p/img/@src', "._._")
-        .split("._._");
-    return pages;
-  }
   List<String> pagesUrl = [];
   final pages = MBridge.xpath(res, '//*[@id="readerarea"]/img/@src', "._._")
       .split("._._");
@@ -209,7 +204,7 @@ getChapterUrl(MangaModel manga) async {
 }
 
 String getMangaUrlDirectory(String sourceName) {
-  if (sourceName == "Sushi-Scans") {
+  if (sourceName == "Sushi-Scan") {
     return "/catalogue";
   }
   return "/manga";
