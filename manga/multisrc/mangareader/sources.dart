@@ -19,7 +19,7 @@ List<Source> _mangareaderSourcesList = [
       version: mangareaderVersion,
       sourceCodeUrl: mangareaderSourceCodeUrl),
   Source(
-      id: "932554594",
+      id: 932554594,
       name: "KomikLab Scans",
       baseUrl: "https://komiklab.com",
       lang: "en",
