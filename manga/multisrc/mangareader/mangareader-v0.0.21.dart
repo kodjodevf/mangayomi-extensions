@@ -156,7 +156,7 @@ getMangaDetail(MangaModel manga) async {
 
 searchManga(MangaModel manga) async {
   final url =
-      "${manga.baseUrl}/manga/?&title=${manga.query}&page=${manga.page}";
+      "${manga.baseUrl}${getMangaUrlDirectory(manga.source)}/?&title=${manga.query}&page=${manga.page}";
   final data = {"url": url, "headers": null, "sourceId": manga.sourceId};
   final res = await MBridge.http(json.encode(data), 0);
   if (res.isEmpty) {
