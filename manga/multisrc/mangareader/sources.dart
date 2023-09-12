@@ -321,7 +321,7 @@ List<Source> _mangareaderSourcesList = [
       baseUrl: "https://sushiscan.fr",
       lang: "fr",
       iconUrl: getIconUrl("sushiscans", "fr"),
-      dateFormat: defaultDateFormat,
+      dateFormat: "MMMM d, yyyy",
       dateFormatLocale: "fr",
       version: mangareaderVersion,
       sourceCodeUrl: mangareaderSourceCodeUrl),
