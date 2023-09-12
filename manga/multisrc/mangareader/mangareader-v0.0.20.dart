@@ -186,6 +186,11 @@ getChapterUrl(MangaModel manga) async {
   if (res.isEmpty) {
     return [];
   }
+  if (manga.source == "Sushi-Scans") {
+    final pages = MBridge.xpath(res, '//*[@id="readerarea"]/p/img/@src', "._._")
+        .split("._._");
+    return pages;
+  }
   List<String> pagesUrl = [];
   final pages = MBridge.xpath(res, '//*[@id="readerarea"]/img/@src', "._._")
       .split("._._");
