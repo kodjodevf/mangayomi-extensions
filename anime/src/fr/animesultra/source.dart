@@ -1,4 +1,5 @@
 import '../../../../model/source.dart';
+import '../../../../utils/utils.dart';
 
 Source get animesultraSource => _animesultraSource;
 const animesultraVersion = "0.0.1";
@@ -9,7 +10,7 @@ Source _animesultraSource = Source(
     baseUrl: "https://ww.animesultra.net",
     lang: "fr",
     typeSource: "single",
-    iconUrl: 'https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/icon/mangayomi-fr-animesultra.png',
+    iconUrl: getIconUrl("animesultra", "fr"),
     sourceCodeUrl: animesultraSourceCodeUrl,
     version: animesultraVersion,
     isManga: false,

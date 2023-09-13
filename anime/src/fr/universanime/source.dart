@@ -1,4 +1,5 @@
 import '../../../../model/source.dart';
+import '../../../../utils/utils.dart';
 
 Source get universanimeSource => _universanimeSource;
 const universanimeVersion = "0.0.13";
@@ -9,8 +10,7 @@ Source _universanimeSource = Source(
     baseUrl: "https://www.universanime.co",
     lang: "fr",
     typeSource: "single",
-    iconUrl:
-        'https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/icon/mangayomi-fr-universanime.png',
+    iconUrl: getIconUrl("universanime", "fr"),
     sourceCodeUrl: universanimeSourceCodeUrl,
     version: universanimeVersion,
     isManga: false,

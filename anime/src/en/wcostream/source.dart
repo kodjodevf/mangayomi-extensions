@@ -1,4 +1,5 @@
 import '../../../../model/source.dart';
+import '../../../../utils/utils.dart';
 
 Source get wcostreamSource => _wcostreamSource;
 const wcostreamVersion = "0.0.11";
@@ -9,7 +10,7 @@ Source _wcostreamSource = Source(
     baseUrl: "https://www.wcostream.org",
     lang: "en",
     typeSource: "single",
-    iconUrl: 'https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/icon/mangayomi-en-wcostream.png',
+    iconUrl: getIconUrl("wcostream", "en"),
     sourceCodeUrl: wcostreamSourceCodeUrl,
     version: wcostreamVersion,
     isManga: false,
