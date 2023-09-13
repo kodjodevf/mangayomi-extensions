@@ -1,4 +1,5 @@
 import '../../../../model/source.dart';
+import '../../../../utils/utils.dart';
 
 Source get franimeSource => _franimeSource;
 const franimeVersion = "0.0.15";
@@ -10,8 +11,7 @@ Source _franimeSource = Source(
     apiUrl: "https://api.franime.fr",
     lang: "fr",
     typeSource: "single",
-    iconUrl:
-        'https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/icon/mangayomi-fr-franime.png',
+    iconUrl: getIconUrl("franime", "fr"),
     sourceCodeUrl: franimeSourceCodeUrl,
     version: franimeVersion,
     isManga: false,

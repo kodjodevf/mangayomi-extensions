@@ -1,4 +1,5 @@
 import '../../../../model/source.dart';
+import '../../../../utils/utils.dart';
 
 Source get otakufr => _otakufr;
 const otakufrVersion = "0.0.12";
@@ -9,8 +10,7 @@ Source _otakufr = Source(
     baseUrl: "https://otakufr.co",
     lang: "fr",
     typeSource: "single",
-    iconUrl:
-        'https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/icon/mangayomi-fr-otakufr.png',
+    iconUrl: getIconUrl("otakufr", "fr"),
     sourceCodeUrl: otakufrCodeUrl,
     version: otakufrVersion,
     isManga: false,
