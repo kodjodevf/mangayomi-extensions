@@ -332,6 +332,7 @@ List<Source> _mangareaderSourcesList = [
       iconUrl: getIconUrl("sushiscan", "fr"),
       dateFormat: defaultDateFormat,
       dateFormatLocale: "fr",
+      hasCloudflare: true,
       version: mangareaderVersion,
       sourceCodeUrl: mangareaderSourceCodeUrl),
   Source(
