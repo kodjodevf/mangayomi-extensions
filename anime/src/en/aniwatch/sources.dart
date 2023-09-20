@@ -1,7 +1,7 @@
 import '../../../../model/source.dart';
 import '../../../../utils/utils.dart';
 
-const aniwatchVersion = "0.0.14";
+const aniwatchVersion = "0.0.15";
 const aniwatchSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/anime/src/en/aniwatch/aniwatch-v$aniwatchVersion.dart";
 
@@ -15,7 +15,7 @@ List<Source> _aniwatchSourcesList = [
       iconUrl: getIconUrl("aniwatch", "en"),
       version: aniwatchVersion,
       isManga: false,
-      appMinVerReq: "0.0.4",
+      appMinVerReq: "0.0.45",
       sourceCodeUrl: aniwatchSourceCodeUrl),
   Source(
       name: "Kaido.to",
@@ -25,6 +25,6 @@ List<Source> _aniwatchSourcesList = [
       iconUrl: getIconUrl("kaido", "en"),
       version: aniwatchVersion,
       isManga: false,
-      appMinVerReq: "0.0.4",
+      appMinVerReq: "0.0.45",
       sourceCodeUrl: aniwatchSourceCodeUrl),
 ];
