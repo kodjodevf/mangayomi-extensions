@@ -2,18 +2,24 @@ import 'dart:convert';
 import 'package:bridge_lib/bridge_lib.dart';
 
 getPopularManga(MangaModel manga) async {
-  final lang = manga.lang.replaceAll("-", "_");
   final url =
-      "${manga.baseUrl}/browse?langs=$lang&sort=views_a&page=${manga.page}";
+      "${manga.baseUrl}/browse?${lang(manga.lang)}&sort=views_a&page=${manga.page}";
   final data = {"url": url, "headers": null, "sourceId": manga.sourceId};
   final res = await MBridge.http(json.encode(data), 0);
   return mangaElementM(res, manga);
 }
 
+String lang(String lang) {
+  lang = lang.replaceAll("-", "_");
+  if (lang == "all") {
+    return "";
+  }
+  return "langs=$lang";
+}
+
 getLatestUpdatesManga(MangaModel manga) async {
-  final lang = manga.lang.replaceAll("-", "_");
   final url =
-      "${manga.baseUrl}/browse?langs=$lang&sort=update&page=${manga.page}";
+      "${manga.baseUrl}/browse?${lang(manga.lang)}&sort=update&page=${manga.page}";
   final data = {"url": url, "headers": null, "sourceId": manga.sourceId};
   final res = await MBridge.http(json.encode(data), 0);
   return mangaElementM(res, manga);
