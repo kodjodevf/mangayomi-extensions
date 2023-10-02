@@ -11,7 +11,7 @@ List<Source> get mangareaderSourcesList => _mangareaderSourcesList;
 List<Source> _mangareaderSourcesList = [
   Source(
       name: "Asura Scans",
-      baseUrl: "https://asura.nacm.xyz",
+      baseUrl: "https://asuratoon.com/",
       lang: "en",
       iconUrl: getIconUrl("asurascans", "en"),
       dateFormat: "MMM d, yyyy",
