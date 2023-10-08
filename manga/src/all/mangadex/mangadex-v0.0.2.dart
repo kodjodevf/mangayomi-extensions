@@ -12,7 +12,7 @@ getPopularManga(MangaModel manga) async {
   final url =
       "https://api.mangadex.org/manga?limit=20&offset=$page&availableTranslatedLanguage[]=en&includes[]=cover_art${getMDXContentRating()}&order[followedCount]=desc";
   final datas = {"url": url, "headers": null};
-  final res = await MBridge.http(json.encode(datas), 0);
+  final res = await MBridge.http('GET', json.encode(datas));
   if (res.isEmpty) {
     return manga;
   }
@@ -51,12 +51,12 @@ MangaModel getChapters(
         r'$.relationships[?@.id!="00e03853-1b96-4f41-9542-c71b8692033b"]', 0);
     String chapName = "".toString();
     for (var element in groups) {
-      final data = MBridge.getMapValue(element, "attributes", 1);
+      final data = MBridge.getMapValue(element, "attributes", encode: true);
       if (data.isEmpty) {
       } else {
-        final name = MBridge.getMapValue(data, "name", 0);
+        final name = MBridge.getMapValue(data, "name");
         scan += "$name".toString();
-        final username = MBridge.getMapValue(data, "username", 0);
+        final username = MBridge.getMapValue(data, "username");
         if (username.isEmpty) {
         } else {
           if (scan.isEmpty) {
@@ -68,11 +68,11 @@ MangaModel getChapters(
     if (scan.isEmpty) {
       scan = "No Group".toString();
     }
-    final dataRes = MBridge.getMapValue(res, "attributes", 1);
+    final dataRes = MBridge.getMapValue(res, "attributes", encode: true);
     if (dataRes.isEmpty) {
     } else {
-      final data = MBridge.getMapValue(res, "attributes", 1);
-      final volume = MBridge.getMapValue(data, "volume", 0);
+      final data = MBridge.getMapValue(res, "attributes", encode: true);
+      final volume = MBridge.getMapValue(data, "volume");
       if (volume.isEmpty) {
       } else {
         if (volume == "null") {
@@ -80,7 +80,7 @@ MangaModel getChapters(
           chapName = "Vol.$volume ".toString();
         }
       }
-      final chapter = MBridge.getMapValue(data, "chapter", 0);
+      final chapter = MBridge.getMapValue(data, "chapter");
       if (chapter.isEmpty) {
       } else {
         if (chapter == "null") {
@@ -88,7 +88,7 @@ MangaModel getChapters(
           chapName += "Ch.$chapter ".toString();
         }
       }
-      final title = MBridge.getMapValue(data, "title", 0);
+      final title = MBridge.getMapValue(data, "title");
       if (title.isEmpty) {
       } else {
         if (title == "null") {
@@ -103,8 +103,8 @@ MangaModel getChapters(
       if (chapName.isEmpty) {
         chapName += "Oneshot".toString();
       }
-      final date = MBridge.getMapValue(data, "publishAt", 0);
-      final id = MBridge.getMapValue(res, "id", 0);
+      final date = MBridge.getMapValue(data, "publishAt");
+      final id = MBridge.getMapValue(res, "id");
       chapterUrl += "._$id";
       chapDate += "._._$date";
       scanlators += "._$scan";
@@ -132,7 +132,7 @@ getMangaDetail(MangaModel manga) async {
   final url =
       "https://api.mangadex.org${manga.link}?includes[]=cover_art&includes[]=author&includes[]=artist";
   final datas = {"url": url, "headers": null};
-  final res = await MBridge.http(json.encode(datas), 0);
+  final res = await MBridge.http('GET', json.encode(datas));
   if (res.isEmpty) {
     return manga;
   }
@@ -254,7 +254,7 @@ getLatestUpdatesManga(MangaModel manga) async {
   final urll =
       "https://api.mangadex.org/chapter?limit=20&offset=$page&translatedLanguage[]=${manga.lang}&includeFutureUpdates=0&order[publishAt]=desc&includeFuturePublishAt=0&includeEmptyPages=0";
   final datas = {"url": urll, "headers": null};
-  final ress = await MBridge.http(json.encode(datas), 0);
+  final ress = await MBridge.http('GET', json.encode(datas));
   if (ress.isEmpty) {
     return manga;
   }
@@ -269,7 +269,7 @@ getLatestUpdatesManga(MangaModel manga) async {
   final newUrl =
       "https://api.mangadex.org/manga?includes[]=cover_art&limit=${mangaIds.length}${getMDXContentRating()}$mangaa";
   final datass = {"url": newUrl, "headers": null};
-  final res = await MBridge.http(json.encode(datass), 0);
+  final res = await MBridge.http('GET', json.encode(datass));
   List<String> data = MBridge.listParse(
       MBridge.jsonPathToString(res, r'$.data[*]', '_.').split("_."), 0);
   List<String> urlList = [];
@@ -293,7 +293,7 @@ searchManga(MangaModel manga) async {
   final url =
       "https://api.mangadex.org/manga?includes[]=cover_art&offset=0&limit=20&title=${manga.query}${getMDXContentRating()}&order[followedCount]=desc&availableTranslatedLanguage[]=${manga.lang}";
   final datas = {"url": url, "headers": null};
-  final res = await MBridge.http(json.encode(datas), 0);
+  final res = await MBridge.http('GET', json.encode(datas));
   if (res.isEmpty) {
     return manga;
   }
@@ -319,7 +319,7 @@ searchManga(MangaModel manga) async {
 getChapterUrl(MangaModel manga) async {
   final url = "https://api.mangadex.org/at-home/server/${manga.link}";
   final data = {"url": url, "headers": null};
-  final res = await MBridge.http(json.encode(data), 0);
+  final res = await MBridge.http('GET', json.encode(data));
   if (res.isEmpty) {
     return [];
   }
@@ -345,7 +345,7 @@ Future<String> paginatedChapterListRequest(
   final url =
       'https://api.mangadex.org/manga/$mangaId/feed?limit=500&offset=$offset&includes[]=user&includes[]=scanlation_group&order[volume]=desc&order[chapter]=desc&translatedLanguage[]=$lang&includeFuturePublishAt=0&includeEmptyPages=0${getMDXContentRating()}';
   final datas = {"url": url, "headers": null};
-  return await MBridge.http(json.encode(datas), 0);
+  return await MBridge.http('GET', json.encode(datas));
 }
 
 String findTitle(String dataRes, int mangaIndex, String lang) {

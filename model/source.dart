@@ -47,7 +47,7 @@ class Source {
       this.version = "",
       this.isManga = true,
       this.isFullData = false,
-      this.appMinVerReq = "0.0.21"});
+      this.appMinVerReq = "0.0.5"});
 
   Map<String, dynamic> toJson() {
     return {
