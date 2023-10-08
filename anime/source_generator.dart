@@ -4,7 +4,7 @@ import 'dart:io';
 import '../model/source.dart';
 import 'src/en/aniwatch/sources.dart';
 import 'src/en/gogoanime/source.dart';
-import 'src/en/wcostream/source.dart';
+// import 'src/en/wcostream/source.dart';
 import 'src/fr/animesultra/source.dart';
 import 'src/fr/franime/source.dart';
 import 'src/fr/otakufr/source.dart';
@@ -16,7 +16,7 @@ void main() {
     franimeSource,
     universanimeSource,
     otakufr,
-    wcostreamSource,
+    // wcostreamSource,
     animesultraSource,
     ...aniwatchSourcesList
   ];
