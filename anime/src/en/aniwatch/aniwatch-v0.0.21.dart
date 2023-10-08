@@ -171,13 +171,13 @@ getVideoList(MangaModel anime) async {
     List<VideoModel> a = [];
     if (name.contains("Vidstreaming")) {
       a = await MBridge.rapidCloudExtractor(url, "Vidstreaming - $subDub");
+      videos.addAll(a);
     } else if (name.contains("Vidcloud")) {
       a = await MBridge.rapidCloudExtractor(url, "Vidcloud - $subDub");
+      videos.addAll(a);
     } else if (name.contains("StreamTape")) {
       a = await MBridge.streamTapeExtractor(url, "StreamTape - $subDub");
-    }
-    for (var vi in a) {
-      videos.add(vi);
+      videos.addAll(a);
     }
   }
 
