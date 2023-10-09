@@ -59,6 +59,7 @@ getPopularManga(MangaModel manga) async {
       "sourceId": manga.sourceId,
       "body": body
     };
+
     res = await MBridge.http('POST', json.encode(data));
   } else {
     final newEndpointUrl = "${manga.apiUrl}/query";
@@ -80,7 +81,6 @@ getPopularManga(MangaModel manga) async {
     };
     print("sssssssssssssssssssss");
     res = await MBridge.http('GET', json.encode(newEndpointData));
-    print(res);
   }
   if (res.isEmpty) {
     return manga;
@@ -136,8 +136,7 @@ getLatestUpdatesManga(MangaModel manga) async {
 }
 
 getMangaDetail(MangaModel manga) async {
-  String currentSlug = manga.link.split('/').last;
-
+  String currentSlug = MBridge.substringAfterLast(manga.link, "/");
   final headers = getHeader(manga.baseUrl);
   final url = "${manga.apiUrl}/series/$currentSlug";
   final data = {"url": url, "headers": headers};
@@ -145,31 +144,39 @@ getMangaDetail(MangaModel manga) async {
   if (res.isEmpty) {
     return manga;
   }
+  print(res);
   manga.author = MBridge.getMapValue(res, "author");
 
   manga.description = MBridge.getMapValue(res, "description");
   manga.genre =
       MBridge.jsonPathToString(res, r"$.tags[*].name", "._").split("._");
-
-  var chapters = [];
-  if (!useNewQueryEndpoint(manga.source)) {
-    chapters = json.decode(res)["chapters"];
-  } else {
-    final seasons = json.decode(res)["seasons"].first;
-    chapters = seasons["chapters"];
-  }
   List<String> chapterTitles = [];
   List<String> chapterUrls = [];
   List<String> chapterDates = [];
-  for (var chapter in chapters) {
-    final chapterName = chapter["chapter_name"];
-    final chapterSlug = chapter["chapter_slug"];
-    final chapterId = chapter["id"];
-    final createdAt = chapter["created_at"];
-    chapterUrls.add("/series/$currentSlug/$chapterSlug#$chapterId");
-    chapterTitles.add(chapterName);
-    chapterDates.add(createdAt);
+
+  if (!useNewQueryEndpoint(manga.source)) {
+    for (var chapter in json.decode(res)["chapters"]) {
+      final chapterName = chapter["chapter_name"];
+      final chapterSlug = chapter["chapter_slug"];
+      final chapterId = chapter["id"];
+      final createdAt = chapter["created_at"];
+      chapterUrls.add("/series/$currentSlug/$chapterSlug#$chapterId");
+      chapterTitles.add(chapterName);
+      chapterDates.add(createdAt);
+    }
+  } else {
+    final seasons = json.decode(res)["seasons"].first;
+    for (var chapter in seasons["chapters"]) {
+      final chapterName = chapter["chapter_name"];
+      final chapterSlug = chapter["chapter_slug"];
+      final chapterId = chapter["id"];
+      final createdAt = chapter["created_at"];
+      chapterUrls.add("/series/$currentSlug/$chapterSlug#$chapterId");
+      chapterTitles.add(chapterName);
+      chapterDates.add(createdAt);
+    }
   }
+
   if (!useNewQueryEndpoint(manga.source)) {
     manga.urls = chapterUrls.reversed.toList();
     manga.names = chapterTitles.reversed.toList();
@@ -244,31 +251,41 @@ bool useNewQueryEndpoint(String sourceName) {
 }
 
 bool useslugStrategy(String sourceName) {
-  List<String> sources = ["YugenMangas", "Reaper Scans"];
+  List<String> sources = ["YugenMangas", "Reaper Scans", "Perf Scan"];
   return sources.contains(sourceName);
 }
 
 MangaModel mangaModelRes(String res, MangaModel manga) {
-  var jsonList = [];
   List<String> names = [];
   List<String> urls = [];
   List<String> images = [];
+
   if (res.startsWith("{")) {
-    jsonList = json.decode(res)["data"];
-  } else {
-    jsonList = json.decode(res);
-  }
-  for (var a in jsonList) {
-    String thumbnail = a["thumbnail"];
-    if (thumbnail.startsWith("https://")) {
-      images.add(thumbnail);
-    } else {
-      images.add("${manga.apiUrl}/cover/$thumbnail");
+    for (var a in json.decode(res)["data"]) {
+      String thumbnail = a["thumbnail"];
+      if (thumbnail.startsWith("https://")) {
+        images.add(thumbnail);
+      } else {
+        images.add("${manga.apiUrl}/cover/$thumbnail");
+      }
+      names.add(a["title"]);
+      final seriesSlug = MBridge.regExp(a["series_slug"], "-\\d+", "", 0, 0);
+      urls.add("/series/$seriesSlug");
     }
-    names.add(a["title"]);
-    final seriesSlug = MBridge.regExp(a["series_slug"], "-\\d+", "", 0, 0);
-    urls.add("/series/$seriesSlug");
+  } else {
+    for (var a in json.decode(res)) {
+      String thumbnail = a["thumbnail"];
+      if (thumbnail.startsWith("https://")) {
+        images.add(thumbnail);
+      } else {
+        images.add("${manga.apiUrl}/cover/$thumbnail");
+      }
+      names.add(a["title"]);
+      final seriesSlug = MBridge.regExp(a["series_slug"], "-\\d+", "", 0, 0);
+      urls.add("/series/$seriesSlug");
+    }
   }
+
   manga.urls = urls;
   manga.images = images;
   manga.names = names;
