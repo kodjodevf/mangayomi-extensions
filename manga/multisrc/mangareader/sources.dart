@@ -246,7 +246,7 @@ List<Source> _mangareaderSourcesList = [
   Source(
       name: "Mundo Mangá-Kun",
       baseUrl: "https://mundomangakun.com.br",
-      lang: "pt-BR",
+      lang: "pt-br",
       isNsfw: true,
       iconUrl: getIconUrl("mundomangakun", "pt"),
       dateFormat: "MMMMM dd, yyyy",
@@ -256,7 +256,7 @@ List<Source> _mangareaderSourcesList = [
   Source(
       name: "Origami Orpheans",
       baseUrl: "https://origami-orpheans.com.br",
-      lang: "pt-BR",
+      lang: "pt-br",
       iconUrl: getIconUrl("origamiorpheans", "pt"),
       dateFormat: "MMMMM dd, yyyy",
       dateFormatLocale: "pt-BR",
