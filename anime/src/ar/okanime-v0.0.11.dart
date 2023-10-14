@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:bridge_lib/bridge_lib.dart';
 
 getPopularAnime(MangaModel anime) async {
-  final data = {"url": anime.baseUrl};
+  final data = {"url": "https://www.okanime.xyz"};
   final res = await MBridge.http('GET', json.encode(data));
   if (res.isEmpty) {
     return anime;
@@ -53,7 +53,9 @@ getAnimeDetail(MangaModel anime) async {
 }
 
 getLatestUpdatesAnime(MangaModel anime) async {
-  final data = {"url": "${anime.baseUrl}/espisode-list?page=${anime.page}"};
+  final data = {
+    "url": "https://www.okanime.xyz/espisode-list?page=${anime.page}"
+  };
   final res = await MBridge.http('GET', json.encode(data));
   if (res.isEmpty) {
     return anime;
@@ -77,7 +79,7 @@ getLatestUpdatesAnime(MangaModel anime) async {
 }
 
 searchAnime(MangaModel anime) async {
-  String url = "${anime.baseUrl}/search/?s=${anime.query}";
+  String url = "https://www.okanime.xyz/search/?s=${anime.query}";
   if (anime.page > 1) {
     url += "&page=${anime.page}";
   }
@@ -106,7 +108,6 @@ searchAnime(MangaModel anime) async {
 
 getVideoList(MangaModel anime) async {
   final datas = {"url": anime.link};
-  print(anime.link);
   final res = await MBridge.http('GET', json.encode(datas));
 
   if (res.isEmpty) {
