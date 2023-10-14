@@ -159,6 +159,6 @@ bool containsVidBom(String url) {
     if (url.contains(n)) {
       return true;
     }
-    return false;
   }
+  return false;
 }
