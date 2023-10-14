@@ -129,7 +129,7 @@ getVideoList(MangaModel anime) async {
     } else if (url.contains("ok.ru")) {
       a = await MBridge.okruExtractor(url);
     } else if (url.contains("voe.sx")) {
-      a = await MBridge.voeExtractor(url, "VoeSX ($quality)");
+      a = await MBridge.voeExtractor(url, "VoeSX $quality");
     } else if (containsVidBom(url)) {
       a = await MBridge.vidBomExtractor(url);
     }
