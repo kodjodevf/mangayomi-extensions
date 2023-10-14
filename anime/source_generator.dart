@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import '../model/source.dart';
-import 'src/ar/source.dart';
+import 'src/ar/okanime/source.dart';
 import 'src/en/aniwatch/sources.dart';
 import 'src/en/gogoanime/source.dart';
 // import 'src/en/wcostream/source.dart';
