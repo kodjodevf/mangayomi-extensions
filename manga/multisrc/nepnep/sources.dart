@@ -18,6 +18,7 @@ List<Source> _nepnepSourcesList = [
     dateFormat: defaultDateFormat,
     dateFormatLocale: defaultDateFormatLocale,
     version: nepnepVersion,
+    appMinVerReq: "0.0.5",
     sourceCodeUrl: nepnepSourceCodeUrl,
   ),
   Source(
@@ -29,6 +30,7 @@ List<Source> _nepnepSourcesList = [
     dateFormat: defaultDateFormat,
     dateFormatLocale: defaultDateFormatLocale,
     version: nepnepVersion,
+    appMinVerReq: "0.0.5",
     sourceCodeUrl: nepnepSourceCodeUrl,
   ),
 ];
