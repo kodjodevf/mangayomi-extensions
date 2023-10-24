@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:bridge_lib/bridge_lib.dart';
 
-getPopularManga(MangaModel manga) async {
+getPopularManga(MManga manga) async {
   final data = {"url": "${manga.baseUrl}/search/"};
   final res = await MBridge.http('GET', json.encode(data));
   if (res.isEmpty) {
@@ -13,7 +13,7 @@ getPopularManga(MangaModel manga) async {
   return parseDirectory(resSort, manga);
 }
 
-getLatestUpdatesManga(MangaModel manga) async {
+getLatestUpdatesManga(MManga manga) async {
   final data = {"url": "${manga.baseUrl}/search/"};
   final res = await MBridge.http('GET', json.encode(data));
   if (res.isEmpty) {
@@ -25,7 +25,7 @@ getLatestUpdatesManga(MangaModel manga) async {
   return parseDirectory(resSort, manga);
 }
 
-searchManga(MangaModel manga) async {
+searchManga(MManga manga) async {
   final data = {"url": "${manga.baseUrl}/search/"};
   final res = await MBridge.http('GET', json.encode(data));
   if (res.isEmpty) {
@@ -45,7 +45,7 @@ searchManga(MangaModel manga) async {
   return parseDirectory(json.encode(queryRes), manga);
 }
 
-getMangaDetail(MangaModel manga) async {
+getMangaDetail(MManga manga) async {
   final statusList = [
     {"Ongoing": 0, "Completed": 1, "Cancelled": 3, "Hiatus": 2}
   ];
@@ -94,7 +94,7 @@ getMangaDetail(MangaModel manga) async {
   return manga;
 }
 
-getChapterUrl(MangaModel manga) async {
+getChapterPages(MManga manga) async {
   final headers = getHeader(manga.baseUrl);
   final url = '${manga.baseUrl}${manga.link}';
   List<String> pages = [];
@@ -164,7 +164,7 @@ String directoryFromDocument(String res) {
       .replaceAll(";", " ");
 }
 
-MangaModel parseDirectory(String resSort, MangaModel manga) {
+MManga parseDirectory(String resSort, MManga manga) {
   final datas = json.decode(resSort) as List;
   manga.names = datas.map((e) => e["s"]).toList();
   manga.images = datas

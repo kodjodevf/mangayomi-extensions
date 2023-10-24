@@ -5,20 +5,16 @@ import '../model/source.dart';
 import 'src/ar/okanime/source.dart';
 import 'src/en/aniwatch/sources.dart';
 import 'src/en/gogoanime/source.dart';
-// import 'src/en/wcostream/source.dart';
 import 'src/en/kisskh/source.dart';
 import 'src/fr/animesultra/source.dart';
 import 'src/fr/franime/source.dart';
 import 'src/fr/otakufr/source.dart';
-import 'src/fr/universanime/source.dart';
 
 void main() {
   List<Source> _sourcesList = [
     gogoanimeSource,
     franimeSource,
-    universanimeSource,
     otakufr,
-    // wcostreamSource,
     animesultraSource,
     ...aniwatchSourcesList,
     kisskhSource,

@@ -1,26 +1,21 @@
 import 'dart:convert';
 import 'package:bridge_lib/bridge_lib.dart';
 
-getPopularAnime(MangaModel anime) async {
+getPopularAnime(MManga anime) async {
   final data = {"url": "${anime.baseUrl}/most-popular?page=${anime.page}"};
   final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return anime;
-  }
 
   return animeElementM(res, anime);
 }
 
-getLatestUpdatesAnime(MangaModel anime) async {
+getLatestUpdatesAnime(MManga anime) async {
   final data = {"url": "${anime.baseUrl}/top-airing?page=${anime.page}"};
   final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return anime;
-  }
+
   return animeElementM(res, anime);
 }
 
-getAnimeDetail(MangaModel anime) async {
+getAnimeDetail(MManga anime) async {
   final statusList = [
     {
       "Currently Airing": 0,
@@ -107,18 +102,16 @@ getAnimeDetail(MangaModel anime) async {
   return anime;
 }
 
-searchAnime(MangaModel anime) async {
+searchAnime(MManga anime) async {
   final data = {
     "url": "${anime.baseUrl}/search?keyword=${anime.query}&page=${anime.page}"
   };
   final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return anime;
-  }
+
   return animeElementM(res, anime);
 }
 
-getVideoList(MangaModel anime) async {
+getVideoList(MManga anime) async {
   final id = MBridge.substringAfterLast(anime.link, '?ep=');
   final datas = {
     "url":
@@ -152,7 +145,7 @@ getVideoList(MangaModel anime) async {
       attributes: "data-type",
       typeRegExp: 0);
 
-  List<VideoModel> videos = [];
+  List<MVideo> videos = [];
 
   for (var i = 0; i < names.length; i++) {
     final name = names[i];
@@ -168,7 +161,7 @@ getVideoList(MangaModel anime) async {
     String url = MBridge.substringBefore(
         MBridge.substringAfter(resE, "\"link\":\""), "\"");
     print(url);
-    List<VideoModel> a = [];
+    List<MVideo> a = [];
     if (name.contains("Vidstreaming")) {
       a = await MBridge.rapidCloudExtractor(url, "Vidstreaming - $subDub");
       videos.addAll(a);
@@ -184,7 +177,7 @@ getVideoList(MangaModel anime) async {
   return videos;
 }
 
-MangaModel animeElementM(String res, MangaModel anime) async {
+MManga animeElementM(String res, MManga anime) async {
   if (res.isEmpty) {
     return anime;
   }

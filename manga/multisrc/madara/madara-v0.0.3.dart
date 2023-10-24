@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:bridge_lib/bridge_lib.dart';
 
-getPopularManga(MangaModel manga) async {
+getPopularManga(MManga manga) async {
   final url = "${manga.baseUrl}/manga/page/${manga.page}/?m_orderby=views";
   final data = {"url": url, "sourceId": manga.sourceId};
   final res = await MBridge.http('GET', json.encode(data));
@@ -25,7 +25,7 @@ getPopularManga(MangaModel manga) async {
   return manga;
 }
 
-getMangaDetail(MangaModel manga) async {
+getMangaDetail(MManga manga) async {
   final statusList = [
     {
       "OnGoing": 0,
@@ -174,7 +174,7 @@ getMangaDetail(MangaModel manga) async {
   return manga;
 }
 
-getChapterUrl(MangaModel manga) async {
+getChapterPages(MManga manga) async {
   final datas = {"url": manga.link, "sourceId": manga.sourceId};
   final res = await MBridge.http('GET', json.encode(datas));
   if (res.isEmpty) {
@@ -222,7 +222,7 @@ getChapterUrl(MangaModel manga) async {
   return pageUrls;
 }
 
-getLatestUpdatesManga(MangaModel manga) async {
+getLatestUpdatesManga(MManga manga) async {
   final url = "${manga.baseUrl}/manga/page/${manga.page}/?m_orderby=latest";
   final datas = {"url": url, "sourceId": manga.sourceId};
   final res = await MBridge.http('GET', json.encode(datas));
@@ -245,7 +245,7 @@ getLatestUpdatesManga(MangaModel manga) async {
   return manga;
 }
 
-searchManga(MangaModel manga) async {
+searchManga(MManga manga) async {
   final urll = "${manga.baseUrl}/?s=${manga.query}&post_type=wp-manga";
   final datas = {"url": urll, "sourceId": manga.sourceId};
   final res = await MBridge.http('GET', json.encode(datas));
