@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:bridge_lib/bridge_lib.dart';
 
-getPopularAnime(MangaModel anime) async {
+getPopularAnime(MManga anime) async {
   final data = {
     "url":
         "${anime.baseUrl}/api/DramaList/List?page=${anime.page}&type=0&sub=0&country=0&status=0&order=1&pageSize=40"
@@ -24,7 +24,7 @@ getPopularAnime(MangaModel anime) async {
   return anime;
 }
 
-getLatestUpdatesAnime(MangaModel anime) async {
+getLatestUpdatesAnime(MManga anime) async {
   final data = {
     "url":
         "${anime.baseUrl}/api/DramaList/List?page=${anime.page}&type=0&sub=0&country=0&status=0&order=12&pageSize=40"
@@ -48,7 +48,7 @@ getLatestUpdatesAnime(MangaModel anime) async {
   return anime;
 }
 
-getAnimeDetail(MangaModel anime) async {
+getAnimeDetail(MManga anime) async {
   final statusList = [
     {
       "Ongoing": 0,
@@ -72,10 +72,10 @@ getAnimeDetail(MangaModel anime) async {
   final episodesCount = jsonRes["episodesCount"] as int;
   List<String> episodesNames = [];
   List<String> episodesUrls = [];
-  bool containsAnime = type.contains("Anime") as bool;
-  bool containsTVSeries = type.contains("TVSeries") as bool;
-  bool containsHollywood = type.contains("Hollywood") as bool;
-  bool containsMovie = type.contains("Movie") as bool;
+  final containsAnime = type.contains("Anime") as bool;
+  final containsTVSeries = type.contains("TVSeries") as bool;
+  final containsHollywood = type.contains("Hollywood") as bool;
+  final containsMovie = type.contains("Movie") as bool;
   for (var a in episodes) {
     String number = (a["number"] as double).toString().replaceAll(".0", "");
     final id = a["id"];
@@ -96,7 +96,7 @@ getAnimeDetail(MangaModel anime) async {
   return anime;
 }
 
-getVideoList(MangaModel anime) async {
+getVideoList(MManga anime) async {
   final datas = {"url": anime.link};
 
   final res = await MBridge.http('GET', json.encode(datas));
@@ -111,13 +111,13 @@ getVideoList(MangaModel anime) async {
       'GET', json.encode({"url": "${anime.baseUrl}/api/Sub/$id"}));
   var jsonSubRes = json.decode(subRes);
 
-  List<TrackModel> subtitles = [];
+  List<MTrack> subtitles = [];
 
   for (var sub in jsonSubRes) {
     try {
       final subUrl = sub["src"];
       final label = sub["label"];
-      TrackModel subtitle = TrackModel();
+      MTrack subtitle = MTrack();
       subtitle
         ..label = label
         ..file = subUrl;
@@ -126,7 +126,7 @@ getVideoList(MangaModel anime) async {
   }
 
   final videoUrl = jsonRes["Video"];
-  VideoModel video = VideoModel();
+  MVideo video = MVideo();
   video
     ..url = videoUrl
     ..originalUrl = videoUrl
@@ -139,7 +139,7 @@ getVideoList(MangaModel anime) async {
   return [video];
 }
 
-searchAnime(MangaModel anime) async {
+searchAnime(MManga anime) async {
   final data = {
     "url": "${anime.baseUrl}/api/DramaList/Search?q=${anime.query}&type=0"
   };
@@ -148,11 +148,8 @@ searchAnime(MangaModel anime) async {
     return anime;
   }
   var jsonRes = json.decode(res) as List;
-
   anime.names = jsonRes.map((e) => e["title"]).toList();
-
   anime.images = jsonRes.map((e) => e["thumbnail"] ?? "").toList();
-
   anime.urls = jsonRes
       .map((e) => "${anime.baseUrl}/api/DramaList/Drama/${e["id"]}?isq=false")
       .toList();

@@ -1,7 +1,7 @@
 import '../../../model/source.dart';
 import '../../../utils/utils.dart';
 
-const heancmsVersion = "0.0.21";
+const heancmsVersion = "0.0.3";
 const heancmsSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/heancms/heancms-v$heancmsVersion.dart";
 const defaultDateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ";

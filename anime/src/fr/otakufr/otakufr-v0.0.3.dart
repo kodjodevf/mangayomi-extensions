@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:bridge_lib/bridge_lib.dart';
 
-getPopularAnime(MangaModel anime) async {
+getPopularAnime(MManga anime) async {
   final data = {
     "url": "${anime.baseUrl}/toute-la-liste-affiches/page/${anime.page}/?q=."
   };
@@ -9,10 +9,8 @@ getPopularAnime(MangaModel anime) async {
   if (res.isEmpty) {
     return anime;
   }
-
   anime.urls =
       MBridge.xpath(res, '//*[@class="list"]/article/div/div/figure/a/@href');
-
   anime.names = MBridge.xpath(
       res, '//*[@class="list"]/article/div/div/figure/a/img/@title');
   anime.images = MBridge.xpath(
@@ -26,13 +24,12 @@ getPopularAnime(MangaModel anime) async {
   return anime;
 }
 
-getLatestUpdatesAnime(MangaModel anime) async {
+getLatestUpdatesAnime(MManga anime) async {
   final data = {"url": "${anime.baseUrl}/page/${anime.page}/"};
   final res = await MBridge.http('GET', json.encode(data));
   if (res.isEmpty) {
     return anime;
   }
-
   anime.urls = MBridge.xpath(res, '//*[@class="episode"]/div/a/@href');
   final namess = MBridge.xpath(res, '//*[@class="episode"]/div/a/text()');
   List<String> names = [];
@@ -66,7 +63,7 @@ getLatestUpdatesAnime(MangaModel anime) async {
   return anime;
 }
 
-getAnimeDetail(MangaModel anime) async {
+getAnimeDetail(MManga anime) async {
   final statusList = [
     {
       "En cours": 0,
@@ -122,7 +119,7 @@ getAnimeDetail(MangaModel anime) async {
   return anime;
 }
 
-searchAnime(MangaModel anime) async {
+searchAnime(MManga anime) async {
   final data = {
     "url":
         "${anime.baseUrl}/toute-la-liste-affiches/page/${anime.page}/?q=${anime.query}"
@@ -148,7 +145,7 @@ searchAnime(MangaModel anime) async {
   return anime;
 }
 
-getVideoList(MangaModel anime) async {
+getVideoList(MManga anime) async {
   final datas = {"url": anime.link};
 
   final res = await MBridge.http('GET', json.encode(datas));
@@ -158,7 +155,7 @@ getVideoList(MangaModel anime) async {
   }
   final servers =
       MBridge.xpath(res, '//*[@id="nav-tabContent"]/div/iframe/@src');
-  List<VideoModel> videos = [];
+  List<MVideo> videos = [];
   for (var url in servers) {
     final datasServer = {
       "url": fixUrl(url),
@@ -168,7 +165,7 @@ getVideoList(MangaModel anime) async {
     final resServer = await MBridge.http('GET', json.encode(datasServer));
     final serverUrl =
         fixUrl(MBridge.regExp(resServer, r"data-url='([^']+)'", '', 1, 1));
-    List<VideoModel> a = [];
+    List<MVideo> a = [];
     if (serverUrl.contains("https://streamwish")) {
       a = await MBridge.streamWishExtractor(serverUrl, "StreamWish");
     } else if (serverUrl.contains("sibnet")) {
