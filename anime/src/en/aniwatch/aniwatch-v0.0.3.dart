@@ -1,26 +1,25 @@
 import 'dart:convert';
 import 'package:bridge_lib/bridge_lib.dart';
 
-getPopularAnime(MangaModel anime) async {
+getPopularAnime(MManga anime) async {
   final data = {"url": "${anime.baseUrl}/most-popular?page=${anime.page}"};
   final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return anime;
+  if (res.hasError) {
+    return res;
   }
-
-  return animeElementM(res, anime);
+  return animeElementM(res.body, anime);
 }
 
-getLatestUpdatesAnime(MangaModel anime) async {
+getLatestUpdatesAnime(MManga anime) async {
   final data = {"url": "${anime.baseUrl}/top-airing?page=${anime.page}"};
   final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return anime;
+  if (res.hasError) {
+    return res;
   }
-  return animeElementM(res, anime);
+  return animeElementM(res.body, anime);
 }
 
-getAnimeDetail(MangaModel anime) async {
+getAnimeDetail(MManga anime) async {
   final statusList = [
     {
       "Currently Airing": 0,
@@ -29,11 +28,11 @@ getAnimeDetail(MangaModel anime) async {
   ];
   final url = "${anime.baseUrl}${anime.link}";
   final data = {"url": url, "headers": null};
-  final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return anime;
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
-
+  String res = response.body;
   final status = MBridge.xpath(res,
           '//*[@class="anisc-info"]/div[contains(text(),"Status:")]/span[2]/text()')
       .first;
@@ -75,7 +74,7 @@ getAnimeDetail(MangaModel anime) async {
   };
   final resEp = await MBridge.http('GET', json.encode(dataEp));
 
-  final html = json.decode(resEp)["html"];
+  final html = json.decode(resEp.body)["html"];
 
   final epUrls = MBridge.querySelectorAll(html,
       selector: "a.ep-item", typeElement: 3, attributes: "href", typeRegExp: 0);
@@ -107,18 +106,18 @@ getAnimeDetail(MangaModel anime) async {
   return anime;
 }
 
-searchAnime(MangaModel anime) async {
+searchAnime(MManga anime) async {
   final data = {
     "url": "${anime.baseUrl}/search?keyword=${anime.query}&page=${anime.page}"
   };
   final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return anime;
+  if (res.hasError) {
+    return res;
   }
-  return animeElementM(res, anime);
+  return animeElementM(res.body, anime);
 }
 
-getVideoList(MangaModel anime) async {
+getVideoList(MManga anime) async {
   final id = MBridge.substringAfterLast(anime.link, '?ep=');
   final datas = {
     "url":
@@ -129,10 +128,10 @@ getVideoList(MangaModel anime) async {
 
   final res = await MBridge.http('GET', json.encode(datas));
 
-  if (res.isEmpty) {
-    return [];
+  if (res.hasError) {
+    return res;
   }
-  final html = json.decode(res)["html"];
+  final html = json.decode(res.body)["html"];
 
   final names = MBridge.querySelectorAll(html,
       selector: "div.server-item",
@@ -152,7 +151,7 @@ getVideoList(MangaModel anime) async {
       attributes: "data-type",
       typeRegExp: 0);
 
-  List<VideoModel> videos = [];
+  List<MVideo> videos = [];
 
   for (var i = 0; i < names.length; i++) {
     final name = names[i];
@@ -166,9 +165,9 @@ getVideoList(MangaModel anime) async {
 
     final resE = await MBridge.http('GET', json.encode(datasE));
     String url = MBridge.substringBefore(
-        MBridge.substringAfter(resE, "\"link\":\""), "\"");
+        MBridge.substringAfter(resE.body, "\"link\":\""), "\"");
     print(url);
-    List<VideoModel> a = [];
+    List<MVideo> a = [];
     if (name.contains("Vidstreaming")) {
       a = await MBridge.rapidCloudExtractor(url, "Vidstreaming - $subDub");
       videos.addAll(a);
@@ -184,7 +183,7 @@ getVideoList(MangaModel anime) async {
   return videos;
 }
 
-MangaModel animeElementM(String res, MangaModel anime) async {
+MManga animeElementM(String res, MManga anime) async {
   if (res.isEmpty) {
     return anime;
   }

@@ -1,7 +1,7 @@
 import '../../../model/source.dart';
 import '../../../utils/utils.dart';
 
-const mangareaderVersion = "0.0.3";
+const mangareaderVersion = "0.0.4";
 const mangareaderSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/mangareader/mangareader-v$mangareaderVersion.dart";
 const defaultDateFormat = "MMMM dd, yyyy";

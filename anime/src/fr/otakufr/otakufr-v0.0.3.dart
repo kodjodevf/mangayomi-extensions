@@ -1,18 +1,17 @@
 import 'dart:convert';
 import 'package:bridge_lib/bridge_lib.dart';
 
-getPopularAnime(MangaModel anime) async {
+getPopularAnime(MManga anime) async {
   final data = {
     "url": "${anime.baseUrl}/toute-la-liste-affiches/page/${anime.page}/?q=."
   };
-  final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return anime;
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
-
+  String res = response.body;
   anime.urls =
       MBridge.xpath(res, '//*[@class="list"]/article/div/div/figure/a/@href');
-
   anime.names = MBridge.xpath(
       res, '//*[@class="list"]/article/div/div/figure/a/img/@title');
   anime.images = MBridge.xpath(
@@ -26,13 +25,13 @@ getPopularAnime(MangaModel anime) async {
   return anime;
 }
 
-getLatestUpdatesAnime(MangaModel anime) async {
+getLatestUpdatesAnime(MManga anime) async {
   final data = {"url": "${anime.baseUrl}/page/${anime.page}/"};
-  final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return anime;
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
-
+  String res = response.body;
   anime.urls = MBridge.xpath(res, '//*[@class="episode"]/div/a/@href');
   final namess = MBridge.xpath(res, '//*[@class="episode"]/div/a/text()');
   List<String> names = [];
@@ -66,7 +65,7 @@ getLatestUpdatesAnime(MangaModel anime) async {
   return anime;
 }
 
-getAnimeDetail(MangaModel anime) async {
+getAnimeDetail(MManga anime) async {
   final statusList = [
     {
       "En cours": 0,
@@ -75,17 +74,22 @@ getAnimeDetail(MangaModel anime) async {
   ];
   final url = anime.link;
   final data = {"url": url};
-  String res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return anime;
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
 
   final originalUrl = MBridge.xpath(res,
           '//*[@class="breadcrumb"]/li[@class="breadcrumb-item"][2]/a/@href')
       .first;
   if (originalUrl.isNotEmpty) {
     final newData = {"url": originalUrl};
-    res = await MBridge.http('GET', json.encode(newData));
+    final newResponse = await MBridge.http('GET', json.encode(newData));
+    if (newResponse.hasError) {
+      return newResponse;
+    }
+    res = newResponse.body;
     if (res.isEmpty) {
       return anime;
     }
@@ -122,15 +126,16 @@ getAnimeDetail(MangaModel anime) async {
   return anime;
 }
 
-searchAnime(MangaModel anime) async {
+searchAnime(MManga anime) async {
   final data = {
     "url":
         "${anime.baseUrl}/toute-la-liste-affiches/page/${anime.page}/?q=${anime.query}"
   };
-  final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return anime;
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
 
   anime.urls =
       MBridge.xpath(res, '//*[@class="list"]/article/div/div/figure/a/@href');
@@ -148,27 +153,29 @@ searchAnime(MangaModel anime) async {
   return anime;
 }
 
-getVideoList(MangaModel anime) async {
+getVideoList(MManga anime) async {
   final datas = {"url": anime.link};
 
   final res = await MBridge.http('GET', json.encode(datas));
 
-  if (res.isEmpty) {
-    return [];
+  if (res.hasError) {
+    return res;
   }
   final servers =
-      MBridge.xpath(res, '//*[@id="nav-tabContent"]/div/iframe/@src');
-  List<VideoModel> videos = [];
+      MBridge.xpath(res.body, '//*[@id="nav-tabContent"]/div/iframe/@src');
+  List<MVideo> videos = [];
   for (var url in servers) {
     final datasServer = {
       "url": fixUrl(url),
       "headers": {"X-Requested-With": "XMLHttpRequest"}
     };
 
-    final resServer = await MBridge.http('GET', json.encode(datasServer));
+    final responseResServer =
+        await MBridge.http('GET', json.encode(datasServer));
+    String resServer = responseResServer.body;
     final serverUrl =
         fixUrl(MBridge.regExp(resServer, r"data-url='([^']+)'", '', 1, 1));
-    List<VideoModel> a = [];
+    List<MVideo> a = [];
     if (serverUrl.contains("https://streamwish")) {
       a = await MBridge.streamWishExtractor(serverUrl, "StreamWish");
     } else if (serverUrl.contains("sibnet")) {

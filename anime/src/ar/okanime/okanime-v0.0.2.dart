@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'package:bridge_lib/bridge_lib.dart';
 
-getPopularAnime(MangaModel anime) async {
+getPopularAnime(MManga anime) async {
   final data = {"url": "https://www.okanime.xyz"};
-  final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return anime;
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
   anime.urls = MBridge.xpath(res,
       '//div[@class="section" and contains(text(),"افضل انميات")]/div[@class="section-content"]/div/div/div[contains(@class,"anime-card")]/div[@class="anime-title")]/h4/a/@href');
 
@@ -19,15 +20,16 @@ getPopularAnime(MangaModel anime) async {
   return anime;
 }
 
-getAnimeDetail(MangaModel anime) async {
+getAnimeDetail(MManga anime) async {
   final statusList = [
     {"يعرض الان": 0, "مكتمل": 1}
   ];
   final data = {"url": anime.link};
-  final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return anime;
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
 
   final status = MBridge.xpath(res,
       '//*[@class="full-list-info" and contains(text(),"حالة الأنمي")]/small/a/text()');
@@ -52,14 +54,15 @@ getAnimeDetail(MangaModel anime) async {
   return anime;
 }
 
-getLatestUpdatesAnime(MangaModel anime) async {
+getLatestUpdatesAnime(MManga anime) async {
   final data = {
     "url": "https://www.okanime.xyz/espisode-list?page=${anime.page}"
   };
-  final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return anime;
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
   anime.urls = MBridge.xpath(res,
       '//*[contains(@class,"anime-card")]/div[@class="anime-title")]/h4/a/@href');
 
@@ -78,16 +81,17 @@ getLatestUpdatesAnime(MangaModel anime) async {
   return anime;
 }
 
-searchAnime(MangaModel anime) async {
+searchAnime(MManga anime) async {
   String url = "https://www.okanime.xyz/search/?s=${anime.query}";
   if (anime.page > 1) {
     url += "&page=${anime.page}";
   }
   final data = {"url": url};
-  final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return anime;
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
   anime.urls = MBridge.xpath(res,
       '//*[contains(@class,"anime-card")]/div[@class="anime-title")]/h4/a/@href');
 
@@ -106,21 +110,22 @@ searchAnime(MangaModel anime) async {
   return anime;
 }
 
-getVideoList(MangaModel anime) async {
+getVideoList(MManga anime) async {
   final datas = {"url": anime.link};
-  final res = await MBridge.http('GET', json.encode(datas));
+  final response = await MBridge.http('GET', json.encode(datas));
 
-  if (res.isEmpty) {
-    return [];
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
   final urls = MBridge.xpath(res, '//*[@id="streamlinks"]/a/@data-src');
   final qualities = MBridge.xpath(res, '//*[@id="streamlinks"]/a/span/text()');
 
-  List<VideoModel> videos = [];
+  List<MVideo> videos = [];
   for (var i = 0; i < urls.length; i++) {
     final url = urls[i];
     final quality = getQuality(qualities[i]);
-    List<VideoModel> a = [];
+    List<MVideo> a = [];
 
     if (url.contains("https://doo")) {
       a = await MBridge.doodExtractor(url, "DoodStream - $quality");
