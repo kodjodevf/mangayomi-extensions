@@ -6,11 +6,11 @@ searchManga(MManga manga) async {
   final url = "${manga.baseUrl}/search?title=${manga.query}&page=${manga.page}";
 
   final data = {"url": url, "headers": headers};
-  final res = await MBridge.http('POST', json.encode(data));
-  if (res.isEmpty) {
-    return manga;
+  final response = await MBridge.http('POST', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
-
+  String res = response.body;
   manga.names = MBridge.xpath(
       res, '//*[contains(@class, "manga-list-4-list")]/li/a/@title');
   manga.images = MBridge.xpath(res,
@@ -25,11 +25,11 @@ getLatestUpdatesManga(MManga manga) async {
   final url = "${manga.baseUrl}/directory/${manga.page}.htm?latest";
 
   final data = {"url": url, "headers": headers};
-  final res = await MBridge.http('POST', json.encode(data));
-  if (res.isEmpty) {
-    return manga;
+  final response = await MBridge.http('POST', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
-
+  String res = response.body;
   manga.names = MBridge.xpath(
       res, '//*[ contains(@class, "manga-list-1-list")]/li/a/@title');
   manga.images = MBridge.xpath(res,
@@ -49,10 +49,11 @@ getMangaDetail(MManga manga) async {
   final headers = getHeader(manga.baseUrl);
   final url = "${manga.baseUrl}/${manga.link}";
   final data = {"url": url, "headers": headers};
-  final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return manga;
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
   manga.author =
       MBridge.xpath(res, '//*[@class="detail-info-right-say"]/a/text()').first;
   manga.description =
@@ -79,10 +80,11 @@ getPopularManga(MManga manga) async {
   final url = "${manga.baseUrl}/directory/${manga.page}.htm";
 
   final data = {"url": url, "headers": headers};
-  final res = await MBridge.http('POST', json.encode(data));
-  if (res.isEmpty) {
-    return manga;
+  final response = await MBridge.http('POST', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
 
   manga.names = MBridge.xpath(
       res, '//*[ contains(@class, "manga-list-1-list")]/li/a/@title');
@@ -97,10 +99,11 @@ getChapterPages(MManga manga) async {
   final headers = getHeader(manga.baseUrl);
   final url = "${manga.baseUrl}${manga.link}";
   final data = {"url": url, "headers": headers};
-  final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return [];
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
   final pages = MBridge.xpath(res, "//body/div/div/span/a/text()");
   List<String> pageUrls = [];
   if (pages.isEmpty) {
@@ -150,7 +153,11 @@ getChapterPages(MManga manga) async {
             "X-Requested-With": "XMLHttpRequest"
           };
           final data = {"url": pageLink, "headers": headers};
-          responseText = await MBridge.http('GET', json.encode(data));
+          final ress = await MBridge.http('GET', json.encode(data));
+          if (ress.hasError) {
+            return response;
+          }
+          responseText = ress.body;
 
           if (responseText.isEmpty) {
             secretKey = "";

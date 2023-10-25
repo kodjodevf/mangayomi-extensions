@@ -3,10 +3,11 @@ import 'package:bridge_lib/bridge_lib.dart';
 
 getPopularManga(MManga manga) async {
   final data = {"url": "${manga.baseUrl}/search/"};
-  final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return manga;
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
   final directory = directoryFromDocument(res);
   final resSort = MBridge.sortMapList(json.decode(directory), "vm", 1);
 
@@ -15,10 +16,11 @@ getPopularManga(MManga manga) async {
 
 getLatestUpdatesManga(MManga manga) async {
   final data = {"url": "${manga.baseUrl}/search/"};
-  final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return manga;
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
   final directory = directoryFromDocument(res);
   final resSort = MBridge.sortMapList(json.decode(directory), "lt", 1);
 
@@ -27,10 +29,11 @@ getLatestUpdatesManga(MManga manga) async {
 
 searchManga(MManga manga) async {
   final data = {"url": "${manga.baseUrl}/search/"};
-  final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return manga;
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
   final directory = directoryFromDocument(res);
   final resSort = MBridge.sortMapList(json.decode(directory), "lt", 1);
   final datas = json.decode(resSort) as List;
@@ -52,10 +55,11 @@ getMangaDetail(MManga manga) async {
   final headers = getHeader(manga.baseUrl);
   final url = '${manga.baseUrl}/manga/${manga.link}';
   final data = {"url": url, "headers": headers};
-  final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return manga;
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
   manga.author = MBridge.xpath(res,
           '//li[contains(@class,"list-group-item") and contains(text(),"Author")]/a/text()')
       .first;
@@ -99,7 +103,12 @@ getChapterPages(MManga manga) async {
   final url = '${manga.baseUrl}${manga.link}';
   List<String> pages = [];
   final data = {"url": url, "headers": headers};
-  final res = await MBridge.http('GET', json.encode(data));
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
+  }
+  String res = response.body;
+
   final script =
       MBridge.xpath(res, '//script[contains(text(), "MainFunction")]/text()')
           .first;

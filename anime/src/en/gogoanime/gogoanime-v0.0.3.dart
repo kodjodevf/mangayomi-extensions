@@ -3,10 +3,11 @@ import 'package:bridge_lib/bridge_lib.dart';
 
 getPopularAnime(MManga anime) async {
   final data = {"url": "${anime.baseUrl}/popular.html?page=${anime.page}"};
-  final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return anime;
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
   anime.urls = MBridge.xpath(res, '//*[@class="img"]/a/@href');
   anime.names = MBridge.xpath(res, '//*[@class="img"]/a/@title');
   anime.images = MBridge.xpath(res, '//*[@class="img"]/a/img/@src');
@@ -17,10 +18,11 @@ getLatestUpdatesAnime(MManga anime) async {
   final url =
       "https://ajax.gogo-load.com/ajax/page-recent-release-ongoing.html?page=${anime.page}&type=1";
   final data = {"url": url};
-  final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return anime;
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
   anime.urls = MBridge.xpath(
       res, '//*[@class="added_series_body popular"]/ul/li/a[1]/@href');
   anime.names = MBridge.xpath(
@@ -46,10 +48,11 @@ getAnimeDetail(MManga anime) async {
   ];
 
   final data = {"url": "${anime.baseUrl}${anime.link}"};
-  final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return anime;
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
 
   final status = MBridge.xpath(
           res, '//*[@class="anime_info_body_bg"]/p[@class="type"][5]/text()')
@@ -70,7 +73,11 @@ getAnimeDetail(MManga anime) async {
   final urlEp =
       "https://ajax.gogo-load.com/ajax/load-list-episode?ep_start=0&ep_end=4000&id=$id";
   final dataEp = {"url": urlEp};
-  final resEp = await MBridge.http('GET', json.encode(dataEp));
+  final responseresEp = await MBridge.http('GET', json.encode(dataEp));
+  if (responseresEp.hasError) {
+    return response;
+  }
+  String resEp = responseresEp.body;
   anime.urls = MBridge.xpath(resEp, '//*[@id="episode_related"]/li/a/@href');
   final names = MBridge.xpath(
       resEp, '//*[@id="episode_related"]/li/a/div[@class="name"]/text()');
@@ -88,11 +95,12 @@ getAnimeDetail(MManga anime) async {
 getVideoList(MManga anime) async {
   final datas = {"url": "${anime.baseUrl}${anime.link}"};
 
-  final res = await MBridge.http('GET', json.encode(datas));
+  final response = await MBridge.http('GET', json.encode(datas));
 
-  if (res.isEmpty) {
-    return [];
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
 
   final serverUrls =
       MBridge.xpath(res, '//*[@class="anime_muti_link"]/ul/li/a/@data-video');
@@ -128,10 +136,11 @@ searchAnime(MManga anime) async {
   final url =
       "${anime.baseUrl}/search.html?keyword=${anime.query}&page=${anime.page}";
   final data = {"url": url};
-  final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return anime;
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
   anime.urls = MBridge.xpath(res, '//*[@class="img"]/a/@href');
   anime.names = MBridge.xpath(res, '//*[@class="img"]/a/@title');
   anime.images = MBridge.xpath(res, '//*[@class="img"]/a/img/@src');

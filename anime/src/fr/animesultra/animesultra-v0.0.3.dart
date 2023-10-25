@@ -3,10 +3,11 @@ import 'package:bridge_lib/bridge_lib.dart';
 
 getPopularAnime(MManga anime) async {
   final data = {"url": "${anime.baseUrl}/"};
-  final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return anime;
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
   anime.urls = MBridge.xpath(res,
       '//*[contains(@class,"swiper-slide item-qtip")]/div[@class="item"]/a/@href');
   anime.names = MBridge.xpath(res,
@@ -19,10 +20,11 @@ getPopularAnime(MManga anime) async {
 
 getLatestUpdatesAnime(MManga anime) async {
   final data = {"url": "${anime.baseUrl}/"};
-  final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return anime;
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
 
   anime.urls = MBridge.xpath(res,
       '//*[@class="block_area block_area_home"]/div[@class="tab-content"]/div[contains(@class,"block_area-content block_area-list")]/div[@class="film_list-wrap"]/div[@class="flw-item"]/div[@class="film-poster"]/a/@href');
@@ -38,10 +40,11 @@ searchAnime(MManga anime) async {
   final url =
       "${anime.baseUrl}/?story=${anime.query}&do=search&subaction=search";
   final data = {"url": url};
-  final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return anime;
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
   anime.urls = MBridge.xpath(res, '//*[@class="film-poster"]/a/@href');
   anime.names = MBridge.xpath(res, '//*[@class="film-poster"]/a/@title');
   anime.images = MBridge.xpath(res, '//*[@class="film-poster"]/img/@data-src');
@@ -58,10 +61,11 @@ getAnimeDetail(MManga anime) async {
   ];
   final url = anime.link;
   final data = {"url": url};
-  final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return anime;
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
   anime.description =
       MBridge.xpath(res, '//*[@class="film-description m-hide"]/text()').first;
 

@@ -4,10 +4,11 @@ import 'package:bridge_lib/bridge_lib.dart';
 getPopularManga(MManga manga) async {
   final url = "${manga.baseUrl}/manga/page/${manga.page}/?m_orderby=views";
   final data = {"url": url, "sourceId": manga.sourceId};
-  final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return manga;
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
   manga.urls = MBridge.xpath(res, '//*[@class^="post-title"]/h3/a/@href');
   var images = MBridge.xpath(res, '//*[@id^="manga-item"]/a/img/@data-src');
   if (images.isEmpty) {
@@ -70,12 +71,13 @@ getMangaDetail(MManga manga) async {
       "Cancelado": 3,
     }
   ];
-
+  MHttpResponse response = MHttpResponse();
   final datas = {"url": manga.link, "sourceId": manga.sourceId};
-  final res = await MBridge.http('GET', json.encode(datas));
-  if (res.isEmpty) {
-    return manga;
+  response = await MBridge.http('GET', json.encode(datas));
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
   manga.author = MBridge.querySelectorAll(res,
           selector: "div.author-content > a",
           typeElement: 0,
@@ -126,21 +128,23 @@ getMangaDetail(MManga manga) async {
       "${baseUrl}wp-admin/admin-ajax.php?action=manga_get_chapters&manga=$mangaId";
   final datasP = {"url": url, "headers": headers, "sourceId": manga.sourceId};
 
-  String resP = await MBridge.http('POST', json.encode(datasP));
-  if (resP == "400") {
+  response = await MBridge.http('POST', json.encode(datasP));
+  if (response.statusCode != 200) {
     final urlP = "${manga.link}ajax/chapters";
     final datasP = {
       "url": urlP,
       "headers": headers,
       "sourceId": manga.sourceId
     };
-    resP = await MBridge.http('POST', json.encode(datasP));
+    response = await MBridge.http('POST', json.encode(datasP));
   }
+
+  String resP = response.body;
   manga.urls = MBridge.xpath(resP, "//li/a/@href");
   var chaptersNames = MBridge.xpath(resP, "//li/a/text()");
 
   var dateF = MBridge.xpath(resP, "//li/span/i/text()");
-  if (MBridge.xpath(resP, "//li/a/text()", "").isEmpty) {
+  if (dateF.isEmpty) {
     final resWebview = await MBridge.getHtmlViaWebview(manga.link,
         "//*[@id='manga-chapters-holder']/div[2]/div/ul/li/a/@href");
     manga.urls = MBridge.xpath(resWebview,
@@ -176,10 +180,11 @@ getMangaDetail(MManga manga) async {
 
 getChapterPages(MManga manga) async {
   final datas = {"url": manga.link, "sourceId": manga.sourceId};
-  final res = await MBridge.http('GET', json.encode(datas));
-  if (res.isEmpty) {
-    return [];
+  final response = await MBridge.http('GET', json.encode(datas));
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
   final pagesSelectorRes = MBridge.querySelectorAll(res,
           selector:
               "div.page-break, li.blocks-gallery-item, .reading-content, .text-left img",
@@ -225,10 +230,11 @@ getChapterPages(MManga manga) async {
 getLatestUpdatesManga(MManga manga) async {
   final url = "${manga.baseUrl}/manga/page/${manga.page}/?m_orderby=latest";
   final datas = {"url": url, "sourceId": manga.sourceId};
-  final res = await MBridge.http('GET', json.encode(datas));
-  if (res.isEmpty) {
-    return manga;
+  final response = await MBridge.http('GET', json.encode(datas));
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
   manga.urls = MBridge.xpath(res, '//*[@class^="post-title"]/h3/a/@href');
   var images = MBridge.xpath(res, '//*[@id^="manga-item"]/a/img/@data-src');
   if (images.isEmpty) {
@@ -248,10 +254,11 @@ getLatestUpdatesManga(MManga manga) async {
 searchManga(MManga manga) async {
   final urll = "${manga.baseUrl}/?s=${manga.query}&post_type=wp-manga";
   final datas = {"url": urll, "sourceId": manga.sourceId};
-  final res = await MBridge.http('GET', json.encode(datas));
-  if (res.isEmpty) {
-    return manga;
+  final response = await MBridge.http('GET', json.encode(datas));
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
   manga.urls =
       MBridge.xpath(res, '//*[@class^="tab-thumb c-image-hover"]/a/@href');
   var images = MBridge.xpath(
