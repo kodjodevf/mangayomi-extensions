@@ -4,15 +4,19 @@ import 'package:bridge_lib/bridge_lib.dart';
 getPopularAnime(MManga anime) async {
   final data = {"url": "${anime.baseUrl}/most-popular?page=${anime.page}"};
   final res = await MBridge.http('GET', json.encode(data));
-
-  return animeElementM(res, anime);
+  if (res.hasError) {
+    return res;
+  }
+  return animeElementM(res.body, anime);
 }
 
 getLatestUpdatesAnime(MManga anime) async {
   final data = {"url": "${anime.baseUrl}/top-airing?page=${anime.page}"};
   final res = await MBridge.http('GET', json.encode(data));
-
-  return animeElementM(res, anime);
+  if (res.hasError) {
+    return res;
+  }
+  return animeElementM(res.body, anime);
 }
 
 getAnimeDetail(MManga anime) async {
@@ -24,11 +28,11 @@ getAnimeDetail(MManga anime) async {
   ];
   final url = "${anime.baseUrl}${anime.link}";
   final data = {"url": url, "headers": null};
-  final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return anime;
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
-
+  String res = response.body;
   final status = MBridge.xpath(res,
           '//*[@class="anisc-info"]/div[contains(text(),"Status:")]/span[2]/text()')
       .first;
@@ -70,7 +74,7 @@ getAnimeDetail(MManga anime) async {
   };
   final resEp = await MBridge.http('GET', json.encode(dataEp));
 
-  final html = json.decode(resEp)["html"];
+  final html = json.decode(resEp.body)["html"];
 
   final epUrls = MBridge.querySelectorAll(html,
       selector: "a.ep-item", typeElement: 3, attributes: "href", typeRegExp: 0);
@@ -107,8 +111,10 @@ searchAnime(MManga anime) async {
     "url": "${anime.baseUrl}/search?keyword=${anime.query}&page=${anime.page}"
   };
   final res = await MBridge.http('GET', json.encode(data));
-
-  return animeElementM(res, anime);
+  if (res.hasError) {
+    return res;
+  }
+  return animeElementM(res.body, anime);
 }
 
 getVideoList(MManga anime) async {
@@ -122,10 +128,10 @@ getVideoList(MManga anime) async {
 
   final res = await MBridge.http('GET', json.encode(datas));
 
-  if (res.isEmpty) {
-    return [];
+  if (res.hasError) {
+    return res;
   }
-  final html = json.decode(res)["html"];
+  final html = json.decode(res.body)["html"];
 
   final names = MBridge.querySelectorAll(html,
       selector: "div.server-item",
@@ -159,7 +165,7 @@ getVideoList(MManga anime) async {
 
     final resE = await MBridge.http('GET', json.encode(datasE));
     String url = MBridge.substringBefore(
-        MBridge.substringAfter(resE, "\"link\":\""), "\"");
+        MBridge.substringAfter(resE.body, "\"link\":\""), "\"");
     print(url);
     List<MVideo> a = [];
     if (name.contains("Vidstreaming")) {

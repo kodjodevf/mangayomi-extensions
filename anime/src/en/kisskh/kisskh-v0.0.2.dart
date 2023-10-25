@@ -6,10 +6,11 @@ getPopularAnime(MManga anime) async {
     "url":
         "${anime.baseUrl}/api/DramaList/List?page=${anime.page}&type=0&sub=0&country=0&status=0&order=1&pageSize=40"
   };
-  final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return anime;
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
   final jsonRes = json.decode(res);
   final datas = jsonRes["data"] as List;
   anime.names = datas.map((e) => e["title"]).toList();
@@ -29,10 +30,11 @@ getLatestUpdatesAnime(MManga anime) async {
     "url":
         "${anime.baseUrl}/api/DramaList/List?page=${anime.page}&type=0&sub=0&country=0&status=0&order=12&pageSize=40"
   };
-  final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return anime;
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
   final jsonRes = json.decode(res);
   final datas = jsonRes["data"] as List;
   anime.names = datas.map((e) => e["title"]).toList();
@@ -57,10 +59,11 @@ getAnimeDetail(MManga anime) async {
   ];
 
   final data = {"url": anime.link};
-  final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return anime;
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
   final jsonRes = json.decode(res);
   final status = jsonRes["status"] ?? "";
   print(status);
@@ -99,17 +102,18 @@ getAnimeDetail(MManga anime) async {
 getVideoList(MManga anime) async {
   final datas = {"url": anime.link};
 
-  final res = await MBridge.http('GET', json.encode(datas));
+  final response = await MBridge.http('GET', json.encode(datas));
 
-  if (res.isEmpty) {
-    return [];
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
   final id = MBridge.substringAfter(
       MBridge.substringBefore(anime.link, ".png"), "Episode/");
   final jsonRes = json.decode(res);
   final subRes = await MBridge.http(
       'GET', json.encode({"url": "${anime.baseUrl}/api/Sub/$id"}));
-  var jsonSubRes = json.decode(subRes);
+  var jsonSubRes = json.decode(subRes.body);
 
   List<MTrack> subtitles = [];
 
@@ -143,10 +147,11 @@ searchAnime(MManga anime) async {
   final data = {
     "url": "${anime.baseUrl}/api/DramaList/Search?q=${anime.query}&type=0"
   };
-  final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return anime;
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
   var jsonRes = json.decode(res) as List;
   anime.names = jsonRes.map((e) => e["title"]).toList();
   anime.images = jsonRes.map((e) => e["thumbnail"] ?? "").toList();

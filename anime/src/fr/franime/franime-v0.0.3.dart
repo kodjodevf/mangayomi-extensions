@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'package:bridge_lib/bridge_lib.dart';
 
-Future<String> dataBase(int sourceId) async {
+Future<MHttpResponse> dataBase(int sourceId) async {
   final data = {
     "url": "https://api.franime.fr/api/animes/",
     "headers": {"Referer": "https://franime.fr/"}
   };
-  final res = await MBridge.http('GET', json.encode(data));
-  return res;
+
+  return await MBridge.http('GET', json.encode(data));
 }
 
 getPopularAnime(MManga anime) async {
@@ -16,10 +16,10 @@ getPopularAnime(MManga anime) async {
     "headers": {"Referer": "https://franime.fr/"}
   };
   final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return anime;
+  if (res.hasError) {
+    return res;
   }
-  List<MManga> animeList = animeResList(res);
+  List<MManga> animeList = animeResList(res.body);
 
   return animeList;
 }
@@ -115,10 +115,10 @@ getAnimeDetail(MManga anime) async {
   String stem =
       MBridge.substringBefore(MBridge.substringAfterLast(anime.link, "/"), "?");
   final res = await dataBase(anime.sourceId);
-  if (res.isEmpty) {
-    return anime;
+  if (res.hasError) {
+    return res;
   }
-  final animeByTitleOJson = databaseAnimeByTitleO(res, stem);
+  final animeByTitleOJson = databaseAnimeByTitleO(res.body, stem);
   if (animeByTitleOJson.isEmpty) {
     return anime;
   }
@@ -168,10 +168,10 @@ getAnimeDetail(MManga anime) async {
 getLatestUpdatesAnime(MManga anime) async {
   final res = await dataBase(anime.sourceId);
 
-  if (res.isEmpty) {
-    return anime;
+  if (res.hasError) {
+    return res;
   }
-  List list = json.decode(res);
+  List list = json.decode(res.body);
   List reversedList = list.reversed.toList();
   List<MManga> animeList = animeResList(json.encode(reversedList));
 
@@ -181,10 +181,10 @@ getLatestUpdatesAnime(MManga anime) async {
 searchAnime(MManga anime) async {
   final res = await dataBase(anime.sourceId);
 
-  if (res.isEmpty) {
-    return anime;
+  if (res.hasError) {
+    return res;
   }
-  List<MManga> animeList = animeSeachFetch(res, anime.query);
+  List<MManga> animeList = animeSeachFetch(res.body, anime.query);
   return animeList;
 }
 
@@ -298,10 +298,10 @@ getVideoList(MManga anime) async {
   String stem =
       MBridge.substringBefore(MBridge.substringAfterLast(anime.link, "/"), "?");
   final res = await dataBase(anime.sourceId);
-  if (res.isEmpty) {
-    return anime;
+  if (res.hasError) {
+    return res;
   }
-  final animeByTitleOJson = databaseAnimeByTitleO(res, stem);
+  final animeByTitleOJson = databaseAnimeByTitleO(res.body, stem);
   if (animeByTitleOJson.isEmpty) {
     return anime;
   }
@@ -358,7 +358,11 @@ getVideoList(MManga anime) async {
       "headers": {"Referer": "https://franime.fr/"},
       "sourceId": anime.sourceId
     };
-    final playerUrl = await MBridge.http('GET', json.encode(data));
+    final requestPlayerUrl = await MBridge.http('GET', json.encode(data));
+    if (requestPlayerUrl.hasError) {
+      return requestPlayerUrl;
+    }
+    String playerUrl = requestPlayerUrl.body;
     List<MVideo> a = [];
     if (playerName.contains("franime_myvi")) {
       videos.add(video
