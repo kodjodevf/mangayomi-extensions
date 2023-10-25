@@ -1,33 +1,43 @@
 import 'dart:convert';
 import 'package:bridge_lib/bridge_lib.dart';
 
-getPopularManga(MangaModel manga) async {
-  final url = "${manga.baseUrl}${getMangaUrlDirectory(manga.source)}/?page=${manga.page}&order=popular";
+getPopularManga(MManga manga) async {
+  final url =
+      "${manga.baseUrl}${getMangaUrlDirectory(manga.source)}/?page=${manga.page}&order=popular";
   final data = {"url": url, "sourceId": manga.sourceId};
-  final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return manga;
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
-  manga.urls = MBridge.xpath(res, '//*[ @class="imgu"  or @class="bsx"]/a/@href');
-  manga.names = MBridge.xpath(res, '//*[ @class="imgu"  or @class="bsx"]/a/@title');
-  manga.images = MBridge.xpath(res, '//*[ @class="imgu"  or @class="bsx"]/a/div[1]/img/@src');
+  String res = response.body;
+  manga.urls =
+      MBridge.xpath(res, '//*[ @class="imgu"  or @class="bsx"]/a/@href');
+  manga.names =
+      MBridge.xpath(res, '//*[ @class="imgu"  or @class="bsx"]/a/@title');
+  manga.images = MBridge.xpath(
+      res, '//*[ @class="imgu"  or @class="bsx"]/a/div[1]/img/@src');
   return manga;
 }
 
-getLatestUpdatesManga(MangaModel manga) async {
-  final url = "${manga.baseUrl}${getMangaUrlDirectory(manga.source)}/?page=${manga.page}&order=update";
+getLatestUpdatesManga(MManga manga) async {
+  final url =
+      "${manga.baseUrl}${getMangaUrlDirectory(manga.source)}/?page=${manga.page}&order=update";
   final data = {"url": url, "sourceId": manga.sourceId};
-  final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return manga;
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
-  manga.urls = MBridge.xpath(res, '//*[ @class="imgu"  or @class="bsx"]/a/@href');
-  manga.names = MBridge.xpath(res, '//*[ @class="imgu"  or @class="bsx"]/a/@title');
-  manga.images = MBridge.xpath(res, '//*[ @class="imgu"  or @class="bsx"]/a/div[1]/img/@src');
+  String res = response.body;
+  manga.urls =
+      MBridge.xpath(res, '//*[ @class="imgu"  or @class="bsx"]/a/@href');
+  manga.names =
+      MBridge.xpath(res, '//*[ @class="imgu"  or @class="bsx"]/a/@title');
+  manga.images = MBridge.xpath(
+      res, '//*[ @class="imgu"  or @class="bsx"]/a/div[1]/img/@src');
   return manga;
 }
 
-getMangaDetail(MangaModel manga) async {
+getMangaDetail(MManga manga) async {
   final statusList = [
     {
       "مستمرة": 0,
@@ -81,11 +91,11 @@ getMangaDetail(MangaModel manga) async {
   ];
 
   final datas = {"url": manga.link, "sourceId": manga.sourceId};
-  final res = await MBridge.http('GET', json.encode(datas));
-
-  if (res.isEmpty) {
-    return manga;
+  final response = await MBridge.http('GET', json.encode(datas));
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
   manga.author = MBridge.xpath(
           res,
           '//*[@class="imptdt" and contains(text(), "Author") or @class="infotable" and contains(text(), "Author") or @class="infotable" and contains(text(), "Auteur") or @class="fmed" and contains(text(), "Auteur") or @class="infotable" and contains(text(), "Autor")]/text()',
@@ -97,7 +107,10 @@ getMangaDetail(MangaModel manga) async {
       .replaceAll("[Add, ]", "");
 
   manga.description = MBridge.querySelectorAll(res,
-          selector: ".desc, .entry-content[itemprop=description]", typeElement: 0, attributes: "", typeRegExp: 0)
+          selector: ".desc, .entry-content[itemprop=description]",
+          typeElement: 0,
+          attributes: "",
+          typeRegExp: 0)
       .first;
 
   final status = MBridge.xpath(
@@ -111,7 +124,8 @@ getMangaDetail(MangaModel manga) async {
 
   manga.status = MBridge.parseStatus(status, statusList);
 
-  manga.genre = MBridge.xpath(res, '//*[@class="gnr"  or @class="mgen"  or @class="seriestugenre" ]/a/text()');
+  manga.genre = MBridge.xpath(res,
+      '//*[@class="gnr"  or @class="mgen"  or @class="seriestugenre" ]/a/text()');
   manga.urls = MBridge.xpath(res,
       '//*[@class="bxcl"  or @class="cl"  or @class="chbox" or @class="eph-num" or @id="chapterlist"]/div/a[not(@href="#/chapter-{{number}}")]/@href');
   manga.names = MBridge.xpath(res,
@@ -120,32 +134,37 @@ getMangaDetail(MangaModel manga) async {
   final chaptersDateUploads = MBridge.xpath(res,
       '//*[@class="bxcl"  or @class="cl"  or @class="chbox" or @class="eph-num" or @id="chapterlist"]/div/a/span[@class="chapterdate" and not(text()="{{date}}")]/text()');
 
-  manga.chaptersDateUploads = MBridge.listParseDateTime(chaptersDateUploads, manga.dateFormat, manga.dateFormatLocale);
+  manga.chaptersDateUploads = MBridge.listParseDateTime(
+      chaptersDateUploads, manga.dateFormat, manga.dateFormatLocale);
 
   return manga;
 }
 
-searchManga(MangaModel manga) async {
-  final url = "${manga.baseUrl}${getMangaUrlDirectory(manga.source)}/?&title=${manga.query}&page=${manga.page}";
+searchManga(MManga manga) async {
+  final url =
+      "${manga.baseUrl}${getMangaUrlDirectory(manga.source)}/?&title=${manga.query}&page=${manga.page}";
   final data = {"url": url, "sourceId": manga.sourceId};
-  final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return manga;
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
-  manga.urls = MBridge.xpath(res, '//*[ @class="imgu"  or @class="bsx"]/a/@href');
-  manga.names = MBridge.xpath(res, '//*[ @class="imgu"  or @class="bsx"]/a/@title');
-  manga.images = MBridge.xpath(res, '//*[ @class="imgu"  or @class="bsx"]/a/div[1]/img/@src');
+  String res = response.body;
+  manga.urls =
+      MBridge.xpath(res, '//*[ @class="imgu"  or @class="bsx"]/a/@href');
+  manga.names =
+      MBridge.xpath(res, '//*[ @class="imgu"  or @class="bsx"]/a/@title');
+  manga.images = MBridge.xpath(
+      res, '//*[ @class="imgu"  or @class="bsx"]/a/div[1]/img/@src');
   return manga;
 }
 
-getChapterUrl(MangaModel manga) async {
+getChapterPages(MManga manga) async {
   final datas = {"url": manga.link, "sourceId": manga.sourceId};
-
-  final res = await MBridge.http('GET', json.encode(datas));
-
-  if (res.isEmpty) {
-    return [];
+  final response = await MBridge.http('GET', json.encode(datas));
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
   var pages = [];
   List<String> pagesUrl = [];
   pages = MBridge.xpath(res, '//*[@id="readerarea"]/p/img/@src');
@@ -153,7 +172,8 @@ getChapterUrl(MangaModel manga) async {
     pages = MBridge.xpath(res, '//*[@id="readerarea"]/img/@src');
   }
   if (pages.isEmpty || pages.length == 1) {
-    final images = MBridge.regExp(res, "\"images\"\\s*:\\s*(\\[.*?])", "", 1, 1);
+    final images =
+        MBridge.regExp(res, "\"images\"\\s*:\\s*(\\[.*?])", "", 1, 1);
     final pages = MBridge.jsonDecodeToList(images, 0);
     for (var page in pages) {
       pagesUrl.add(page);

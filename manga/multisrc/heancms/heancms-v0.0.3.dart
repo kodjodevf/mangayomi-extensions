@@ -1,47 +1,30 @@
 import 'dart:convert';
 import 'package:bridge_lib/bridge_lib.dart';
 
-searchManga(MangaModel manga) async {
+searchManga(MManga manga) async {
   final headers = getHeader(manga.baseUrl);
-
-  String res = "".toString();
+  MHttpResponse response = MHttpResponse();
   if (!useNewQueryEndpoint(manga.source)) {
     final url = "${manga.apiUrl}/series/search";
     final body = {"term": manga.query};
     final data = {"url": url, "headers": headers, "body": body};
-    res = await MBridge.http('POST', json.encode(data));
-    if (res.isEmpty) {
-      return manga;
-    }
+    response = await MBridge.http('POST', json.encode(data));
   } else {
-    final newEndpointUrl = "${manga.apiUrl}/query";
-    final newEndpointBody = {
-      "query_string": manga.query,
-      "series_status": "All",
-      "page": manga.page,
-      "order": "desc",
-      "order_by": "total_views",
-      "perPage": "12",
-      "tags_ids": "[]",
-      "series_type": "Comic"
-    };
-    final newEndpointData = {
-      "url": newEndpointUrl,
-      "headers": headers,
-      "newEndpointBody": newEndpointBody
-    };
-    res = await MBridge.http('GET', json.encode(newEndpointData));
-    if (res.isEmpty) {
-      return manga;
-    }
-  }
+    final newEndpointUrl =
+        "${manga.apiUrl}/query/?page=${manga.page}&query_string=${manga.query}&series_status=All&order=desc&orderBy=total_views&perPage=12&tags_ids=[]&series_type=Comic";
 
-  return mangaModelRes(res, manga);
+    final newEndpointData = {"url": newEndpointUrl, "headers": headers};
+    response = await MBridge.http('GET', json.encode(newEndpointData));
+  }
+  if (response.hasError) {
+    return response;
+  }
+  return mMangaRes(response, manga);
 }
 
-getPopularManga(MangaModel manga) async {
+getPopularManga(MManga manga) async {
   final headers = getHeader(manga.baseUrl);
-  String res = "".toString();
+  MHttpResponse response = MHttpResponse();
   if (!useNewQueryEndpoint(manga.source)) {
     final url = "${manga.apiUrl}/series/querysearch";
     print(url);
@@ -59,38 +42,24 @@ getPopularManga(MangaModel manga) async {
       "sourceId": manga.sourceId,
       "body": body
     };
-
-    res = await MBridge.http('POST', json.encode(data));
+    response = await MBridge.http('POST', json.encode(data));
   } else {
-    final newEndpointUrl = "${manga.apiUrl}/query";
-    final newEndpointBody = {
-      "query_string": "",
-      "series_status": "All",
-      "page": manga.page,
-      "order": "desc",
-      "order_by": "total_views",
-      "perPage": "12",
-      "tags_ids": "[]",
-      "series_type": "Comic"
-    };
+    final newEndpointUrl =
+        "${manga.apiUrl}/query/?page=${manga.page}&query_string=&series_status=All&order=desc&orderBy=total_views&perPage=12&tags_ids=[]&series_type=Comic";
+
     final newEndpointData = {
       "url": newEndpointUrl,
       "headers": headers,
-      "sourceId": manga.sourceId,
-      "body": newEndpointBody
+      "sourceId": manga.sourceId
     };
-    print("sssssssssssssssssssss");
-    res = await MBridge.http('GET', json.encode(newEndpointData));
+    response = await MBridge.http('GET', json.encode(newEndpointData));
   }
-  if (res.isEmpty) {
-    return manga;
-  }
-  return mangaModelRes(res, manga);
+  return mMangaRes(response, manga);
 }
 
-getLatestUpdatesManga(MangaModel manga) async {
+getLatestUpdatesManga(MManga manga) async {
   final headers = getHeader(manga.baseUrl);
-  String res = "".toString();
+  MHttpResponse response = MHttpResponse();
   if (!useNewQueryEndpoint(manga.source)) {
     final url = "${manga.apiUrl}/series/querysearch";
     final body = {
@@ -106,45 +75,28 @@ getLatestUpdatesManga(MangaModel manga) async {
       "sourceId": manga.sourceId,
       "body": body
     };
-    res = await MBridge.http('POST', json.encode(data));
+    response = await MBridge.http('POST', json.encode(data));
   } else {
-    final newEndpointUrl = "${manga.apiUrl}/query";
-    final newEndpointBody = {
-      "query_string": "",
-      "series_status": "All",
-      "page": manga.page,
-      "order": "desc",
-      "order_by": "latest",
-      "perPage": "12",
-      "tags_ids": "[]",
-      "series_type": "Comic"
-    };
-    final newEndpointData = {
-      "url": newEndpointUrl,
-      "headers": headers,
-      "sourceId": manga.sourceId,
-      "body": newEndpointBody
-    };
-    res = await MBridge.http('GET', json.encode(newEndpointData));
-    print(res);
+    final newEndpointUrl =
+        "${manga.apiUrl}/query/?page=${manga.page}&query_string=&series_status=All&order=desc&orderBy=latest&perPage=12&tags_ids=[]&series_type=Comic";
+
+    final newEndpointData = {"url": newEndpointUrl, "headers": headers};
+    response = await MBridge.http('GET', json.encode(newEndpointData));
   }
 
-  if (res.isEmpty) {
-    return manga;
-  }
-  return mangaModelRes(res, manga);
+  return mMangaRes(response, manga);
 }
 
-getMangaDetail(MangaModel manga) async {
+getMangaDetail(MManga manga) async {
   String currentSlug = MBridge.substringAfterLast(manga.link, "/");
   final headers = getHeader(manga.baseUrl);
   final url = "${manga.apiUrl}/series/$currentSlug";
   final data = {"url": url, "headers": headers};
-  final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return manga;
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
-  print(res);
+  String res = response.body;
   manga.author = MBridge.getMapValue(res, "author");
 
   manga.description = MBridge.getMapValue(res, "description");
@@ -193,19 +145,25 @@ getMangaDetail(MangaModel manga) async {
   return manga;
 }
 
-getChapterUrl(MangaModel manga) async {
-  String res = "".toString();
+getChapterPages(MManga manga) async {
+  MHttpResponse response = MHttpResponse();
   final headers = getHeader(manga.baseUrl);
+
+  String res = "".toString();
   if (!useslugStrategy(manga.source)) {
     String chapterId = MBridge.substringAfter(manga.link, '#');
-
     final url = "${manga.apiUrl}/series/chapter/$chapterId";
     final data = {"url": url, "headers": headers};
-    res = await MBridge.http('GET', json.encode(data));
+    response = await MBridge.http('GET', json.encode(data));
+    res = response.body;
   } else {
     final url = "${manga.baseUrl}${manga.link}";
     final data = {"url": url, "headers": headers};
-    res = await MBridge.http('GET', json.encode(data));
+    response = await MBridge.http('GET', json.encode(data));
+    if (response.hasError) {
+      return response;
+    }
+    res = response.body;
     List<String> pageUrls = [];
     var imagesRes = MBridge.querySelectorAll(res,
         selector: "div.min-h-screen > div.container > p.items-center",
@@ -218,9 +176,8 @@ getChapterUrl(MangaModel manga) async {
 
     return pageUrls.where((e) => e.isNotEmpty).toList();
   }
-
-  if (res.isEmpty) {
-    return [];
+  if (response.hasError) {
+    return response;
   }
   final pages = MBridge.jsonPathToList(res, r"$.content.images[*]", 0);
   List<String> pageUrls = [];
@@ -255,11 +212,11 @@ bool useslugStrategy(String sourceName) {
   return sources.contains(sourceName);
 }
 
-MangaModel mangaModelRes(String res, MangaModel manga) {
+MManga mMangaRes(MHttpResponse response, MManga manga) {
+  String res = response.body;
   List<String> names = [];
   List<String> urls = [];
   List<String> images = [];
-
   if (res.startsWith("{")) {
     for (var a in json.decode(res)["data"]) {
       String thumbnail = a["thumbnail"];
@@ -269,7 +226,7 @@ MangaModel mangaModelRes(String res, MangaModel manga) {
         images.add("${manga.apiUrl}/cover/$thumbnail");
       }
       names.add(a["title"]);
-      final seriesSlug = MBridge.regExp(a["series_slug"], "-\\d+", "", 0, 0);
+      final seriesSlug = a["series_slug"];
       urls.add("/series/$seriesSlug");
     }
   } else {
@@ -281,9 +238,10 @@ MangaModel mangaModelRes(String res, MangaModel manga) {
         images.add("${manga.apiUrl}/cover/$thumbnail");
       }
       names.add(a["title"]);
-      final seriesSlug = MBridge.regExp(a["series_slug"], "-\\d+", "", 0, 0);
+      final seriesSlug = a["series_slug"];
       urls.add("/series/$seriesSlug");
     }
+    manga.hasNextPage = false;
   }
 
   manga.urls = urls;

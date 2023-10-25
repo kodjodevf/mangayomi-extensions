@@ -1,60 +1,58 @@
 import 'dart:convert';
 import 'package:bridge_lib/bridge_lib.dart';
 
-getPopularAnime(MangaModel anime) async {
+getPopularAnime(MManga anime) async {
   final data = {"url": "${anime.baseUrl}/"};
-  final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return anime;
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
   anime.urls = MBridge.xpath(res,
       '//*[contains(@class,"swiper-slide item-qtip")]/div[@class="item"]/a/@href');
-
   anime.names = MBridge.xpath(res,
       '//*[contains(@class,"swiper-slide item-qtip")]/div[@class="item"]/a/img/@title');
-
   anime.images = MBridge.xpath(res,
       '//*[contains(@class,"swiper-slide item-qtip")]/div[@class="item"]/a/img/@data-src');
   anime.hasNextPage = false;
   return anime;
 }
 
-getLatestUpdatesAnime(MangaModel anime) async {
+getLatestUpdatesAnime(MManga anime) async {
   final data = {"url": "${anime.baseUrl}/"};
-  final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return anime;
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
 
   anime.urls = MBridge.xpath(res,
       '//*[@class="block_area block_area_home"]/div[@class="tab-content"]/div[contains(@class,"block_area-content block_area-list")]/div[@class="film_list-wrap"]/div[@class="flw-item"]/div[@class="film-poster"]/a/@href');
-
   anime.names = MBridge.xpath(res,
       '//*[@class="block_area block_area_home"]/div[@class="tab-content"]/div[contains(@class,"block_area-content block_area-list")]/div[@class="film_list-wrap"]/div[@class="flw-item"]/div[@class="film-poster"]/a/@title');
-
   anime.images = MBridge.xpath(res,
       '//*[@class="block_area block_area_home"]/div[@class="tab-content"]/div[contains(@class,"block_area-content block_area-list")]/div[@class="film_list-wrap"]/div[@class="flw-item"]/div[@class="film-poster"]/img/@data-src');
   anime.hasNextPage = false;
   return anime;
 }
 
-searchAnime(MangaModel anime) async {
+searchAnime(MManga anime) async {
   final url =
       "${anime.baseUrl}/?story=${anime.query}&do=search&subaction=search";
   final data = {"url": url};
-  final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return anime;
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
+  String res = response.body;
   anime.urls = MBridge.xpath(res, '//*[@class="film-poster"]/a/@href');
-
   anime.names = MBridge.xpath(res, '//*[@class="film-poster"]/a/@title');
   anime.images = MBridge.xpath(res, '//*[@class="film-poster"]/img/@data-src');
   anime.hasNextPage = false;
   return anime;
 }
 
-getAnimeDetail(MangaModel anime) async {
+getAnimeDetail(MManga anime) async {
   final statusList = [
     {
       "En cours": 0,
@@ -63,20 +61,18 @@ getAnimeDetail(MangaModel anime) async {
   ];
   final url = anime.link;
   final data = {"url": url};
-  final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return anime;
+  final response = await MBridge.http('GET', json.encode(data));
+  if (response.hasError) {
+    return response;
   }
-
+  String res = response.body;
   anime.description =
       MBridge.xpath(res, '//*[@class="film-description m-hide"]/text()').first;
 
   final status = MBridge.xpath(res,
           '//*[@class="item item-title" and contains(text(),"Status:")]/span[2]/text()')
       .first;
-
   anime.status = MBridge.parseStatus(status, statusList);
-
   anime.genre = MBridge.xpath(res,
       '//*[@class="item item-list" and contains(text(),"Genres:")]/a/text()');
   anime.author = MBridge.xpath(res,
@@ -88,7 +84,6 @@ getAnimeDetail(MangaModel anime) async {
   anime.urls = MBridge.xpath(resEpWebview, '//*[@class="ss-list"]/a/@href')
       .reversed
       .toList();
-
   anime.names = MBridge.xpath(resEpWebview,
           '//*[@class="ss-list"]/a/div[@class="ssli-detail"]/div/text()')
       .reversed
@@ -97,7 +92,7 @@ getAnimeDetail(MangaModel anime) async {
   return anime;
 }
 
-getVideoList(MangaModel anime) async {
+getVideoList(MManga anime) async {
   final resWebview = await MBridge.getHtmlViaWebview(
       anime.link, '//*[@class="ps__-list"]/div/@data-server-id');
 
@@ -112,13 +107,12 @@ getVideoList(MangaModel anime) async {
             .first;
     serverUrls.add(serversUrls);
   }
-
-  List<VideoModel> videos = [];
+  List<MVideo> videos = [];
   for (var i = 0; i < serverNames.length; i++) {
     final name = serverNames[i];
     final url = serverUrls[i];
 
-    List<VideoModel> a = [];
+    List<MVideo> a = [];
     if (name.contains("Sendvid")) {
       a = await MBridge.sendVidExtractor(
           url.replaceAll("https:////", "https://"),

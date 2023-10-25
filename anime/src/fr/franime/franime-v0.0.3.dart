@@ -1,34 +1,34 @@
 import 'dart:convert';
 import 'package:bridge_lib/bridge_lib.dart';
 
-Future<String> dataBase(int sourceId) async {
+Future<MHttpResponse> dataBase(int sourceId) async {
   final data = {
     "url": "https://api.franime.fr/api/animes/",
     "headers": {"Referer": "https://franime.fr/"}
   };
-  final res = await MBridge.http('GET', json.encode(data));
-  return res;
+
+  return await MBridge.http('GET', json.encode(data));
 }
 
-getPopularAnime(MangaModel anime) async {
+getPopularAnime(MManga anime) async {
   final data = {
     "url": "https://api.franime.fr/api/animes/",
     "headers": {"Referer": "https://franime.fr/"}
   };
   final res = await MBridge.http('GET', json.encode(data));
-  if (res.isEmpty) {
-    return anime;
+  if (res.hasError) {
+    return res;
   }
-  List<MangaModel> animeList = animeResList(res);
+  List<MManga> animeList = animeResList(res.body);
 
   return animeList;
 }
 
-List<MangaModel> animeResList(String res) {
+List<MManga> animeResList(String res) {
   final statusList = [
     {"EN COURS": 0, "TERMINÉ": 1}
   ];
-  List<MangaModel> animeList = [];
+  List<MManga> animeList = [];
 
   var jsonResList = json.decode(res);
 
@@ -56,7 +56,7 @@ List<MangaModel> animeResList(String res) {
     bool hasVf = vfListName.contains(true);
     if (hasVostfr || hasVf) {
       for (int i = 0; i < seasons.length; i++) {
-        MangaModel anime = MangaModel();
+        MManga anime = MManga();
         int ind = i + 1;
         anime.genre = genre;
         anime.description = description;
@@ -106,7 +106,7 @@ String databaseAnimeByTitleO(String res, String titleO) {
   return "";
 }
 
-getAnimeDetail(MangaModel anime) async {
+getAnimeDetail(MManga anime) async {
   String language = "vo".toString();
   if (anime.link.contains("lang=")) {
     language = MBridge.substringBefore(
@@ -115,10 +115,10 @@ getAnimeDetail(MangaModel anime) async {
   String stem =
       MBridge.substringBefore(MBridge.substringAfterLast(anime.link, "/"), "?");
   final res = await dataBase(anime.sourceId);
-  if (res.isEmpty) {
-    return anime;
+  if (res.hasError) {
+    return res;
   }
-  final animeByTitleOJson = databaseAnimeByTitleO(res, stem);
+  final animeByTitleOJson = databaseAnimeByTitleO(res.body, stem);
   if (animeByTitleOJson.isEmpty) {
     return anime;
   }
@@ -165,37 +165,37 @@ getAnimeDetail(MangaModel anime) async {
   return anime;
 }
 
-getLatestUpdatesAnime(MangaModel anime) async {
+getLatestUpdatesAnime(MManga anime) async {
   final res = await dataBase(anime.sourceId);
 
-  if (res.isEmpty) {
-    return anime;
+  if (res.hasError) {
+    return res;
   }
-  List list = json.decode(res);
+  List list = json.decode(res.body);
   List reversedList = list.reversed.toList();
-  List<MangaModel> animeList = animeResList(json.encode(reversedList));
+  List<MManga> animeList = animeResList(json.encode(reversedList));
 
   return animeList;
 }
 
-searchAnime(MangaModel anime) async {
+searchAnime(MManga anime) async {
   final res = await dataBase(anime.sourceId);
 
-  if (res.isEmpty) {
-    return anime;
+  if (res.hasError) {
+    return res;
   }
-  List<MangaModel> animeList = animeSeachFetch(res, anime.query);
+  List<MManga> animeList = animeSeachFetch(res.body, anime.query);
   return animeList;
 }
 
-List<MangaModel> animeSeachFetch(String res, query) {
+List<MManga> animeSeachFetch(String res, query) {
   final statusList = [
     {"EN COURS": 0, "TERMINÉ": 1}
   ];
-  List<MangaModel> animeList = [];
+  List<MManga> animeList = [];
   final jsonResList = json.decode(res);
   for (var animeJson in jsonResList) {
-    MangaModel anime = MangaModel();
+    MManga anime = MManga();
 
     final titleO = MBridge.getMapValue(json.encode(animeJson), "titleO");
     final titleAlt =
@@ -250,7 +250,7 @@ List<MangaModel> animeSeachFetch(String res, query) {
       bool hasVf = vfListName.contains(true);
       if (hasVostfr || hasVf) {
         for (int i = 0; i < seasons.length; i++) {
-          MangaModel anime = MangaModel();
+          MManga anime = MManga();
           int ind = i + 1;
           anime.genre = genre;
           anime.description = description;
@@ -287,7 +287,7 @@ List<MangaModel> animeSeachFetch(String res, query) {
   return animeList;
 }
 
-getVideoList(MangaModel anime) async {
+getVideoList(MManga anime) async {
   String language = "vo".toString();
   String videoBaseUrl = "https://api.franime.fr/api/anime".toString();
   if (anime.link.contains("lang=")) {
@@ -298,10 +298,10 @@ getVideoList(MangaModel anime) async {
   String stem =
       MBridge.substringBefore(MBridge.substringAfterLast(anime.link, "/"), "?");
   final res = await dataBase(anime.sourceId);
-  if (res.isEmpty) {
-    return anime;
+  if (res.hasError) {
+    return res;
   }
-  final animeByTitleOJson = databaseAnimeByTitleO(res, stem);
+  final animeByTitleOJson = databaseAnimeByTitleO(res.body, stem);
   if (animeByTitleOJson.isEmpty) {
     return anime;
   }
@@ -346,20 +346,24 @@ getVideoList(MangaModel anime) async {
   } else if (language == "vf" && hasVf) {
     players = vfPlayers;
   }
-  List<VideoModel> videos = [];
+  List<MVideo> videos = [];
   for (var i = 0; i < players.length; i++) {
     String apiUrl = "$videoBaseUrl/$language/$i";
     String playerName = players[i];
 
-    VideoModel video = VideoModel();
+    MVideo video = MVideo();
 
     final data = {
       "url": apiUrl,
       "headers": {"Referer": "https://franime.fr/"},
       "sourceId": anime.sourceId
     };
-    final playerUrl = await MBridge.http('GET', json.encode(data));
-    List<VideoModel> a = [];
+    final requestPlayerUrl = await MBridge.http('GET', json.encode(data));
+    if (requestPlayerUrl.hasError) {
+      return requestPlayerUrl;
+    }
+    String playerUrl = requestPlayerUrl.body;
+    List<MVideo> a = [];
     if (playerName.contains("franime_myvi")) {
       videos.add(video
         ..url = playerUrl
