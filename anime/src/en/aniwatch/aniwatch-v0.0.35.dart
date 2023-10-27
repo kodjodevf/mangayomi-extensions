@@ -11,7 +11,7 @@ getPopularAnime(MManga anime) async {
 }
 
 getLatestUpdatesAnime(MManga anime) async {
-  final data = {"url": "${anime.baseUrl}/top-airing?page=${anime.page}"};
+  final data = {"url": "${anime.baseUrl}/recently-updated?page=${anime.page}"};
   final res = await MBridge.http('GET', json.encode(data));
   if (res.hasError) {
     return res;
