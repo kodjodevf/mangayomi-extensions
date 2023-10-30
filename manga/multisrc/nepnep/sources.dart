@@ -1,7 +1,7 @@
 import '../../../model/source.dart';
 import '../../../utils/utils.dart';
 
-const nepnepVersion = "0.0.2";
+const nepnepVersion = "0.0.25";
 const nepnepSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/nepnep/nepnep-v$nepnepVersion.dart";
 const defaultDateFormat = "yyyy-MM-dd HH:mm:ss";

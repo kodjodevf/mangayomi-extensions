@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import '../model/source.dart';
+import 'multisrc/zorotheme/sources.dart';
 import 'src/ar/okanime/source.dart';
 import 'src/en/aniwatch/sources.dart';
 import 'src/en/gogoanime/source.dart';
@@ -16,7 +17,7 @@ void main() {
     franimeSource,
     otakufr,
     animesultraSource,
-    ...aniwatchSourcesList,
+    ...zorothemeSourcesList,
     kisskhSource,
     okanimeSource
   ];
