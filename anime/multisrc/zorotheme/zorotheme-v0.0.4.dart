@@ -1,101 +1,88 @@
 import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
-class ZoroTheme extends MSourceProvider {
+class ZoroTheme extends MProvider {
   ZoroTheme();
 
   @override
-  Future<MPages> getPopular(MSource sourceInfo, int page) async {
-    final data = {"url": "${sourceInfo.baseUrl}/most-popular?page=$page"};
-    final res = await MBridge.http('GET', json.encode(data));
+  Future<MPages> getPopular(MSource source, int page) async {
+    final data = {"url": "${source.baseUrl}/most-popular?page=$page"};
+    final res = await http('GET', json.encode(data));
 
     return animeElementM(res);
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource sourceInfo, int page) async {
-    final data = {"url": "${sourceInfo.baseUrl}/recently-updated?page=$page"};
-    final res = await MBridge.http('GET', json.encode(data));
+  Future<MPages> getLatestUpdates(MSource source, int page) async {
+    final data = {"url": "${source.baseUrl}/recently-updated?page=$page"};
+    final res = await http('GET', json.encode(data));
 
     return animeElementM(res);
   }
 
   @override
-  Future<MPages> search(MSource sourceInfo, String query, int page) async {
+  Future<MPages> search(MSource source, String query, int page) async {
     final data = {
-      "url": "${sourceInfo.baseUrl}/search?keyword=$query&page=$page"
+      "url": "${source.baseUrl}/search?keyword=$query&page=$page"
     };
-    final res = await MBridge.http('GET', json.encode(data));
+    final res = await http('GET', json.encode(data));
 
     return animeElementM(res);
   }
 
   @override
-  Future<MManga> getDetail(MSource sourceInfo, String url) async {
+  Future<MManga> getDetail(MSource source, String url) async {
     final statusList = [
       {
         "Currently Airing": 0,
         "Finished Airing": 1,
       }
     ];
-    final data = {"url": "${sourceInfo.baseUrl}$url"};
-    final res = await MBridge.http('GET', json.encode(data));
+    final data = {"url": "${source.baseUrl}$url"};
+    final res = await http('GET', json.encode(data));
     MManga anime = MManga();
-    final status = MBridge.xpath(res,
+    final status = xpath(res,
             '//*[@class="anisc-info"]/div[contains(text(),"Status:")]/span[2]/text()')
         .first;
-    anime.status = MBridge.parseStatus(status, statusList);
-    anime.author = MBridge.xpath(res,
+        
+    anime.status = parseStatus(status, statusList);
+    anime.author = xpath(res,
             '//*[@class="anisc-info"]/div[contains(text(),"Studios:")]/span/text()')
         .first
         .replaceAll("Studios:", "");
-    final aired = MBridge.xpath(res,
-            '//*[@class="anisc-info"]/div[contains(text(),"Aired:")]/span/text()')
-        .first;
-    final japanese = MBridge.xpath(res,
-            '//*[@class="anisc-info"]/div[contains(text(),"Japanese:")]/span/text()')
-        .first;
-    final synonyms = MBridge.xpath(res,
-            '//*[@class="anisc-info"]/div[contains(text(),"Synonyms:")]/span/text()')
-        .first;
-    final premiered = MBridge.xpath(res,
-            '//*[@class="anisc-info"]/div[contains(text(),"Premiered:")]/span/text()')
-        .first;
-    final overview = MBridge.xpath(res,
+    anime.description = xpath(res,
             '//*[@class="anisc-info"]/div[contains(text(),"Overview:")]/text()')
         .first
         .replaceAll("Overview:", "");
-    String description =
-        "$overview\n\n$japanese\n$synonyms\n$aired\n$premiered";
-    anime.description = description;
-    final genre = MBridge.xpath(res,
+    final genre = xpath(res,
         '//*[@class="anisc-info"]/div[contains(text(),"Genres:")]/a/text()');
 
     anime.genre = genre;
-    final id = MBridge.substringAfterLast(anime.link, '-');
+    final id = substringAfterLast(url, '-');
+
     final urlEp =
-        "${anime.baseUrl}/ajax${ajaxRoute('${anime.baseUrl}')}/episode/list/$id";
+        "${source.baseUrl}/ajax${ajaxRoute('${source.baseUrl}')}/episode/list/$id";
 
     final dataEp = {
       "url": urlEp,
       "headers": {"referer": url}
     };
-    final resEp = await MBridge.http('GET', json.encode(dataEp));
+    final resEp = await http('GET', json.encode(dataEp));
 
     final html = json.decode(resEp)["html"];
 
-    final epUrls = MBridge.querySelectorAll(html,
+    final epUrls = querySelectorAll(html,
         selector: "a.ep-item",
         typeElement: 3,
         attributes: "href",
         typeRegExp: 0);
-    final numbers = MBridge.querySelectorAll(html,
+    final numbers = querySelectorAll(html,
         selector: "a.ep-item",
         typeElement: 3,
         attributes: "data-number",
         typeRegExp: 0);
 
-    final titles = MBridge.querySelectorAll(html,
+    final titles = querySelectorAll(html,
         selector: "a.ep-item",
         typeElement: 3,
         attributes: "title",
@@ -121,30 +108,30 @@ class ZoroTheme extends MSourceProvider {
   }
 
   @override
-  Future<List<MVideo>> getVideoList(MSource sourceInfo, String url) async {
-    final id = MBridge.substringAfterLast(url, '?ep=');
+  Future<List<MVideo>> getVideoList(MSource source, String url) async {
+    final id = substringAfterLast(url, '?ep=');
 
     final datas = {
       "url":
-          "${sourceInfo.baseUrl}/ajax${ajaxRoute('${sourceInfo.baseUrl}')}/episode/servers?episodeId=$id",
-      "headers": {"referer": "${sourceInfo.baseUrl}/$url"}
+          "${source.baseUrl}/ajax${ajaxRoute('${source.baseUrl}')}/episode/servers?episodeId=$id",
+      "headers": {"referer": "${source.baseUrl}/$url"}
     };
-    final res = await MBridge.http('GET', json.encode(datas));
+    final res = await http('GET', json.encode(datas));
     final html = json.decode(res)["html"];
 
-    final names = MBridge.querySelectorAll(html,
+    final names = querySelectorAll(html,
         selector: "div.server-item",
         typeElement: 0,
         attributes: "",
         typeRegExp: 0);
 
-    final ids = MBridge.querySelectorAll(html,
+    final ids = querySelectorAll(html,
         selector: "div.server-item",
         typeElement: 3,
         attributes: "data-id",
         typeRegExp: 0);
 
-    final subDubs = MBridge.querySelectorAll(html,
+    final subDubs = querySelectorAll(html,
         selector: "div.server-item",
         typeElement: 3,
         attributes: "data-type",
@@ -158,21 +145,21 @@ class ZoroTheme extends MSourceProvider {
       final subDub = subDubs[i];
       final datasE = {
         "url":
-            "${sourceInfo.baseUrl}/ajax${ajaxRoute('${sourceInfo.baseUrl}')}/episode/sources?id=$id",
-        "headers": {"referer": "${sourceInfo.baseUrl}/$url"}
+            "${source.baseUrl}/ajax${ajaxRoute('${source.baseUrl}')}/episode/sources?id=$id",
+        "headers": {"referer": "${source.baseUrl}/$url"}
       };
 
-      final resE = await MBridge.http('GET', json.encode(datasE));
-      String epUrl = MBridge.substringBefore(
-          MBridge.substringAfter(resE, "\"link\":\""), "\"");
+      final resE = await http('GET', json.encode(datasE));
+      String epUrl = substringBefore(
+          substringAfter(resE, "\"link\":\""), "\"");
       print(epUrl);
       List<MVideo> a = [];
       if (name.contains("Vidstreaming")) {
-        a = await MBridge.rapidCloudExtractor(epUrl, "Vidstreaming - $subDub");
+        a = await rapidCloudExtractor(epUrl, "Vidstreaming - $subDub");
       } else if (name.contains("Vidcloud")) {
-        a = await MBridge.rapidCloudExtractor(epUrl, "Vidcloud - $subDub");
+        a = await rapidCloudExtractor(epUrl, "Vidcloud - $subDub");
       } else if (name.contains("StreamTape")) {
-        a = await MBridge.streamTapeExtractor(epUrl, "StreamTape - $subDub");
+        a = await streamTapeExtractor(epUrl, "StreamTape - $subDub");
       }
       videos.addAll(a);
     }
@@ -181,22 +168,21 @@ class ZoroTheme extends MSourceProvider {
   }
 
   @override
-  Future<List<String>> getPageList(MSource sourceInfo, String url) async {
+  Future<List<String>> getPageList(MSource source, String url) async {
     return [];
   }
 
   MPages animeElementM(String res) {
     List<MManga> animeList = [];
 
-    final urls = MBridge.xpath(
+    final urls = xpath(
         res, '//*[@class^="flw-item"]/div[@class="film-detail"]/h3/a/@href');
 
-    final names = MBridge.xpath(res,
+    final names = xpath(res,
         '//*[@class^="flw-item"]/div[@class="film-detail"]/h3/a/@data-jname');
 
-    final images = MBridge.xpath(
+    final images = xpath(
         res, '//*[@class^="flw-item"]/div[@class="film-poster"]/img/@data-src');
-
     for (var i = 0; i < names.length; i++) {
       MManga anime = MManga();
       anime.name = names[i];
@@ -204,7 +190,7 @@ class ZoroTheme extends MSourceProvider {
       anime.link = urls[i];
       animeList.add(anime);
     }
-    final nextPage = MBridge.xpath(
+    final nextPage = xpath(
         res, '//li[@class="page-item"]/a[@title="Next"]/@href', "");
     return MPages(animeList, !nextPage.isEmpty);
   }
@@ -220,3 +206,4 @@ class ZoroTheme extends MSourceProvider {
 ZoroTheme main() {
   return ZoroTheme();
 }
+

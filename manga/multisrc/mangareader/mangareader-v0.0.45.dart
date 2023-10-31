@@ -1,41 +1,41 @@
 import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
-class MangaReader extends MSourceProvider {
+class MangaReader extends MProvider {
   MangaReader();
 
   @override
-  Future<MPages> getPopular(MSource sourceInfo, int page) async {
+  Future<MPages> getPopular(MSource source, int page) async {
     final url =
-        "${sourceInfo.baseUrl}${getMangaUrlDirectory(sourceInfo.name)}/?page=$page&order=popular";
-    final data = {"url": url, "sourceId": sourceInfo.id};
-    final res = await MBridge.http('GET', json.encode(data));
+        "${source.baseUrl}${getMangaUrlDirectory(source.name)}/?page=$page&order=popular";
+    final data = {"url": url, "sourceId": source.id};
+    final res = await http('GET', json.encode(data));
 
     return mangaRes(res);
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource sourceInfo, int page) async {
+  Future<MPages> getLatestUpdates(MSource source, int page) async {
     final url =
-        "${sourceInfo.baseUrl}${getMangaUrlDirectory(sourceInfo.name)}/?page=$page&order=update";
-    final data = {"url": url, "sourceId": sourceInfo.id};
-    final res = await MBridge.http('GET', json.encode(data));
+        "${source.baseUrl}${getMangaUrlDirectory(source.name)}/?page=$page&order=update";
+    final data = {"url": url, "sourceId": source.id};
+    final res = await http('GET', json.encode(data));
 
     return mangaRes(res);
   }
 
   @override
-  Future<MPages> search(MSource sourceInfo, String query, int page) async {
+  Future<MPages> search(MSource source, String query, int page) async {
     final url =
-        "${sourceInfo.baseUrl}${getMangaUrlDirectory(sourceInfo.name)}/?&title=$query&page=$page";
-    final data = {"url": url, "sourceId": sourceInfo.id};
-    final res = await MBridge.http('GET', json.encode(data));
+        "${source.baseUrl}${getMangaUrlDirectory(source.name)}/?&title=$query&page=$page";
+    final data = {"url": url, "sourceId": source.id};
+    final res = await http('GET', json.encode(data));
 
     return mangaRes(res);
   }
 
   @override
-  Future<MManga> getDetail(MSource sourceInfo, String url) async {
+  Future<MManga> getDetail(MSource source, String url) async {
     final statusList = [
       {
         "مستمرة": 0,
@@ -89,10 +89,10 @@ class MangaReader extends MSourceProvider {
     ];
 
     MManga manga = MManga();
-    final datas = {"url": url, "sourceId": sourceInfo.id};
-    final res = await MBridge.http('GET', json.encode(datas));
+    final datas = {"url": url, "sourceId": source.id};
+    final res = await http('GET', json.encode(datas));
 
-    manga.author = MBridge.xpath(
+    manga.author = xpath(
             res,
             '//*[@class="imptdt" and contains(text(), "Author") or @class="infotable" and contains(text(), "Author") or @class="infotable" and contains(text(), "Auteur") or @class="fmed" and contains(text(), "Auteur") or @class="infotable" and contains(text(), "Autor")]/text()',
             '')
@@ -102,14 +102,14 @@ class MangaReader extends MSourceProvider {
         .replaceAll("Auteur", "")
         .replaceAll("[Add, ]", "");
 
-    manga.description = MBridge.querySelectorAll(res,
+    manga.description = querySelectorAll(res,
             selector: ".desc, .entry-content[itemprop=description]",
             typeElement: 0,
             attributes: "",
             typeRegExp: 0)
         .first;
 
-    final status = MBridge.xpath(
+    final status = xpath(
             res,
             '//*[@class="imptdt" and contains(text(), "Status") or @class="imptdt" and contains(text(), "Estado") or @class="infotable" and contains(text(), "Status") or @class="infotable" and contains(text(), "Statut") or @class="imptdt" and contains(text(), "Statut")]/text()',
             '')
@@ -118,20 +118,20 @@ class MangaReader extends MSourceProvider {
         .replaceAll("Estado", "")
         .replaceAll("Statut", "");
 
-    manga.status = MBridge.parseStatus(status, statusList);
+    manga.status = parseStatus(status, statusList);
 
-    manga.genre = MBridge.xpath(res,
+    manga.genre = xpath(res,
         '//*[@class="gnr"  or @class="mgen"  or @class="seriestugenre" ]/a/text()');
 
-    var chapUrls = MBridge.xpath(res,
+    var chapUrls = xpath(res,
         '//*[@class="bxcl"  or @class="cl"  or @class="chbox" or @class="eph-num" or @id="chapterlist"]/div/a[not(@href="#/chapter-{{number}}")]/@href');
-    var chaptersNames = MBridge.xpath(res,
+    var chaptersNames = xpath(res,
         '//*[@class="bxcl"  or @class="cl"  or @class="chbox" or @class="eph-num" or @id="chapterlist"]/div/a/span[@class="chapternum" and not(text()="Chapter {{number}}") or @class="lch" and not(text()="Chapter {{number}}")]/text()');
-    var chapterDates = MBridge.xpath(res,
+    var chapterDates = xpath(res,
         '//*[@class="bxcl"  or @class="cl"  or @class="chbox" or @class="eph-num" or @id="chapterlist"]/div/a/span[@class="chapterdate" and not(text()="{{date}}")]/text()');
 
-    var dateUploads = MBridge.parseDates(
-        chapterDates, sourceInfo.dateFormat, sourceInfo.dateFormatLocale);
+    var dateUploads = parseDates(
+        chapterDates, source.dateFormat, source.dateFormatLocale);
 
     List<MChapter>? chaptersList = [];
     for (var i = 0; i < chaptersNames.length; i++) {
@@ -146,20 +146,20 @@ class MangaReader extends MSourceProvider {
   }
 
   @override
-  Future<List<String>> getPageList(MSource sourceInfo, String url) async {
-    final datas = {"url": url, "sourceId": sourceInfo.id};
-    final res = await MBridge.http('GET', json.encode(datas));
+  Future<List<String>> getPageList(MSource source, String url) async {
+    final datas = {"url": url, "sourceId": source.id};
+    final res = await http('GET', json.encode(datas));
 
     List<String> pages = [];
     List<String> pagesUrl = [];
-    pages = MBridge.xpath(res, '//*[@id="readerarea"]/p/img/@src');
+    pages = xpath(res, '//*[@id="readerarea"]/p/img/@src');
     if (pages.isEmpty || pages.length == 1) {
-      pages = MBridge.xpath(res, '//*[@id="readerarea"]/img/@src');
+      pages = xpath(res, '//*[@id="readerarea"]/img/@src');
     }
     if (pages.isEmpty || pages.length == 1) {
       final images =
-          MBridge.regExp(res, "\"images\"\\s*:\\s*(\\[.*?])", "", 1, 1);
-      final pages = MBridge.jsonDecodeToList(images, 0);
+          regExp(res, "\"images\"\\s*:\\s*(\\[.*?])", "", 1, 1);
+      final pages = json.decode(images) as List;
       for (var page in pages) {
         pagesUrl.add(page);
       }
@@ -173,10 +173,10 @@ class MangaReader extends MSourceProvider {
   MPages mangaRes(String res) {
     List<MManga> mangaList = [];
     final urls =
-        MBridge.xpath(res, '//*[ @class="imgu"  or @class="bsx"]/a/@href');
+        xpath(res, '//*[ @class="imgu"  or @class="bsx"]/a/@href');
     final names =
-        MBridge.xpath(res, '//*[ @class="imgu"  or @class="bsx"]/a/@title');
-    final images = MBridge.xpath(
+        xpath(res, '//*[ @class="imgu"  or @class="bsx"]/a/@title');
+    final images = xpath(
         res, '//*[ @class="imgu"  or @class="bsx"]/a/div[1]/img/@src');
 
     for (var i = 0; i < names.length; i++) {
@@ -198,7 +198,7 @@ class MangaReader extends MSourceProvider {
   }
 
   @override
-  Future<List<MVideo>> getVideoList(MSource sourceInfo, String url) async {
+  Future<List<MVideo>> getVideoList(MSource source, String url) async {
     return [];
   }
 }

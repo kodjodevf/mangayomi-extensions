@@ -1,61 +1,59 @@
 import 'package:mangayomi/bridge_lib.dart';
-import 'package:mangayomi/utils.dart';
 import 'dart:convert';
 
-class Batoto extends MSourceProvider {
+class Batoto extends MProvider {
   Batoto();
 
   @override
-  Future<MPages> getPopular(MSource sourceInfo, int page) async {
+  Future<MPages> getPopular(MSource source, int page) async {
     final url =
-        "${sourceInfo.baseUrl}/browse?${lang(sourceInfo.lang)}&sort=views_a&page=$page";
+        "${source.baseUrl}/browse?${lang(source.lang)}&sort=views_a&page=$page";
     final data = {"url": url};
-    final res = await MBridge.http('GET', json.encode(data));
-    return mangaElementM(res, sourceInfo);
+    final res = await http('GET', json.encode(data));
+    return mangaElementM(res, source);
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource sourceInfo, int page) async {
+  Future<MPages> getLatestUpdates(MSource source, int page) async {
     final url =
-        "${sourceInfo.baseUrl}/browse?${lang(sourceInfo.lang)}&sort=update&page=$page";
+        "${source.baseUrl}/browse?${lang(source.lang)}&sort=update&page=$page";
     final data = {"url": url};
-    final res = await MBridge.http('GET', json.encode(data));
-    return mangaElementM(res, sourceInfo);
+    final res = await http('GET', json.encode(data));
+    return mangaElementM(res, source);
   }
 
   @override
-  Future<MPages> search(MSource sourceInfo, String query, int page) async {
-    final url = "${sourceInfo.baseUrl}/search?word=$query&page=$page";
+  Future<MPages> search(MSource source, String query, int page) async {
+    final url = "${source.baseUrl}/search?word=$query&page=$page";
     final data = {"url": url};
-    final res = await MBridge.http('GET', json.encode(data));
-    return mangaElementM(res, sourceInfo);
+    final res = await http('GET', json.encode(data));
+    return mangaElementM(res, source);
   }
 
   @override
-  Future<MManga> getDetail(MSource sourceInfo, String url) async {
+  Future<MManga> getDetail(MSource source, String url) async {
     final statusList = [
       {"Ongoing": 0, "Completed": 1, "Cancelled": 3, "Hiatus": 2}
     ];
 
-    final data = {"url": "${sourceInfo.baseUrl}$url"};
-    final res = await MBridge.http('GET', json.encode(data));
+    final data = {"url": "${source.baseUrl}$url"};
+    final res = await http('GET', json.encode(data));
     MManga manga = MManga();
-    final workStatus = MBridge.xpath(res,
+    final workStatus = xpath(res,
             '//*[@class="attr-item"]/b[contains(text(),"Original work")]/following-sibling::span[1]/text()')
         .first;
-    manga.status = MBridge.parseStatus(workStatus, statusList);
+    manga.status = parseStatus(workStatus, statusList);
 
-    manga.author = MBridge.xpath(res,
+    manga.author = xpath(res,
             '//*[@class="attr-item"]/b[contains(text(),"Authors")]/following-sibling::span[1]/text()')
         .first;
-    manga.genre = MBridge.xpath(res,
+    manga.genre = xpath(res,
             '//*[@class="attr-item"]/b[contains(text(),"Genres")]/following-sibling::span[1]/text()')
         .first
         .split(",");
-    manga.description =
-        MBridge.xpath(res, '//*[@class="limit-html"]/text()').first;
+    manga.description = xpath(res, '//*[@class="limit-html"]/text()').first;
 
-    List<String> chapsElement = MBridge.querySelectorAll(res,
+    List<String> chapsElement = querySelectorAll(res,
         selector: "div.main div.p-2",
         typeElement: 2,
         attributes: "",
@@ -65,26 +63,24 @@ class Batoto extends MSourceProvider {
     List<String> chapsNames = [];
     List<String> scanlators = [];
     for (var element in chapsElement) {
-      final urlElement = MBridge.querySelectorAll(element,
+      final urlElement = querySelectorAll(element,
               selector: "a.chapt",
               typeElement: 2,
               attributes: "",
               typeRegExp: 0)
           .first;
-      final group =
-          MBridge.xpath(element, '//*[@class="extra"]/a/text()').first;
-      final name = MBridge.xpath(urlElement, '//a/text()').first;
-      final url = MBridge.xpath(urlElement, '//a/@href').first;
+      final group = xpath(element, '//*[@class="extra"]/a/text()').first;
+      final name = xpath(urlElement, '//a/text()').first;
+      final url = xpath(urlElement, '//a/@href').first;
       final time =
-          MBridge.xpath(element, '//*[@class="extra"]/i[@class="ps-3"]/text()')
-              .first;
+          xpath(element, '//*[@class="extra"]/i[@class="ps-3"]/text()').first;
       times.add(time);
       chapsUrls.add(url);
       scanlators.add(group);
       chapsNames.add(name.replaceAll("\n ", "").replaceAll("  ", ""));
     }
-    var dateUploads = MBridge.parseDates(
-        times, sourceInfo.dateFormat, sourceInfo.dateFormatLocale);
+    var dateUploads =
+        parseDates(times, source.dateFormat, source.dateFormatLocale);
     List<MChapter>? chaptersList = [];
     for (var i = 0; i < chapsNames.length; i++) {
       MChapter chapter = MChapter();
@@ -99,29 +95,23 @@ class Batoto extends MSourceProvider {
   }
 
   @override
-  Future<List<String>> getPageList(MSource sourceInfo, String url) async {
-    final datas = {"url": "${sourceInfo.baseUrl}$url"};
-    final res = await MBridge.http('GET', json.encode(datas));
+  Future<List<String>> getPageList(MSource source, String url) async {
+    final datas = {"url": "${source.baseUrl}$url"};
+    final res = await http('GET', json.encode(datas));
 
-    final script = MBridge.xpath(res,
+    final script = xpath(res,
             '//script[contains(text(), "imgHttpLis") and contains(text(), "batoWord") and contains(text(), "batoPass")]/text()')
         .first;
-    final imgHttpLisString = Substring(script)
-        .substringAfterLast('const imgHttpLis =')
-        .substringBefore(';')
-        .text;
+    final imgHttpLisString =
+        substringBefore(substringAfterLast(script, 'const imgHttpLis ='), ';');
     var imgHttpLis = json.decode(imgHttpLisString);
-    final batoWord = Substring(script)
-        .substringAfterLast('const batoWord =')
-        .substringBefore(';')
-        .text;
-    final batoPass = Substring(script)
-        .substringAfterLast('const batoPass =')
-        .substringBefore(';')
-        .text;
-    final evaluatedPass = MBridge.deobfuscateJsPassword(batoPass);
+    final batoWord =
+        substringBefore(substringAfterLast(script, 'const batoWord ='), ';');
+    final batoPass =
+        substringBefore(substringAfterLast(script, 'const batoPass ='), ';');
+    final evaluatedPass = deobfuscateJsPassword(batoPass);
     final imgAccListString =
-        MBridge.decryptAESCryptoJS(batoWord.replaceAll('"', ""), evaluatedPass);
+        decryptAESCryptoJS(batoWord.replaceAll('"', ""), evaluatedPass);
     var imgAccList = json.decode(imgAccListString);
     List<String> pagesUrl = [];
     for (int i = 0; i < imgHttpLis.length; i++) {
@@ -133,10 +123,10 @@ class Batoto extends MSourceProvider {
     return pagesUrl;
   }
 
-  MPages mangaElementM(String res, MSource sourceInfo) async {
-    final lang = sourceInfo.lang.replaceAll("-", "_");
+  MPages mangaElementM(String res, MSource source) async {
+    final lang = source.lang.replaceAll("-", "_");
 
-    var resB = MBridge.querySelectorAll(res,
+    var resB = querySelectorAll(res,
         selector: "div#series-list div.col",
         typeElement: 2,
         attributes: "",
@@ -147,22 +137,22 @@ class Batoto extends MSourceProvider {
     List<String> names = [];
 
     for (var element in resB) {
-      if (sourceInfo.lang == "all" ||
-          sourceInfo.lang == "en" && element.contains('no-flag') ||
+      if (source.lang == "all" ||
+          source.lang == "en" && element.contains('no-flag') ||
           element.contains('data-lang="$lang"')) {
-        final item = MBridge.querySelectorAll(element,
+        final item = querySelectorAll(element,
                 selector: "a.item-cover",
                 typeElement: 2,
                 attributes: "",
                 typeRegExp: 0)
             .first;
-        final img = MBridge.querySelectorAll(item,
+        final img = querySelectorAll(item,
                 selector: "img",
                 typeElement: 3,
                 attributes: "src",
                 typeRegExp: 0)
             .first;
-        final url = MBridge.querySelectorAll(item,
+        final url = querySelectorAll(item,
                 selector: "a",
                 typeElement: 3,
                 attributes: "href",
@@ -170,7 +160,7 @@ class Batoto extends MSourceProvider {
             .first;
         images.add(img);
         urls.add(url);
-        final title = MBridge.querySelectorAll(element,
+        final title = querySelectorAll(element,
                 selector: "a.item-title",
                 typeElement: 0,
                 attributes: "",
@@ -201,7 +191,7 @@ class Batoto extends MSourceProvider {
   }
 
   @override
-  Future<List<MVideo>> getVideoList(MSource sourceInfo, String url) async {
+  Future<List<MVideo>> getVideoList(MSource source, String url) async {
     return [];
   }
 }

@@ -1,26 +1,26 @@
 import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
-class Madara extends MSourceProvider {
+class Madara extends MProvider {
   Madara();
 
   @override
-  Future<MPages> getPopular(MSource sourceInfo, int page) async {
-    final url = "${sourceInfo.baseUrl}/manga/page/$page/?m_orderby=views";
-    final data = {"url": url, "sourceId": sourceInfo.id};
-    final res = await MBridge.http('GET', json.encode(data));
+  Future<MPages> getPopular(MSource source, int page) async {
+    final url = "${source.baseUrl}/manga/page/$page/?m_orderby=views";
+    final data = {"url": url, "sourceId": source.id};
+    final res = await http('GET', json.encode(data));
 
     List<MManga> mangaList = [];
-    final urls = MBridge.xpath(res, '//*[@class^="post-title"]/h3/a/@href');
-    final names = MBridge.xpath(res, '//*[@id^="manga-item"]/a/@title');
-    var images = MBridge.xpath(res, '//*[@id^="manga-item"]/a/img/@data-src');
+    final urls = xpath(res, '//*[@class^="post-title"]/h3/a/@href');
+    final names = xpath(res, '//*[@id^="manga-item"]/a/@title');
+    var images = xpath(res, '//*[@id^="manga-item"]/a/img/@data-src');
     if (images.isEmpty) {
       images =
-          MBridge.xpath(res, '//*[@id^="manga-item"]/a/img/@data-lazy-src');
+          xpath(res, '//*[@id^="manga-item"]/a/img/@data-lazy-src');
       if (images.isEmpty) {
-        images = MBridge.xpath(res, '//*[@id^="manga-item"]/a/img/@srcset');
+        images = xpath(res, '//*[@id^="manga-item"]/a/img/@srcset');
         if (images.isEmpty) {
-          images = MBridge.xpath(res, '//*[@id^="manga-item"]/a/img/@src');
+          images = xpath(res, '//*[@id^="manga-item"]/a/img/@src');
         }
       }
     }
@@ -37,22 +37,22 @@ class Madara extends MSourceProvider {
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource sourceInfo, int page) async {
-    final url = "${sourceInfo.baseUrl}/manga/page/$page/?m_orderby=latest";
-    final data = {"url": url, "sourceId": sourceInfo.id};
-    final res = await MBridge.http('GET', json.encode(data));
+  Future<MPages> getLatestUpdates(MSource source, int page) async {
+    final url = "${source.baseUrl}/manga/page/$page/?m_orderby=latest";
+    final data = {"url": url, "sourceId": source.id};
+    final res = await http('GET', json.encode(data));
 
     List<MManga> mangaList = [];
-    final urls = MBridge.xpath(res, '//*[@class^="post-title"]/h3/a/@href');
-    final names = MBridge.xpath(res, '//*[@id^="manga-item"]/a/@title');
-    var images = MBridge.xpath(res, '//*[@id^="manga-item"]/a/img/@data-src');
+    final urls = xpath(res, '//*[@class^="post-title"]/h3/a/@href');
+    final names = xpath(res, '//*[@id^="manga-item"]/a/@title');
+    var images = xpath(res, '//*[@id^="manga-item"]/a/img/@data-src');
     if (images.isEmpty) {
       images =
-          MBridge.xpath(res, '//*[@id^="manga-item"]/a/img/@data-lazy-src');
+          xpath(res, '//*[@id^="manga-item"]/a/img/@data-lazy-src');
       if (images.isEmpty) {
-        images = MBridge.xpath(res, '//*[@id^="manga-item"]/a/img/@srcset');
+        images = xpath(res, '//*[@id^="manga-item"]/a/img/@srcset');
         if (images.isEmpty) {
-          images = MBridge.xpath(res, '//*[@id^="manga-item"]/a/img/@src');
+          images = xpath(res, '//*[@id^="manga-item"]/a/img/@src');
         }
       }
     }
@@ -69,28 +69,28 @@ class Madara extends MSourceProvider {
   }
 
   @override
-  Future<MPages> search(MSource sourceInfo, String query, int page) async {
+  Future<MPages> search(MSource source, String query, int page) async {
     final data = {
-      "url": "${sourceInfo.baseUrl}/?s=$query&post_type=wp-manga",
-      "sourceId": sourceInfo.id
+      "url": "${source.baseUrl}/?s=$query&post_type=wp-manga",
+      "sourceId": source.id
     };
-    final res = await MBridge.http('GET', json.encode(data));
+    final res = await http('GET', json.encode(data));
 
     List<MManga> mangaList = [];
     final urls =
-        MBridge.xpath(res, '//*[@class^="tab-thumb c-image-hover"]/a/@href');
+        xpath(res, '//*[@class^="tab-thumb c-image-hover"]/a/@href');
     final names =
-        MBridge.xpath(res, '//*[@class^="tab-thumb c-image-hover"]/a/@title');
-    var images = MBridge.xpath(
+        xpath(res, '//*[@class^="tab-thumb c-image-hover"]/a/@title');
+    var images = xpath(
         res, '//*[@class^="tab-thumb c-image-hover"]/a/img/@data-src');
     if (images.isEmpty) {
-      images = MBridge.xpath(
+      images = xpath(
           res, '//*[@class^="tab-thumb c-image-hover"]/a/img/@data-lazy-src');
       if (images.isEmpty) {
-        images = MBridge.xpath(
+        images = xpath(
             res, '//*[@class^="tab-thumb c-image-hover"]/a/img/@srcset');
         if (images.isEmpty) {
-          images = MBridge.xpath(
+          images = xpath(
               res, '//*[@class^="tab-thumb c-image-hover"]/a/img/@src');
         }
       }
@@ -108,7 +108,7 @@ class Madara extends MSourceProvider {
   }
 
   @override
-  Future<MManga> getDetail(MSource sourceInfo, String url) async {
+  Future<MManga> getDetail(MSource source, String url) async {
     final statusList = [
       {
         "OnGoing": 0,
@@ -155,36 +155,36 @@ class Madara extends MSourceProvider {
     ];
     MManga manga = MManga();
     String res = "";
-    final datas = {"url": url, "sourceId": sourceInfo.id};
-    res = await MBridge.http('GET', json.encode(datas));
+    final datas = {"url": url, "sourceId": source.id};
+    res = await http('GET', json.encode(datas));
 
-    manga.author = MBridge.querySelectorAll(res,
+    manga.author = querySelectorAll(res,
             selector: "div.author-content > a",
             typeElement: 0,
             attributes: "",
             typeRegExp: 0)
         .first;
-    manga.description = MBridge.querySelectorAll(res,
+    manga.description = querySelectorAll(res,
             selector:
                 "div.description-summary div.summary__content, div.summary_content div.post-content_item > h5 + div, div.summary_content div.manga-excerpt, div.sinopsis div.contenedor, .description-summary > p",
             typeElement: 0,
             attributes: "",
             typeRegExp: 0)
         .first;
-    manga.imageUrl = MBridge.querySelectorAll(res,
+    manga.imageUrl = querySelectorAll(res,
             selector: "div.summary_image img",
             typeElement: 2,
             attributes: "",
             typeRegExp: 2)
         .first;
-    final mangaId = MBridge.querySelectorAll(res,
+    final mangaId = querySelectorAll(res,
             selector: "div[id^=manga-chapters-holder]",
             typeElement: 3,
             attributes: "data-id",
             typeRegExp: 0)
         .first;
-    manga.status = MBridge.parseStatus(
-        MBridge.querySelectorAll(res,
+    manga.status = parseStatus(
+        querySelectorAll(res,
                 selector: "div.summary-content",
                 typeElement: 0,
                 attributes: "",
@@ -192,13 +192,13 @@ class Madara extends MSourceProvider {
             .last,
         statusList);
 
-    manga.genre = MBridge.querySelectorAll(res,
+    manga.genre = querySelectorAll(res,
         selector: "div.genres-content a",
         typeElement: 0,
         attributes: "",
         typeRegExp: 0);
 
-    final baseUrl = "${sourceInfo.baseUrl}/";
+    final baseUrl = "${source.baseUrl}/";
     final headers = {
       "Referer": baseUrl,
       "Content-Type": "application/x-www-form-urlencoded",
@@ -206,33 +206,33 @@ class Madara extends MSourceProvider {
     };
     final urll =
         "${baseUrl}wp-admin/admin-ajax.php?action=manga_get_chapters&manga=$mangaId";
-    final datasP = {"url": urll, "headers": headers, "sourceId": sourceInfo.id};
-    res = await MBridge.http('POST', json.encode(datasP));
+    final datasP = {"url": urll, "headers": headers, "sourceId": source.id};
+    res = await http('POST', json.encode(datasP));
     if (res == "400") {
       final urlP = "${url}ajax/chapters";
       final datasP = {
         "url": urlP,
         "headers": headers,
-        "sourceId": sourceInfo.id
+        "sourceId": source.id
       };
-      res = await MBridge.http('POST', json.encode(datasP));
+      res = await http('POST', json.encode(datasP));
     }
 
-    var chapUrls = MBridge.xpath(res, "//li/a/@href");
-    var chaptersNames = MBridge.xpath(res, "//li/a/text()");
-    var dateF = MBridge.xpath(res, "//li/span/i/text()");
+    var chapUrls = xpath(res, "//li/a/@href");
+    var chaptersNames = xpath(res, "//li/a/text()");
+    var dateF = xpath(res, "//li/span/i/text()");
     if (dateF.isEmpty) {
-      final resWebview = await MBridge.getHtmlViaWebview(
+      final resWebview = await getHtmlViaWebview(
           url, "//*[@id='manga-chapters-holder']/div[2]/div/ul/li/a/@href");
-      chapUrls = MBridge.xpath(resWebview,
+      chapUrls = xpath(resWebview,
           "//*[@id='manga-chapters-holder']/div[2]/div/ul/li/a/@href");
-      chaptersNames = MBridge.xpath(resWebview,
+      chaptersNames = xpath(resWebview,
           "//*[@id='manga-chapters-holder']/div[2]/div/ul/li/a/text()");
-      dateF = MBridge.xpath(resWebview,
+      dateF = xpath(resWebview,
           "//*[@id='manga-chapters-holder']/div[2]/div/ul/li/span/i/text()");
     }
-    var dateUploads = MBridge.parseDates(
-        dateF, sourceInfo.dateFormat, sourceInfo.dateFormatLocale);
+    var dateUploads = parseDates(
+        dateF, source.dateFormat, source.dateFormatLocale);
     if (dateF.length < chaptersNames.length) {
       final length = chaptersNames.length - dateF.length;
       String date = "${DateTime.now().millisecondsSinceEpoch}";
@@ -240,8 +240,8 @@ class Madara extends MSourceProvider {
         date += "--..${DateTime.now().millisecondsSinceEpoch}";
       }
 
-      final dateFF = MBridge.parseDates(
-          dateF, sourceInfo.dateFormat, sourceInfo.dateFormatLocale);
+      final dateFF = parseDates(
+          dateF, source.dateFormat, source.dateFormatLocale);
       List<String> chapterDate = date.split('--..');
 
       for (var date in dateFF) {
@@ -263,36 +263,36 @@ class Madara extends MSourceProvider {
   }
 
   @override
-  Future<List<String>> getPageList(MSource sourceInfo, String url) async {
-    final datas = {"url": url, "sourceId": sourceInfo.id};
-    final res = await MBridge.http('GET', json.encode(datas));
+  Future<List<String>> getPageList(MSource source, String url) async {
+    final datas = {"url": url, "sourceId": source.id};
+    final res = await http('GET', json.encode(datas));
 
-    final pagesSelectorRes = MBridge.querySelectorAll(res,
+    final pagesSelectorRes = querySelectorAll(res,
             selector:
                 "div.page-break, li.blocks-gallery-item, .reading-content, .text-left img",
             typeElement: 1,
             attributes: "",
             typeRegExp: 0)
         .first;
-    final imgs = MBridge.querySelectorAll(pagesSelectorRes,
+    final imgs = querySelectorAll(pagesSelectorRes,
         selector: "img", typeElement: 2, attributes: "", typeRegExp: 2);
     var pageUrls = [];
 
     if (imgs.length == 1) {
-      final pages = MBridge.querySelectorAll(res,
+      final pages = querySelectorAll(res,
               selector: "#single-pager",
               typeElement: 2,
               attributes: "",
               typeRegExp: 0)
           .first;
 
-      final pagesNumber = MBridge.querySelectorAll(pages,
+      final pagesNumber = querySelectorAll(pages,
           selector: "option", typeElement: 2, attributes: "", typeRegExp: 0);
 
       for (var i = 0; i < pagesNumber.length; i++) {
         final val = i + 1;
         if (i.toString().length == 1) {
-          pageUrls.add(MBridge.querySelectorAll(pagesSelectorRes,
+          pageUrls.add(querySelectorAll(pagesSelectorRes,
                   selector: "img",
                   typeElement: 2,
                   attributes: "",
@@ -300,7 +300,7 @@ class Madara extends MSourceProvider {
               .first
               .replaceAll("01", '0$val'));
         } else {
-          pageUrls.add(MBridge.querySelectorAll(pagesSelectorRes,
+          pageUrls.add(querySelectorAll(pagesSelectorRes,
                   selector: "img",
                   typeElement: 2,
                   attributes: "",
@@ -316,7 +316,7 @@ class Madara extends MSourceProvider {
   }
 
   @override
-  Future<List<MVideo>> getVideoList(MSource sourceInfo, String url) async {
+  Future<List<MVideo>> getVideoList(MSource source, String url) async {
     return [];
   }
 }

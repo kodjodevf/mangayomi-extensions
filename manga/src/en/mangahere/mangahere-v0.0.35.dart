@@ -1,23 +1,23 @@
 import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
-class MangaHere extends MSourceProvider {
+class MangaHere extends MProvider {
   MangaHere();
 
   @override
-  Future<MPages> getPopular(MSource sourceInfo, int page) async {
-    final headers = getHeader(sourceInfo.baseUrl);
-    final url = "${sourceInfo.baseUrl}/directory/$page.htm";
+  Future<MPages> getPopular(MSource source, int page) async {
+    final headers = getHeader(source.baseUrl);
+    final url = "${source.baseUrl}/directory/$page.htm";
 
     final data = {"url": url, "headers": headers};
-    final res = await MBridge.http('POST', json.encode(data));
+    final res = await http('POST', json.encode(data));
 
     List<MManga> mangaList = [];
-    final names = MBridge.xpath(
+    final names = xpath(
         res, '//*[ contains(@class, "manga-list-1-list")]/li/a/@title');
-    final images = MBridge.xpath(res,
+    final images = xpath(res,
         '//*[ contains(@class, "manga-list-1-list")]/li/a/img[@class="manga-list-1-cover"]/@src');
-    final urls = MBridge.xpath(
+    final urls = xpath(
         res, '//*[ contains(@class, "manga-list-1-list")]/li/a/@href');
 
     for (var i = 0; i < names.length; i++) {
@@ -32,19 +32,19 @@ class MangaHere extends MSourceProvider {
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource sourceInfo, int page) async {
-    final headers = getHeader(sourceInfo.baseUrl);
-    final url = "${sourceInfo.baseUrl}/directory/$page.htm?latest";
+  Future<MPages> getLatestUpdates(MSource source, int page) async {
+    final headers = getHeader(source.baseUrl);
+    final url = "${source.baseUrl}/directory/$page.htm?latest";
 
     final data = {"url": url, "headers": headers};
-    final res = await MBridge.http('POST', json.encode(data));
+    final res = await http('POST', json.encode(data));
 
     List<MManga> mangaList = [];
-    final names = MBridge.xpath(
+    final names = xpath(
         res, '//*[ contains(@class, "manga-list-1-list")]/li/a/@title');
-    final images = MBridge.xpath(res,
+    final images = xpath(res,
         '//*[ contains(@class, "manga-list-1-list")]/li/a/img[@class="manga-list-1-cover"]/@src');
-    final urls = MBridge.xpath(
+    final urls = xpath(
         res, '//*[ contains(@class, "manga-list-1-list")]/li/a/@href');
 
     for (var i = 0; i < names.length; i++) {
@@ -59,19 +59,19 @@ class MangaHere extends MSourceProvider {
   }
 
   @override
-  Future<MPages> search(MSource sourceInfo, String query, int page) async {
-    final headers = getHeader(sourceInfo.baseUrl);
-    final url = "${sourceInfo.baseUrl}/search?title=$query&page=$page";
+  Future<MPages> search(MSource source, String query, int page) async {
+    final headers = getHeader(source.baseUrl);
+    final url = "${source.baseUrl}/search?title=$query&page=$page";
 
     final data = {"url": url, "headers": headers};
-    final res = await MBridge.http('POST', json.encode(data));
+    final res = await http('POST', json.encode(data));
 
     List<MManga> mangaList = [];
-    final names = MBridge.xpath(
+    final names = xpath(
         res, '//*[contains(@class, "manga-list-4-list")]/li/a/@title');
-    final images = MBridge.xpath(res,
+    final images = xpath(res,
         '//*[contains(@class, "manga-list-4-list")]/li/a/img[@class="manga-list-4-cover"]/@src');
-    final urls = MBridge.xpath(
+    final urls = xpath(
         res, '//*[contains(@class, "manga-list-4-list")]/li/a/@href');
 
     for (var i = 0; i < names.length; i++) {
@@ -86,34 +86,34 @@ class MangaHere extends MSourceProvider {
   }
 
   @override
-  Future<MManga> getDetail(MSource sourceInfo, String url) async {
+  Future<MManga> getDetail(MSource source, String url) async {
     final statusList = [
       {"Ongoing": 0, "Completed": 1}
     ];
-    final headers = getHeader(sourceInfo.baseUrl);
-    final data = {"url": "${sourceInfo.baseUrl}/$url", "headers": headers};
-    final res = await MBridge.http('GET', json.encode(data));
+    final headers = getHeader(source.baseUrl);
+    final data = {"url": "${source.baseUrl}/$url", "headers": headers};
+    final res = await http('GET', json.encode(data));
     MManga manga = MManga();
     manga.author =
-        MBridge.xpath(res, '//*[@class="detail-info-right-say"]/a/text()')
+        xpath(res, '//*[@class="detail-info-right-say"]/a/text()')
             .first;
     manga.description =
-        MBridge.xpath(res, '//*[@class="fullcontent"]/text()').first;
+        xpath(res, '//*[@class="fullcontent"]/text()').first;
     final status =
-        MBridge.xpath(res, '//*[@class="detail-info-right-title-tip"]/text()')
+        xpath(res, '//*[@class="detail-info-right-title-tip"]/text()')
             .first;
-    manga.status = MBridge.parseStatus(status, statusList);
+    manga.status = parseStatus(status, statusList);
     manga.genre =
-        MBridge.xpath(res, '//*[@class="detail-info-right-tag-list"]/a/text()');
+        xpath(res, '//*[@class="detail-info-right-tag-list"]/a/text()');
 
     var chapUrls =
-        MBridge.xpath(res, '//*[@class="detail-main-list"]/li/a/@href');
-    var chaptersNames = MBridge.xpath(res,
+        xpath(res, '//*[@class="detail-main-list"]/li/a/@href');
+    var chaptersNames = xpath(res,
         '//*[@class="detail-main-list"]/li/a/div/p[@class="title3"]/text()');
-    final chapterDates = MBridge.xpath(res,
+    final chapterDates = xpath(res,
         '//*[@class="detail-main-list"]/li/a/div/p[@class="title2"]/text()');
-    var dateUploads = MBridge.parseDates(
-        chapterDates, sourceInfo.dateFormat, sourceInfo.dateFormatLocale);
+    var dateUploads = parseDates(
+        chapterDates, source.dateFormat, source.dateFormatLocale);
 
     List<MChapter>? chaptersList = [];
     for (var i = 0; i < chaptersNames.length; i++) {
@@ -128,19 +128,19 @@ class MangaHere extends MSourceProvider {
   }
 
   @override
-  Future<List<String>> getPageList(MSource sourceInfo, String url) async {
-    final headers = getHeader(sourceInfo.baseUrl);
-    final urll = "${sourceInfo.baseUrl}$url";
+  Future<List<String>> getPageList(MSource source, String url) async {
+    final headers = getHeader(source.baseUrl);
+    final urll = "${source.baseUrl}$url";
     final data = {"url": urll, "headers": headers};
-    final res = await MBridge.http('GET', json.encode(data));
-    final pages = MBridge.xpath(res, "//body/div/div/span/a/text()");
+    final res = await http('GET', json.encode(data));
+    final pages = xpath(res, "//body/div/div/span/a/text()");
     List<String> pageUrls = [];
     if (pages.isEmpty) {
-      final script = MBridge.xpath(
+      final script = xpath(
               res, "//script[contains(text(),'function(p,a,c,k,e,d)')]/text()")
           .first
           .replaceAll("eval", "");
-      String deobfuscatedScript = MBridge.evalJs(script);
+      String deobfuscatedScript = evalJs(script);
       int a = deobfuscatedScript.indexOf("newImgs=['") + 10;
       int b = deobfuscatedScript.indexOf("'];");
       List<String> urls = deobfuscatedScript.substring(a, b).split("','");
@@ -156,7 +156,7 @@ class MangaHere extends MSourceProvider {
       String secretKeyScript = res
           .substring(secretKeyScriptLocation, secretKeyScriptEndLocation)
           .replaceAll("eval", "");
-      String secretKeyDeobfuscatedScript = MBridge.evalJs(secretKeyScript);
+      String secretKeyDeobfuscatedScript = evalJs(secretKeyScript);
       int secretKeyStartLoc = secretKeyDeobfuscatedScript.indexOf("'");
       int secretKeyEndLoc = secretKeyDeobfuscatedScript.indexOf(";");
 
@@ -181,7 +181,7 @@ class MangaHere extends MSourceProvider {
               "X-Requested-With": "XMLHttpRequest"
             };
             final data = {"url": pageLink, "headers": headers};
-            final ress = await MBridge.http('GET', json.encode(data));
+            final ress = await http('GET', json.encode(data));
 
             responseText = ress;
 
@@ -191,7 +191,7 @@ class MangaHere extends MSourceProvider {
           }
         }
         String deobfuscatedScript =
-            MBridge.evalJs(responseText.replaceAll("eval", ""));
+            evalJs(responseText.replaceAll("eval", ""));
 
         int baseLinkStartPos = deobfuscatedScript.indexOf("pix=") + 5;
         int baseLinkEndPos =
@@ -212,7 +212,7 @@ class MangaHere extends MSourceProvider {
   }
 
   @override
-  Future<List<MVideo>> getVideoList(MSource sourceInfo, String url) async {
+  Future<List<MVideo>> getVideoList(MSource source, String url) async {
     return [];
   }
 }

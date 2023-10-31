@@ -1,16 +1,16 @@
 import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
-class KissKh extends MSourceProvider {
+class KissKh extends MProvider {
   KissKh();
 
   @override
-  Future<MPages> getPopular(MSource sourceInfo, int page) async {
+  Future<MPages> getPopular(MSource source, int page) async {
     final data = {
       "url":
-          "${sourceInfo.baseUrl}/api/DramaList/List?page=$page&type=0&sub=0&country=0&status=0&order=1&pageSize=40"
+          "${source.baseUrl}/api/DramaList/List?page=$page&type=0&sub=0&country=0&status=0&order=1&pageSize=40"
     };
-    final res = await MBridge.http('GET', json.encode(data));
+    final res = await http('GET', json.encode(data));
     final jsonRes = json.decode(res);
     final datas = jsonRes["data"] as List;
     List<MManga> animeList = [];
@@ -20,7 +20,7 @@ class KissKh extends MSourceProvider {
       anime.name = data["title"];
       anime.imageUrl = data["thumbnail"] ?? "";
       anime.link =
-          "${sourceInfo.baseUrl}/api/DramaList/Drama/${data["id"]}?isq=false";
+          "${source.baseUrl}/api/DramaList/Drama/${data["id"]}?isq=false";
       animeList.add(anime);
     }
 
@@ -30,13 +30,13 @@ class KissKh extends MSourceProvider {
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource sourceInfo, int page) async {
+  Future<MPages> getLatestUpdates(MSource source, int page) async {
     final data = {
       "url":
-          "${sourceInfo.baseUrl}/api/DramaList/List?page=$page&type=0&sub=0&country=0&status=0&order=12&pageSize=40",
+          "${source.baseUrl}/api/DramaList/List?page=$page&type=0&sub=0&country=0&status=0&order=12&pageSize=40",
       "header": {"ee": "eee"}
     };
-    final res = await MBridge.http('GET', json.encode(data));
+    final res = await http('GET', json.encode(data));
     final jsonRes = json.decode(res);
     final datas = jsonRes["data"] as List;
 
@@ -47,7 +47,7 @@ class KissKh extends MSourceProvider {
       anime.name = data["title"];
       anime.imageUrl = data["thumbnail"] ?? "";
       anime.link =
-          "${sourceInfo.baseUrl}/api/DramaList/Drama/${data["id"]}?isq=false";
+          "${source.baseUrl}/api/DramaList/Drama/${data["id"]}?isq=false";
       animeList.add(anime);
     }
 
@@ -57,11 +57,11 @@ class KissKh extends MSourceProvider {
   }
 
   @override
-  Future<MPages> search(MSource sourceInfo, String query, int page) async {
+  Future<MPages> search(MSource source, String query, int page) async {
     final data = {
-      "url": "${sourceInfo.baseUrl}/api/DramaList/Search?q=$query&type=0"
+      "url": "${source.baseUrl}/api/DramaList/Search?q=$query&type=0"
     };
-    final res = await MBridge.http('GET', json.encode(data));
+    final res = await http('GET', json.encode(data));
     final jsonRes = json.decode(res);
     List<MManga> animeList = [];
     for (var data in jsonRes) {
@@ -69,14 +69,14 @@ class KissKh extends MSourceProvider {
       anime.name = data["title"];
       anime.imageUrl = data["thumbnail"] ?? "";
       anime.link =
-          "${sourceInfo.baseUrl}/api/DramaList/Drama/${data["id"]}?isq=false";
+          "${source.baseUrl}/api/DramaList/Drama/${data["id"]}?isq=false";
       animeList.add(anime);
     }
     return MPages(animeList, false);
   }
 
   @override
-  Future<MManga> getDetail(MSource sourceInfo, String url) async {
+  Future<MManga> getDetail(MSource source, String url) async {
     final statusList = [
       {
         "Ongoing": 0,
@@ -84,13 +84,13 @@ class KissKh extends MSourceProvider {
       }
     ];
     final data = {"url": url};
-    final res = await MBridge.http('GET', json.encode(data));
+    final res = await http('GET', json.encode(data));
     MManga anime = MManga();
     final jsonRes = json.decode(res);
     final status = jsonRes["status"] ?? "";
     print(status);
     anime.description = jsonRes["description"];
-    anime.status = MBridge.parseStatus(status, statusList);
+    anime.status = parseStatus(status, statusList);
     anime.imageUrl = jsonRes["thumbnail"];
     var episodes = jsonRes["episodes"];
     String type = jsonRes["type"];
@@ -113,7 +113,7 @@ class KissKh extends MSourceProvider {
         episode.name = "Episode $number";
       }
       episode.url =
-          "${sourceInfo.baseUrl}/api/DramaList/Episode/$id.png?err=false&ts=&time=";
+          "${source.baseUrl}/api/DramaList/Episode/$id.png?err=false&ts=&time=";
       episodesList.add(episode);
     }
 
@@ -122,16 +122,16 @@ class KissKh extends MSourceProvider {
   }
 
   @override
-  Future<List<MVideo>> getVideoList(MSource sourceInfo, String url) async {
+  Future<List<MVideo>> getVideoList(MSource source, String url) async {
     final datas = {"url": url};
 
-    final res = await MBridge.http('GET', json.encode(datas));
-    final id = MBridge.substringAfter(
-        MBridge.substringBefore(url, ".png"), "Episode/");
+    final res = await http('GET', json.encode(datas));
+    final id = substringAfter(
+        substringBefore(url, ".png"), "Episode/");
     final jsonRes = json.decode(res);
 
-    final subRes = await MBridge.http(
-        'GET', json.encode({"url": "${sourceInfo.baseUrl}/api/Sub/$id"}));
+    final subRes = await http(
+        'GET', json.encode({"url": "${source.baseUrl}/api/Sub/$id"}));
     var jsonSubRes = json.decode(subRes);
 
     List<MTrack> subtitles = [];
@@ -162,7 +162,7 @@ class KissKh extends MSourceProvider {
   }
 
   @override
-  Future<List<String>> getPageList(MSource sourceInfo, String url) async {
+  Future<List<String>> getPageList(MSource source, String url) async {
     return [];
   }
 }
