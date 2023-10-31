@@ -1,23 +1,22 @@
 import 'package:mangayomi/bridge_lib.dart';
-import 'package:mangayomi/utils.dart';
 import 'dart:convert';
 
-class FrAnime extends MSourceProvider {
+class FrAnime extends MProvider {
   FrAnime();
 
   @override
-  Future<MPages> getPopular(MSource sourceInfo, int page) async {
+  Future<MPages> getPopular(MSource source, int page) async {
     final data = {
       "url": "https://api.franime.fr/api/animes/",
       "headers": {"Referer": "https://franime.fr/"}
     };
-    final res = await MBridge.http('GET', json.encode(data));
+    final res = await http('GET', json.encode(data));
 
     return animeResList(res);
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource sourceInfo, int page) async {
+  Future<MPages> getLatestUpdates(MSource source, int page) async {
     final res = await dataBase();
 
     List list = json.decode(res);
@@ -25,23 +24,20 @@ class FrAnime extends MSourceProvider {
   }
 
   @override
-  Future<MPages> search(MSource sourceInfo, String query, int page) async {
+  Future<MPages> search(MSource source, String query, int page) async {
     final res = await dataBase();
 
     return animeSeachFetch(res, query);
   }
 
   @override
-  Future<MManga> getDetail(MSource sourceInfo, String url) async {
+  Future<MManga> getDetail(MSource source, String url) async {
     MManga anime = MManga();
     String language = "vo".toString();
     if (url.contains("lang=")) {
-      language =
-          Substring(url).substringAfter("lang=").substringBefore("&").text;
-      print(language);
+      language = substringBefore(substringAfter(url, "lang="), "&");
     }
-    String stem =
-        Substring(url).substringAfterLast("/").substringBefore("?").text;
+    String stem = substringBefore(substringAfterLast(url, "/"), "?");
     final res = await dataBase();
 
     final animeByTitleOJson = databaseAnimeByTitleO(res, stem);
@@ -50,8 +46,8 @@ class FrAnime extends MSourceProvider {
     var seasonsJson = seasons.first;
 
     if (url.contains("s=")) {
-      int seasonNumber = int.parse(
-          Substring(url).substringAfter("s=").substringBefore("&").text);
+      int seasonNumber =
+          int.parse(substringBefore(substringAfter(url, "s="), "&"));
       seasonsJson = seasons[seasonNumber - 1];
     }
 
@@ -84,21 +80,18 @@ class FrAnime extends MSourceProvider {
       }
     }
 
-    anime.chapters = episodesList;
+    anime.chapters = episodesList.reversed.toList();
     return anime;
   }
 
   @override
-  Future<List<MVideo>> getVideoList(MSource sourceInfo, String url) async {
+  Future<List<MVideo>> getVideoList(MSource source, String url) async {
     String language = "vo".toString();
     String videoBaseUrl = "https://api.franime.fr/api/anime".toString();
     if (url.contains("lang=")) {
-      language =
-          Substring(url).substringAfter("lang=").substringBefore("&").text;
-      print(language);
+      language = substringBefore(substringAfter(url, "lang="), "&");
     }
-    String stem =
-        Substring(url).substringAfterLast("/").substringBefore("?").text;
+    String stem = substringBefore(substringAfterLast(url, "/"), "?");
     final res = await dataBase();
 
     final animeByTitleOJson = databaseAnimeByTitleO(res, stem);
@@ -110,8 +103,8 @@ class FrAnime extends MSourceProvider {
     videoBaseUrl += "/$animeId/";
 
     if (url.contains("s=")) {
-      int seasonNumber = int.parse(
-          Substring(url).substringAfter("s=").substringBefore("&").text);
+      int seasonNumber =
+          int.parse(substringBefore(substringAfter(url, "s="), "&"));
       print(seasonNumber);
       videoBaseUrl += "${seasonNumber - 1}/";
       seasonsJson = seasons[seasonNumber - 1];
@@ -121,7 +114,7 @@ class FrAnime extends MSourceProvider {
     final episodesJson = seasonsJson["episodes"];
     var episode = episodesJson.first;
     if (url.contains("ep=")) {
-      int episodeNumber = int.parse(Substring(url).substringAfter("ep=").text);
+      int episodeNumber = int.parse(substringAfter(url, "ep="));
       print(episodeNumber);
       episode = episodesJson[episodeNumber - 1];
       videoBaseUrl += "${episodeNumber - 1}";
@@ -153,7 +146,7 @@ class FrAnime extends MSourceProvider {
         "url": apiUrl,
         "headers": {"Referer": "https://franime.fr/"}
       };
-      final playerUrl = await MBridge.http('GET', json.encode(data));
+      final playerUrl = await http('GET', json.encode(data));
 
       List<MVideo> a = [];
       if (playerName.contains("vido")) {
@@ -162,13 +155,13 @@ class FrAnime extends MSourceProvider {
           ..originalUrl = playerUrl
           ..quality = "FRAnime (Vido)");
       } else if (playerName.contains("myvi")) {
-        a = await MBridge.myTvExtractor(playerUrl);
+        a = await myTvExtractor(playerUrl);
       } else if (playerName.contains("sendvid")) {
-        a = await MBridge.sendVidExtractor(
+        a = await sendVidExtractor(
             playerUrl, json.encode({"Referer": "https://franime.fr/"}), "");
       } else if (playerName.contains("sibnet")) {
-        a = await MBridge.sibnetExtractor(playerUrl);
-      } 
+        a = await sibnetExtractor(playerUrl);
+      }
       videos.addAll(a);
     }
 
@@ -176,7 +169,7 @@ class FrAnime extends MSourceProvider {
   }
 
   @override
-  Future<List<String>> getPageList(MSource sourceInfo, String url) async {
+  Future<List<String>> getPageList(MSource source, String url) async {
     return [];
   }
 
@@ -206,7 +199,7 @@ class FrAnime extends MSourceProvider {
       final title = animeJson["title"];
       final genre = animeJson["themes"];
       final description = animeJson["description"];
-      final status = MBridge.parseStatus(animeJson["status"], statusList);
+      final status = parseStatus(animeJson["status"], statusList);
       final imageUrl = animeJson["affiche"];
       bool hasVostfr = vostfrListName.contains(true);
       bool hasVf = vfListName.contains(true);
@@ -239,7 +232,7 @@ class FrAnime extends MSourceProvider {
           anime.name = seasonTitle;
           anime.imageUrl = imageUrl;
           anime.link =
-              "/anime/${MBridge.regExp(titleO, "[^A-Za-z0-9 ]", "", 0, 0).replaceAll(" ", "-").toLowerCase()}?lang=$lang&s=$ind";
+              "/anime/${regExp(titleO, "[^A-Za-z0-9 ]", "", 0, 0).replaceAll(" ", "-").toLowerCase()}?lang=$lang&s=$ind";
 
           animeList.add(anime);
         }
@@ -257,18 +250,18 @@ class FrAnime extends MSourceProvider {
     for (var animeJson in jsonResList) {
       MManga anime = MManga();
 
-      final titleO = MBridge.getMapValue(json.encode(animeJson), "titleO");
+      final titleO = getMapValue(json.encode(animeJson), "titleO");
       final titleAlt =
-          MBridge.getMapValue(json.encode(animeJson), "titles", encode: true);
-      final containsEn = MBridge.getMapValue(titleAlt, "en")
+          getMapValue(json.encode(animeJson), "titles", encode: true);
+      final containsEn = getMapValue(titleAlt, "en")
           .toString()
           .toLowerCase()
           .contains(query.toLowerCase());
-      final containsEnJp = MBridge.getMapValue(titleAlt, "en_jp")
+      final containsEnJp = getMapValue(titleAlt, "en_jp")
           .toString()
           .toLowerCase()
           .contains(query.toLowerCase());
-      final containsJaJp = MBridge.getMapValue(titleAlt, "ja_jp")
+      final containsJaJp = getMapValue(titleAlt, "ja_jp")
           .toString()
           .toLowerCase()
           .contains(query.toLowerCase());
@@ -291,7 +284,7 @@ class FrAnime extends MSourceProvider {
         final title = animeJson["title"];
         final genre = animeJson["themes"];
         final description = animeJson["description"];
-        final status = MBridge.parseStatus(animeJson["status"], statusList);
+        final status = parseStatus(animeJson["status"], statusList);
         final imageUrl = animeJson["affiche"];
 
         bool hasVostfr = vostfrListName.contains(true);
@@ -325,7 +318,7 @@ class FrAnime extends MSourceProvider {
             anime.name = seasonTitle;
             anime.imageUrl = imageUrl;
             anime.link =
-                "/anime/${MBridge.regExp(titleO, "[^A-Za-z0-9 ]", "", 0, 0).replaceAll(" ", "-").toLowerCase()}?lang=$lang&s=$ind";
+                "/anime/${regExp(titleO, "[^A-Za-z0-9 ]", "", 0, 0).replaceAll(" ", "-").toLowerCase()}?lang=$lang&s=$ind";
 
             animeList.add(anime);
           }
@@ -341,18 +334,18 @@ class FrAnime extends MSourceProvider {
       "headers": {"Referer": "https://franime.fr/"}
     };
 
-    return await MBridge.http('GET', json.encode(data));
+    return await http('GET', json.encode(data));
   }
 
   String databaseAnimeByTitleO(String res, String titleO) {
-    final datas = MBridge.jsonDecodeToList(res, 1);
+    print(titleO);
+    final datas = json.decode(res) as List;
     for (var data in datas) {
-      if (MBridge.regExp(MBridge.getMapValue(data, "titleO"), "[^A-Za-z0-9 ]",
-                  "", 0, 0)
+      if (regExp(data["titleO"], "[^A-Za-z0-9 ]", "", 0, 0)
               .replaceAll(" ", "-")
               .toLowerCase() ==
           "${titleO}") {
-        return data;
+        return json.encode(data);
       }
     }
     return "";

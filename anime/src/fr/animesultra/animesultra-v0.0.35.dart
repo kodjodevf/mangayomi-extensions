@@ -1,20 +1,20 @@
 import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
-class AnimesUltra extends MSourceProvider {
+class AnimesUltra extends MProvider {
   AnimesUltra();
 
   @override
-  Future<MPages> getPopular(MSource sourceInfo, int page) async {
-    final data = {"url": "${sourceInfo.baseUrl}/"};
-    final res = await MBridge.http('GET', json.encode(data));
+  Future<MPages> getPopular(MSource source, int page) async {
+    final data = {"url": "${source.baseUrl}/"};
+    final res = await http('GET', json.encode(data));
 
     List<MManga> animeList = [];
-    final urls = MBridge.xpath(res,
+    final urls = xpath(res,
         '//*[contains(@class,"swiper-slide item-qtip")]/div[@class="item"]/a/@href');
-    final names = MBridge.xpath(res,
+    final names = xpath(res,
         '//*[contains(@class,"swiper-slide item-qtip")]/div[@class="item"]/a/img/@title');
-    final images = MBridge.xpath(res,
+    final images = xpath(res,
         '//*[contains(@class,"swiper-slide item-qtip")]/div[@class="item"]/a/img/@data-src');
 
     for (var i = 0; i < names.length; i++) {
@@ -29,16 +29,16 @@ class AnimesUltra extends MSourceProvider {
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource sourceInfo, int page) async {
-    final data = {"url": "${sourceInfo.baseUrl}/"};
-    final res = await MBridge.http('GET', json.encode(data));
+  Future<MPages> getLatestUpdates(MSource source, int page) async {
+    final data = {"url": "${source.baseUrl}/"};
+    final res = await http('GET', json.encode(data));
 
     List<MManga> animeList = [];
-    final urls = MBridge.xpath(res,
+    final urls = xpath(res,
         '//*[@class="block_area block_area_home"]/div[@class="tab-content"]/div[contains(@class,"block_area-content block_area-list")]/div[@class="film_list-wrap"]/div[@class="flw-item"]/div[@class="film-poster"]/a/@href');
-    final names = MBridge.xpath(res,
+    final names = xpath(res,
         '//*[@class="block_area block_area_home"]/div[@class="tab-content"]/div[contains(@class,"block_area-content block_area-list")]/div[@class="film_list-wrap"]/div[@class="flw-item"]/div[@class="film-poster"]/a/@title');
-    final images = MBridge.xpath(res,
+    final images = xpath(res,
         '//*[@class="block_area block_area_home"]/div[@class="tab-content"]/div[contains(@class,"block_area-content block_area-list")]/div[@class="film_list-wrap"]/div[@class="flw-item"]/div[@class="film-poster"]/img/@data-src');
 
     for (var i = 0; i < names.length; i++) {
@@ -53,15 +53,15 @@ class AnimesUltra extends MSourceProvider {
   }
 
   @override
-  Future<MPages> search(MSource sourceInfo, String query, int page) async {
-    final data = {"url": "${sourceInfo.baseUrl}/"};
-    final res = await MBridge.http('GET', json.encode(data));
+  Future<MPages> search(MSource source, String query, int page) async {
+    final data = {"url": "${source.baseUrl}/"};
+    final res = await http('GET', json.encode(data));
 
     List<MManga> animeList = [];
-    final urls = MBridge.xpath(res, '//*[@class="film-poster"]/a/@href');
-    final names = MBridge.xpath(res, '//*[@class="film-poster"]/a/@title');
+    final urls = xpath(res, '//*[@class="film-poster"]/a/@href');
+    final names = xpath(res, '//*[@class="film-poster"]/a/@title');
     final images =
-        MBridge.xpath(res, '//*[@class="film-poster"]/img/@data-src');
+        xpath(res, '//*[@class="film-poster"]/img/@data-src');
 
     for (var i = 0; i < names.length; i++) {
       MManga anime = MManga();
@@ -75,7 +75,7 @@ class AnimesUltra extends MSourceProvider {
   }
 
   @override
-  Future<MManga> getDetail(MSource sourceInfo, String url) async {
+  Future<MManga> getDetail(MSource source, String url) async {
     final statusList = [
       {
         "En cours": 0,
@@ -83,28 +83,28 @@ class AnimesUltra extends MSourceProvider {
       }
     ];
     final data = {"url": url};
-    final res = await MBridge.http('GET', json.encode(data));
+    final res = await http('GET', json.encode(data));
     MManga anime = MManga();
     anime.description =
-        MBridge.xpath(res, '//*[@class="film-description m-hide"]/text()')
+        xpath(res, '//*[@class="film-description m-hide"]/text()')
             .first;
 
-    final status = MBridge.xpath(res,
+    final status = xpath(res,
             '//*[@class="item item-title" and contains(text(),"Status:")]/span[2]/text()')
         .first;
-    anime.status = MBridge.parseStatus(status, statusList);
-    anime.genre = MBridge.xpath(res,
+    anime.status = parseStatus(status, statusList);
+    anime.genre = xpath(res,
         '//*[@class="item item-list" and contains(text(),"Genres:")]/a/text()');
-    anime.author = MBridge.xpath(res,
+    anime.author = xpath(res,
             '//*[@class="item item-title" and contains(text(),"Studio:")]/span[2]/text()')
         .first;
     final urlEp = url.replaceAll('.html', '/episode-1.html');
     final resEpWebview =
-        await MBridge.getHtmlViaWebview(urlEp, '//*[@class="ss-list"]/a/@href');
-    final epUrls = MBridge.xpath(resEpWebview, '//*[@class="ss-list"]/a/@href')
+        await getHtmlViaWebview(urlEp, '//*[@class="ss-list"]/a/@href');
+    final epUrls = xpath(resEpWebview, '//*[@class="ss-list"]/a/@href')
         .reversed
         .toList();
-    final names = MBridge.xpath(resEpWebview,
+    final names = xpath(resEpWebview,
             '//*[@class="ss-list"]/a/div[@class="ssli-detail"]/div/text()')
         .reversed
         .toList();
@@ -122,18 +122,18 @@ class AnimesUltra extends MSourceProvider {
   }
 
   @override
-  Future<List<MVideo>> getVideoList(MSource sourceInfo, String url) async {
-    final resWebview = await MBridge.getHtmlViaWebview(
+  Future<List<MVideo>> getVideoList(MSource source, String url) async {
+    final resWebview = await getHtmlViaWebview(
         url, '//*[@class="ps__-list"]/div/@data-server-id');
 
-    final serverIds = MBridge.xpath(
+    final serverIds = xpath(
         resWebview, '//*[@class="ps__-list"]/div/@data-server-id');
     final serverNames =
-        MBridge.xpath(resWebview, '//*[@class="ps__-list"]/div/a/text()');
+        xpath(resWebview, '//*[@class="ps__-list"]/div/a/text()');
     List<String> serverUrls = [];
     for (var id in serverIds) {
       final serversUrls =
-          MBridge.xpath(resWebview, '//*[@id="content_player_${id}"]/text()')
+          xpath(resWebview, '//*[@id="content_player_${id}"]/text()')
               .first;
       serverUrls.add(serversUrls);
     }
@@ -144,15 +144,15 @@ class AnimesUltra extends MSourceProvider {
 
       List<MVideo> a = [];
       if (name.contains("Sendvid")) {
-        a = await MBridge.sendVidExtractor(
+        a = await sendVidExtractor(
             url.replaceAll("https:////", "https://"),
-            json.encode({"Referer": "${sourceInfo.baseUrl}/"}),
+            json.encode({"Referer": "${source.baseUrl}/"}),
             "");
       } else if (name.contains("Sibnet")) {
-        a = await MBridge.sibnetExtractor(
+        a = await sibnetExtractor(
             "https://video.sibnet.ru/shell.php?videoid=$url");
       } else if (name.contains("Mytv")) {
-        a = await MBridge.myTvExtractor("https://www.myvi.tv/embed/$url");
+        a = await myTvExtractor("https://www.myvi.tv/embed/$url");
       }
       videos.addAll(a);
     }
@@ -161,7 +161,7 @@ class AnimesUltra extends MSourceProvider {
   }
 
   @override
-  Future<List<String>> getPageList(MSource sourceInfo, String url) async {
+  Future<List<String>> getPageList(MSource source, String url) async {
     return [];
   }
 }

@@ -1,15 +1,15 @@
 import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
-class HeanCms extends MSourceProvider {
+class HeanCms extends MProvider {
   HeanCms();
 
   @override
-  Future<MPages> getPopular(MSource sourceInfo, int page) async {
-    final headers = getHeader(sourceInfo.baseUrl);
+  Future<MPages> getPopular(MSource source, int page) async {
+    final headers = getHeader(source.baseUrl);
     String res = "";
-    if (!useNewQueryEndpoint(sourceInfo.name)) {
-      final url = "${sourceInfo.apiUrl}/series/querysearch";
+    if (!useNewQueryEndpoint(source.name)) {
+      final url = "${source.apiUrl}/series/querysearch";
 
       final body = {
         "page": page,
@@ -19,23 +19,23 @@ class HeanCms extends MSourceProvider {
         "series_type": "Comic"
       };
       final data = {"url": url, "headers": headers, "body": body};
-      res = await MBridge.http('POST', json.encode(data));
+      res = await http('POST', json.encode(data));
     } else {
       final newEndpointUrl =
-          "${sourceInfo.apiUrl}/query/?page=$page&query_string=&series_status=All&order=desc&orderBy=total_views&perPage=12&tags_ids=[]&series_type=Comic";
+          "${source.apiUrl}/query/?page=$page&query_string=&series_status=All&order=desc&orderBy=total_views&perPage=12&tags_ids=[]&series_type=Comic";
 
       final newEndpointData = {"url": newEndpointUrl, "headers": headers};
-      res = await MBridge.http('GET', json.encode(newEndpointData));
+      res = await http('GET', json.encode(newEndpointData));
     }
-    return mMangaRes(res, sourceInfo);
+    return mMangaRes(res, source);
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource sourceInfo, int page) async {
-    final headers = getHeader(sourceInfo.baseUrl);
+  Future<MPages> getLatestUpdates(MSource source, int page) async {
+    final headers = getHeader(source.baseUrl);
     String res = "";
-    if (!useNewQueryEndpoint(sourceInfo.name)) {
-      final url = "${sourceInfo.apiUrl}/series/querysearch";
+    if (!useNewQueryEndpoint(source.name)) {
+      final url = "${source.apiUrl}/series/querysearch";
       final body = {
         "page": page,
         "order": "desc",
@@ -44,55 +44,54 @@ class HeanCms extends MSourceProvider {
         "series_type": "Comic"
       };
       final data = {"url": url, "headers": headers, "body": body};
-      res = await MBridge.http('POST', json.encode(data));
+      res = await http('POST', json.encode(data));
     } else {
       final newEndpointUrl =
-          "${sourceInfo.apiUrl}/query/?page=$page&query_string=&series_status=All&order=desc&orderBy=latest&perPage=12&tags_ids=[]&series_type=Comic";
+          "${source.apiUrl}/query/?page=$page&query_string=&series_status=All&order=desc&orderBy=latest&perPage=12&tags_ids=[]&series_type=Comic";
 
       final newEndpointData = {"url": newEndpointUrl, "headers": headers};
-      res = await MBridge.http('GET', json.encode(newEndpointData));
+      res = await http('GET', json.encode(newEndpointData));
     }
-    return mMangaRes(res, sourceInfo);
+    return mMangaRes(res, source);
   }
 
   @override
-  Future<MPages> search(MSource sourceInfo, String query, int page) async {
-    final headers = getHeader(sourceInfo.baseUrl);
+  Future<MPages> search(MSource source, String query, int page) async {
+    final headers = getHeader(source.baseUrl);
     String res = "";
-    if (!useNewQueryEndpoint(sourceInfo.source)) {
-      final url = "${sourceInfo.apiUrl}/series/search";
+    if (!useNewQueryEndpoint(source.source)) {
+      final url = "${source.apiUrl}/series/search";
       final body = {"term": query};
       final data = {"url": url, "headers": headers, "body": body};
-      res = await MBridge.http('POST', json.encode(data));
+      res = await http('POST', json.encode(data));
     } else {
       final newEndpointUrl =
-          "${sourceInfo.apiUrl}/query/?page=$page&query_string=$query&series_status=All&order=desc&orderBy=total_views&perPage=12&tags_ids=[]&series_type=Comic";
+          "${source.apiUrl}/query/?page=$page&query_string=$query&series_status=All&order=desc&orderBy=total_views&perPage=12&tags_ids=[]&series_type=Comic";
 
       final newEndpointData = {"url": newEndpointUrl, "headers": headers};
-      res = await MBridge.http('GET', json.encode(newEndpointData));
+      res = await http('GET', json.encode(newEndpointData));
     }
-    return mMangaRes(res, sourceInfo);
+    return mMangaRes(res, source);
   }
 
   @override
-  Future<MManga> getDetail(MSource sourceInfo, String url) async {
+  Future<MManga> getDetail(MSource source, String url) async {
     MManga manga = MManga();
-    String currentSlug = MBridge.substringAfterLast(url, "/");
-    final headers = getHeader(sourceInfo.baseUrl);
+    String currentSlug = substringAfterLast(url, "/");
+    final headers = getHeader(source.baseUrl);
     final data = {
-      "url": "${sourceInfo.apiUrl}/series/$currentSlug",
+      "url": "${source.apiUrl}/series/$currentSlug",
       "headers": headers
     };
-    final res = await MBridge.http('GET', json.encode(data));
-    manga.author = MBridge.getMapValue(res, "author");
-    manga.description = MBridge.getMapValue(res, "description");
-    manga.genre =
-        MBridge.jsonPathToString(res, r"$.tags[*].name", "._").split("._");
+    final res = await http('GET', json.encode(data));
+    manga.author = getMapValue(res, "author");
+    manga.description = getMapValue(res, "description");
+    manga.genre = jsonPathToString(res, r"$.tags[*].name", "._").split("._");
     List<String> chapterTitles = [];
     List<String> chapterUrls = [];
     List<String> chapterDates = [];
 
-    if (!useNewQueryEndpoint(sourceInfo.name)) {
+    if (!useNewQueryEndpoint(source.name)) {
       for (var chapter in json.decode(res)["chapters"]) {
         final chapterName = chapter["chapter_name"];
         final chapterSlug = chapter["chapter_slug"];
@@ -114,8 +113,7 @@ class HeanCms extends MSourceProvider {
         chapterDates.add(createdAt);
       }
     }
-    final dateUploads =
-        MBridge.parseDates(chapterDates, "dd MMMM yyyy", "fr");
+    final dateUploads = parseDates(chapterDates, "dd MMMM yyyy", "fr");
     List<MChapter>? chaptersList = [];
     for (var i = 0; i < chapterTitles.length; i++) {
       MChapter chapter = MChapter();
@@ -124,7 +122,7 @@ class HeanCms extends MSourceProvider {
       chapter.dateUpload = dateUploads[i];
       chaptersList.add(chapter);
     }
-    if (!useNewQueryEndpoint(sourceInfo.name)) {
+    if (!useNewQueryEndpoint(source.name)) {
       chaptersList = chaptersList.reversed.toList();
     }
 
@@ -133,48 +131,48 @@ class HeanCms extends MSourceProvider {
   }
 
   @override
-  Future<List<String>> getPageList(MSource sourceInfo, String url) async {
-    final headers = getHeader(sourceInfo.baseUrl);
+  Future<List<String>> getPageList(MSource source, String url) async {
+    final headers = getHeader(source.baseUrl);
 
     String res = "".toString();
-    if (!useslugStrategy(sourceInfo.name)) {
-      String chapterId = MBridge.substringAfter(url, '#');
+    if (!useslugStrategy(source.name)) {
+      String chapterId = substringAfter(url, '#');
       final data = {
-        "url": "${sourceInfo.apiUrl}/series/chapter/$chapterId",
+        "url": "${source.apiUrl}/series/chapter/$chapterId",
         "headers": headers
       };
-      res = await MBridge.http('GET', json.encode(data));
+      res = await http('GET', json.encode(data));
     } else {
-      final data = {"url": "${sourceInfo.baseUrl}$url", "headers": headers};
-      res = await MBridge.http('GET', json.encode(data));
+      final data = {"url": "${source.baseUrl}$url", "headers": headers};
+      res = await http('GET', json.encode(data));
 
       List<String> pageUrls = [];
-      var imagesRes = MBridge.querySelectorAll(res,
+      var imagesRes = querySelectorAll(res,
           selector: "div.min-h-screen > div.container > p.items-center",
           typeElement: 1,
           attributes: "",
           typeRegExp: 0);
-      pageUrls = MBridge.xpath(imagesRes.first, '//img/@src');
+      pageUrls = xpath(imagesRes.first, '//img/@src');
 
-      pageUrls.addAll(MBridge.xpath(imagesRes.first, '//img/@data-src'));
+      pageUrls.addAll(xpath(imagesRes.first, '//img/@data-src'));
 
       return pageUrls.where((e) => e.isNotEmpty).toList();
     }
 
-    final pages = MBridge.jsonPathToList(res, r"$.content.images[*]", 0);
+    final pages = jsonPathToList(res, r"$.content.images[*]", 0);
     List<String> pageUrls = [];
     for (var u in pages) {
       final url = u.replaceAll('"', "");
       if (url.startsWith("http")) {
         pageUrls.add(url);
       } else {
-        pageUrls.add("${sourceInfo.apiUrl}/$url");
+        pageUrls.add("${source.apiUrl}/$url");
       }
     }
     return pageUrls;
   }
 
-  MPages mMangaRes(String res, MSource sourceInfo) {
+  MPages mMangaRes(String res, MSource source) {
     bool hasNextPage = true;
     List<MManga> mangaList = [];
     List<String> names = [];
@@ -186,7 +184,7 @@ class HeanCms extends MSourceProvider {
         if (thumbnail.startsWith("https://")) {
           images.add(thumbnail);
         } else {
-          images.add("${sourceInfo.apiUrl}/cover/$thumbnail");
+          images.add("${source.apiUrl}/cover/$thumbnail");
         }
         names.add(a["title"]);
         final seriesSlug = a["series_slug"];
@@ -198,7 +196,7 @@ class HeanCms extends MSourceProvider {
         if (thumbnail.startsWith("https://")) {
           images.add(thumbnail);
         } else {
-          images.add("${sourceInfo.apiUrl}/cover/$thumbnail");
+          images.add("${source.apiUrl}/cover/$thumbnail");
         }
         names.add(a["title"]);
         final seriesSlug = a["series_slug"];
@@ -217,16 +215,6 @@ class HeanCms extends MSourceProvider {
     return MPages(mangaList, hasNextPage);
   }
 
-  Map<String, String> getHeader(String url) {
-    final headers = {
-      'Origin': url,
-      'Referer': '$url/',
-      'Accept': 'application/json, text/plain, */*',
-      'Content-Type': 'application/json'
-    };
-    return headers;
-  }
-
   bool useNewQueryEndpoint(String sourceName) {
     List<String> sources = ["YugenMangas", "Perf Scan", "Reaper Scans"];
     return sources.contains(sourceName);
@@ -238,9 +226,19 @@ class HeanCms extends MSourceProvider {
   }
 
   @override
-  Future<List<MVideo>> getVideoList(MSource sourceInfo, String url) async {
+  Future<List<MVideo>> getVideoList(MSource source, String url) async {
     return [];
   }
+}
+
+Map<String, String> getHeader(String url) {
+  final headers = {
+    'Origin': url,
+    'Referer': '$url/',
+    'Accept': 'application/json, text/plain, */*',
+    'Content-Type': 'application/json'
+  };
+  return headers;
 }
 
 HeanCms main() {

@@ -1,38 +1,38 @@
 import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
-class NepNep extends MSourceProvider {
+class NepNep extends MProvider {
   NepNep();
 
   @override
-  Future<MPages> getPopular(MSource sourceInfo, int page) async {
-    final data = {"url": "${sourceInfo.baseUrl}/search/"};
-    final res = await MBridge.http('GET', json.encode(data));
+  Future<MPages> getPopular(MSource source, int page) async {
+    final data = {"url": "${source.baseUrl}/search/"};
+    final res = await http('GET', json.encode(data));
 
     final directory = directoryFromDocument(res);
-    final resSort = MBridge.sortMapList(json.decode(directory), "vm", 1);
+    final resSort = sortMapList(json.decode(directory), "vm", 1);
 
     return parseDirectory(resSort);
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource sourceInfo, int page) async {
-    final data = {"url": "${sourceInfo.baseUrl}/search/"};
-    final res = await MBridge.http('GET', json.encode(data));
+  Future<MPages> getLatestUpdates(MSource source, int page) async {
+    final data = {"url": "${source.baseUrl}/search/"};
+    final res = await http('GET', json.encode(data));
 
     final directory = directoryFromDocument(res);
-    final resSort = MBridge.sortMapList(json.decode(directory), "lt", 1);
+    final resSort = sortMapList(json.decode(directory), "lt", 1);
 
     return parseDirectory(resSort);
   }
 
   @override
-  Future<MPages> search(MSource sourceInfo, String query, int page) async {
-    final data = {"url": "${sourceInfo.baseUrl}/search/"};
-    final res = await MBridge.http('GET', json.encode(data));
+  Future<MPages> search(MSource source, String query, int page) async {
+    final data = {"url": "${source.baseUrl}/search/"};
+    final res = await http('GET', json.encode(data));
 
     final directory = directoryFromDocument(res);
-    final resSort = MBridge.sortMapList(json.decode(directory), "lt", 1);
+    final resSort = sortMapList(json.decode(directory), "lt", 1);
     final datas = json.decode(resSort) as List;
     final queryRes = datas.where((e) {
       String name = e['s'];
@@ -43,40 +43,36 @@ class NepNep extends MSourceProvider {
   }
 
   @override
-  Future<MManga> getDetail(MSource sourceInfo, String url) async {
+  Future<MManga> getDetail(MSource source, String url) async {
     final statusList = [
       {"Ongoing": 0, "Completed": 1, "Cancelled": 3, "Hiatus": 2}
     ];
-    final headers = getHeader(sourceInfo.baseUrl);
-    final data = {
-      "url": '${sourceInfo.baseUrl}/manga/$url',
-      "headers": headers
-    };
-    final res = await MBridge.http('GET', json.encode(data));
+    final headers = getHeader(source.baseUrl);
+    final data = {"url": '${source.baseUrl}/manga/$url', "headers": headers};
+    final res = await http('GET', json.encode(data));
     MManga manga = MManga();
-    manga.author = MBridge.xpath(res,
+    manga.author = xpath(res,
             '//li[contains(@class,"list-group-item") and contains(text(),"Author")]/a/text()')
         .first;
-    manga.description = MBridge.xpath(res,
+    manga.description = xpath(res,
             '//li[contains(@class,"list-group-item") and contains(text(),"Description:")]/div/text()')
         .first;
-    final status = MBridge.xpath(res,
+    final status = xpath(res,
             '//li[contains(@class,"list-group-item") and contains(text(),"Status")]/a/text()')
         .first;
 
-    manga.status = MBridge.parseStatus(toStatus(status), statusList);
-    manga.genre = MBridge.xpath(res,
+    manga.status = parseStatus(toStatus(status), statusList);
+    manga.genre = xpath(res,
         '//li[contains(@class,"list-group-item") and contains(text(),"Genre(s)")]/a/text()');
 
     final script =
-        MBridge.xpath(res, '//script[contains(text(), "MainFunction")]/text()')
-            .first;
-    final vmChapters = MBridge.substringBefore(
-        MBridge.substringAfter(script, "vm.Chapters = "), ";");
+        xpath(res, '//script[contains(text(), "MainFunction")]/text()').first;
+    final vmChapters =
+        substringBefore(substringAfter(script, "vm.Chapters = "), ";");
     final chapters = json.decode(vmChapters) as List;
     var chapUrls = chapters
         .map((ch) =>
-            '/read-online/${MBridge.substringAfter(url, "/manga/")}${chapterURLEncode(ch['Chapter'])}')
+            '/read-online/${substringAfter(url, "/manga/")}${chapterURLEncode(ch['Chapter'])}')
         .toList();
 
     var chaptersNames = chapters.map((ch) {
@@ -88,8 +84,8 @@ class NepNep extends MSourceProvider {
       return name;
     }).toList();
     var chaptersDates = chapters.map((ch) => ch['Date']).toList();
-    var dateUploads = MBridge.parseDates(
-        chaptersDates, sourceInfo.dateFormat, sourceInfo.dateFormatLocale);
+    var dateUploads =
+        parseDates(chaptersDates, source.dateFormat, source.dateFormatLocale);
     List<MChapter> chaptersList = [];
 
     for (var ch in chapters) {
@@ -101,10 +97,10 @@ class NepNep extends MSourceProvider {
       }
       chapter.name = name;
       chapter.url =
-          '/read-online/${MBridge.substringAfter(url, "/manga/")}${chapterURLEncode(ch['Chapter'])}';
-      chapter.dateUpload = MBridge.parseDates(
-              [ch['Date']], sourceInfo.dateFormat, sourceInfo.dateFormatLocale)
-          .first;
+          '/read-online/${substringAfter(url, "/manga/")}${chapterURLEncode(ch['Chapter'])}';
+      chapter.dateUpload =
+          parseDates([ch['Date']], source.dateFormat, source.dateFormatLocale)
+              .first;
       chaptersList.add(chapter);
     }
     manga.chapters = chaptersList;
@@ -112,25 +108,24 @@ class NepNep extends MSourceProvider {
   }
 
   @override
-  Future<List<String>> getPageList(MSource sourceInfo, String url) async {
-    final headers = getHeader(sourceInfo.baseUrl);
+  Future<List<String>> getPageList(MSource source, String url) async {
+    final headers = getHeader(source.baseUrl);
     List<String> pages = [];
-    final data = {"url": '${sourceInfo.baseUrl}$url', "headers": headers};
+    final data = {"url": '${source.baseUrl}$url', "headers": headers};
     print(data);
-    final res = await MBridge.http('GET', json.encode(data));
+    final res = await http('GET', json.encode(data));
     final script =
-        MBridge.xpath(res, '//script[contains(text(), "MainFunction")]/text()')
-            .first;
-    final chapScript = json.decode(MBridge.substringBefore(
-        MBridge.substringAfter(script, "vm.CurChapter = "), ";"));
-    final pathName = MBridge.substringBefore(
-        MBridge.substringAfter(script, "vm.CurPathName = \"", ""), "\"");
+        xpath(res, '//script[contains(text(), "MainFunction")]/text()').first;
+    final chapScript = json.decode(
+        substringBefore(substringAfter(script, "vm.CurChapter = "), ";"));
+    final pathName = substringBefore(
+        substringAfter(script, "vm.CurPathName = \"", ""), "\"");
     var directory = chapScript['Directory'] ?? '';
     if (directory.length > 0) {
       directory += '/';
     }
-    final mangaName = MBridge.substringBefore(
-        MBridge.substringAfter(url, "/read-online/"), "-chapter");
+    final mangaName =
+        substringBefore(substringAfter(url, "/read-online/"), "-chapter");
     var chNum = chapterImage(chapScript['Chapter'], false);
     var totalPages = int.parse(chapScript['Page']);
     for (int page = 1; page <= totalPages; page++) {
@@ -145,10 +140,9 @@ class NepNep extends MSourceProvider {
 
   String directoryFromDocument(String res) {
     final script =
-        MBridge.xpath(res, '//script[contains(text(), "MainFunction")]/text()')
-            .first;
-    return MBridge.substringBefore(
-            MBridge.substringAfter(script, "vm.Directory = "), "vm.GetIntValue")
+        xpath(res, '//script[contains(text(), "MainFunction")]/text()').first;
+    return substringBefore(
+            substringAfter(script, "vm.Directory = "), "vm.GetIntValue")
         .replaceAll(";", " ");
   }
 
@@ -165,19 +159,10 @@ class NepNep extends MSourceProvider {
     return MPages(mangaList, true);
   }
 
-  Map<String, String> getHeader(String url) {
-    final headers = {
-      'Referer': '$url/',
-      "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:71.0) Gecko/20100101 Firefox/77.0"
-    };
-    return headers;
-  }
-
   String chapterImage(String e, bool cleanString) {
     var a = e.substring(1, e.length - 1);
     if (cleanString) {
-      a = MBridge.regExp(a, r'^0+', "", 0, 0);
+      a = regExp(a, r'^0+', "", 0, 0);
     }
 
     var b = int.parse(e.substring(e.length - 1));
@@ -236,9 +221,18 @@ class NepNep extends MSourceProvider {
   }
 
   @override
-  Future<List<MVideo>> getVideoList(MSource sourceInfo, String url) async {
+  Future<List<MVideo>> getVideoList(MSource source, String url) async {
     return [];
   }
+}
+
+Map<String, String> getHeader(String url) {
+  final headers = {
+    'Referer': '$url/',
+    "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:71.0) Gecko/20100101 Firefox/77.0"
+  };
+  return headers;
 }
 
 NepNep main() {
