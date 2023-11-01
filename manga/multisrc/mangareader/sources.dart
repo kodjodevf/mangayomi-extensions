@@ -13,7 +13,7 @@ List<Source> _mangareaderSourcesList = [
       name: "Beast Scans",
       baseUrl: "https://beast-scans.com",
       lang: "ar",
-      iconUrl: getIconUrl("asurascans", "en"),
+      iconUrl: getIconUrl("beastscans", "ar"),
       dateFormat: "MMMM dd, yyyy",
       dateFormatLocale: "ar",
       version: mangareaderVersion,
