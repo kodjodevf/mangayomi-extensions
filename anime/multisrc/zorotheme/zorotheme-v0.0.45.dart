@@ -101,7 +101,7 @@ class ZoroTheme extends MProvider {
       episodesList.add(episode);
     }
 
-    anime.chapters = episodesList;
+    anime.chapters = episodesList.reversed.toList();
     return anime;
   }
 
