@@ -168,11 +168,6 @@ class FrAnime extends MProvider {
     return videos;
   }
 
-  @override
-  Future<List<String>> getPageList(MSource source, String url) async {
-    return [];
-  }
-
   MPages animeResList(String res) {
     final statusList = [
       {"EN COURS": 0, "TERMINÉ": 1}

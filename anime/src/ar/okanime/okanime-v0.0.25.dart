@@ -94,11 +94,9 @@ class OkAnime extends MProvider {
     if (status.isNotEmpty) {
       anime.status = parseStatus(status.first, statusList);
     }
-    anime.description =
-        xpath(res, '//*[@class="review-content"]/text()').first;
+    anime.description = xpath(res, '//*[@class="review-content"]/text()').first;
 
-    anime.genre =
-        xpath(res, '//*[@class="review-author-info"]/a/text()');
+    anime.genre = xpath(res, '//*[@class="review-author-info"]/a/text()');
     final epUrls = xpath(res,
             '//*[contains(@class,"anime-card")]/div[@class="anime-title")]/h5/a/@href')
         .reversed
@@ -125,8 +123,7 @@ class OkAnime extends MProvider {
     final res = await http('GET', json.encode({"url": url}));
 
     final urls = xpath(res, '//*[@id="streamlinks"]/a/@data-src');
-    final qualities =
-        xpath(res, '//*[@id="streamlinks"]/a/span/text()');
+    final qualities = xpath(res, '//*[@id="streamlinks"]/a/span/text()');
 
     List<MVideo> videos = [];
     for (var i = 0; i < urls.length; i++) {
@@ -171,11 +168,6 @@ class OkAnime extends MProvider {
       }
     }
     return false;
-  }
-
-  @override
-  Future<List<String>> getPageList(MSource source, String url) async {
-    return [];
   }
 }
 

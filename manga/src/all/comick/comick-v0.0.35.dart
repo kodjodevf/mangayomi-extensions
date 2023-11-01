@@ -166,11 +166,6 @@ class ComickFun extends MProvider {
 
     return result;
   }
-
-  @override
-  Future<List<MVideo>> getVideoList(MSource source, String url) async {
-    return [];
-  }
 }
 
 Map<String, String> getHeader(String url) {

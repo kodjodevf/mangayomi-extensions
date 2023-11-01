@@ -60,8 +60,7 @@ class AnimesUltra extends MProvider {
     List<MManga> animeList = [];
     final urls = xpath(res, '//*[@class="film-poster"]/a/@href');
     final names = xpath(res, '//*[@class="film-poster"]/a/@title');
-    final images =
-        xpath(res, '//*[@class="film-poster"]/img/@data-src');
+    final images = xpath(res, '//*[@class="film-poster"]/img/@data-src');
 
     for (var i = 0; i < names.length; i++) {
       MManga anime = MManga();
@@ -86,8 +85,7 @@ class AnimesUltra extends MProvider {
     final res = await http('GET', json.encode(data));
     MManga anime = MManga();
     anime.description =
-        xpath(res, '//*[@class="film-description m-hide"]/text()')
-            .first;
+        xpath(res, '//*[@class="film-description m-hide"]/text()').first;
 
     final status = xpath(res,
             '//*[@class="item item-title" and contains(text(),"Status:")]/span[2]/text()')
@@ -101,9 +99,8 @@ class AnimesUltra extends MProvider {
     final urlEp = url.replaceAll('.html', '/episode-1.html');
     final resEpWebview =
         await getHtmlViaWebview(urlEp, '//*[@class="ss-list"]/a/@href');
-    final epUrls = xpath(resEpWebview, '//*[@class="ss-list"]/a/@href')
-        .reversed
-        .toList();
+    final epUrls =
+        xpath(resEpWebview, '//*[@class="ss-list"]/a/@href').reversed.toList();
     final names = xpath(resEpWebview,
             '//*[@class="ss-list"]/a/div[@class="ssli-detail"]/div/text()')
         .reversed
@@ -126,15 +123,14 @@ class AnimesUltra extends MProvider {
     final resWebview = await getHtmlViaWebview(
         url, '//*[@class="ps__-list"]/div/@data-server-id');
 
-    final serverIds = xpath(
-        resWebview, '//*[@class="ps__-list"]/div/@data-server-id');
+    final serverIds =
+        xpath(resWebview, '//*[@class="ps__-list"]/div/@data-server-id');
     final serverNames =
         xpath(resWebview, '//*[@class="ps__-list"]/div/a/text()');
     List<String> serverUrls = [];
     for (var id in serverIds) {
       final serversUrls =
-          xpath(resWebview, '//*[@id="content_player_${id}"]/text()')
-              .first;
+          xpath(resWebview, '//*[@id="content_player_${id}"]/text()').first;
       serverUrls.add(serversUrls);
     }
     List<MVideo> videos = [];
@@ -144,10 +140,8 @@ class AnimesUltra extends MProvider {
 
       List<MVideo> a = [];
       if (name.contains("Sendvid")) {
-        a = await sendVidExtractor(
-            url.replaceAll("https:////", "https://"),
-            json.encode({"Referer": "${source.baseUrl}/"}),
-            "");
+        a = await sendVidExtractor(url.replaceAll("https:////", "https://"),
+            json.encode({"Referer": "${source.baseUrl}/"}), "");
       } else if (name.contains("Sibnet")) {
         a = await sibnetExtractor(
             "https://video.sibnet.ru/shell.php?videoid=$url");
@@ -158,11 +152,6 @@ class AnimesUltra extends MProvider {
     }
 
     return videos;
-  }
-
-  @override
-  Future<List<String>> getPageList(MSource source, String url) async {
-    return [];
   }
 }
 

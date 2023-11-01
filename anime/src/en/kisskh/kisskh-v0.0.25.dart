@@ -126,8 +126,7 @@ class KissKh extends MProvider {
     final datas = {"url": url};
 
     final res = await http('GET', json.encode(datas));
-    final id = substringAfter(
-        substringBefore(url, ".png"), "Episode/");
+    final id = substringAfter(substringBefore(url, ".png"), "Episode/");
     final jsonRes = json.decode(res);
 
     final subRes = await http(
@@ -159,11 +158,6 @@ class KissKh extends MProvider {
         "origin": "https://kisskh.me"
       };
     return [video];
-  }
-
-  @override
-  Future<List<String>> getPageList(MSource source, String url) async {
-    return [];
   }
 }
 

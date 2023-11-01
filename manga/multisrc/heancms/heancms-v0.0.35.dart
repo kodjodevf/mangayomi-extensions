@@ -224,11 +224,6 @@ class HeanCms extends MProvider {
     List<String> sources = ["YugenMangas", "Reaper Scans", "Perf Scan"];
     return sources.contains(sourceName);
   }
-
-  @override
-  Future<List<MVideo>> getVideoList(MSource source, String url) async {
-    return [];
-  }
 }
 
 Map<String, String> getHeader(String url) {

@@ -57,15 +57,10 @@ class MangaDex extends MProvider {
         res, r'$..data.relationships[*].attributes.name', ', ');
 
     String expressionDescriptionA = r'$..data.attributes.description.en';
-    String expressionDescription = regExp(
-        r'$..data.attributes.description[a]',
-        r'\[a\]',
-        ".${source.lang}",
-        0,
-        1);
+    String expressionDescription = regExp(r'$..data.attributes.description[a]',
+        r'\[a\]', ".${source.lang}", 0, 1);
 
-    String description =
-        jsonPathToString(res, expressionDescription, '');
+    String description = jsonPathToString(res, expressionDescription, '');
     if (description.isEmpty) {
       description = jsonPathToString(res, expressionDescriptionA, '');
     }
@@ -81,29 +76,27 @@ class MangaDex extends MProvider {
     if (contentRating != "safe") {
       genres.add(contentRating);
     }
-    String publicationDemographic = jsonPathToString(
-        res, r'$..data.attributes.publicationDemographic', '');
+    String publicationDemographic =
+        jsonPathToString(res, r'$..data.attributes.publicationDemographic', '');
     if (publicationDemographic == "null") {
     } else {
       genres.add(publicationDemographic);
     }
     manga.genre = genres;
-    String statusRes =
-        jsonPathToString(res, r'$..data.attributes.status', '');
+    String statusRes = jsonPathToString(res, r'$..data.attributes.status', '');
     manga.status = parseStatus(statusRes, statusList);
     final mangaId = url.split('/').last;
 
     final paginatedChapterList =
         await paginatedChapterListRequest(mangaId, 0, source.lang);
     final chapterList =
-        jsonPathToString(paginatedChapterList, r'$.data[*]', '_.')
-            .split('_.');
-    int limit = int.parse(
-        jsonPathToString(paginatedChapterList, r'$.limit', ''));
-    int offset = int.parse(
-        jsonPathToString(paginatedChapterList, r'$.offset', ''));
-    int total = int.parse(
-        jsonPathToString(paginatedChapterList, r'$.total', ''));
+        jsonPathToString(paginatedChapterList, r'$.data[*]', '_.').split('_.');
+    int limit =
+        int.parse(jsonPathToString(paginatedChapterList, r'$.limit', ''));
+    int offset =
+        int.parse(jsonPathToString(paginatedChapterList, r'$.offset', ''));
+    int total =
+        int.parse(jsonPathToString(paginatedChapterList, r'$.total', ''));
     List<MChapter> chapterListA = [];
 
     final list =
@@ -115,8 +108,7 @@ class MangaDex extends MProvider {
       offset += limit;
       var newRequest =
           await paginatedChapterListRequest(mangaId, offset, source.lang);
-      int total =
-          int.parse(jsonPathToString(newRequest, r'$.total', ''));
+      int total = int.parse(jsonPathToString(newRequest, r'$.total', ''));
       final chapterList =
           jsonPathToString(paginatedChapterList, r'$.data[*]', '_.')
               .split('_.');
@@ -159,8 +151,7 @@ class MangaDex extends MProvider {
   List<MChapter> getChapters(int length, String paginatedChapterListA) {
     List<MChapter> chaptersList = [];
     String paginatedChapterList = paginatedChapterListA.toString();
-    final dataList =
-        jsonPathToList(paginatedChapterList, r'$.data[*]', 0);
+    final dataList = jsonPathToList(paginatedChapterList, r'$.data[*]', 0);
     for (var res in dataList) {
       String scan = "".toString();
       final groups = jsonPathToList(res,
@@ -215,9 +206,8 @@ class MangaDex extends MProvider {
         chapterr.name = chapName;
         chapterr.url = id;
         chapterr.scanlator = scan;
-        chapterr.dateUpload = parseDates(
-                [date], "yyyy-MM-dd'T'HH:mm:ss+SSS", "en_US")
-            .first;
+        chapterr.dateUpload =
+            parseDates([date], "yyyy-MM-dd'T'HH:mm:ss+SSS", "en_US").first;
         chaptersList.add(chapterr);
       }
     }
@@ -267,11 +257,6 @@ class MangaDex extends MProvider {
       }
     }
     return coverFileName;
-  }
-
-  @override
-  Future<List<MVideo>> getVideoList(MSource source, String url) async {
-    return [];
   }
 }
 

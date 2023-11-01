@@ -14,10 +14,10 @@ class OtakuFr extends MProvider {
     List<MManga> animeList = [];
     final urls =
         xpath(res, '//*[@class="list"]/article/div/div/figure/a/@href');
-    final names = xpath(
-        res, '//*[@class="list"]/article/div/div/figure/a/img/@title');
-    final images = xpath(
-        res, '//*[@class="list"]/article/div/div/figure/a/img/@src');
+    final names =
+        xpath(res, '//*[@class="list"]/article/div/div/figure/a/img/@title');
+    final images =
+        xpath(res, '//*[@class="list"]/article/div/div/figure/a/img/@src');
 
     for (var i = 0; i < names.length; i++) {
       MManga anime = MManga();
@@ -57,8 +57,7 @@ class OtakuFr extends MProvider {
           .replaceAll(' (Vf)', '')
           .replaceAll(' (Vostfr)', ''));
     }
-    final images =
-        xpath(res, '//*[@class="episode"]/div/figure/a/img/@src');
+    final images = xpath(res, '//*[@class="episode"]/div/figure/a/img/@src');
 
     for (var i = 0; i < names.length; i++) {
       MManga anime = MManga();
@@ -74,18 +73,17 @@ class OtakuFr extends MProvider {
   @override
   Future<MPages> search(MSource source, String query, int page) async {
     final data = {
-      "url":
-          "${source.baseUrl}/toute-la-liste-affiches/page/$page/?q=$query"
+      "url": "${source.baseUrl}/toute-la-liste-affiches/page/$page/?q=$query"
     };
     final res = await http('GET', json.encode(data));
 
     List<MManga> animeList = [];
     final urls =
         xpath(res, '//*[@class="list"]/article/div/div/figure/a/@href');
-    final names = xpath(
-        res, '//*[@class="list"]/article/div/div/figure/a/img/@title');
-    final images = xpath(
-        res, '//*[@class="list"]/article/div/div/figure/a/img/@src');
+    final names =
+        xpath(res, '//*[@class="list"]/article/div/div/figure/a/img/@title');
+    final images =
+        xpath(res, '//*[@class="list"]/article/div/div/figure/a/img/@src');
 
     for (var i = 0; i < names.length; i++) {
       MManga anime = MManga();
@@ -117,10 +115,9 @@ class OtakuFr extends MProvider {
       res = await http('GET', json.encode(newData));
     }
 
-    anime.description =
-        xpath(res, '//*[@class="episode fz-sm synop"]/p/text()')
-            .first
-            .replaceAll("Synopsis:", "");
+    anime.description = xpath(res, '//*[@class="episode fz-sm synop"]/p/text()')
+        .first
+        .replaceAll("Synopsis:", "");
     final status = xpath(res,
             '//*[@class="list-unstyled"]/li[contains(text(),"Statut")]/text()')
         .first
@@ -129,12 +126,10 @@ class OtakuFr extends MProvider {
     anime.genre = xpath(res,
         '//*[@class="list-unstyled"]/li[contains(text(),"Genre")]/ul/li/a/text()');
 
-    final epUrls =
-        xpath(res, '//*[@class="list-episodes list-group"]/a/@href');
-    final dates = xpath(
-        res, '//*[@class="list-episodes list-group"]/a/span/text()');
-    final names =
-        xpath(res, '//*[@class="list-episodes list-group"]/a/text()');
+    final epUrls = xpath(res, '//*[@class="list-episodes list-group"]/a/@href');
+    final dates =
+        xpath(res, '//*[@class="list-episodes list-group"]/a/span/text()');
+    final names = xpath(res, '//*[@class="list-episodes list-group"]/a/text()');
     List<String> episodes = [];
 
     for (var i = 0; i < names.length; i++) {
@@ -162,8 +157,7 @@ class OtakuFr extends MProvider {
   Future<List<MVideo>> getVideoList(MSource source, String url) async {
     final res = await http('GET', json.encode({"url": url}));
 
-    final servers =
-        xpath(res, '//*[@id="nav-tabContent"]/div/iframe/@src');
+    final servers = xpath(res, '//*[@id="nav-tabContent"]/div/iframe/@src');
     List<MVideo> videos = [];
     for (var url in servers) {
       final datasServer = {
@@ -194,11 +188,6 @@ class OtakuFr extends MProvider {
 
   String fixUrl(String url) {
     return regExp(url, r"^(?:(?:https?:)?//|www\.)", 'https://', 0, 0);
-  }
-
-  @override
-  Future<List<String>> getPageList(MSource source, String url) async {
-    return [];
   }
 }
 

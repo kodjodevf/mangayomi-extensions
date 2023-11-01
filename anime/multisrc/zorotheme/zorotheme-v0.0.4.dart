@@ -22,9 +22,7 @@ class ZoroTheme extends MProvider {
 
   @override
   Future<MPages> search(MSource source, String query, int page) async {
-    final data = {
-      "url": "${source.baseUrl}/search?keyword=$query&page=$page"
-    };
+    final data = {"url": "${source.baseUrl}/search?keyword=$query&page=$page"};
     final res = await http('GET', json.encode(data));
 
     return animeElementM(res);
@@ -44,7 +42,7 @@ class ZoroTheme extends MProvider {
     final status = xpath(res,
             '//*[@class="anisc-info"]/div[contains(text(),"Status:")]/span[2]/text()')
         .first;
-        
+
     anime.status = parseStatus(status, statusList);
     anime.author = xpath(res,
             '//*[@class="anisc-info"]/div[contains(text(),"Studios:")]/span/text()')
@@ -150,8 +148,7 @@ class ZoroTheme extends MProvider {
       };
 
       final resE = await http('GET', json.encode(datasE));
-      String epUrl = substringBefore(
-          substringAfter(resE, "\"link\":\""), "\"");
+      String epUrl = substringBefore(substringAfter(resE, "\"link\":\""), "\"");
       print(epUrl);
       List<MVideo> a = [];
       if (name.contains("Vidstreaming")) {
@@ -165,11 +162,6 @@ class ZoroTheme extends MProvider {
     }
 
     return videos;
-  }
-
-  @override
-  Future<List<String>> getPageList(MSource source, String url) async {
-    return [];
   }
 
   MPages animeElementM(String res) {
@@ -190,8 +182,8 @@ class ZoroTheme extends MProvider {
       anime.link = urls[i];
       animeList.add(anime);
     }
-    final nextPage = xpath(
-        res, '//li[@class="page-item"]/a[@title="Next"]/@href', "");
+    final nextPage =
+        xpath(res, '//li[@class="page-item"]/a[@title="Next"]/@href', "");
     return MPages(animeList, !nextPage.isEmpty);
   }
 
@@ -206,4 +198,3 @@ class ZoroTheme extends MProvider {
 ZoroTheme main() {
   return ZoroTheme();
 }
-
