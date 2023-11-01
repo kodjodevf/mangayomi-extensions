@@ -2,7 +2,7 @@ import '../../../../model/source.dart';
 import '../../../../utils/utils.dart';
 
 Source get mangahereSource => _mangahereSource;
-const mangahereVersion = "0.0.3";
+const mangahereVersion = "0.0.35";
 const mangahereSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/src/en/mangahere/mangahere-v$mangahereVersion.dart";
 Source _mangahereSource = Source(
