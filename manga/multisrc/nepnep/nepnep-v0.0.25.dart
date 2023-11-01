@@ -70,22 +70,7 @@ class NepNep extends MProvider {
     final vmChapters =
         substringBefore(substringAfter(script, "vm.Chapters = "), ";");
     final chapters = json.decode(vmChapters) as List;
-    var chapUrls = chapters
-        .map((ch) =>
-            '/read-online/${substringAfter(url, "/manga/")}${chapterURLEncode(ch['Chapter'])}')
-        .toList();
 
-    var chaptersNames = chapters.map((ch) {
-      String name = ch['ChapterName'] ?? "";
-      String indexChapter = ch['Chapter'];
-      if (name.isEmpty) {
-        name = '${ch['Type']} ${chapterImage(indexChapter, true)}';
-      }
-      return name;
-    }).toList();
-    var chaptersDates = chapters.map((ch) => ch['Date']).toList();
-    var dateUploads =
-        parseDates(chaptersDates, source.dateFormat, source.dateFormatLocale);
     List<MChapter> chaptersList = [];
 
     for (var ch in chapters) {
@@ -218,11 +203,6 @@ class NepNep extends MProvider {
     }
 
     return '-chapter-$n$suffix$index.html';
-  }
-
-  @override
-  Future<List<MVideo>> getVideoList(MSource source, String url) async {
-    return [];
   }
 }
 

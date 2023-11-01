@@ -10,6 +10,24 @@ const defaultDateFormatLocale = "en_US";
 List<Source> get mangareaderSourcesList => _mangareaderSourcesList;
 List<Source> _mangareaderSourcesList = [
   Source(
+      name: "Beast Scans",
+      baseUrl: "https://beast-scans.com",
+      lang: "ar",
+      iconUrl: getIconUrl("asurascans", "en"),
+      dateFormat: "MMMM dd, yyyy",
+      dateFormatLocale: "ar",
+      version: mangareaderVersion,
+      sourceCodeUrl: mangareaderSourceCodeUrl),
+  Source(
+      name: "Lelmanga",
+      baseUrl: "https://www.lelmanga.com",
+      lang: "fr",
+      iconUrl: getIconUrl("lelmanga", "fr"),
+      dateFormat: "MMMM d, yyyy",
+      dateFormatLocale: "en",
+      version: mangareaderVersion,
+      sourceCodeUrl: mangareaderSourceCodeUrl),
+  Source(
       name: "Asura Scans",
       baseUrl: "https://asuratoon.com/",
       lang: "en",

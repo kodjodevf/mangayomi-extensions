@@ -34,8 +34,8 @@ class GogoAnime extends MProvider {
     final res = await http('GET', json.encode(data));
 
     List<MManga> animeList = [];
-    final urls = xpath(
-        res, '//*[@class="added_series_body popular"]/ul/li/a[1]/@href');
+    final urls =
+        xpath(res, '//*[@class="added_series_body popular"]/ul/li/a[1]/@href');
     final names = xpath(
         res, '//*[//*[@class="added_series_body popular"]/ul/li/a[1]/@title');
     List<String> images = [];
@@ -111,8 +111,7 @@ class GogoAnime extends MProvider {
     final dataEp = {"url": urlEp};
     final resEp = await http('GET', json.encode(dataEp));
 
-    final epUrls =
-        xpath(resEp, '//*[@id="episode_related"]/li/a/@href');
+    final epUrls = xpath(resEp, '//*[@id="episode_related"]/li/a/@href');
     final names = xpath(
         resEp, '//*[@id="episode_related"]/li/a/div[@class="name"]/text()');
     List<String> episodes = [];
@@ -139,8 +138,7 @@ class GogoAnime extends MProvider {
     final res = await http('GET', json.encode(datas));
     final serverUrls =
         xpath(res, '//*[@class="anime_muti_link"]/ul/li/a/@data-video');
-    final classNames =
-        xpath(res, '//*[@class="anime_muti_link"]/ul/li/@class');
+    final classNames = xpath(res, '//*[@class="anime_muti_link"]/ul/li/@class');
     List<MVideo> videos = [];
     for (var i = 0; i < classNames.length; i++) {
       final name = classNames[i];
@@ -159,11 +157,6 @@ class GogoAnime extends MProvider {
     }
 
     return videos;
-  }
-
-  @override
-  Future<List<String>> getPageList(MSource source, String url) async {
-    return [];
   }
 }
 

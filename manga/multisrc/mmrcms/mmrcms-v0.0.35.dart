@@ -1,8 +1,8 @@
 import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
-class MMCRCms extends MProvider {
-  MMCRCms();
+class MMRCMS extends MProvider {
+  MMRCMS();
 
   @override
   Future<MPages> getPopular(MSource source, int page) async {
@@ -131,35 +131,33 @@ class MMCRCms extends MProvider {
     final datas = {"url": url, "sourceId": source.id};
     final res = await http('GET', json.encode(datas));
 
-    manga.author = xpath(res,
-            '//*[@class="dl-horizontal"]/dt[contains(text(), "Auteur(s)") or contains(text(), "Author(s)") or contains(text(), "Autor(es)") or contains(text(), "Yazar(lar) or contains(text(), "Mangaka(lar)")]//following-sibling::dd[1]/text()')
-        .first;
+    final author = xpath(res,
+        '//*[@class="dl-horizontal"]/dt[contains(text(), "Auteur(s)") or contains(text(), "Author(s)") or contains(text(), "Autor(es)") or contains(text(), "Yazar(lar) or contains(text(), "Mangaka(lar)")]//following-sibling::dd[1]/text()');
+    if (author.isNotEmpty) {
+      manga.author = author.first;
+    }
     final status = xpath(res,
-            '//*[@class="dl-horizontal"]/dt[contains(text(), "Statut") or contains(text(), "Status") or contains(text(), "Estado") or contains(text(), "Durum")]/following-sibling::dd[1]/text()')
-        .first;
-    manga.status = parseStatus(status, statusList);
-    manga.description =
-        xpath(res, '//*[@class="well" or @class="manga well"]/p/text()')
-            .first;
+        '//*[@class="dl-horizontal"]/dt[contains(text(), "Statut") or contains(text(), "Status") or contains(text(), "Estado") or contains(text(), "Durum")]/following-sibling::dd[1]/text()');
+    if (status.isNotEmpty) {
+      manga.status = parseStatus(status.first, statusList);
+    }
+
+    final description =
+        xpath(res, '//*[@class="well" or @class="manga well"]/p/text()');
+    if (description.isNotEmpty) {
+      manga.description = description.first;
+    }
+
     manga.genre = xpath(res,
         '//*[@class="dl-horizontal"]/dt[contains(text(), "Categories") or contains(text(), "Categorias") or contains(text(), "Categorías") or contains(text(), "Catégories") or contains(text(), "Kategoriler" or contains(text(), "Kategorie") or contains(text(), "Kategori") or contains(text(), "Tagi"))]/following-sibling::dd[1]/text()');
 
-    final baseUrl = "${source.baseUrl}/";
-    final headers = {
-      "Referer": baseUrl,
-      "Content-Type": "application/x-www-form-urlencoded",
-      "X-Requested-With": "XMLHttpRequest"
-    };
-
-    var chapUrls =
-        xpath(res, '//*[@class="chapter-title-rtl"]/a/@href');
-    var chaptersNames =
-        xpath(res, '//*[@class="chapter-title-rtl"]/a/text()');
+    var chapUrls = xpath(res, '//*[@class="chapter-title-rtl"]/a/@href');
+    var chaptersNames = xpath(res, '//*[@class="chapter-title-rtl"]/a/text()');
     var chaptersDates =
         xpath(res, '//*[@class="date-chapter-title-rtl"]/text()');
 
-    var dateUploads = parseDates(
-        chaptersDates, source.dateFormat, source.dateFormatLocale);
+    var dateUploads =
+        parseDates(chaptersDates, source.dateFormat, source.dateFormatLocale);
 
     List<MChapter>? chaptersList = [];
     for (var i = 0; i < chaptersNames.length; i++) {
@@ -179,8 +177,8 @@ class MMCRCms extends MProvider {
     final res = await http('GET', json.encode(datas));
 
     List<String> pagesUrl = [];
-    final pages = xpath(
-        res, '//*[@id="all"]/img[@class="img-responsive"]/@data-src');
+    final pages =
+        xpath(res, '//*[@id="all"]/img[@class="img-responsive"]/@data-src');
     for (var page in pages) {
       if (page.startsWith('//')) {
         pagesUrl.add(page.replaceAll('//', 'https://'));
@@ -191,13 +189,8 @@ class MMCRCms extends MProvider {
 
     return pagesUrl;
   }
-
-  @override
-  Future<List<MVideo>> getVideoList(MSource source, String url) async {
-    return [];
-  }
 }
 
-MMCRCms main() {
-  return MMCRCms();
+MMRCMS main() {
+  return MMRCMS();
 }

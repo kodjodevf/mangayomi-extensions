@@ -92,33 +92,41 @@ class MangaReader extends MProvider {
     final datas = {"url": url, "sourceId": source.id};
     final res = await http('GET', json.encode(datas));
 
-    manga.author = xpath(
-            res,
-            '//*[@class="imptdt" and contains(text(), "Author") or @class="infotable" and contains(text(), "Author") or @class="infotable" and contains(text(), "Auteur") or @class="fmed" and contains(text(), "Auteur") or @class="infotable" and contains(text(), "Autor")]/text()',
-            '')
-        .first
-        .replaceAll("Autor", "")
-        .replaceAll("Author", "")
-        .replaceAll("Auteur", "")
-        .replaceAll("[Add, ]", "");
+    final author = xpath(
+        res,
+        '//*[@class="imptdt" and contains(text(), "Author") or @class="infotable" and contains(text(), "Author") or @class="infotable" and contains(text(), "Auteur") or @class="fmed" and contains(text(), "Auteur") or @class="infotable" and contains(text(), "Autor")]/text()',
+        '');
 
-    manga.description = querySelectorAll(res,
-            selector: ".desc, .entry-content[itemprop=description]",
-            typeElement: 0,
-            attributes: "",
-            typeRegExp: 0)
-        .first;
+    if (author.isNotEmpty) {
+      manga.author = author.first
+          .replaceAll("Autor", "")
+          .replaceAll("Author", "")
+          .replaceAll("Auteur", "")
+          .replaceAll("[Add, ]", "");
+    }
+
+    final description = querySelectorAll(res,
+        selector: ".desc, .entry-content[itemprop=description]",
+        typeElement: 0,
+        attributes: "",
+        typeRegExp: 0);
+    if (description.isNotEmpty) {
+      manga.description = description.first;
+    }
 
     final status = xpath(
-            res,
-            '//*[@class="imptdt" and contains(text(), "Status") or @class="imptdt" and contains(text(), "Estado") or @class="infotable" and contains(text(), "Status") or @class="infotable" and contains(text(), "Statut") or @class="imptdt" and contains(text(), "Statut")]/text()',
-            '')
-        .first
-        .replaceAll("Status", "")
-        .replaceAll("Estado", "")
-        .replaceAll("Statut", "");
+        res,
+        '//*[@class="imptdt" and contains(text(), "Status") or @class="imptdt" and contains(text(), "Estado") or @class="infotable" and contains(text(), "Status") or @class="infotable" and contains(text(), "Statut") or @class="imptdt" and contains(text(), "Statut")]/text()',
+        '');
 
-    manga.status = parseStatus(status, statusList);
+    if (status.isNotEmpty) {
+      manga.status = parseStatus(
+          status.first
+              .replaceAll("Status", "")
+              .replaceAll("Estado", "")
+              .replaceAll("Statut", ""),
+          statusList);
+    }
 
     manga.genre = xpath(res,
         '//*[@class="gnr"  or @class="mgen"  or @class="seriestugenre" ]/a/text()');
@@ -130,8 +138,8 @@ class MangaReader extends MProvider {
     var chapterDates = xpath(res,
         '//*[@class="bxcl"  or @class="cl"  or @class="chbox" or @class="eph-num" or @id="chapterlist"]/div/a/span[@class="chapterdate" and not(text()="{{date}}")]/text()');
 
-    var dateUploads = parseDates(
-        chapterDates, source.dateFormat, source.dateFormatLocale);
+    var dateUploads =
+        parseDates(chapterDates, source.dateFormat, source.dateFormatLocale);
 
     List<MChapter>? chaptersList = [];
     for (var i = 0; i < chaptersNames.length; i++) {
@@ -157,8 +165,7 @@ class MangaReader extends MProvider {
       pages = xpath(res, '//*[@id="readerarea"]/img/@src');
     }
     if (pages.isEmpty || pages.length == 1) {
-      final images =
-          regExp(res, "\"images\"\\s*:\\s*(\\[.*?])", "", 1, 1);
+      final images = regExp(res, "\"images\"\\s*:\\s*(\\[.*?])", "", 1, 1);
       final pages = json.decode(images) as List;
       for (var page in pages) {
         pagesUrl.add(page);
@@ -172,12 +179,10 @@ class MangaReader extends MProvider {
 
   MPages mangaRes(String res) {
     List<MManga> mangaList = [];
-    final urls =
-        xpath(res, '//*[ @class="imgu"  or @class="bsx"]/a/@href');
-    final names =
-        xpath(res, '//*[ @class="imgu"  or @class="bsx"]/a/@title');
-    final images = xpath(
-        res, '//*[ @class="imgu"  or @class="bsx"]/a/div[1]/img/@src');
+    final urls = xpath(res, '//*[ @class="imgu"  or @class="bsx"]/a/@href');
+    final names = xpath(res, '//*[ @class="imgu"  or @class="bsx"]/a/@title');
+    final images =
+        xpath(res, '//*[ @class="imgu"  or @class="bsx"]/a/div[1]/img/@src');
 
     for (var i = 0; i < names.length; i++) {
       MManga manga = MManga();
@@ -195,11 +200,6 @@ class MangaReader extends MProvider {
       return "/catalogue";
     }
     return "/manga";
-  }
-
-  @override
-  Future<List<MVideo>> getVideoList(MSource source, String url) async {
-    return [];
   }
 }
 

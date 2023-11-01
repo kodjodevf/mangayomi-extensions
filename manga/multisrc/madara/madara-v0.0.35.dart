@@ -15,8 +15,7 @@ class Madara extends MProvider {
     final names = xpath(res, '//*[@id^="manga-item"]/a/@title');
     var images = xpath(res, '//*[@id^="manga-item"]/a/img/@data-src');
     if (images.isEmpty) {
-      images =
-          xpath(res, '//*[@id^="manga-item"]/a/img/@data-lazy-src');
+      images = xpath(res, '//*[@id^="manga-item"]/a/img/@data-lazy-src');
       if (images.isEmpty) {
         images = xpath(res, '//*[@id^="manga-item"]/a/img/@srcset');
         if (images.isEmpty) {
@@ -47,8 +46,7 @@ class Madara extends MProvider {
     final names = xpath(res, '//*[@id^="manga-item"]/a/@title');
     var images = xpath(res, '//*[@id^="manga-item"]/a/img/@data-src');
     if (images.isEmpty) {
-      images =
-          xpath(res, '//*[@id^="manga-item"]/a/img/@data-lazy-src');
+      images = xpath(res, '//*[@id^="manga-item"]/a/img/@data-lazy-src');
       if (images.isEmpty) {
         images = xpath(res, '//*[@id^="manga-item"]/a/img/@srcset');
         if (images.isEmpty) {
@@ -77,21 +75,19 @@ class Madara extends MProvider {
     final res = await http('GET', json.encode(data));
 
     List<MManga> mangaList = [];
-    final urls =
-        xpath(res, '//*[@class^="tab-thumb c-image-hover"]/a/@href');
-    final names =
-        xpath(res, '//*[@class^="tab-thumb c-image-hover"]/a/@title');
-    var images = xpath(
-        res, '//*[@class^="tab-thumb c-image-hover"]/a/img/@data-src');
+    final urls = xpath(res, '//*[@class^="tab-thumb c-image-hover"]/a/@href');
+    final names = xpath(res, '//*[@class^="tab-thumb c-image-hover"]/a/@title');
+    var images =
+        xpath(res, '//*[@class^="tab-thumb c-image-hover"]/a/img/@data-src');
     if (images.isEmpty) {
       images = xpath(
           res, '//*[@class^="tab-thumb c-image-hover"]/a/img/@data-lazy-src');
       if (images.isEmpty) {
-        images = xpath(
-            res, '//*[@class^="tab-thumb c-image-hover"]/a/img/@srcset');
+        images =
+            xpath(res, '//*[@class^="tab-thumb c-image-hover"]/a/img/@srcset');
         if (images.isEmpty) {
-          images = xpath(
-              res, '//*[@class^="tab-thumb c-image-hover"]/a/img/@src');
+          images =
+              xpath(res, '//*[@class^="tab-thumb c-image-hover"]/a/img/@src');
         }
       }
     }
@@ -158,39 +154,45 @@ class Madara extends MProvider {
     final datas = {"url": url, "sourceId": source.id};
     res = await http('GET', json.encode(datas));
 
-    manga.author = querySelectorAll(res,
-            selector: "div.author-content > a",
-            typeElement: 0,
-            attributes: "",
-            typeRegExp: 0)
-        .first;
-    manga.description = querySelectorAll(res,
-            selector:
-                "div.description-summary div.summary__content, div.summary_content div.post-content_item > h5 + div, div.summary_content div.manga-excerpt, div.sinopsis div.contenedor, .description-summary > p",
-            typeElement: 0,
-            attributes: "",
-            typeRegExp: 0)
-        .first;
-    manga.imageUrl = querySelectorAll(res,
-            selector: "div.summary_image img",
-            typeElement: 2,
-            attributes: "",
-            typeRegExp: 2)
-        .first;
+    final author = querySelectorAll(res,
+        selector: "div.author-content > a",
+        typeElement: 0,
+        attributes: "",
+        typeRegExp: 0);
+    if (author.isNotEmpty) {
+      manga.author = author.first;
+    }
+    final description = querySelectorAll(res,
+        selector:
+            "div.description-summary div.summary__content, div.summary_content div.post-content_item > h5 + div, div.summary_content div.manga-excerpt, div.sinopsis div.contenedor, .description-summary > p",
+        typeElement: 0,
+        attributes: "",
+        typeRegExp: 0);
+    if (description.isNotEmpty) {
+      manga.description = description.first;
+    }
+    final imageUrl = querySelectorAll(res,
+        selector: "div.summary_image img",
+        typeElement: 2,
+        attributes: "",
+        typeRegExp: 2);
+    if (imageUrl.isNotEmpty) {
+      manga.imageUrl = imageUrl.first;
+    }
     final mangaId = querySelectorAll(res,
             selector: "div[id^=manga-chapters-holder]",
             typeElement: 3,
             attributes: "data-id",
             typeRegExp: 0)
         .first;
-    manga.status = parseStatus(
-        querySelectorAll(res,
-                selector: "div.summary-content",
-                typeElement: 0,
-                attributes: "",
-                typeRegExp: 0)
-            .last,
-        statusList);
+    final status = querySelectorAll(res,
+        selector: "div.summary-content",
+        typeElement: 0,
+        attributes: "",
+        typeRegExp: 0);
+    if (status.isNotEmpty) {
+      manga.status = parseStatus(status.last, statusList);
+    }
 
     manga.genre = querySelectorAll(res,
         selector: "div.genres-content a",
@@ -208,13 +210,9 @@ class Madara extends MProvider {
         "${baseUrl}wp-admin/admin-ajax.php?action=manga_get_chapters&manga=$mangaId";
     final datasP = {"url": urll, "headers": headers, "sourceId": source.id};
     res = await http('POST', json.encode(datasP));
-    if (res == "400") {
+    if (res == "error") {
       final urlP = "${url}ajax/chapters";
-      final datasP = {
-        "url": urlP,
-        "headers": headers,
-        "sourceId": source.id
-      };
+      final datasP = {"url": urlP, "headers": headers, "sourceId": source.id};
       res = await http('POST', json.encode(datasP));
     }
 
@@ -231,8 +229,8 @@ class Madara extends MProvider {
       dateF = xpath(resWebview,
           "//*[@id='manga-chapters-holder']/div[2]/div/ul/li/span/i/text()");
     }
-    var dateUploads = parseDates(
-        dateF, source.dateFormat, source.dateFormatLocale);
+    var dateUploads =
+        parseDates(dateF, source.dateFormat, source.dateFormatLocale);
     if (dateF.length < chaptersNames.length) {
       final length = chaptersNames.length - dateF.length;
       String date = "${DateTime.now().millisecondsSinceEpoch}";
@@ -240,8 +238,8 @@ class Madara extends MProvider {
         date += "--..${DateTime.now().millisecondsSinceEpoch}";
       }
 
-      final dateFF = parseDates(
-          dateF, source.dateFormat, source.dateFormatLocale);
+      final dateFF =
+          parseDates(dateF, source.dateFormat, source.dateFormatLocale);
       List<String> chapterDate = date.split('--..');
 
       for (var date in dateFF) {
@@ -313,11 +311,6 @@ class Madara extends MProvider {
       return imgs;
     }
     return pageUrls;
-  }
-
-  @override
-  Future<List<MVideo>> getVideoList(MSource source, String url) async {
-    return [];
   }
 }
 
