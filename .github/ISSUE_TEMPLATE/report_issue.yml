@@ -73,7 +73,7 @@ body:
       label: Device
       description: List your device, model and the OS version.
       placeholder: |
-        Example: "Google Pixel 5 android 11"
+        Example: "Google Pixel 5 Android 11"
     validations:
       required: true
 
@@ -96,5 +96,5 @@ body:
           required: true
         - label: I have updated all installed extensions.
           required: true
-        - label: If this is an issue with the app itself, I should be opening an issue in the [app repository](https://github.com/kodjodevf/mangayomi/issues/new).
+        - label: If this is an issue with the app itself, I should be opening an issue in the [app repository](https://github.com/kodjodevf/mangayomi/issues/new/choose).
           required: true
