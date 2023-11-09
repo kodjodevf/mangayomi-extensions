@@ -9,6 +9,9 @@ import 'src/en/kisskh/source.dart';
 import 'src/fr/animesultra/source.dart';
 import 'src/fr/franime/source.dart';
 import 'src/fr/otakufr/source.dart';
+import 'src/id/nimegami/source.dart';
+import 'src/id/oploverz/source.dart';
+import 'src/id/otakudesu/source.dart';
 
 void main() {
   List<Source> _sourcesList = [
@@ -18,7 +21,10 @@ void main() {
     animesultraSource,
     ...zorothemeSourcesList,
     kisskhSource,
-    okanimeSource
+    okanimeSource,
+    otakudesu,
+    nimegami,
+    oploverz
   ];
   final List<Map<String, dynamic>> jsonList =
       _sourcesList.map((source) => source.toJson()).toList();
