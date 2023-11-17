@@ -4,6 +4,7 @@ import 'dart:io';
 import '../model/source.dart';
 import 'multisrc/zorotheme/sources.dart';
 import 'src/ar/okanime/source.dart';
+import 'src/en/aniwave/source.dart';
 import 'src/en/gogoanime/source.dart';
 import 'src/en/kisskh/source.dart';
 import 'src/fr/animesultra/source.dart';
@@ -24,7 +25,8 @@ void main() {
     okanimeSource,
     otakudesu,
     nimegami,
-    oploverz
+    oploverz,
+    aniwave
   ];
   final List<Map<String, dynamic>> jsonList =
       _sourcesList.map((source) => source.toJson()).toList();

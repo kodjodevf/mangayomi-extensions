@@ -96,7 +96,7 @@ class NimeGami extends MProvider {
       episode.name = names[i];
       episode.url = json.encode({
         "episodeIndex": int.parse(substringAfterLast(epNums[i], '_')),
-        'urls': json.decode(base64(epUrls[i], 0))
+        'urls': json.decode(utf8.decode(base64Url.decode(epUrls[i])))
       });
       episodesList.add(episode);
     }
@@ -124,8 +124,8 @@ class NimeGami extends MProvider {
     List<MVideo> videos = [];
     List<MVideo> a = [];
     if (url.contains("video.nimegami.id")) {
-      final realUrl =
-          base64(substringBefore(substringAfter(url, "url="), "&"), 0);
+      final realUrl = utf8.decode(
+          base64Url.decode(substringBefore(substringAfter(url, "url="), "&")));
       final a = await extractHXFileVideos(realUrl, quality);
       videos.addAll(a);
     } else if (url.contains("berkasdrive") || url.contains("drive.nimegami")) {
