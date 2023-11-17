@@ -101,7 +101,7 @@ class OtakuDesu extends MProvider {
         xpath(res, '//*[@class="mirrorstream"]/ul/li/a/@data-content');
     for (var stream in mirrorstream) {
       List<MVideo> a = [];
-      final decodedData = json.decode(base64(stream, 0));
+      final decodedData = json.decode(utf8.decode(base64Url.decode(stream)));
       final q = decodedData["q"];
       final id = decodedData["id"];
       final i = decodedData["i"];
@@ -114,7 +114,8 @@ class OtakuDesu extends MProvider {
             "body": body,
             "url": "${source.baseUrl}/wp-admin/admin-ajax.php"
           }));
-      final html = base64(substringBefore(substringAfter(res, ":\""), '"'), 0);
+      final html = utf8.decode(
+          base64Url.decode(substringBefore(substringAfter(res, ":\""), '"')));
       final url = xpath(html, '//iframe/@src').first;
 
       if (url.contains("yourupload")) {
