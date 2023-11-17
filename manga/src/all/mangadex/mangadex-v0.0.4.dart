@@ -127,22 +127,25 @@ class MangaDex extends MProvider {
 
     final res = await http('GET', json.encode({"url": urll}));
 
-    final dataRes = json.decode(res);
-    final host = dataRes["baseUrl"];
-    final hash = dataRes["chapter"]["hash"];
-    final chapterDatas = dataRes["chapter"]["data"] as List;
+    // final dataRes = json.decode(res);
+    final host = getMapValue(res, "baseUrl");
+    final chapter = getMapValue(res, "chapter", encode: true);
+    final hash = getMapValue(chapter, "hash");
+    final chapterDatas =
+        json.decode(getMapValue(chapter, "data", encode: true)) as List;
     return chapterDatas.map((e) => "$host/data/$hash/$e").toList();
   }
 
   MPages mangaRes(String res, MSource source) {
-    final datasRes = json.decode(res);
-    final resJson = datasRes["data"] as List;
+    final datasRes = getMapValue(res, "data", encode: true);
+
+    final resJson = json.decode(datasRes) as List;
     List<MManga> mangaList = [];
     for (var e in resJson) {
       MManga manga = MManga();
-      manga.name = findTitle(e, source.lang);
-      manga.imageUrl = getCover(e);
-      manga.link = "/manga/${e["id"]}";
+      manga.name = findTitle(json.encode(e), source.lang);
+      manga.imageUrl = getCover(json.encode(e));
+      manga.link = "/manga/${getMapValue(json.encode(e), "id")}";
       mangaList.add(manga);
     }
     return MPages(mangaList, true);
@@ -229,10 +232,12 @@ class MangaDex extends MProvider {
     return ctnRating;
   }
 
-  String findTitle(Map<String, dynamic> dataRes, String lang) {
-    final altTitlesJ = dataRes["attributes"]["altTitles"];
-    final titleJ = dataRes["attributes"]["title"];
-    final title = getMapValue(json.encode(titleJ), "en");
+  String findTitle(String dataRes, String lang) {
+    final attributes = getMapValue(dataRes, "attributes", encode: true);
+    final altTitlesJ =
+        json.decode(getMapValue(attributes, "altTitles", encode: true));
+    final titleJ = getMapValue(attributes, "title", encode: true);
+    final title = getMapValue(titleJ, "en");
     if (title.isEmpty) {
       for (var r in altTitlesJ) {
         final altTitle = getMapValue(json.encode(r), "en");
@@ -244,15 +249,18 @@ class MangaDex extends MProvider {
     return title;
   }
 
-  String getCover(Map<String, dynamic> dataRes) {
-    final relationships = dataRes["relationships"];
+  String getCover(String dataRes) {
+    final relationships = json
+        .decode(getMapValue(dataRes, "relationships", encode: true)) as List;
     String coverFileName = "".toString();
     for (var a in relationships) {
-      final relationType = a["type"];
+      final relationType = getMapValue(json.encode(a), "type");
       if (relationType == "cover_art") {
         if (coverFileName.isEmpty) {
+          final attributes =
+              getMapValue(json.encode(a), "attributes", encode: true);
           coverFileName =
-              "https://uploads.mangadex.org/covers/${dataRes["id"]}/${a["attributes"]["fileName"]}";
+              "https://uploads.mangadex.org/covers/${getMapValue(dataRes, "id")}/${getMapValue(attributes, "fileName")}";
         }
       }
     }
