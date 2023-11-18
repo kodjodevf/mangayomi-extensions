@@ -35,7 +35,7 @@ class NepNep extends MProvider {
     final resSort = sortMapList(json.decode(directory), "lt", 1);
     final datas = json.decode(resSort) as List;
     final queryRes = datas.where((e) {
-      String name = e['s'];
+      String name = getMapValue(e, 's');
       return name.toLowerCase().contains(query.toLowerCase());
     }).toList();
 
@@ -74,18 +74,19 @@ class NepNep extends MProvider {
     List<MChapter> chaptersList = [];
 
     for (var ch in chapters) {
+      final c = json.encode(ch);
       MChapter chapter = MChapter();
-      String name = ch['ChapterName'] ?? "";
-      String indexChapter = ch['Chapter'];
+      String name = getMapValue(c, 'ChapterName');
+      String indexChapter = getMapValue(c, 'Chapter');
       if (name.isEmpty) {
-        name = '${ch['Type']} ${chapterImage(indexChapter, true)}';
+        name = '${getMapValue(c, 'Type')} ${chapterImage(indexChapter, true)}';
       }
-      chapter.name = name;
+      chapter.name = name == "null" ? "" : name;
       chapter.url =
-          '/read-online/${substringAfter(url, "/manga/")}${chapterURLEncode(ch['Chapter'])}';
-      chapter.dateUpload =
-          parseDates([ch['Date']], source.dateFormat, source.dateFormatLocale)
-              .first;
+          '/read-online/${substringAfter(url, "/manga/")}${chapterURLEncode(getMapValue(c, 'Chapter'))}';
+      chapter.dateUpload = parseDates([getMapValue(c, 'Date')],
+              source.dateFormat, source.dateFormatLocale)
+          .first;
       chaptersList.add(chapter);
     }
     manga.chapters = chaptersList;
@@ -101,18 +102,20 @@ class NepNep extends MProvider {
     final res = await http('GET', json.encode(data));
     final script =
         xpath(res, '//script[contains(text(), "MainFunction")]/text()').first;
-    final chapScript = json.decode(
-        substringBefore(substringAfter(script, "vm.CurChapter = "), ";"));
+    final chapScript =
+        substringBefore(substringAfter(script, "vm.CurChapter = "), ";");
     final pathName = substringBefore(
         substringAfter(script, "vm.CurPathName = \"", ""), "\"");
-    var directory = chapScript['Directory'] ?? '';
+    var directory = getMapValue(chapScript, 'Directory') == 'null'
+        ? ''
+        : getMapValue(chapScript, 'Directory');
     if (directory.length > 0) {
       directory += '/';
     }
     final mangaName =
         substringBefore(substringAfter(url, "/read-online/"), "-chapter");
-    var chNum = chapterImage(chapScript['Chapter'], false);
-    var totalPages = int.parse(chapScript['Page']);
+    var chNum = chapterImage(getMapValue(chapScript, 'Chapter'), false);
+    var totalPages = int.parse(getMapValue(chapScript, 'Page'));
     for (int page = 1; page <= totalPages; page++) {
       String paddedPageNumber = "$page".padLeft(3, '0');
       String pageUrl =
@@ -135,10 +138,12 @@ class NepNep extends MProvider {
     List<MManga> mangaList = [];
     final datas = json.decode(res) as List;
     for (var data in datas) {
+      final d = json.encode(data);
       MManga manga = MManga();
-      manga.name = data["s"];
-      manga.imageUrl = 'https://temp.compsci88.com/cover/${data['i']}.jpg';
-      manga.link = data["i"];
+      manga.name = getMapValue(d, "s");
+      manga.imageUrl =
+          'https://temp.compsci88.com/cover/${getMapValue(d, "i")}.jpg';
+      manga.link = getMapValue(d, "i");
       mangaList.add(manga);
     }
     return MPages(mangaList, true);
