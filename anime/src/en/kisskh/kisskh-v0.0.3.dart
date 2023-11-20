@@ -12,7 +12,7 @@ class KissKh extends MProvider {
     };
     final res = await http('GET', json.encode(data));
     final jsonRes = json.decode(res);
-    final datas = jsonRes["data"] as List;
+    final datas = jsonRes["data"];
     List<MManga> animeList = [];
 
     for (var data in datas) {
@@ -38,7 +38,7 @@ class KissKh extends MProvider {
     };
     final res = await http('GET', json.encode(data));
     final jsonRes = json.decode(res);
-    final datas = jsonRes["data"] as List;
+    final datas = jsonRes["data"];
 
     List<MManga> animeList = [];
 
@@ -78,23 +78,19 @@ class KissKh extends MProvider {
   @override
   Future<MManga> getDetail(MSource source, String url) async {
     final statusList = [
-      {
-        "Ongoing": 0,
-        "Completed": 1,
-      }
+      {"Ongoing": 0, "Completed": 1}
     ];
     final data = {"url": url};
     final res = await http('GET', json.encode(data));
     MManga anime = MManga();
     final jsonRes = json.decode(res);
     final status = jsonRes["status"] ?? "";
-    print(status);
     anime.description = jsonRes["description"];
     anime.status = parseStatus(status, statusList);
     anime.imageUrl = jsonRes["thumbnail"];
     var episodes = jsonRes["episodes"];
     String type = jsonRes["type"];
-    final episodesCount = jsonRes["episodesCount"];
+    final episodesCount = jsonRes["episodesCount"] as int;
     final containsAnime = type.contains("Anime");
     final containsTVSeries = type.contains("TVSeries");
     final containsHollywood = type.contains("Hollywood");
