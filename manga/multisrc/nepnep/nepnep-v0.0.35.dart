@@ -35,7 +35,7 @@ class NepNep extends MProvider {
     final resSort = sortMapList(json.decode(directory), "lt", 1);
     final datas = json.decode(resSort) as List;
     final queryRes = datas.where((e) {
-      String name = getMapValue(e, 's');
+      String name = getMapValue(json.encode(e), 's');
       return name.toLowerCase().contains(query.toLowerCase());
     }).toList();
 
