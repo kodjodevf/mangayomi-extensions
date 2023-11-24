@@ -25,9 +25,49 @@ class MangaReader extends MProvider {
   }
 
   @override
-  Future<MPages> search(MSource source, String query, int page) async {
-    final url =
+  Future<MPages> search(
+      MSource source, String query, int page, FilterList filterList) async {
+    final filters = filterList.filters;
+
+    String url =
         "${source.baseUrl}${getMangaUrlDirectory(source.name)}/?&title=$query&page=$page";
+
+    for (var filter in filters) {
+      if (filter.type == "AuthorFilter") {
+        url += "${ll(url)}author=${Uri.encodeComponent(filter.state)}";
+      } else if (filter.type == "YearFilter") {
+        url += "${ll(url)}yearx=${Uri.encodeComponent(filter.state)}";
+      } else if (filter.type == "StatusFilter") {
+        final status = filter.values[filter.state].value;
+        url += "${ll(url)}status=$status";
+      } else if (filter.type == "TypeFilter") {
+        final type = filter.values[filter.state].value;
+        url += "${ll(url)}type=$type";
+      } else if (filter.type == "OrderByFilter") {
+        final order = filter.values[filter.state].value;
+        url += "${ll(url)}order=$order";
+      } else if (filter.type == "GenreListFilter") {
+        final included = (filter.state as List)
+            .where((e) => e.state == 1 ? true : false)
+            .toList();
+        final excluded = (filter.state as List)
+            .where((e) => e.state == 2 ? true : false)
+            .toList();
+        if (included.isNotEmpty) {
+          url += "${ll(url)}genres[]=";
+          for (var val in included) {
+            url += "${val.value},";
+          }
+        }
+        if (excluded.isNotEmpty) {
+          url += "${ll(url)}genres[]=";
+          for (var val in excluded) {
+            url += "-${val.value},";
+          }
+        }
+      }
+    }
+
     final data = {"url": url, "sourceId": source.id};
     final res = await http('GET', json.encode(data));
 
@@ -193,6 +233,47 @@ class MangaReader extends MProvider {
     }
 
     return MPages(mangaList, true);
+  }
+
+  List<dynamic> getFilterList() {
+    return [
+      SeparatorFilter(),
+      TextFilter("AuthorFilter", "Author"),
+      TextFilter("YearFilter", "Year"),
+      SelectFilter("StatusFilter", "Status", 0, [
+        SelectFilterOption("All", ""),
+        SelectFilterOption("Ongoing", "ongoing"),
+        SelectFilterOption("Completed", "completed"),
+        SelectFilterOption("Hiatus", "hiatus"),
+        SelectFilterOption("Dropped", "dropped"),
+      ]),
+      SelectFilter("TypeFilter", "Type", 0, [
+        SelectFilterOption("All", ""),
+        SelectFilterOption("Manga", "Manga"),
+        SelectFilterOption("Manhwa", "Manhwa"),
+        SelectFilterOption("Manhua", "Manhua"),
+        SelectFilterOption("Comic", "Comic"),
+      ]),
+      SelectFilter("OrderByFilter", "Sort By", 0, [
+        SelectFilterOption("Default", ""),
+        SelectFilterOption("A-Z", "title"),
+        SelectFilterOption("Z-A", "titlereverse"),
+        SelectFilterOption("Latest Update", "update"),
+        SelectFilterOption("Latest Added", "latest"),
+        SelectFilterOption("Popular", "popular"),
+      ]),
+      HeaderFilter("Genre exclusion is not available for all sources"),
+      GroupFilter("GenreListFilter", "Genre", [
+        TriStateFilter("Press reset to attempt to fetch genres", ""),
+      ]),
+    ];
+  }
+
+  String ll(String url) {
+    if (url.contains("?")) {
+      return "&";
+    }
+    return "?";
   }
 
   String getMangaUrlDirectory(String sourceName) {

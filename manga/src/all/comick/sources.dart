@@ -1,7 +1,7 @@
 import '../../../../model/source.dart';
 import '../../../../utils/utils.dart';
 
-const comickVersion = "0.0.35";
+const comickVersion = "0.0.4";
 const comickSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/src/all/comick/comick-v$comickVersion.dart";
 
