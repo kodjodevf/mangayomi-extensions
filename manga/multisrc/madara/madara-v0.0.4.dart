@@ -67,11 +67,53 @@ class Madara extends MProvider {
   }
 
   @override
-  Future<MPages> search(MSource source, String query, int page) async {
-    final data = {
-      "url": "${source.baseUrl}/?s=$query&post_type=wp-manga",
-      "sourceId": source.id
-    };
+  Future<MPages> search(
+      MSource source, String query, int page, FilterList filterList) async {
+    final filters = filterList.filters;
+
+    String url = "${source.baseUrl}/?s=$query&post_type=wp-manga";
+
+    for (var filter in filters) {
+      if (filter.type == "AuthorFilter") {
+        if (filter.state.isNotEmpty) {
+          url += "${ll(url)}author=${Uri.encodeComponent(filter.state)}";
+        }
+      } else if (filter.type == "ArtistFilter") {
+        if (filter.state.isNotEmpty) {
+          url += "${ll(url)}artist=${Uri.encodeComponent(filter.state)}";
+        }
+      } else if (filter.type == "YearFilter") {
+        if (filter.state.isNotEmpty) {
+          url += "${ll(url)}release=${Uri.encodeComponent(filter.state)}";
+        }
+      } else if (filter.type == "StatusFilter") {
+        final status = (filter.state as List).where((e) => e.state).toList();
+        if (status.isNotEmpty) {
+          for (var st in status) {
+            url += "${ll(url)}status[]=${st.value},";
+          }
+        }
+      } else if (filter.type == "OrderByFilter") {
+        if (filter.state != 0) {
+          final order = filter.values[filter.state].value;
+          url += "${ll(url)}m_orderby=$order";
+        }
+      } else if (filter.type == "AdultContentFilter") {
+        final ctn = filter.values[filter.state].value;
+        if (ctn.isNotEmpty) {
+          url += "${ll(url)}adult=$ctn";
+        }
+      } else if (filter.type == "GenreListFilter") {
+        final genres = (filter.state as List).where((e) => e.state).toList();
+        if (genres.isNotEmpty) {
+          for (var genre in genres) {
+            url += "${ll(url)}genre[]=${genre.value},";
+          }
+        }
+      }
+    }
+
+    final data = {"url": url, "sourceId": source.id};
     final res = await http('GET', json.encode(data));
 
     List<MManga> mangaList = [];
@@ -311,6 +353,41 @@ class Madara extends MProvider {
       return imgs;
     }
     return pageUrls;
+  }
+
+  List<dynamic> getFilterList() {
+    return [
+      TextFilter("AuthorFilter", "Author"),
+      TextFilter("ArtistFilter", "Artist"),
+      TextFilter("YearFilter", "Year of Released"),
+      GroupFilter("StatusFilter", "Status", [
+        CheckBoxFilter("Completed", "end"),
+        CheckBoxFilter("Ongoing", "on-going"),
+        CheckBoxFilter("Canceled", "canceled"),
+        CheckBoxFilter("On Hold", "on-hold"),
+      ]),
+      SelectFilter("OrderByFilter", "Order By", 0, [
+        SelectFilterOption("Relevance", ""),
+        SelectFilterOption("Latest", "latest"),
+        SelectFilterOption("A-Z", "alphabet"),
+        SelectFilterOption("Rating", "rating"),
+        SelectFilterOption("Trending", "trending"),
+        SelectFilterOption("Most Views", "views"),
+        SelectFilterOption("New", "new-manga"),
+      ]),
+      SelectFilter("AdultContentFilter", "Adult Content", 0, [
+        SelectFilterOption("All", ""),
+        SelectFilterOption("None", "0"),
+        SelectFilterOption("Only", "1"),
+      ])
+    ];
+  }
+
+  String ll(String url) {
+    if (url.contains("?")) {
+      return "&";
+    }
+    return "?";
   }
 }
 

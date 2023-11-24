@@ -35,7 +35,8 @@ class MangaDex extends MProvider {
   }
 
   @override
-  Future<MPages> search(MSource source, String query, int page) async {
+  Future<MPages> search(
+      MSource source, String query, int page, FilterList filterList) async {
     final url =
         "https://api.mangadex.org/manga?includes[]=cover_art&offset=0&limit=20&title=$query${getMDXContentRating()}&order[followedCount]=desc&availableTranslatedLanguage[]=${source.lang}";
 
