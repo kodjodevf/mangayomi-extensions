@@ -52,29 +52,29 @@ class MangaDex extends MProvider {
       } else if (filter.type == "OriginalLanguageList") {
         final langs = (filter.state as List).where((e) => e.state).toList();
         if (langs.isNotEmpty) {
-          for (var ln in langs) {
-            url += "${ll(url)}${ln.value}";
+          for (var lang in langs) {
+            url += "${ll(url)}${lang.value}";
           }
         }
       } else if (filter.type == "ContentRatingList") {
-        final langs = (filter.state as List).where((e) => e.state).toList();
-        if (langs.isNotEmpty) {
-          for (var ln in langs) {
-            url += "${ll(url)}${ln.value}";
+        final ctns = (filter.state as List).where((e) => e.state).toList();
+        if (ctns.isNotEmpty) {
+          for (var ctn in ctns) {
+            url += "${ll(url)}${ctn.value}";
           }
         }
       } else if (filter.type == "DemographicList") {
-        final langs = (filter.state as List).where((e) => e.state).toList();
-        if (langs.isNotEmpty) {
-          for (var ln in langs) {
-            url += "${ll(url)}${ln.value}";
+        final demogr = (filter.state as List).where((e) => e.state).toList();
+        if (demogr.isNotEmpty) {
+          for (var demog in demogr) {
+            url += "${ll(url)}${demog.value}";
           }
         }
       } else if (filter.type == "StatusList") {
-        final langs = (filter.state as List).where((e) => e.state).toList();
-        if (langs.isNotEmpty) {
-          for (var ln in langs) {
-            url += "${ll(url)}${ln.value}";
+        final statusL = (filter.state as List).where((e) => e.state).toList();
+        if (statusL.isNotEmpty) {
+          for (var status in statusL) {
+            url += "${ll(url)}${status.value}";
           }
         }
       } else if (filter.type == "SortFilter") {
