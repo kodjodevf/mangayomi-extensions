@@ -2,7 +2,7 @@ import '../../../../model/source.dart';
 import '../../../../utils/utils.dart';
 
 Source get aniwave => _aniwave;
-const aniwaveVersion = "0.0.1";
+const aniwaveVersion = "0.0.15";
 const aniwaveCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/anime/src/en/aniwave/aniwave-v$aniwaveVersion.dart";
 Source _aniwave = Source(
