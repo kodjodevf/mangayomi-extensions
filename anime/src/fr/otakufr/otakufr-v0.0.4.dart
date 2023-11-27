@@ -71,7 +71,8 @@ class OtakuFr extends MProvider {
   }
 
   @override
-  Future<MPages> search(MSource source, String query, int page) async {
+  Future<MPages> search(
+      MSource source, String query, int page, FilterList filterList) async {
     final data = {
       "url": "${source.baseUrl}/toute-la-liste-affiches/page/$page/?q=$query"
     };

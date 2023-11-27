@@ -60,39 +60,39 @@ class NepNep extends MProvider {
       if (filter.type == "ScanStatusFilter") {
         if (filter.state != 0) {
           queryRes = queryRes.where((e) {
-            final name = getMapValue(json.encode(e), 'ss');
-            return name.toLowerCase().contains(
+            final value = getMapValue(json.encode(e), 'ss');
+            return value.toLowerCase().contains(
                 (filter.values[filter.state].value as String).toLowerCase());
           }).toList();
         }
       } else if (filter.type == "PublishStatusFilter") {
         if (filter.state != 0) {
           queryRes = queryRes.where((e) {
-            final name = getMapValue(json.encode(e), 'ps');
-            return name.toLowerCase().contains(
+            final value = getMapValue(json.encode(e), 'ps');
+            return value.toLowerCase().contains(
                 (filter.values[filter.state].value as String).toLowerCase());
           }).toList();
         }
       } else if (filter.type == "TypeFilter") {
         if (filter.state != 0) {
           queryRes = queryRes.where((e) {
-            final name = getMapValue(json.encode(e), 't');
-            return name.toLowerCase().contains(
+            final value = getMapValue(json.encode(e), 't');
+            return value.toLowerCase().contains(
                 (filter.values[filter.state].value as String).toLowerCase());
           }).toList();
         }
       } else if (filter.type == "TranslationFilter") {
         if (filter.state != 0) {
           queryRes = queryRes.where((e) {
-            final name = getMapValue(json.encode(e), 'o');
-            return name.toLowerCase().contains("yes");
+            final value = getMapValue(json.encode(e), 'o');
+            return value.toLowerCase().contains("yes");
           }).toList();
         }
       } else if (filter.type == "YearFilter") {
         if (filter.state.isNotEmpty) {
           queryRes = queryRes.where((e) {
-            final name = getMapValue(json.encode(e), 'y');
-            return name
+            final value = getMapValue(json.encode(e), 'y');
+            return value
                 .toLowerCase()
                 .contains((filter.name as String).toLowerCase());
           }).toList();
@@ -100,8 +100,8 @@ class NepNep extends MProvider {
       } else if (filter.type == "AuthorFilter") {
         if (filter.state.isNotEmpty) {
           queryRes = queryRes.where((e) {
-            final name = getMapValue(json.encode(e), 'a');
-            return name
+            final value = getMapValue(json.encode(e), 'a');
+            return value
                 .toLowerCase()
                 .contains((filter.name as String).toLowerCase());
           }).toList();
@@ -116,8 +116,8 @@ class NepNep extends MProvider {
         if (included.isNotEmpty) {
           for (var val in included) {
             queryRes = queryRes.where((e) {
-              final name = getMapValue(json.encode(e), 'g');
-              return name
+              final value = getMapValue(json.encode(e), 'g');
+              return value
                   .toLowerCase()
                   .contains((val.value as String).toLowerCase());
             }).toList();
@@ -126,8 +126,8 @@ class NepNep extends MProvider {
         if (excluded.isNotEmpty) {
           for (var val in excluded) {
             queryRes = queryRes.where((e) {
-              final name = getMapValue(json.encode(e), 'g');
-              return !(name
+              final value = getMapValue(json.encode(e), 'g');
+              return !(value
                   .toLowerCase()
                   .contains((val.value as String).toLowerCase()));
             }).toList();
