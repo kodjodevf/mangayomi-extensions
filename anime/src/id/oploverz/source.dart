@@ -13,5 +13,4 @@ Source _oploverz = Source(
     iconUrl: getIconUrl("oploverz", "id"),
     sourceCodeUrl: oploverzCodeUrl,
     version: oploverzVersion,
-    appMinVerReq: "0.0.7",
     isManga: false);
