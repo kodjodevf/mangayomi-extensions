@@ -12,6 +12,4 @@ Source _otakudesu = Source(
     typeSource: "single",
     iconUrl: getIconUrl("otakudesu", "id"),
     sourceCodeUrl: otakudesuCodeUrl,
-    version: otakudesuVersion,
-    appMinVerReq: "0.0.8",
     isManga: false);

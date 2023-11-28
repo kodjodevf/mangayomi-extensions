@@ -13,5 +13,4 @@ Source _nimegami = Source(
     iconUrl: getIconUrl("nimegami", "id"),
     sourceCodeUrl: nimegamiCodeUrl,
     version: nimegamiVersion,
-    appMinVerReq: "0.0.8",
     isManga: false);

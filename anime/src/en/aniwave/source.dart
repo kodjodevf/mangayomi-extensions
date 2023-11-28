@@ -13,5 +13,4 @@ Source _aniwave = Source(
     iconUrl: getIconUrl("aniwave", "en"),
     sourceCodeUrl: aniwaveCodeUrl,
     version: aniwaveVersion,
-    appMinVerReq: "0.0.8",
     isManga: false);
