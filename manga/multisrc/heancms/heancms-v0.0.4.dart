@@ -56,7 +56,8 @@ class HeanCms extends MProvider {
   }
 
   @override
-  Future<MPages> search(MSource source, String query, int page) async {
+  Future<MPages> search(
+      MSource source, String query, int page, FilterList filterList) async {
     final headers = getHeader(source.baseUrl);
     String res = "";
     if (!useNewQueryEndpoint(source.source)) {

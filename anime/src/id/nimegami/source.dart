@@ -2,7 +2,7 @@ import '../../../../model/source.dart';
 import '../../../../utils/utils.dart';
 
 Source get nimegami => _nimegami;
-const nimegamiVersion = "0.0.2";
+const nimegamiVersion = "0.0.25";
 const nimegamiCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/anime/src/id/nimegami/nimegami-v$nimegamiVersion.dart";
 Source _nimegami = Source(
@@ -13,5 +13,4 @@ Source _nimegami = Source(
     iconUrl: getIconUrl("nimegami", "id"),
     sourceCodeUrl: nimegamiCodeUrl,
     version: nimegamiVersion,
-    appMinVerReq: "0.0.8",
     isManga: false);

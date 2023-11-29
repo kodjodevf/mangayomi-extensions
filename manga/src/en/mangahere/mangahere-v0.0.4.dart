@@ -59,10 +59,55 @@ class MangaHere extends MProvider {
   }
 
   @override
-  Future<MPages> search(MSource source, String query, int page) async {
+  Future<MPages> search(
+      MSource source, String query, int page, FilterList filterList) async {
     final headers = getHeader(source.baseUrl);
-    final url = "${source.baseUrl}/search?title=$query&page=$page";
 
+    final filters = filterList.filters;
+    String url = "${source.baseUrl}/search";
+
+    for (var filter in filters) {
+      if (filter.type == "TypeList") {
+        final type = filter.values[filter.state].value;
+        url += "${ll(url)}type=$type";
+      } else if (filter.type == "CompletionList") {
+        final cmp = filter.values[filter.state].value;
+        url += "${ll(url)}st=$cmp";
+      } else if (filter.type == "RatingList") {
+        url += "${ll(url)}rating_method=gt";
+        final rt = filter.values[filter.state].value;
+        url += "${ll(url)}rating=$rt";
+      } else if (filter.type == "GenreList") {
+        final included = (filter.state as List)
+            .where((e) => e.state == 1 ? true : false)
+            .toList();
+        final excluded = (filter.state as List)
+            .where((e) => e.state == 2 ? true : false)
+            .toList();
+        if (included.isNotEmpty) {
+          url += "${ll(url)}genres=";
+          for (var val in included) {
+            url += "${val.value},";
+          }
+        }
+        if (excluded.isNotEmpty) {
+          url += "${ll(url)}nogenres=";
+          for (var val in excluded) {
+            url += "${val.value},";
+          }
+        }
+      } else if (filter.type == "ArtistFilter") {
+        url += "${ll(url)}artist_method=cw";
+        url += "${ll(url)}artist=${Uri.encodeComponent(filter.state)}";
+      } else if (filter.type == "AuthorFilter") {
+        url += "${ll(url)}author_method=cw";
+        url += "${ll(url)}author=${Uri.encodeComponent(filter.state)}";
+      } else if (filter.type == "YearFilter") {
+        url += "${ll(url)}released_method=cw";
+        url += "${ll(url)}released=${Uri.encodeComponent(filter.state)}";
+      }
+    }
+    url += "${ll(url)}title=$query&page=$page";
     final data = {"url": url, "headers": headers};
     final res = await http('POST', json.encode(data));
 
@@ -204,6 +249,84 @@ class MangaHere extends MProvider {
     }
 
     return pageUrls;
+  }
+
+  String ll(String url) {
+    if (url.contains("?")) {
+      return "&";
+    }
+    return "?";
+  }
+
+  @override
+  List<dynamic> getFilterList() {
+    return [
+      SelectFilter("TypeList", "Type", 1, [
+        SelectFilterOption("American Manga", "5"),
+        SelectFilterOption("Any", "0"),
+        SelectFilterOption("Chinese Manhua", "3"),
+        SelectFilterOption("European Manga", "4"),
+        SelectFilterOption("Hong Kong Manga", "6"),
+        SelectFilterOption("Japanese Manga", "1"),
+        SelectFilterOption("Korean Manhwa", "2"),
+        SelectFilterOption("Other Manga", "7"),
+      ]),
+      TextFilter("ArtistFilter", "Artist"),
+      TextFilter("AuthorFilter", "Author"),
+      GroupFilter("GenreList", "Genres", [
+        TriStateFilter("Action", "1"),
+        TriStateFilter("Adventure", "2"),
+        TriStateFilter("Comedy", "3"),
+        TriStateFilter("Fantasy", "4"),
+        TriStateFilter("Historical", "5"),
+        TriStateFilter("Horror", "6"),
+        TriStateFilter("Martial Arts", "7"),
+        TriStateFilter("Mystery", "8"),
+        TriStateFilter("Romance", "9"),
+        TriStateFilter("Shounen Ai", "10"),
+        TriStateFilter("Supernatural", "11"),
+        TriStateFilter("Drama", "12"),
+        TriStateFilter("Shounen", "13"),
+        TriStateFilter("School Life", "14"),
+        TriStateFilter("Shoujo", "15"),
+        TriStateFilter("Gender Bender", "16"),
+        TriStateFilter("Josei", "17"),
+        TriStateFilter("Psychological", "18"),
+        TriStateFilter("Seinen", "19"),
+        TriStateFilter("Slice of Life", "20"),
+        TriStateFilter("Sci-fi", "21"),
+        TriStateFilter("Ecchi", "22"),
+        TriStateFilter("Harem", "23"),
+        TriStateFilter("Shoujo Ai", "24"),
+        TriStateFilter("Yuri", "25"),
+        TriStateFilter("Mature", "26"),
+        TriStateFilter("Tragedy", "27"),
+        TriStateFilter("Yaoi", "28"),
+        TriStateFilter("Doujinshi", "29"),
+        TriStateFilter("Sports", "30"),
+        TriStateFilter("Adult", "31"),
+        TriStateFilter("One Shot", "32"),
+        TriStateFilter("Smut", "33"),
+        TriStateFilter("Mecha", "34"),
+        TriStateFilter("Shotacon", "35"),
+        TriStateFilter("Lolicon", "36"),
+        TriStateFilter("Webtoons", "37"),
+      ]),
+      SelectFilter("RatingList", "Minimum rating", 0, [
+        SelectFilterOption("No Stars", "0"),
+        SelectFilterOption("1 Star", "1"),
+        SelectFilterOption("2 Stars", "2"),
+        SelectFilterOption("3 Stars", "3"),
+        SelectFilterOption("4 Stars", "4"),
+        SelectFilterOption("5 Stars", "5"),
+      ]),
+      TextFilter("YearFilter", "Year released"),
+      SelectFilter("CompletionList", "Completed series", 0, [
+        SelectFilterOption("Either", "0"),
+        SelectFilterOption("No", "1"),
+        SelectFilterOption("Yes", "2"),
+      ]),
+    ];
   }
 }
 

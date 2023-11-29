@@ -53,7 +53,8 @@ class OkAnime extends MProvider {
   }
 
   @override
-  Future<MPages> search(MSource source, String query, int page) async {
+  Future<MPages> search(
+      MSource source, String query, int page, FilterList filterList) async {
     String url = "${source.baseUrl}/search/?s=$query";
     if (page > 1) {
       url += "&page=$page";
