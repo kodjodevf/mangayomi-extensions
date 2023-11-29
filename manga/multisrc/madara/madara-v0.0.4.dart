@@ -355,6 +355,7 @@ class Madara extends MProvider {
     return pageUrls;
   }
 
+  @override
   List<dynamic> getFilterList() {
     return [
       TextFilter("AuthorFilter", "Author"),

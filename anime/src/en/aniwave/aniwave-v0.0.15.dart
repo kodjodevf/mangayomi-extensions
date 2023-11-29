@@ -294,6 +294,7 @@ class Aniwave extends MProvider {
     return vrf;
   }
 
+  @override
   List<dynamic> getFilterList() {
     return [
       SelectFilter("OrderFilter", "Sort order", 0, [

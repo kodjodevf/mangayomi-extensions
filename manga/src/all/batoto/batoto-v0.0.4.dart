@@ -272,6 +272,7 @@ class Batoto extends MProvider {
     return "?";
   }
 
+  @override
   List<dynamic> getFilterList() {
     return [
       SelectFilter("LetterFilter", "Letter matching mode (Slow)", 0, [

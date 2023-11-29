@@ -235,6 +235,7 @@ class MangaReader extends MProvider {
     return MPages(mangaList, true);
   }
 
+  @override
   List<dynamic> getFilterList() {
     return [
       SeparatorFilter(),

@@ -214,6 +214,7 @@ class ComickFun extends MProvider {
     return "?";
   }
 
+  @override
   List<dynamic> getFilterList() {
     return [
       HeaderFilter("The filter is ignored when using text search."),
