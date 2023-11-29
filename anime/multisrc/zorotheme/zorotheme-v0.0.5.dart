@@ -286,6 +286,8 @@ class ZoroTheme extends MProvider {
       SelectFilterOption(i.toString(), i.toString()),
     SelectFilterOption("All", "")
   ];
+
+  @override
   List<dynamic> getFilterList() {
     return [
       SelectFilter("TypeFilter", "Type", 0, [

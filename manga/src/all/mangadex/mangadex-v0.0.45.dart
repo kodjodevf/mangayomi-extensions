@@ -367,6 +367,7 @@ class MangaDex extends MProvider {
     return coverFileName;
   }
 
+  @override
   List<dynamic> getFilterList() {
     return [
       CheckBoxFilter(

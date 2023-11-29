@@ -244,6 +244,7 @@ class GogoAnime extends MProvider {
     return videos;
   }
 
+  @override
   List<dynamic> getFilterList() {
     return [
       HeaderFilter("Advanced search"),

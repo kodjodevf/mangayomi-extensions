@@ -307,6 +307,7 @@ class NepNep extends MProvider {
     return '-chapter-$n$suffix$index.html';
   }
 
+  @override
   List<dynamic> getFilterList() {
     return [
       TextFilter("YearFilter", "Years"),
