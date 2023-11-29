@@ -23,7 +23,8 @@ class OploVerz extends MProvider {
   }
 
   @override
-  Future<MPages> search(MSource source, String query, int page) async {
+  Future<MPages> search(
+      MSource source, String query, int page, FilterList filterList) async {
     final data = {
       "url": "${source.baseUrl}/anime-list/page/$page/?title=$query"
     };
@@ -95,15 +96,14 @@ class OploVerz extends MProvider {
         }));
     final playerLink =
         xpath(ress, '//iframe[@class="playeriframe"]/@src').first;
-    print(playerLink);
     final resPlayer = await http('GET', json.encode({"url": playerLink}));
     var resJson = substringBefore(substringAfter(resPlayer, "= "), "<");
-    var streams = json.decode(resJson)["streams"] as List;
+    var streams =
+        json.decode(getMapValue(resJson, "streams", encode: true)) as List;
     List<MVideo> videos = [];
     for (var stream in streams) {
-      print(stream["play_url"]);
-      final videoUrl = stream["play_url"];
-      final quality = getQuality(stream["format_id"]);
+      final videoUrl = getMapValue(stream, "play_url");
+      final quality = getQuality(getMapValue(stream, "format_id"));
 
       MVideo video = MVideo();
       video

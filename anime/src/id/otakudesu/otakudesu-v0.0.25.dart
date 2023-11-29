@@ -19,7 +19,8 @@ class OtakuDesu extends MProvider {
   }
 
   @override
-  Future<MPages> search(MSource source, String query, int page) async {
+  Future<MPages> search(
+      MSource source, String query, int page, FilterList filterList) async {
     final data = {"url": "${source.baseUrl}/?s=$query&post_type=anime"};
     final res = await http('GET', json.encode(data));
     List<MManga> animeList = [];

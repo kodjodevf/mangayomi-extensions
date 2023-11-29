@@ -1,7 +1,7 @@
 import '../../../model/source.dart';
 import '../../../utils/utils.dart';
 
-const zorothemeVersion = "0.0.45";
+const zorothemeVersion = "0.0.5";
 const zorothemeSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/anime/multisrc/zorotheme/zorotheme-v$zorothemeVersion.dart";
 
