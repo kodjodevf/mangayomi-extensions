@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import '../model/source.dart';
+import 'multisrc/dopeflix/sources.dart';
 import 'multisrc/zorotheme/sources.dart';
 import 'src/ar/okanime/source.dart';
 import 'src/en/aniwave/source.dart';
@@ -26,7 +27,8 @@ void main() {
     otakudesu,
     nimegami,
     oploverz,
-    aniwave
+    aniwave,
+    ...dopeflixSourcesList
   ];
   final List<Map<String, dynamic>> jsonList =
       _sourcesList.map((source) => source.toJson()).toList();
