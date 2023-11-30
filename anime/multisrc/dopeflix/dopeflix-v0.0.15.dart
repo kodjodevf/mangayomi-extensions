@@ -103,29 +103,36 @@ class DopeFlix extends MProvider {
     } else {
       final dataS = {"url": "${source.baseUrl}/ajax/v2/tv/seasons/$id"};
       final resS = await http('GET', json.encode(dataS));
-      final seasonId =
-          xpath(resS, '//a[@class="dropdown-item ss-item"]/@data-id').first;
-      final seasonName =
-          xpath(resS, '//a[@class="dropdown-item ss-item"]/text()').first;
-      final dataE = {
-        "url": "${source.baseUrl}/ajax/v2/season/episodes/$seasonId"
-      };
-      final html = await http('GET', json.encode(dataE));
-      final epsHtml = querySelectorAll(html,
-          selector: "div.eps-item",
-          typeElement: 2,
-          attributes: "",
-          typeRegExp: 0);
-      for (var epHtml in epsHtml) {
-        final episodeId =
-            xpath(epHtml, '//div[contains(@class,"eps-item")]/@data-id').first;
-        final epNum =
-            xpath(epHtml, '//div[@class="episode-number"]/text()').first;
-        final epName = xpath(epHtml, '//h3[@class="film-name"]/text()').first;
-        MChapter episode = MChapter();
-        episode.name = "$seasonName $epNum $epName";
-        episode.url = "${source.baseUrl}/ajax/v2/episode/servers/$episodeId";
-        episodesList.add(episode);
+
+      final seasonIds =
+          xpath(resS, '//a[@class="dropdown-item ss-item"]/@data-id');
+      final seasonNames =
+          xpath(resS, '//a[@class="dropdown-item ss-item"]/text()');
+      for (int i = 0; i < seasonIds.length; i++) {
+        final seasonId = seasonIds[i];
+        final seasonName = seasonNames[i];
+        final dataE = {
+          "url": "${source.baseUrl}/ajax/v2/season/episodes/$seasonId"
+        };
+        final html = await http('GET', json.encode(dataE));
+        final epsHtml = querySelectorAll(html,
+            selector: "div.eps-item",
+            typeElement: 2,
+            attributes: "",
+            typeRegExp: 0);
+        print("${source.baseUrl}/ajax/v2/season/episodes/$seasonId");
+        for (var epHtml in epsHtml) {
+          final episodeId =
+              xpath(epHtml, '//div[contains(@class,"eps-item")]/@data-id')
+                  .first;
+          final epNum =
+              xpath(epHtml, '//div[@class="episode-number"]/text()').first;
+          final epName = xpath(epHtml, '//h3[@class="film-name"]/text()').first;
+          MChapter episode = MChapter();
+          episode.name = "$seasonName $epNum $epName";
+          episode.url = "${source.baseUrl}/ajax/v2/episode/servers/$episodeId";
+          episodesList.add(episode);
+        }
       }
     }
     anime.chapters = episodesList.reversed.toList();
