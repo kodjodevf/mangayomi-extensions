@@ -6,18 +6,21 @@ class DopeFlix extends MProvider {
 
   @override
   Future<MPages> getPopular(MSource source, int page) async {
-    final data = {"url": "${source.baseUrl}/movie?page=$page"};
+    final data = {
+      "url":
+          "${preferenceBaseUrl(source.id)}/${getPreferenceValue(source.id, "preferred_popular_page")}?page=$page"
+    };
     final res = await http('GET', json.encode(data));
     return parseAnimeList(res);
   }
 
   @override
   Future<MPages> getLatestUpdates(MSource source, int page) async {
-    final data = {"url": "${source.baseUrl}/home"};
+    final data = {"url": "${preferenceBaseUrl(source.id)}/home"};
     final res = await http('GET', json.encode(data));
     List<MManga> animeList = [];
     final path =
-        '//section[contains(text(),"Latest Movies")]/div/div[@class="film_list-wrap"]/div[@class="flw-item"]/div[@class="film-poster"]';
+        '//section[contains(text(),"${getPreferenceValue(source.id, "preferred_latest_page")}")]/div/div[@class="film_list-wrap"]/div[@class="flw-item"]/div[@class="film-poster"]';
     final urls = xpath(res, '$path/a/@href');
     final names = xpath(res, '$path/a/@title');
     final images = xpath(res, '$path/img/@data-src');
@@ -36,7 +39,7 @@ class DopeFlix extends MProvider {
   Future<MPages> search(
       MSource source, String query, int page, FilterList filterList) async {
     final filters = filterList.filters;
-    String url = "${source.baseUrl}";
+    String url = "${preferenceBaseUrl(source.id)}";
 
     if (query.isNotEmpty) {
       url += "/search/${query.replaceAll(" ", "-")}?page=$page";
@@ -79,7 +82,7 @@ class DopeFlix extends MProvider {
   @override
   Future<MManga> getDetail(MSource source, String url) async {
     url = Uri.parse(url).path;
-    final data = {"url": "${source.baseUrl}$url"};
+    final data = {"url": "${preferenceBaseUrl(source.id)}$url"};
     final res = await http('GET', json.encode(data));
     MManga anime = MManga();
     final description = xpath(res, '//div[@class="description"]/text()');
@@ -98,10 +101,12 @@ class DopeFlix extends MProvider {
     if (dataType == "1") {
       MChapter episode = MChapter();
       episode.name = "Movie";
-      episode.url = "${source.baseUrl}/ajax/movie/episodes/$id";
+      episode.url = "${preferenceBaseUrl(source.id)}/ajax/movie/episodes/$id";
       episodesList.add(episode);
     } else {
-      final dataS = {"url": "${source.baseUrl}/ajax/v2/tv/seasons/$id"};
+      final dataS = {
+        "url": "${preferenceBaseUrl(source.id)}/ajax/v2/tv/seasons/$id"
+      };
       final resS = await http('GET', json.encode(dataS));
 
       final seasonIds =
@@ -112,7 +117,8 @@ class DopeFlix extends MProvider {
         final seasonId = seasonIds[i];
         final seasonName = seasonNames[i];
         final dataE = {
-          "url": "${source.baseUrl}/ajax/v2/season/episodes/$seasonId"
+          "url":
+              "${preferenceBaseUrl(source.id)}/ajax/v2/season/episodes/$seasonId"
         };
         final html = await http('GET', json.encode(dataE));
         final epsHtml = querySelectorAll(html,
@@ -120,7 +126,8 @@ class DopeFlix extends MProvider {
             typeElement: 2,
             attributes: "",
             typeRegExp: 0);
-        print("${source.baseUrl}/ajax/v2/season/episodes/$seasonId");
+        print(
+            "${preferenceBaseUrl(source.id)}/ajax/v2/season/episodes/$seasonId");
         for (var epHtml in epsHtml) {
           final episodeId =
               xpath(epHtml, '//div[contains(@class,"eps-item")]/@data-id')
@@ -130,7 +137,8 @@ class DopeFlix extends MProvider {
           final epName = xpath(epHtml, '//h3[@class="film-name"]/text()').first;
           MChapter episode = MChapter();
           episode.name = "$seasonName $epNum $epName";
-          episode.url = "${source.baseUrl}/ajax/v2/episode/servers/$episodeId";
+          episode.url =
+              "${preferenceBaseUrl(source.id)}/ajax/v2/episode/servers/$episodeId";
           episodesList.add(episode);
         }
       }
@@ -142,8 +150,8 @@ class DopeFlix extends MProvider {
   @override
   Future<List<MVideo>> getVideoList(MSource source, String url) async {
     url = Uri.parse(url).path;
-    final res =
-        await http('GET', json.encode({"url": "${source.baseUrl}/$url"}));
+    final res = await http(
+        'GET', json.encode({"url": "${preferenceBaseUrl(source.id)}/$url"}));
     final vidsHtml = querySelectorAll(res,
         selector: "ul.fss-list a.btn-play",
         typeElement: 2,
@@ -154,7 +162,9 @@ class DopeFlix extends MProvider {
       final id = xpath(vidHtml, '//a/@data-id').first;
       final name = xpath(vidHtml, '//span/text()').first;
       final resSource = await http(
-          'GET', json.encode({"url": "${source.baseUrl}/ajax/sources/$id"}));
+          'GET',
+          json.encode(
+              {"url": "${preferenceBaseUrl(source.id)}/ajax/sources/$id"}));
       final vidUrl =
           substringBefore(substringAfter(resSource, "\"link\":\""), "\"");
       List<MVideo> a = [];
@@ -212,6 +222,7 @@ class DopeFlix extends MProvider {
             subtitles.add(subtitle);
           } catch (_) {}
         }
+        subtitles = sortSubs(subtitles, source.id);
         if (type == "hls") {
           final masterPlaylistRes =
               await http('GET', json.encode({"url": masterUrl}));
@@ -248,7 +259,7 @@ class DopeFlix extends MProvider {
       videos.addAll(a);
     }
 
-    return videos;
+    return sortVideos(videos, source.id);
   }
 
   Future<List<List<int>>> generateIndexPairs() async {
@@ -261,8 +272,8 @@ class DopeFlix extends MProvider {
     script = script.substring(0, script.lastIndexOf(','));
     final list = script
         .split(",")
-        .map((e) {
-          String value = substringAfter((e as String), "=");
+        .map((String e) {
+          String value = substringAfter(e, "=");
           if (value.contains("0x")) {
             return int.parse(substringAfter(value, "0x"), radix: 16);
           } else {
@@ -273,7 +284,7 @@ class DopeFlix extends MProvider {
         .skip(1)
         .toList();
     return chunked(list, 2)
-        .map((list) => (list as List<int>).reversed.toList())
+        .map((List<int> list) => list.reversed.toList())
         .toList();
   }
 
@@ -403,6 +414,119 @@ class DopeFlix extends MProvider {
         CheckBoxFilter("United States of America", "129")
       ]),
     ];
+  }
+
+  @override
+  List<dynamic> getSourcePreferences(MSource source) {
+    return [
+      ListPreference(
+          key: "preferred_domain",
+          title: "Preferred domain",
+          summary: "",
+          valueIndex: 0,
+          entries: ["dopebox.to", "dopebox.se"],
+          entryValues: ["https://dopebox.to", "https://dopebox.se"]),
+      ListPreference(
+          key: "preferred_quality",
+          title: "Preferred Quality",
+          summary: "",
+          valueIndex: 0,
+          entries: ["1080p", "720p", "480p", "360p"],
+          entryValues: ["1080p", "720p", "480p", "360p"]),
+      ListPreference(
+          key: "preferred_subLang",
+          title: "Preferred sub language",
+          summary: "",
+          valueIndex: 1,
+          entries: [
+            "Arabic",
+            "English",
+            "French",
+            "German",
+            "Hungarian",
+            "Italian",
+            "Japanese",
+            "Portuguese",
+            "Romanian",
+            "Russian",
+            "Spanish"
+          ],
+          entryValues: [
+            "Arabic",
+            "English",
+            "French",
+            "German",
+            "Hungarian",
+            "Italian",
+            "Japanese",
+            "Portuguese",
+            "Romanian",
+            "Russian",
+            "Spanish"
+          ]),
+      ListPreference(
+          key: "preferred_latest_page",
+          title: "Preferred latest page",
+          summary: "",
+          valueIndex: 0,
+          entries: ["Movies", "TV Shows"],
+          entryValues: ["Latest Movies", "Latest TV Shows"]),
+      ListPreference(
+          key: "preferred_popular_page",
+          title: "Preferred popular page",
+          summary: "",
+          valueIndex: 0,
+          entries: ["Movies", "TV Shows"],
+          entryValues: ["movie", "tv-show"]),
+    ];
+  }
+
+  List<MVideo> sortVideos(List<MVideo> videos, int sourceId) {
+    String quality = getPreferenceValue(sourceId, "preferred_quality");
+
+    videos.sort((MVideo a, MVideo b) {
+      int qualityMatchA = 0;
+      if (a.quality.contains(quality)) {
+        qualityMatchA = 1;
+      }
+      int qualityMatchB = 0;
+      if (b.quality.contains(quality)) {
+        qualityMatchB = 1;
+      }
+      if (qualityMatchA != qualityMatchB) {
+        return qualityMatchB - qualityMatchA;
+      }
+
+      final regex = RegExp(r'(\d+)p');
+      final matchA = regex.firstMatch(a.quality);
+      final matchB = regex.firstMatch(b.quality);
+      final int qualityNumA = int.tryParse(matchA?.group(1) ?? '0') ?? 0;
+      final int qualityNumB = int.tryParse(matchB?.group(1) ?? '0') ?? 0;
+      return qualityNumB - qualityNumA;
+    });
+
+    return videos;
+  }
+
+  List<MTrack> sortSubs(List<MTrack> subs, int sourceId) {
+    String lang = getPreferenceValue(sourceId, "preferred_subLang");
+
+    subs.sort((MTrack a, MTrack b) {
+      int langMatchA = 0;
+      if (a.label.toLowerCase().contains(lang.toLowerCase())) {
+        langMatchA = 1;
+      }
+      int langMatchB = 0;
+      if (b.label.toLowerCase().contains(lang.toLowerCase())) {
+        langMatchB = 1;
+      }
+      return langMatchB - langMatchA;
+    });
+    return subs;
+  }
+
+  String preferenceBaseUrl(int sourceId) {
+    return getPreferenceValue(sourceId, "preferred_domain");
   }
 
   String ll(String url) {
