@@ -232,7 +232,7 @@ class MMRCMS extends MProvider {
     return pagesUrl;
   }
 
-  List<dynamic> getFilterList() {
+  List<dynamic> getFilterList(MSource source) {
     return [
       HeaderFilter("NOTE: Ignored if using text search!"),
       SeparatorFilter(),

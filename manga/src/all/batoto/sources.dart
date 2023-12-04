@@ -1,7 +1,7 @@
 import '../../../../model/source.dart';
 import '../../../../utils/utils.dart';
 
-const batotoVersion = "0.0.4";
+const batotoVersion = "0.0.45";
 const batotoSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/src/all/batoto/batoto-v$batotoVersion.dart";
 

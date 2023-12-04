@@ -98,12 +98,11 @@ class OploVerz extends MProvider {
         xpath(ress, '//iframe[@class="playeriframe"]/@src').first;
     final resPlayer = await http('GET', json.encode({"url": playerLink}));
     var resJson = substringBefore(substringAfter(resPlayer, "= "), "<");
-    var streams =
-        json.decode(getMapValue(resJson, "streams", encode: true)) as List;
+    var streams = json.decode(resJson)["streams"] as List<Map<String, dynamic>>;
     List<MVideo> videos = [];
     for (var stream in streams) {
-      final videoUrl = getMapValue(stream, "play_url");
-      final quality = getQuality(getMapValue(stream, "format_id"));
+      String videoUrl = stream["play_url"];
+      final quality = getQuality(stream["format_id"]);
 
       MVideo video = MVideo();
       video

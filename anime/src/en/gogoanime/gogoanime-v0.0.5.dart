@@ -251,7 +251,7 @@ class GogoAnime extends MProvider {
   }
 
   @override
-  List<dynamic> getFilterList() {
+  List<dynamic> getFilterList(MSource source) {
     return [
       HeaderFilter("Advanced search"),
       GroupFilter("GenreFilter", "Genre", [

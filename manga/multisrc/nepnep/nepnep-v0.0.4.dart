@@ -10,9 +10,15 @@ class NepNep extends MProvider {
     final res = await http('GET', json.encode(data));
 
     final directory = directoryFromDocument(res);
-    final resSort = sortMapList(json.decode(directory), "vm", 1);
+    final resSort = (json.decode(directory) as List<Map<String, dynamic>>);
+    resSort.sort(
+      (Map<String, dynamic> a, Map<String, dynamic> b) =>
+          (a["vm"] as String).compareTo(b["vm"] as String),
+    );
 
-    return parseDirectory(resSort);
+    // sortMapList(json.decode(directory), "vm", 1);
+
+    return parseDirectory(json.encode(resSort));
   }
 
   @override
@@ -308,7 +314,7 @@ class NepNep extends MProvider {
   }
 
   @override
-  List<dynamic> getFilterList() {
+  List<dynamic> getFilterList(MSource source) {
     return [
       TextFilter("YearFilter", "Years"),
       TextFilter("AuthorFilter", "Author"),
