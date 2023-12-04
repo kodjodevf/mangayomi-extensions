@@ -10,13 +10,7 @@ class NepNep extends MProvider {
     final res = await http('GET', json.encode(data));
 
     final directory = directoryFromDocument(res);
-    final resSort = (json.decode(directory) as List<Map<String, dynamic>>);
-    resSort.sort(
-      (Map<String, dynamic> a, Map<String, dynamic> b) =>
-          (a["vm"] as String).compareTo(b["vm"] as String),
-    );
-
-    // sortMapList(json.decode(directory), "vm", 1);
+    final resSort = sortMapList(json.decode(directory), "vm", 1);
 
     return parseDirectory(json.encode(resSort));
   }
