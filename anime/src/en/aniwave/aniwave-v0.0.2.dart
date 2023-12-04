@@ -312,7 +312,7 @@ class Aniwave extends MProvider {
   }
 
   @override
-  List<dynamic> getFilterList() {
+  List<dynamic> getFilterList(MSource source) {
     return [
       SelectFilter("OrderFilter", "Sort order", 0, [
         SelectFilterOption("Most relevance", "most_relevance"),

@@ -321,7 +321,7 @@ class DopeFlix extends MProvider {
   }
 
   @override
-  List<dynamic> getFilterList() {
+  List<dynamic> getFilterList(MSource source) {
     return [
       SelectFilter("TypeFilter", "Type", 0, [
         SelectFilterOption("All", "all"),
@@ -419,13 +419,22 @@ class DopeFlix extends MProvider {
   @override
   List<dynamic> getSourcePreferences(MSource source) {
     return [
-      ListPreference(
-          key: "preferred_domain",
-          title: "Preferred domain",
-          summary: "",
-          valueIndex: 0,
-          entries: ["dopebox.to", "dopebox.se"],
-          entryValues: ["https://dopebox.to", "https://dopebox.se"]),
+      if (source.name == "DopeBox")
+        ListPreference(
+            key: "preferred_domain",
+            title: "Preferred domain",
+            summary: "",
+            valueIndex: 0,
+            entries: ["dopebox.to", "dopebox.se"],
+            entryValues: ["https://dopebox.to", "https://dopebox.se"]),
+      if (source.name == "SFlix")
+        ListPreference(
+            key: "preferred_domain",
+            title: "Preferred domain",
+            summary: "",
+            valueIndex: 0,
+            entries: ["sflix.to", "sflix.se"],
+            entryValues: ["https://sflix.to", "https://sflix.se"]),
       ListPreference(
           key: "preferred_quality",
           title: "Preferred Quality",

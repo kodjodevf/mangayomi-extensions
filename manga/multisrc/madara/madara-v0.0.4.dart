@@ -356,7 +356,7 @@ class Madara extends MProvider {
   }
 
   @override
-  List<dynamic> getFilterList() {
+  List<dynamic> getFilterList(MSource source) {
     return [
       TextFilter("AuthorFilter", "Author"),
       TextFilter("ArtistFilter", "Artist"),

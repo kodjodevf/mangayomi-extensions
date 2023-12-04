@@ -259,7 +259,7 @@ class MangaHere extends MProvider {
   }
 
   @override
-  List<dynamic> getFilterList() {
+  List<dynamic> getFilterList(MSource source) {
     return [
       SelectFilter("TypeList", "Type", 1, [
         SelectFilterOption("American Manga", "5"),
