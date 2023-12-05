@@ -14,6 +14,7 @@ import 'src/fr/otakufr/source.dart';
 import 'src/id/nimegami/source.dart';
 import 'src/id/oploverz/source.dart';
 import 'src/id/otakudesu/source.dart';
+import 'src/it/source.dart';
 
 void main() {
   List<Source> _sourcesList = [
@@ -28,7 +29,8 @@ void main() {
     nimegami,
     oploverz,
     aniwave,
-    ...dopeflixSourcesList
+    ...dopeflixSourcesList,
+    animesaturn
   ];
   final List<Map<String, dynamic>> jsonList =
       _sourcesList.map((source) => source.toJson()).toList();
