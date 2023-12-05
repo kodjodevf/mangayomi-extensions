@@ -12,7 +12,7 @@ class NepNep extends MProvider {
     final directory = directoryFromDocument(res);
     final resSort = sortMapList(json.decode(directory), "vm", 1);
 
-    return parseDirectory(json.encode(resSort));
+    return parseDirectory(resSort);
   }
 
   @override
