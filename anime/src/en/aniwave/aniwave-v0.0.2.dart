@@ -6,7 +6,9 @@ class Aniwave extends MProvider {
 
   @override
   Future<MPages> getPopular(MSource source, int page) async {
-    final data = {"url": "${source.baseUrl}/filter?sort=trending&page=$page"};
+    final data = {
+      "url": "${preferenceBaseUrl(source.id)}/filter?sort=trending&page=$page"
+    };
     final res = await http('GET', json.encode(data));
     return parseAnimeList(res);
   }
@@ -14,7 +16,8 @@ class Aniwave extends MProvider {
   @override
   Future<MPages> getLatestUpdates(MSource source, int page) async {
     final data = {
-      "url": "${source.baseUrl}/filter?sort=recently_updated&page=$page"
+      "url":
+          "${preferenceBaseUrl(source.id)}/filter?sort=recently_updated&page=$page"
     };
     final res = await http('GET', json.encode(data));
     return parseAnimeList(res);
@@ -24,7 +27,7 @@ class Aniwave extends MProvider {
   Future<MPages> search(
       MSource source, String query, int page, FilterList filterList) async {
     final filters = filterList.filters;
-    String url = "${source.baseUrl}/filter?keyword=$query";
+    String url = "${preferenceBaseUrl(source.id)}/filter?keyword=$query";
 
     for (var filter in filters) {
       if (filter.type == "OrderFilter") {
@@ -98,7 +101,7 @@ class Aniwave extends MProvider {
     final statusList = [
       {"Releasing": 0, "Completed": 1}
     ];
-    final data = {"url": "${source.baseUrl}${url}"};
+    final data = {"url": "${preferenceBaseUrl(source.id)}${url}"};
     final res = await http('GET', json.encode(data));
     MManga anime = MManga();
     final status = xpath(res, '//div[contains(text(),"Status")]/span/text()');
@@ -124,7 +127,9 @@ class Aniwave extends MProvider {
         .first;
     final encrypt = vrfEncrypt(id);
     final vrf = "vrf=${Uri.encodeComponent(encrypt)}";
-    final dataEp = {"url": "${source.baseUrl}/ajax/episode/list/$id?$vrf"};
+    final dataEp = {
+      "url": "${preferenceBaseUrl(source.id)}/ajax/episode/list/$id?$vrf"
+    };
     final resEp = await http('GET', json.encode(dataEp));
     final html = json.decode(resEp)["result"];
     List<MChapter>? episodesList = [];
@@ -172,8 +177,11 @@ class Aniwave extends MProvider {
     final ids = substringBefore(url, "&");
     final encrypt = vrfEncrypt(ids);
     final vrf = "vrf=${Uri.encodeComponent(encrypt)}";
-    final res = await http('GET',
-        json.encode({"url": "${source.baseUrl}/ajax/server/list/$ids?$vrf"}));
+    final res = await http(
+        'GET',
+        json.encode({
+          "url": "${preferenceBaseUrl(source.id)}/ajax/server/list/$ids?$vrf"
+        }));
     final html = json.decode(res)["result"];
     final vidsHtml = querySelectorAll(html,
         selector: "div.servers > div",
@@ -191,25 +199,34 @@ class Aniwave extends MProvider {
         final vrf = "vrf=${Uri.encodeComponent(encrypt)}";
         final res = await http(
             'GET',
-            json.encode(
-                {"url": "${source.baseUrl}/ajax/server/$serverId?$vrf"}));
+            json.encode({
+              "url":
+                  "${preferenceBaseUrl(source.id)}/ajax/server/$serverId?$vrf"
+            }));
         final status = json.decode(res)["status"];
         if (status == 200) {
           List<MVideo> a = [];
           final url = vrfDecrypt(json.decode(res)["result"]["url"]);
-          if (url.contains("mp4upload")) {
-            a = await mp4UploadExtractor(url, null, "", type);
-          } else if (url.contains("streamtape")) {
-            a = await streamTapeExtractor(url, "StreamTape - $type");
-          } else if (url.contains("filemoon")) {
-            a = await filemoonExtractor(url, "", type);
+          final hosterSelection = preferenceHosterSelection(source.id);
+          final typeSelection = preferenceTypeSelection(source.id);
+          if (typeSelection.contains(type.toLowerCase())) {
+            if (url.contains("mp4upload") &&
+                hosterSelection.contains("mp4upload")) {
+              a = await mp4UploadExtractor(url, null, "", type);
+            } else if (url.contains("streamtape") &&
+                hosterSelection.contains("streamtape")) {
+              a = await streamTapeExtractor(url, "StreamTape - $type");
+            } else if (url.contains("filemoon") &&
+                hosterSelection.contains("filemoon")) {
+              a = await filemoonExtractor(url, "", type);
+            }
+            videos.addAll(a);
           }
-          videos.addAll(a);
         }
       }
     }
 
-    return videos;
+    return sortVideos(videos, source.id);
   }
 
   MPages parseAnimeList(String res) {
@@ -295,7 +312,7 @@ class Aniwave extends MProvider {
   }
 
   @override
-  List<dynamic> getFilterList() {
+  List<dynamic> getFilterList(MSource source) {
     return [
       SelectFilter("OrderFilter", "Sort order", 0, [
         SelectFilterOption("Most relevance", "most_relevance"),
@@ -427,20 +444,153 @@ class Aniwave extends MProvider {
     ];
   }
 
+  @override
+  List<dynamic> getSourcePreferences(MSource source) {
+    return [
+      ListPreference(
+          key: "preferred_domain",
+          title: "Preferred domain",
+          summary: "",
+          valueIndex: 0,
+          entries: [
+            "aniwave.to",
+            "aniwave.bz",
+            "aniwave.ws"
+          ],
+          entryValues: [
+            "https://aniwave.to",
+            "https://aniwave.bz",
+            "https://aniwave.ws"
+          ]),
+      ListPreference(
+          key: "preferred_quality",
+          title: "Preferred Quality",
+          summary: "",
+          valueIndex: 0,
+          entries: ["1080p", "720p", "480p", "360p"],
+          entryValues: ["1080", "720", "480", "360"]),
+      ListPreference(
+          key: "preferred_language",
+          title: "Preferred Type",
+          summary: "",
+          valueIndex: 0,
+          entries: ["Sub", "Softsub", "Dub"],
+          entryValues: ["Sub", "Softsub", "Dub"]),
+      ListPreference(
+          key: "preferred_server",
+          title: "Preferred server",
+          summary: "",
+          valueIndex: 0,
+          entries: [
+            "VidPlay",
+            "MyCloud",
+            "Filemoon",
+            "StreamTape",
+            "Mp4Upload"
+          ],
+          entryValues: [
+            "vidplay",
+            "mycloud",
+            "filemoon",
+            "streamtape",
+            "mp4upload"
+          ]),
+      MultiSelectListPreference(
+          key: "hoster_selection",
+          title: "Enable/Disable Hosts",
+          summary: "",
+          entries: [
+            "VidPlay",
+            "MyCloud",
+            "Filemoon",
+            "StreamTape",
+            "Mp4Upload"
+          ],
+          entryValues: [
+            "vidplay",
+            "mycloud",
+            "filemoon",
+            "streamtape",
+            "mp4upload"
+          ],
+          values: [
+            "vidplay",
+            "mycloud",
+            "filemoon",
+            "streamtape",
+            "mp4upload"
+          ]),
+      MultiSelectListPreference(
+          key: "type_selection",
+          title: "Enable/Disable Type",
+          summary: "",
+          entries: ["Sub", "Softsub", "Dub"],
+          entryValues: ["sub", "softsub", "dub"],
+          values: ["sub", "softsub", "dub"]),
+    ];
+  }
+
+  String preferenceBaseUrl(int sourceId) {
+    return getPreferenceValue(sourceId, "preferred_domain");
+  }
+
+  List<String> preferenceHosterSelection(int sourceId) {
+    return getPreferenceValue(sourceId, "hoster_selection");
+  }
+
+  List<String> preferenceTypeSelection(int sourceId) {
+    return getPreferenceValue(sourceId, "type_selection");
+  }
+
+  List<MVideo> sortVideos(List<MVideo> videos, int sourceId) {
+    String quality = getPreferenceValue(sourceId, "preferred_quality");
+    String server = getPreferenceValue(sourceId, "preferred_server");
+    String lang = getPreferenceValue(sourceId, "preferred_language");
+    videos = videos
+        .where(
+            (MVideo e) => e.quality.toLowerCase().contains(lang.toLowerCase()))
+        .toList();
+    videos.sort((MVideo a, MVideo b) {
+      int qualityMatchA = 0;
+      if (a.quality.contains(quality)) {
+        qualityMatchA = 1;
+      }
+      int qualityMatchB = 0;
+      if (b.quality.contains(quality)) {
+        qualityMatchB = 1;
+      }
+      if (qualityMatchA != qualityMatchB) {
+        return qualityMatchB - qualityMatchA;
+      }
+
+      final regex = RegExp(r'(\d+)p');
+      final matchA = regex.firstMatch(a.quality);
+      final matchB = regex.firstMatch(b.quality);
+      final int qualityNumA = int.tryParse(matchA?.group(1) ?? '0') ?? 0;
+      final int qualityNumB = int.tryParse(matchB?.group(1) ?? '0') ?? 0;
+      return qualityNumB - qualityNumA;
+    });
+
+    videos.sort((MVideo a, MVideo b) {
+      int serverMatchA = 0;
+      if (a.quality.toLowerCase().contains(server.toLowerCase())) {
+        serverMatchA = 1;
+      }
+      int serverMatchB = 0;
+      if (b.quality.toLowerCase().contains(server.toLowerCase())) {
+        serverMatchB = 1;
+      }
+      return serverMatchB - serverMatchA;
+    });
+    return videos;
+  }
+
   String ll(String url) {
     if (url.contains("?")) {
       return "&";
     }
     return "?";
   }
-}
-
-Map<String, String> getMirrorPref() {
-  return {
-    "aniwave.to": "https://aniwave.to",
-    "aniwave.bz": "https://aniwave.bz",
-    "aniwave.ws": "https://aniwave.ws",
-  };
 }
 
 Aniwave main() {

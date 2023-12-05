@@ -223,7 +223,8 @@ class ZoroTheme extends MProvider {
         typeRegExp: 0);
 
     List<MVideo> videos = [];
-
+    final hosterSelection = preferenceHosterSelection(source.id);
+    final typeSelection = preferenceTypeSelection(source.id);
     for (var i = 0; i < names.length; i++) {
       final name = names[i];
       final id = ids[i];
@@ -236,19 +237,22 @@ class ZoroTheme extends MProvider {
 
       final resE = await http('GET', json.encode(datasE));
       String epUrl = substringBefore(substringAfter(resE, "\"link\":\""), "\"");
-      print(epUrl);
+
       List<MVideo> a = [];
-      if (name.contains("Vidstreaming")) {
-        a = await rapidCloudExtractor(epUrl, "Vidstreaming - $subDub");
-      } else if (name.contains("Vidcloud")) {
-        a = await rapidCloudExtractor(epUrl, "Vidcloud - $subDub");
-      } else if (name.contains("StreamTape")) {
-        a = await streamTapeExtractor(epUrl, "StreamTape - $subDub");
+
+      if (hosterSelection.contains(name) && typeSelection.contains(subDub)) {
+        if (name.contains("Vidstreaming")) {
+          a = await rapidCloudExtractor(epUrl, "Vidstreaming - $subDub");
+        } else if (name.contains("Vidcloud")) {
+          a = await rapidCloudExtractor(epUrl, "Vidcloud - $subDub");
+        } else if (name.contains("StreamTape")) {
+          a = await streamTapeExtractor(epUrl, "StreamTape - $subDub");
+        }
+        videos.addAll(a);
       }
-      videos.addAll(a);
     }
 
-    return videos;
+    return sortVideos(videos, source.id);
   }
 
   MPages animeElementM(String res) {
@@ -288,7 +292,7 @@ class ZoroTheme extends MProvider {
   ];
 
   @override
-  List<dynamic> getFilterList() {
+  List<dynamic> getFilterList(MSource source) {
     return [
       SelectFilter("TypeFilter", "Type", 0, [
         SelectFilterOption("All", ""),
@@ -419,6 +423,98 @@ class ZoroTheme extends MProvider {
         CheckBoxFilter("Yuri", "34")
       ]),
     ];
+  }
+
+  @override
+  List<dynamic> getSourcePreferences(MSource source) {
+    return [
+      ListPreference(
+          key: "preferred_quality",
+          title: "Preferred Quality",
+          summary: "",
+          valueIndex: 1,
+          entries: ["1080p", "720p", "480p", "360p"],
+          entryValues: ["1080", "720", "480", "360"]),
+      ListPreference(
+          key: "preferred_server",
+          title: "Preferred server",
+          summary: "",
+          valueIndex: 0,
+          entries: ["Vidstreaming", "VidCloud", "StreamTape"],
+          entryValues: ["Vidstreaming", "VidCloud", "StreamTape"]),
+      ListPreference(
+          key: "preferred_type",
+          title: "Preferred Type",
+          summary: "",
+          valueIndex: 0,
+          entries: ["Sub", "Dub"],
+          entryValues: ["sub", "dub"]),
+      MultiSelectListPreference(
+          key: "hoster_selection",
+          title: "Enable/Disable Hosts",
+          summary: "",
+          entries: ["Vidstreaming", "VidCloud", "StreamTape"],
+          entryValues: ["Vidstreaming", "Vidcloud", "StreamTape"],
+          values: ["Vidstreaming", "Vidcloud", "StreamTape"]),
+      MultiSelectListPreference(
+          key: "type_selection",
+          title: "Enable/Disable Types",
+          summary: "",
+          entries: ["Sub", "Dub"],
+          entryValues: ["sub", "dub"],
+          values: ["sub", "dub"]),
+    ];
+  }
+
+  List<MVideo> sortVideos(List<MVideo> videos, int sourceId) {
+    String quality = getPreferenceValue(sourceId, "preferred_quality");
+    String server = getPreferenceValue(sourceId, "preferred_server");
+    String type = getPreferenceValue(sourceId, "preferred_type");
+    videos = videos
+        .where(
+            (MVideo e) => e.quality.toLowerCase().contains(type.toLowerCase()))
+        .toList();
+    videos.sort((MVideo a, MVideo b) {
+      int qualityMatchA = 0;
+      if (a.quality.contains(quality)) {
+        qualityMatchA = 1;
+      }
+      int qualityMatchB = 0;
+      if (b.quality.contains(quality)) {
+        qualityMatchB = 1;
+      }
+      if (qualityMatchA != qualityMatchB) {
+        return qualityMatchB - qualityMatchA;
+      }
+
+      final regex = RegExp(r'(\d+)p');
+      final matchA = regex.firstMatch(a.quality);
+      final matchB = regex.firstMatch(b.quality);
+      final int qualityNumA = int.tryParse(matchA?.group(1) ?? '0') ?? 0;
+      final int qualityNumB = int.tryParse(matchB?.group(1) ?? '0') ?? 0;
+      return qualityNumB - qualityNumA;
+    });
+
+    videos.sort((MVideo a, MVideo b) {
+      int serverMatchA = 0;
+      if (a.quality.toLowerCase().contains(server.toLowerCase())) {
+        serverMatchA = 1;
+      }
+      int serverMatchB = 0;
+      if (b.quality.toLowerCase().contains(server.toLowerCase())) {
+        serverMatchB = 1;
+      }
+      return serverMatchB - serverMatchA;
+    });
+    return videos;
+  }
+
+  List<String> preferenceHosterSelection(int sourceId) {
+    return getPreferenceValue(sourceId, "hoster_selection");
+  }
+
+  List<String> preferenceTypeSelection(int sourceId) {
+    return getPreferenceValue(sourceId, "type_selection");
   }
 
   String ll(String url) {

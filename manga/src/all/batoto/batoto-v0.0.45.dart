@@ -7,7 +7,7 @@ class Batoto extends MProvider {
   @override
   Future<MPages> getPopular(MSource source, int page) async {
     final url =
-        "${source.baseUrl}/browse?${lang(source.lang)}&sort=views_a&page=$page";
+        "${preferenceMirror(source.id)}/browse?${lang(source.lang)}&sort=views_a&page=$page";
     final data = {"url": url};
     final res = await http('GET', json.encode(data));
     return mangaElementM(res, source);
@@ -16,7 +16,7 @@ class Batoto extends MProvider {
   @override
   Future<MPages> getLatestUpdates(MSource source, int page) async {
     final url =
-        "${source.baseUrl}/browse?${lang(source.lang)}&sort=update&page=$page";
+        "${preferenceMirror(source.id)}/browse?${lang(source.lang)}&sort=update&page=$page";
     final data = {"url": url};
     final res = await http('GET', json.encode(data));
     return mangaElementM(res, source);
@@ -30,7 +30,7 @@ class Batoto extends MProvider {
     String min = "";
     String max = "";
     if (query.isNotEmpty) {
-      url = "${source.baseUrl}/search?word=$query&page=$page";
+      url = "${preferenceMirror(source.id)}/search?word=$query&page=$page";
       for (var filter in filters) {
         if (filter.type == "LetterFilter") {
           if (filter.state == 1) {
@@ -39,7 +39,7 @@ class Batoto extends MProvider {
         }
       }
     } else {
-      url = "${source.baseUrl}/browse";
+      url = "${preferenceMirror(source.id)}/browse";
       for (var filter in filters) {
         if (filter.type == "LangGroupFilter") {
           final langs = (filter.state as List).where((e) => e.state).toList();
@@ -111,7 +111,7 @@ class Batoto extends MProvider {
       {"Ongoing": 0, "Completed": 1, "Cancelled": 3, "Hiatus": 2}
     ];
 
-    final data = {"url": "${source.baseUrl}$url"};
+    final data = {"url": "${preferenceMirror(source.id)}$url"};
     final res = await http('GET', json.encode(data));
     MManga manga = MManga();
     final workStatus = xpath(res,
@@ -171,7 +171,7 @@ class Batoto extends MProvider {
 
   @override
   Future<List<String>> getPageList(MSource source, String url) async {
-    final datas = {"url": "${source.baseUrl}$url"};
+    final datas = {"url": "${preferenceMirror(source.id)}$url"};
     final res = await http('GET', json.encode(datas));
 
     final script = xpath(res,
@@ -273,7 +273,7 @@ class Batoto extends MProvider {
   }
 
   @override
-  List<dynamic> getFilterList() {
+  List<dynamic> getFilterList(MSource source) {
     return [
       SelectFilter("LetterFilter", "Letter matching mode (Slow)", 0, [
         SelectFilterOption("Disabled", "disabled"),
@@ -1663,36 +1663,51 @@ class Batoto extends MProvider {
       SeparatorFilter(),
     ];
   }
-}
 
-Map<String, String> getMirrorPref() {
-  return {
-    "bato.to": "https://bato.to",
-    "batocomic.com": "https://batocomic.com",
-    "batocomic.net": "https://batocomic.net",
-    "batocomic.org": "https://batocomic.org",
-    "batotoo.com": "https://batotoo.com",
-    "batotwo.com": "https://batotwo.com",
-    "battwo.com": "https://battwo.com",
-    "comiko.net": "https://comiko.net",
-    "comiko.org": "https://comiko.org",
-    "mangatoto.com": "https://mangatoto.com",
-    "mangatoto.net": "https://mangatoto.net",
-    "mangatoto.org": "https://mangatoto.org",
-    "readtoto.com": "https://readtoto.com",
-    "readtoto.net": "https://readtoto.net",
-    "readtoto.org": "https://readtoto.org",
-    "dto.to": "https://dto.to",
-    "hto.to": "https://hto.to",
-    "mto.to": "https://mto.to",
-    "wto.to": "https://wto.to",
-    "xbato.com": "https://xbato.com",
-    "xbato.net": "https://xbato.net",
-    "xbato.org": "https://xbato.org",
-    "zbato.com": "https://zbato.com",
-    "zbato.net": "https://zbato.net",
-    "zbato.org": "https://zbato.org",
-  };
+  @override
+  List<dynamic> getSourcePreferences(MSource source) {
+    return [
+      ListPreference(
+          key: "mirror",
+          title: "Mirror",
+          summary: "",
+          valueIndex: 0,
+          entries: mirrorEntries,
+          entryValues: mirrorEntries.map((e) => "https://$e").toList()),
+    ];
+  }
+
+  List<String> mirrorEntries = [
+    "bato.to",
+    "batocomic.com",
+    "batocomic.net",
+    "batocomic.org",
+    "batotoo.com",
+    "batotwo.com",
+    "battwo.com",
+    "comiko.net",
+    "comiko.org",
+    "mangatoto.com",
+    "mangatoto.net",
+    "mangatoto.org",
+    "readtoto.com",
+    "readtoto.net",
+    "readtoto.org",
+    "dto.to",
+    "hto.to",
+    "mto.to",
+    "wto.to",
+    "xbato.com",
+    "xbato.net",
+    "xbato.org",
+    "zbato.com",
+    "zbato.net",
+    "zbato.org",
+  ];
+
+  String preferenceMirror(int sourceId) {
+    return getPreferenceValue(sourceId, "mirror");
+  }
 }
 
 Batoto main() {

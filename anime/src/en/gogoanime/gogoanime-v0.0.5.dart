@@ -6,7 +6,9 @@ class GogoAnime extends MProvider {
 
   @override
   Future<MPages> getPopular(MSource source, int page) async {
-    final data = {"url": "${source.baseUrl}/popular.html?page=$page"};
+    final data = {
+      "url": "${preferenceBaseUrl(source.id)}/popular.html?page=$page"
+    };
     final res = await http('GET', json.encode(data));
 
     List<MManga> animeList = [];
@@ -130,14 +132,15 @@ class GogoAnime extends MProvider {
       }
     }
     if (genre.isNotEmpty) {
-      url = "${source.baseUrl}/genre/$genre?page=$page";
+      url = "${preferenceBaseUrl(source.id)}/genre/$genre?page=$page";
     } else if (recent.isNotEmpty) {
       url =
           "https://ajax.gogo-load.com/ajax/page-recent-release.html?page=$page&type=$recent";
     } else if (season.isNotEmpty) {
-      url = "${source.baseUrl}/$season?page=$page";
+      url = "${preferenceBaseUrl(source.id)}/$season?page=$page";
     } else {
-      url = "${source.baseUrl}/filter.html?keyword=$query$filterStr&page=$page";
+      url =
+          "${preferenceBaseUrl(source.id)}/filter.html?keyword=$query$filterStr&page=$page";
     }
 
     final data = {"url": url};
@@ -167,7 +170,7 @@ class GogoAnime extends MProvider {
         "Completed": 1,
       }
     ];
-    final data = {"url": "${source.baseUrl}$url"};
+    final data = {"url": "${preferenceBaseUrl(source.id)}$url"};
     final res = await http('GET', json.encode(data));
     MManga anime = MManga();
     final status = xpath(
@@ -213,7 +216,7 @@ class GogoAnime extends MProvider {
 
   @override
   Future<List<MVideo>> getVideoList(MSource source, String url) async {
-    final datas = {"url": "${source.baseUrl}$url"};
+    final datas = {"url": "${preferenceBaseUrl(source.id)}$url"};
 
     final res = await http('GET', json.encode(datas));
     final serverUrls =
@@ -221,31 +224,34 @@ class GogoAnime extends MProvider {
     final serverNames =
         xpath(res, '//*[@class="anime_muti_link"]/ul/li/@class');
     List<MVideo> videos = [];
+    final hosterSelection = preferenceHosterSelection(source.id);
     for (var i = 0; i < serverNames.length; i++) {
       final name = serverNames[i];
       final url = serverUrls[i];
       List<MVideo> a = [];
-      if (name.contains("anime")) {
-        a = await gogoCdnExtractor(url);
-      } else if (name.contains("vidcdn")) {
-        a = await gogoCdnExtractor(url);
-      } else if (name.contains("doodstream")) {
-        a = await doodExtractor(url);
-      } else if (name.contains("mp4upload")) {
-        a = await mp4UploadExtractor(url, null, "", "");
-      } else if (name.contains("filelions")) {
-        a = await streamWishExtractor(url, "FileLions");
-      } else if (name.contains("streamwish")) {
-        a = await streamWishExtractor(url, "StreamWish");
+      if (hosterSelection.contains(name)) {
+        if (name.contains("anime")) {
+          a = await gogoCdnExtractor(url);
+        } else if (name.contains("vidcdn")) {
+          a = await gogoCdnExtractor(url);
+        } else if (name.contains("doodstream")) {
+          a = await doodExtractor(url);
+        } else if (name.contains("mp4upload")) {
+          a = await mp4UploadExtractor(url, null, "", "");
+        } else if (name.contains("filelions")) {
+          a = await streamWishExtractor(url, "FileLions");
+        } else if (name.contains("streamwish")) {
+          a = await streamWishExtractor(url, "StreamWish");
+        }
+        videos.addAll(a);
       }
-      videos.addAll(a);
     }
 
-    return videos;
+    return sortVideos(videos, source.id);
   }
 
   @override
-  List<dynamic> getFilterList() {
+  List<dynamic> getFilterList(MSource source) {
     return [
       HeaderFilter("Advanced search"),
       GroupFilter("GenreFilter", "Genre", [
@@ -1024,6 +1030,124 @@ class GogoAnime extends MProvider {
         SelectFilterOption("Winter 2014", "sub-category/winter-2014-anime")
       ]),
     ];
+  }
+
+  @override
+  List<dynamic> getSourcePreferences(MSource source) {
+    return [
+      EditTextPreference(
+          key: "override_baseurl_v${source.id}",
+          title: "Override BaseUrl",
+          summary:
+              "For temporary uses. Updating the extension will erase this setting.",
+          value: "https://gogoanime3.net",
+          dialogTitle: "Override BaseUrl",
+          dialogMessage: "Default: https://gogoanime3.net",
+          text: "https://gogoanime3.net"),
+      ListPreference(
+          key: "preferred_quality",
+          title: "Preferred quality",
+          summary: "",
+          valueIndex: 0,
+          entries: ["1080p", "720p", "480p", "360p"],
+          entryValues: ["1080", "720", "480", "360"]),
+      ListPreference(
+          key: "preferred_server",
+          title: "Preferred server",
+          summary: "",
+          valueIndex: 0,
+          entries: [
+            "Gogostream",
+            "Vidstreaming",
+            "Doodstream",
+            "StreamWish",
+            "Mp4upload",
+            "FileLions"
+          ],
+          entryValues: [
+            "Gogostream",
+            "Vidstreaming",
+            "Doodstream",
+            "StreamWish",
+            "Mp4upload",
+            "FileLions"
+          ]),
+      MultiSelectListPreference(
+          key: "hoster_selection",
+          title: "Enable/Disable Hosts",
+          summary: "",
+          entries: [
+            "Gogostream",
+            "Vidstreaming",
+            "Doodstream",
+            "StreamWish",
+            "Mp4upload",
+            "FileLions"
+          ],
+          entryValues: [
+            "vidcdn",
+            "anime",
+            "doodstream",
+            "streamwish",
+            "mp4upload",
+            "filelions"
+          ],
+          values: [
+            "vidcdn",
+            "anime",
+            "doodstream",
+            "streamwish",
+            "mp4upload",
+            "filelions"
+          ]),
+    ];
+  }
+
+  String preferenceBaseUrl(int sourceId) {
+    return getPreferenceValue(sourceId, "override_baseurl_v$sourceId");
+  }
+
+  List<String> preferenceHosterSelection(int sourceId) {
+    return getPreferenceValue(sourceId, "hoster_selection");
+  }
+
+  List<MVideo> sortVideos(List<MVideo> videos, int sourceId) {
+    String quality = getPreferenceValue(sourceId, "preferred_quality");
+    String server = getPreferenceValue(sourceId, "preferred_server");
+
+    videos.sort((MVideo a, MVideo b) {
+      int qualityMatchA = 0;
+      if (a.quality.contains(quality)) {
+        qualityMatchA = 1;
+      }
+      int qualityMatchB = 0;
+      if (b.quality.contains(quality)) {
+        qualityMatchB = 1;
+      }
+      if (qualityMatchA != qualityMatchB) {
+        return qualityMatchB - qualityMatchA;
+      }
+
+      final regex = RegExp(r'(\d+)p');
+      final matchA = regex.firstMatch(a.quality);
+      final matchB = regex.firstMatch(b.quality);
+      final int qualityNumA = int.tryParse(matchA?.group(1) ?? '0') ?? 0;
+      final int qualityNumB = int.tryParse(matchB?.group(1) ?? '0') ?? 0;
+      return qualityNumB - qualityNumA;
+    });
+
+    videos.sort((MVideo a, MVideo b) {
+      int serverMatchA = 0;
+      if (a.quality.contains(server)) {
+        serverMatchA = 1;
+      }
+      int serverMatchB = 0;
+      if (b.quality.contains(server)) {
+        serverMatchB = 1;
+      }
+      return serverMatchB - serverMatchA;
+    });
+    return videos;
   }
 }
 
