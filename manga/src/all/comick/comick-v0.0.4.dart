@@ -215,7 +215,7 @@ class ComickFun extends MProvider {
   }
 
   @override
-  List<dynamic> getFilterList() {
+  List<dynamic> getFilterList(MSource source) {
     return [
       HeaderFilter("The filter is ignored when using text search."),
       GroupFilter("GenreFilter", "Genre", [

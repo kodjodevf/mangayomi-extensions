@@ -236,7 +236,7 @@ class MangaReader extends MProvider {
   }
 
   @override
-  List<dynamic> getFilterList() {
+  List<dynamic> getFilterList(MSource source) {
     return [
       SeparatorFilter(),
       TextFilter("AuthorFilter", "Author"),

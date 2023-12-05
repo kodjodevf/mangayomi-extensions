@@ -308,7 +308,7 @@ class NepNep extends MProvider {
   }
 
   @override
-  List<dynamic> getFilterList() {
+  List<dynamic> getFilterList(MSource source) {
     return [
       TextFilter("YearFilter", "Years"),
       TextFilter("AuthorFilter", "Author"),

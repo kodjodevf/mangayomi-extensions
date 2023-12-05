@@ -136,6 +136,7 @@ class FrAnime extends MProvider {
     } else if (language == "vf" && hasVf) {
       players = vfPlayers;
     }
+    print(players);
     List<MVideo> videos = [];
     for (var i = 0; i < players.length; i++) {
       String apiUrl = "$videoBaseUrl/$language/$i";
@@ -155,8 +156,6 @@ class FrAnime extends MProvider {
           ..url = playerUrl
           ..originalUrl = playerUrl
           ..quality = "FRAnime (Vido)");
-      } else if (playerName.contains("myvi")) {
-        a = await myTvExtractor(playerUrl);
       } else if (playerName.contains("sendvid")) {
         a = await sendVidExtractor(
             playerUrl, json.encode({"Referer": "https://franime.fr/"}), "");
@@ -191,7 +190,7 @@ class FrAnime extends MProvider {
         }
       }
 
-      final titleO = animeJson["titleO"];
+      String titleO = animeJson["titleO"];
       final title = animeJson["title"];
       final genre = animeJson["themes"];
       final description = animeJson["description"];
@@ -228,7 +227,7 @@ class FrAnime extends MProvider {
           anime.name = seasonTitle;
           anime.imageUrl = imageUrl;
           anime.link =
-              "/anime/${regExp(titleO, "[^A-Za-z0-9 ]", "", 0, 0).replaceAll(" ", "-").toLowerCase()}?lang=$lang&s=$ind";
+              "/anime/${titleO.replaceAll(RegExp("[^A-Za-z0-9 ]"), "").replaceAll(" ", "-").toLowerCase()}?lang=$lang&s=$ind";
 
           animeList.add(anime);
         }
@@ -276,7 +275,7 @@ class FrAnime extends MProvider {
             vfListName.add(vf["lecteurs"].isNotEmpty);
           }
         }
-        final titleO = animeJson["titleO"];
+        String titleO = animeJson["titleO"];
         final title = animeJson["title"];
         final genre = animeJson["themes"];
         final description = animeJson["description"];
@@ -314,7 +313,7 @@ class FrAnime extends MProvider {
             anime.name = seasonTitle;
             anime.imageUrl = imageUrl;
             anime.link =
-                "/anime/${regExp(titleO, "[^A-Za-z0-9 ]", "", 0, 0).replaceAll(" ", "-").toLowerCase()}?lang=$lang&s=$ind";
+                "/anime/${titleO.replaceAll(RegExp("[^A-Za-z0-9 ]"), "").replaceAll(" ", "-").toLowerCase()}?lang=$lang&s=$ind";
 
             animeList.add(anime);
           }
@@ -335,12 +334,11 @@ class FrAnime extends MProvider {
 
   String databaseAnimeByTitleO(String res, String titleO) {
     print(titleO);
-    final datas = json.decode(res) as List;
+    final datas = json.decode(res) as List<Map<String, dynamic>>;
     for (var data in datas) {
-      if (regExp(data["titleO"], "[^A-Za-z0-9 ]", "", 0, 0)
-              .replaceAll(" ", "-")
-              .toLowerCase() ==
-          "${titleO}") {
+      String title =
+          (data["titleO"] as String).replaceAll(RegExp("[^A-Za-z0-9 ]"), "");
+      if (title.replaceAll(" ", "-").toLowerCase() == "${titleO}") {
         return json.encode(data);
       }
     }

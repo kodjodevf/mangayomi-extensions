@@ -8,7 +8,7 @@ class MangaDex extends MProvider {
   Future<MPages> getPopular(MSource source, int page) async {
     page = (20 * (page - 1));
     final url =
-        "https://api.mangadex.org/manga?limit=20&offset=$page&availableTranslatedLanguage[]=${source.lang}&includes[]=cover_art${getMDXContentRating()}&order[followedCount]=desc";
+        "https://api.mangadex.org/manga?limit=20&offset=$page&availableTranslatedLanguage[]=${source.lang}&includes[]=cover_art${preferenceContentRating(source.id)}${preferenceOriginalLanguages(source.id)}&order[followedCount]=desc";
     final datas = {"url": url};
     final res = await http('GET', json.encode(datas));
     return mangaRes(res, source);
@@ -24,12 +24,12 @@ class MangaDex extends MProvider {
     final mangaIds =
         jsonPathToString(ress, r'$.data[*].relationships[*].id', '.--')
             .split('.--');
-    String mangaIdss = "".toString();
+    String mangaIdss = "";
     for (var id in mangaIds) {
       mangaIdss += "&ids[]=$id";
     }
     final newUrl =
-        "https://api.mangadex.org/manga?includes[]=cover_art&limit=${mangaIds.length}${getMDXContentRating()}$mangaIdss";
+        "https://api.mangadex.org/manga?includes[]=cover_art&limit=${mangaIds.length}${preferenceContentRating(source.id)}${preferenceOriginalLanguages(source.id)}$mangaIdss";
     final res = await http('GET', json.encode({"url": newUrl}));
     return mangaRes(res, source);
   }
@@ -188,7 +188,7 @@ class MangaDex extends MProvider {
     final mangaId = url.split('/').last;
 
     final paginatedChapterList =
-        await paginatedChapterListRequest(mangaId, 0, source.lang);
+        await paginatedChapterListRequest(mangaId, 0, source.lang, source.id);
     final chapterList =
         jsonPathToString(paginatedChapterList, r'$.data[*]', '_.').split('_.');
     int limit =
@@ -206,8 +206,8 @@ class MangaDex extends MProvider {
     var hasMoreResults = (limit + offset) < total;
     while (hasMoreResults) {
       offset += limit;
-      var newRequest =
-          await paginatedChapterListRequest(mangaId, offset, source.lang);
+      var newRequest = await paginatedChapterListRequest(
+          mangaId, offset, source.lang, source.id);
       int total = int.parse(jsonPathToString(newRequest, r'$.total', ''));
       final chapterList =
           jsonPathToString(paginatedChapterList, r'$.data[*]', '_.')
@@ -244,7 +244,7 @@ class MangaDex extends MProvider {
     for (var e in resJson) {
       MManga manga = MManga();
       manga.name = findTitle(json.encode(e), source.lang);
-      manga.imageUrl = getCover(json.encode(e));
+      manga.imageUrl = getCover(json.encode(e), source.id);
       manga.link = "/manga/${getMapValue(json.encode(e), "id")}";
       mangaList.add(manga);
     }
@@ -253,28 +253,28 @@ class MangaDex extends MProvider {
 
   List<MChapter> getChapters(int length, String paginatedChapterListA) {
     List<MChapter> chaptersList = [];
-    String paginatedChapterList = paginatedChapterListA.toString();
+    String paginatedChapterList = paginatedChapterListA;
     final dataList = jsonPathToList(paginatedChapterList, r'$.data[*]', 0);
     for (var res in dataList) {
-      String scan = "".toString();
+      String scan = "";
       final groups = jsonPathToList(res,
           r'$.relationships[?@.id!="00e03853-1b96-4f41-9542-c71b8692033b"]', 0);
-      String chapName = "".toString();
+      String chapName = "";
       for (var element in groups) {
         final data = getMapValue(element, "attributes", encode: true);
         if (data.isNotEmpty) {
           final name = getMapValue(data, "name");
-          scan += "$name".toString();
+          scan += "$name";
           final username = getMapValue(data, "username");
           if (username.isNotEmpty) {
             if (scan.isEmpty) {
-              scan += "Uploaded by $username".toString();
+              scan += "Uploaded by $username";
             }
           }
         }
       }
       if (scan.isEmpty) {
-        scan = "No Group".toString();
+        scan = "No Group";
       }
       final dataRes = getMapValue(res, "attributes", encode: true);
       if (dataRes.isNotEmpty) {
@@ -282,26 +282,26 @@ class MangaDex extends MProvider {
         final volume = getMapValue(data, "volume");
         if (volume.isNotEmpty) {
           if (volume != "null") {
-            chapName = "Vol.$volume ".toString();
+            chapName = "Vol.$volume ";
           }
         }
         final chapter = getMapValue(data, "chapter");
         if (chapter.isNotEmpty) {
           if (chapter != "null") {
-            chapName += "Ch.$chapter ".toString();
+            chapName += "Ch.$chapter ";
           }
         }
         final title = getMapValue(data, "title");
         if (title.isNotEmpty) {
           if (title != "null") {
             if (chapName.isNotEmpty) {
-              chapName += "- ".toString();
+              chapName += "- ";
             }
-            chapName += "$title".toString();
+            chapName += "$title";
           }
         }
         if (chapName.isEmpty) {
-          chapName += "Oneshot".toString();
+          chapName += "Oneshot";
         }
         final date = getMapValue(data, "publishAt");
         final id = getMapValue(res, "id");
@@ -319,17 +319,11 @@ class MangaDex extends MProvider {
   }
 
   Future<String> paginatedChapterListRequest(
-      String mangaId, int offset, String lang) async {
+      String mangaId, int offset, String lang, int sourceId) async {
     final url =
-        'https://api.mangadex.org/manga/$mangaId/feed?limit=500&offset=$offset&includes[]=user&includes[]=scanlation_group&order[volume]=desc&order[chapter]=desc&translatedLanguage[]=$lang&includeFuturePublishAt=0&includeEmptyPages=0${getMDXContentRating()}';
+        'https://api.mangadex.org/manga/$mangaId/feed?limit=500&offset=$offset&includes[]=user&includes[]=scanlation_group&order[volume]=desc&order[chapter]=desc&translatedLanguage[]=$lang&includeFuturePublishAt=0&includeEmptyPages=0${preferenceContentRating(sourceId)}';
     final res = await http('GET', json.encode({"url": url}));
     return res;
-  }
-
-  String getMDXContentRating() {
-    String ctnRating =
-        "&contentRating[]=suggestive&contentRating[]=safe&contentRating[]=erotica&contentRating[]=pornographic";
-    return ctnRating;
   }
 
   String findTitle(String dataRes, String lang) {
@@ -349,7 +343,8 @@ class MangaDex extends MProvider {
     return title;
   }
 
-  String getCover(String dataRes) {
+  String getCover(String dataRes, int sourceId) {
+    final coverQuality = getPreferenceValue(sourceId, "cover_quality");
     final relationships = json
         .decode(getMapValue(dataRes, "relationships", encode: true)) as List;
     String coverFileName = "".toString();
@@ -360,7 +355,7 @@ class MangaDex extends MProvider {
           final attributes =
               getMapValue(json.encode(a), "attributes", encode: true);
           coverFileName =
-              "https://uploads.mangadex.org/covers/${getMapValue(dataRes, "id")}/${getMapValue(attributes, "fileName")}";
+              "https://uploads.mangadex.org/covers/${getMapValue(dataRes, "id")}/${getMapValue(attributes, "fileName")}$coverQuality";
         }
       }
     }
@@ -368,7 +363,7 @@ class MangaDex extends MProvider {
   }
 
   @override
-  List<dynamic> getFilterList() {
+  List<dynamic> getFilterList(MSource source) {
     return [
       CheckBoxFilter(
           "Has available chapters", "", "HasAvailableChaptersFilter"),
@@ -508,6 +503,83 @@ class MangaDex extends MProvider {
         TriStateFilter("Zombies", "631ef465-9aba-4afb-b0fc-ea10efe274a8"),
       ]),
     ];
+  }
+
+  @override
+  List<dynamic> getSourcePreferences(MSource source) {
+    return [
+      ListPreference(
+          key: "cover_quality",
+          title: "Cover quality",
+          summary: "",
+          valueIndex: 0,
+          entries: ["Original", "Medium", "Low"],
+          entryValues: ["", ".512.jpg", ".256.jpg"]),
+      MultiSelectListPreference(
+          key: "content_rating",
+          title: "Default content rating",
+          summary: "Show content with the selected rating by default",
+          valueIndex: 0,
+          entries: [
+            "safe",
+            "suggestive",
+            "erotica",
+            "pornographic"
+          ],
+          entryValues: [
+            "contentRating[]=safe",
+            "contentRating[]=suggestive",
+            "contentRating[]=erotica",
+            "contentRating[]=pornographic"
+          ],
+          values: [
+            "contentRating[]=safe",
+            "contentRating[]=suggestive"
+          ]),
+      MultiSelectListPreference(
+          key: "original_languages",
+          title: "Filter original languages",
+          summary:
+              "Only show content that was originaly published in the selected languages in both latest and browse",
+          valueIndex: 0,
+          entries: [
+            "Japanese",
+            "Chinese",
+            "Korean"
+          ],
+          entryValues: [
+            "originalLanguage[]=ja",
+            "originalLanguage[]=zh&originalLanguage[]=zh-hk",
+            "originalLanguage[]=ko"
+          ],
+          values: []),
+    ];
+  }
+
+  String preferenceContentRating(int sourceId) {
+    final contentRating =
+        getPreferenceValue(sourceId, "content_rating") as List<String>;
+    String contentRatingStr = "";
+    if (contentRating.isNotEmpty) {
+      contentRatingStr = "&";
+      for (var ctn in contentRating) {
+        contentRatingStr += "&$ctn";
+      }
+    }
+    return contentRatingStr;
+  }
+
+  String preferenceOriginalLanguages(int sourceId) {
+    final originalLanguages =
+        getPreferenceValue(sourceId, "original_languages") as List<String>;
+    String originalLanguagesStr = "";
+    if (originalLanguages.isNotEmpty) {
+      originalLanguagesStr = "&";
+      for (var language in originalLanguages) {
+        originalLanguagesStr += "&$language";
+      }
+    }
+    return originalLanguagesStr;
   }
 
   String ll(String url) {
