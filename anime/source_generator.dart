@@ -14,7 +14,8 @@ import 'src/fr/otakufr/source.dart';
 import 'src/id/nimegami/source.dart';
 import 'src/id/oploverz/source.dart';
 import 'src/id/otakudesu/source.dart';
-import 'src/it/source.dart';
+import 'src/it/animesaturn/source.dart';
+
 
 void main() {
   List<Source> _sourcesList = [

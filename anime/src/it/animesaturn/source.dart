@@ -1,5 +1,5 @@
-import '../../../model/source.dart';
-import '../../../utils/utils.dart';
+import '../../../../model/source.dart';
+import '../../../../utils/utils.dart';
 
 Source get animesaturn => _animesaturn;
 const animesaturnVersion = "0.0.1";
