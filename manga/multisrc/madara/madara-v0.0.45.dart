@@ -27,7 +27,7 @@ class Madara extends MProvider {
     for (var i = 0; i < names.length; i++) {
       MManga manga = MManga();
       manga.name = names[i];
-      manga.imageUrl = images[i];
+      manga.imageUrl = substringBefore(images[i], " ");
       manga.link = urls[i];
       mangaList.add(manga);
     }
@@ -58,7 +58,7 @@ class Madara extends MProvider {
     for (var i = 0; i < names.length; i++) {
       MManga manga = MManga();
       manga.name = names[i];
-      manga.imageUrl = images[i];
+      manga.imageUrl = substringBefore(images[i], " ");
       manga.link = urls[i];
       mangaList.add(manga);
     }
@@ -137,7 +137,7 @@ class Madara extends MProvider {
     for (var i = 0; i < names.length; i++) {
       MManga manga = MManga();
       manga.name = names[i];
-      manga.imageUrl = images[i];
+      manga.imageUrl = substringBefore(images[i], " ");
       manga.link = urls[i];
       mangaList.add(manga);
     }
@@ -221,12 +221,16 @@ class Madara extends MProvider {
     if (imageUrl.isNotEmpty) {
       manga.imageUrl = imageUrl.first;
     }
-    final mangaId = querySelectorAll(res,
-            selector: "div[id^=manga-chapters-holder]",
-            typeElement: 3,
-            attributes: "data-id",
-            typeRegExp: 0)
-        .first;
+    String mangaId = "";
+
+    final id = querySelectorAll(res,
+        selector: "div[id^=manga-chapters-holder]",
+        typeElement: 3,
+        attributes: "data-id",
+        typeRegExp: 0);
+    if (id.isNotEmpty) {
+      mangaId = id.first;
+    }
     final status = querySelectorAll(res,
         selector: "div.summary-content",
         typeElement: 0,
@@ -235,13 +239,11 @@ class Madara extends MProvider {
     if (status.isNotEmpty) {
       manga.status = parseStatus(status.last, statusList);
     }
-
     manga.genre = querySelectorAll(res,
         selector: "div.genres-content a",
         typeElement: 0,
         attributes: "",
         typeRegExp: 0);
-
     final baseUrl = "${source.baseUrl}/";
     final headers = {
       "Referer": baseUrl,
@@ -252,15 +254,15 @@ class Madara extends MProvider {
         "${baseUrl}wp-admin/admin-ajax.php?action=manga_get_chapters&manga=$mangaId";
     final datasP = {"url": urll, "headers": headers, "sourceId": source.id};
     res = await http('POST', json.encode(datasP));
-    if (res == "error") {
+    print("datasP");
+    if (res == "error" || mangaId.isEmpty) {
       final urlP = "${url}ajax/chapters";
       final datasP = {"url": urlP, "headers": headers, "sourceId": source.id};
       res = await http('POST', json.encode(datasP));
     }
-
-    var chapUrls = xpath(res, "//li/a/@href");
-    var chaptersNames = xpath(res, "//li/a/text()");
-    var dateF = xpath(res, "//li/span/i/text()");
+    var chapUrls = xpath(res, '//li[@class^="wp-manga-chapter"]/a/@href');
+    var chaptersNames = xpath(res, '//li[@class^="wp-manga-chapter"]/a/text()');
+    var dateF = xpath(res, '//li[@class^="wp-manga-chapter"]/span/i/text()');
     if (dateF.isEmpty) {
       final resWebview = await getHtmlViaWebview(
           url, "//*[@id='manga-chapters-holder']/div[2]/div/ul/li/a/@href");
@@ -271,23 +273,26 @@ class Madara extends MProvider {
       dateF = xpath(resWebview,
           "//*[@id='manga-chapters-holder']/div[2]/div/ul/li/span/i/text()");
     }
-    var dateUploads =
-        parseDates(dateF, source.dateFormat, source.dateFormatLocale);
-    if (dateF.length < chaptersNames.length) {
-      final length = chaptersNames.length - dateF.length;
-      String date = "${DateTime.now().millisecondsSinceEpoch}";
-      for (var i = 0; i < length - 1; i++) {
-        date += "--..${DateTime.now().millisecondsSinceEpoch}";
-      }
-
-      final dateFF =
+    List<String> dateUploads = [];
+    if (source.dateFormat.isNotEmpty) {
+      dateUploads =
           parseDates(dateF, source.dateFormat, source.dateFormatLocale);
-      List<String> chapterDate = date.split('--..');
+      if (dateF.length < chaptersNames.length) {
+        final length = chaptersNames.length - dateF.length;
+        String date = "${DateTime.now().millisecondsSinceEpoch}";
+        for (var i = 0; i < length - 1; i++) {
+          date += "--..${DateTime.now().millisecondsSinceEpoch}";
+        }
 
-      for (var date in dateFF) {
-        chapterDate.add(date);
+        final dateFF =
+            parseDates(dateF, source.dateFormat, source.dateFormatLocale);
+        List<String> chapterDate = date.split('--..');
+
+        for (var date in dateFF) {
+          chapterDate.add(date);
+        }
+        dateUploads = chapterDate;
       }
-      dateUploads = chapterDate;
     }
 
     List<MChapter>? chaptersList = [];
@@ -295,7 +300,7 @@ class Madara extends MProvider {
       MChapter chapter = MChapter();
       chapter.name = chaptersNames[i];
       chapter.url = chapUrls[i];
-      chapter.dateUpload = dateUploads[i];
+      if (source.dateFormat.isNotEmpty) chapter.dateUpload = dateUploads[i];
       chaptersList.add(chapter);
     }
     manga.chapters = chaptersList;
