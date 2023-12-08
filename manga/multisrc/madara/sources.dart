@@ -1,1887 +1,511 @@
 import '../../../model/source.dart';
-import '../../../utils/utils.dart';
+import 'src/firstkissdashmanga/firstkissdashmanga.dart';
+import 'src/firstmanhwa/firstmanhwa.dart';
+import 'src/manhwaworld/manhwaworld.dart';
+import 'src/adultwebtoon/adultwebtoon.dart';
+import 'src/akumanotenshi/akumanotenshi.dart';
+import 'src/anikiga/anikiga.dart';
+import 'src/apollcomics/apollcomics.dart';
+import 'src/apolltoons/apolltoons.dart';
+import 'src/araznovel/araznovel.dart';
+import 'src/arthurscan/arthurscan.dart';
+import 'src/astralmanga/astralmanga.dart';
+import 'src/asurascansus/asurascansus.dart';
+import 'src/bananamanga/bananamanga.dart';
+import 'src/barmanga/barmanga.dart';
+import 'src/bestmanga/bestmanga.dart';
+import 'src/birdtoon/birdtoon.dart';
+import 'src/cerisescans/cerisescans.dart';
+import 'src/chibimanga/chibimanga.dart';
+import 'src/clovermanga/clovermanga.dart';
+import 'src/cocorip/cocorip.dart';
+import 'src/coffeemanga/coffeemanga.dart';
+import 'src/comicznetv2/comicznetv2.dart';
+import 'src/decadencescans/decadencescans.dart';
+import 'src/dessertscan/dessertscan.dart';
+import 'src/doodmanga/doodmanga.dart';
+import 'src/elitemanga/elitemanga.dart';
+import 'src/emperorscan/emperorscan.dart';
+import 'src/evascans/evascans.dart';
+import 'src/frscan/frscan.dart';
+import 'src/factmanga/factmanga.dart';
+import 'src/finalscans/finalscans.dart';
+import 'src/flextapescans/flextapescans.dart';
+import 'src/freemanga/freemanga.dart';
+import 'src/freemangatop/freemangatop.dart';
+import 'src/ghostscan/ghostscan.dart';
+import 'src/girlslovemanga/girlslovemanga.dart';
+import 'src/glorymanga/glorymanga.dart';
+import 'src/gooffansub/gooffansub.dart';
+import 'src/hm2d/hm2d.dart';
+import 'src/harimanga/harimanga.dart';
+import 'src/hentaicube/hentaicube.dart';
+import 'src/hentaimanga/hentaimanga.dart';
+import 'src/hentaiteca/hentaiteca.dart';
+import 'src/hentai3z/hentai3z.dart';
+import 'src/hentaiwebtoon/hentaiwebtoon.dart';
+import 'src/hentaixcomic/hentaixcomic.dart';
+import 'src/hentaixyuri/hentaixyuri.dart';
+import 'src/hentaizone/hentaizone.dart';
+import 'src/hipercool/hipercool.dart';
+import 'src/hiperdex/hiperdex.dart';
+import 'src/immortalupdates/immortalupdates.dart';
+import 'src/imperioscans/imperioscans.dart';
+import 'src/inmortalscan/inmortalscan.dart';
+import 'src/isekaiscanmanga/isekaiscanmanga.dart';
+import 'src/itsyourrightmanhua/itsyourrightmanhua.dart';
+import 'src/jiangzaitoon/jiangzaitoon.dart';
+import 'src/jimanga/jimanga.dart';
+import 'src/ksgroupscans/ksgroupscans.dart';
+import 'src/kakuseiproject/kakuseiproject.dart';
+import 'src/kamisamaexplorer/kamisamaexplorer.dart';
+import 'src/komikchan/komikchan.dart';
+import 'src/lhtranslation/lhtranslation.dart';
+import 'src/ladyestelarscan/ladyestelarscan.dart';
+import 'src/leviatanscans/leviatanscans.dart';
+import 'src/linkstartscan/linkstartscan.dart';
+import 'src/lolicon/lolicon.dart';
+import 'src/luffymanga/luffymanga.dart';
+import 'src/maidscan/maidscan.dart';
+import 'src/manga18h/manga18h.dart';
+import 'src/mangabee/mangabee.dart';
+import 'src/mangadistrict/mangadistrict.dart';
+import 'src/mangadiyari/mangadiyari.dart';
+import 'src/mangafenix/mangafenix.dart';
+import 'src/mangagalaxy/mangagalaxy.dart';
+import 'src/mangaqueencom/mangaqueencom.dart';
+import 'src/mangaread/mangaread.dart';
+import 'src/mangatxgg/mangatxgg.dart';
+import 'src/mangaweebs/mangaweebs.dart';
+import 'src/mangasehri/mangasehri.dart';
+import 'src/mangatxunoriginal/mangatxunoriginal.dart';
+import 'src/mangaclash/mangaclash.dart';
+import 'src/mangafreakonline/mangafreakonline.dart';
+import 'src/mangagoyaoi/mangagoyaoi.dart';
+import 'src/mangagreat/mangagreat.dart';
+import 'src/mangakomi/mangakomi.dart';
+import 'src/mangaowlone/mangaowlone.dart';
+import 'src/mangapure/mangapure.dart';
+import 'src/mangareadorg/mangareadorg.dart';
+import 'src/mangarolls/mangarolls.dart';
+import 'src/mangarubycom/mangarubycom.dart';
+import 'src/mangatyrant/mangatyrant.dart';
+import 'src/mangaus/mangaus.dart';
+import 'src/mangavisa/mangavisa.dart';
+import 'src/mangaland/mangaland.dart';
+import 'src/mangaryu/mangaryu.dart';
+import 'src/mangasorigines/mangasorigines.dart';
+import 'src/mangasushi/mangasushi.dart';
+import 'src/mangaxico/mangaxico.dart';
+import 'src/mangananquim/mangananquim.dart';
+import 'src/manhuaes/manhuaes.dart';
+import 'src/manhuazonghe/manhuazonghe.dart';
+import 'src/manhuaus/manhuaus.dart';
+import 'src/manhuazone/manhuazone.dart';
+import 'src/manhwa18app/manhwa18app.dart';
+import 'src/manhwa18org/manhwa18org.dart';
+import 'src/manhwa68/manhwa68.dart';
+import 'src/manhwaclan/manhwaclan.dart';
+import 'src/manhwamanhua/manhwamanhua.dart';
+import 'src/manhwanew/manhwanew.dart';
+import 'src/manhwafull/manhwafull.dart';
+import 'src/manhwahentaime/manhwahentaime.dart';
+import 'src/mantrazscan/mantrazscan.dart';
+import 'src/milftoon/milftoon.dart';
+import 'src/momonohanascan/momonohanascan.dart';
+import 'src/monarcamanga/monarcamanga.dart';
+import 'src/moonwitchinlove/moonwitchinlove.dart';
+import 'src/moonloversscan/moonloversscan.dart';
+import 'src/murimscan/murimscan.dart';
+import 'src/nekopostco/nekopostco.dart';
+import 'src/nijitranslations/nijitranslations.dart';
+import 'src/novelcrow/novelcrow.dart';
+import 'src/pantheonscan/pantheonscan.dart';
+import 'src/pawmanga/pawmanga.dart';
+import 'src/pinkseaunicorn/pinkseaunicorn.dart';
+import 'src/pojokmanga/pojokmanga.dart';
+import 'src/portalyaoi/portalyaoi.dart';
+import 'src/prismahentais/prismahentais.dart';
+import 'src/projetoscanlator/projetoscanlator.dart';
+import 'src/mangasoverall/mangasoverall.dart';
+import 'src/ragnarokscanlation/ragnarokscanlation.dart';
+import 'src/rainbowfairyscan/rainbowfairyscan.dart';
+import 'src/randomscan/randomscan.dart';
+import 'src/readergen/readergen.dart';
+import 'src/richtoscan/richtoscan.dart';
+import 'src/rightdarkscan/rightdarkscan.dart';
+import 'src/rio2manga/rio2manga.dart';
+import 'src/romantikmanga/romantikmanga.dart';
+import 'src/s2manga/s2manga.dart';
+import 'src/samuraiscan/samuraiscan.dart';
+import 'src/scambertraslator/scambertraslator.dart';
+import 'src/scantradvf/scantradvf.dart';
+import 'src/shadowtrad/shadowtrad.dart';
+import 'src/shibamanga/shibamanga.dart';
+import 'src/sinensis/sinensis.dart';
+import 'src/sweettimescan/sweettimescan.dart';
+import 'src/taberumangas/taberumangas.dart';
+import 'src/tankouhentai/tankouhentai.dart';
+import 'src/tatakaescan/tatakaescan.dart';
+import 'src/taurusfansub/taurusfansub.dart';
+import 'src/thebeginningaftertheend/thebeginningaftertheend.dart';
+import 'src/toonizy/toonizy.dart';
+import 'src/tortugaceviri/tortugaceviri.dart';
+import 'src/valkyriescan/valkyriescan.dart';
+import 'src/vermanhwas/vermanhwas.dart';
+import 'src/vinmanga/vinmanga.dart';
+import 'src/wickedwitchscan/wickedwitchscan.dart';
+import 'src/winterscan/winterscan.dart';
+import 'src/wonderlandscan/wonderlandscan.dart';
+import 'src/yanpfansub/yanpfansub.dart';
+import 'src/yaoicomics/yaoicomics.dart';
+import 'src/yuriverso/yuriverso.dart';
+import 'src/zeroscan/zeroscan.dart';
+import 'src/falconmanga/falconmanga.dart';
+import 'src/comicarab/comicarab.dart';
+import 'src/manga3asq/manga3asq.dart';
+import 'src/bakamh/bakamh.dart';
 
 const madaraVersion = "0.0.45";
 const madaraSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/madara-v$madaraVersion.dart";
-const defaultDateFormat = "MMMM dd, yyyy";
-const defaultDateFormatLocale = "en_US";
 
 List<Source> get madaraSourcesList => _madaraSourcesList;
 List<Source> _madaraSourcesList = [
-  Source(
-      name: "Anikiga",
-      baseUrl: "https://anikiga.com",
-      lang: "tr",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("anikiga", "tr"),
-      dateFormat: "d MMMMM yyyy",
-      dateFormatLocale: "tr"),
-  Source(
-      name: "ApollComics",
-      baseUrl: "https://apollcomics.xyz",
-      lang: "es",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("apollcomics", "es"),
-      dateFormat: "dd MMMM, yyyy",
-      dateFormatLocale: "es"),
-
-  Source(
-      name: "Apolltoons",
-      baseUrl: "https://apolltoons.xyz",
-      lang: "es",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("apolltoons", "es"),
-      dateFormat: "dd MMMMM, yyyy",
-      dateFormatLocale: "es"),
-
-  Source(
-      name: "Arthur Scan",
-      baseUrl: "https://arthurscan.xyz",
-      lang: "pt-BR",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("arthurscan", "pt"),
-      dateFormat: "MMMMM dd, yyyy",
-      dateFormatLocale: "pt-br"),
-
-  Source(
-      name: "Asura Scans.us (unoriginal)",
-      baseUrl: "https://asurascans.us",
-      lang: "en",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("asurascansus", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "巴卡漫画",
-      baseUrl: "https://bakamh.com",
-      lang: "zh",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("bakamh", "zh")),
-
-  Source(
-      name: "Banana Manga",
-      baseUrl: "https://bananamanga.net",
-      lang: "en",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("bananamanga", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "BarManga",
-      baseUrl: "https://barmanga.com",
-      lang: "es",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("barmanga", "es"),
-      dateFormat: "MM/dd/yyyy",
-      dateFormatLocale: "es"),
-
-  Source(
-      name: "BirdToon",
-      baseUrl: "https://birdtoon.net",
-      lang: "id",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("birdtoon", "id"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "Cerise Scan",
-      baseUrl: "https://cerisescan.com",
-      lang: "pt-BR",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("cerisescans", "pt"),
-      dateFormat: "dd 'de' MMMMM 'de' yyyy",
-      dateFormatLocale: "pt-br"),
-
-  Source(
-      name: "Clover Manga",
-      baseUrl: "https://clover-manga.com",
-      lang: "tr",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("clovermanga", "tr"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: "tr"),
-
-  Source(
-      name: "Coco Rip",
-      baseUrl: "https://cocorip.net",
-      lang: "es",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("cocorip", "es"),
-      dateFormat: "dd/MM/yyyy",
-      dateFormatLocale: "es"),
-
-  Source(
-      name: "Coffee Manga",
-      baseUrl: "https://coffeemanga.io",
-      lang: "en",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("coffeemanga", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "كوميك العرب",
-      baseUrl: "https://comicarab.com",
-      lang: "ar",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("comicarab", "ar")),
-
-  Source(
-      name: "Comicz.net v2",
-      baseUrl: "https://v2.comiz.net",
-      lang: "all",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("comicznetv2", "all"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "Decadence Scans",
-      baseUrl: "https://reader.decadencescans.com",
-      lang: "en",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("decadencescans", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "Dessert Scan",
-      baseUrl: "https://cabaredowatame.site",
-      lang: "pt-BR",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("dessertscan", "pt"),
-      dateFormat: "dd/MM/yyyy",
-      dateFormatLocale: "pt-br"),
-
-  Source(
-      name: "Doodmanga",
-      baseUrl: "https://www.doodmanga.com",
-      lang: "th",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("doodmanga", "th"),
-      dateFormat: "dd MMMMM yyyy",
-      dateFormatLocale: "th"),
-
-  Source(
-      name: "Elite Manga",
-      baseUrl: "https://www.elitemanga.org",
-      lang: "en",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("elitemanga", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "Emperor Scan",
-      baseUrl: "https://emperorscan.com",
-      lang: "es",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("emperorscan", "es"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: "es"),
-
-  Source(
-      name: "ManWe",
-      baseUrl: "https://manwe.pro",
-      lang: "tr",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("evascans", "tr"),
-      dateFormat: "MMM d, yyy",
-      dateFormatLocale: "tr"),
-
-  Source(
-      name: "FactManga",
-      baseUrl: "https://factmanga.com",
-      lang: "en",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("factmanga", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "فالكون مانجا",
-      baseUrl: "https://falconmanga.com",
-      lang: "ar",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("falconmanga", "ar")),
-
-  Source(
-      name: "1st Kiss-Manga (unoriginal)",
-      baseUrl: "https://1stkiss-manga.com",
-      lang: "en",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("firstkissdashmanga", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "1st Manhwa",
-      baseUrl: "https://1stmanhwa.com",
-      lang: "en",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("firstmanhwa", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "Flex Tape Scans",
-      baseUrl: "https://flextapescans.com",
-      lang: "en",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("flextapescans", "en"),
-      dateFormat: "MM/dd/yyy",
-      dateFormatLocale: "en"),
-
-  Source(
-      name: "Free Manga",
-      baseUrl: "https://freemanga.me",
-      lang: "en",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("freemanga", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "FreeMangaTop",
-      baseUrl: "https://freemangatop.com",
-      lang: "en",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("freemangatop", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "Ghost Scan",
-      baseUrl: "https://ghostscan.com.br",
-      lang: "pt-BR",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("ghostscan", "pt"),
-      dateFormat: "dd 'de' MMMMM 'de' yyyy",
-      dateFormatLocale: "pt-br"),
-
-  Source(
-      name: "Girls Love Manga!",
-      baseUrl: "https://glmanga.com",
-      lang: "en",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("girlslovemanga", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "Goof Fansub",
-      baseUrl: "https://gooffansub.com",
-      lang: "pt-BR",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("gooffansub", "pt"),
-      dateFormat: "dd/MM/yyy",
-      dateFormatLocale: "pt-br"),
-
-  Source(
-      name: "Harimanga",
-      baseUrl: "https://harimanga.com",
-      lang: "en",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("harimanga", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "Hentai3z",
-      baseUrl: "https://hentai3z.xyz",
-      lang: "en",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("hentai3z", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "Hentai CB",
-      baseUrl: "https://hentaicube.net",
-      lang: "vi",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("hentaicube", "vi"),
-      dateFormat: "dd/MM/yyyy",
-      dateFormatLocale: "vi"),
-
-  Source(
-      name: "Hentai Manga",
-      baseUrl: "https://hentaimanga.me",
-      lang: "en",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("hentaimanga", "en"),
-      dateFormat: "MMM d, yyyy",
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "Hentai Teca",
-      baseUrl: "https://hentaiteca.net",
-      lang: "pt-BR",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("hentaiteca", "pt"),
-      dateFormat: "MMMMM dd, yyyy",
-      dateFormatLocale: "pt-br"),
-
-  Source(
-      name: "HentaiWebtoon",
-      baseUrl: "https://hentaiwebtoon.com",
-      lang: "en",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("hentaiwebtoon", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "HentaiXComic",
-      baseUrl: "https://hentaixcomic.com",
-      lang: "en",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("hentaixcomic", "en"),
-      dateFormat: "MMM d, yyyy",
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "HentaiXYuri",
-      baseUrl: "https://hentaixyuri.com",
-      lang: "en",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("hentaixyuri", "en"),
-      dateFormat: "MMM d, yyyy",
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "HentaiZone",
-      baseUrl: "https://hentaizone.xyz",
-      lang: "fr",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("hentaizone", "fr"),
-      dateFormat: "MMM d, yyyy",
-      dateFormatLocale: "fr"),
-
-  Source(
-      name: "HipercooL",
-      baseUrl: "https://hipercool.xyz",
-      lang: "pt-BR",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("hipercool", "pt"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "Hiperdex",
-      baseUrl: "https://hiperdex.com",
-      lang: "en",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("hiperdex", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "HM2D",
-      baseUrl: "https://mangadistrict.com/hdoujin",
-      lang: "en",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("hm2d", "en"),
-      dateFormat: "MMM d, yyyy",
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "Immortal Updates",
-      baseUrl: "https://immortalupdates.com",
-      lang: "en",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("immortalupdates", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "Império Scans",
-      baseUrl: "https://imperioscans.com.br",
-      lang: "pt-BR",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("imperioscans", "pt"),
-      dateFormat: "dd/MM/yyyy",
-      dateFormatLocale: "pt-br"),
-
-  Source(
-      name: "Inmortal Scan",
-      baseUrl: "https://manga.mundodrama.site",
-      lang: "es",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("inmortalscan", "es"),
-      dateFormat: "MMMM d, yyyy",
-      dateFormatLocale: "es"),
-
-  Source(
-      name: "IsekaiScanManga (unoriginal)",
-      baseUrl: "https://isekaiscanmanga.com",
-      lang: "en",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("isekaiscanmanga", "en"),
-      dateFormat: "dd MMM، yyyy",
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "Jiangzaitoon",
-      baseUrl: "https://jiangzaitoon.cc",
-      lang: "tr",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("jiangzaitoon", "tr"),
-      dateFormat: "d MMM yyy",
-      dateFormatLocale: "tr"),
-
-  Source(
-      name: "Jimanga",
-      baseUrl: "https://jimanga.com",
-      lang: "en",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("jimanga", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "Kakusei Project",
-      baseUrl: "https://kakuseiproject.com.br",
-      lang: "pt-BR",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("kakuseiproject", "pt"),
-      dateFormat: "MMMMM dd, yyyy",
-      dateFormatLocale: "pt-br"),
-
-  Source(
-      name: "Komik Chan",
-      baseUrl: "https://komikchan.com",
-      lang: "en",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("komikchan", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "Lady Estelar Scan",
-      baseUrl: "https://ladyestelarscan.com.br",
-      lang: "pt-BR",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("ladyestelarscan", "pt"),
-      dateFormat: "dd/MM/yyyy",
-      dateFormatLocale: "pt-br"),
-
-  Source(
-      name: "Leviatan Scans",
-      baseUrl: "https://lscomic.com",
-      lang: "en",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("leviatanscans", "en"),
-      dateFormat: "MMM dd, yyyy",
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "Link Start Scan",
-      baseUrl: "https://www.linkstartscan.xyz",
-      lang: "pt-BR",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("linkstartscan", "pt"),
-      dateFormat: "dd/MM/yyyy",
-      dateFormatLocale: "pt-br"),
-
-  Source(
-      name: "Luffy Manga",
-      baseUrl: "https://luffymanga.com",
-      lang: "en",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("luffymanga", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "Maid Scan",
-      baseUrl: "https://maidscan.com.br",
-      lang: "pt-BR",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("maidscan", "pt"),
-      dateFormat: "dd 'de' MMMMM 'de' yyyy",
-      dateFormatLocale: "pt-br"),
-
-  Source(
-      name: "Manga 18h",
-      baseUrl: "https://manga18h.com",
-      lang: "en",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("manga18h", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "مانجا العاشق",
-      baseUrl: "https://3asq.org",
-      lang: "ar",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("manga3asq", "ar")),
-
-  Source(
-      name: "Manga Bee",
-      baseUrl: "https://mangabee.net",
-      lang: "en",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("mangabee", "en"),
-      dateFormat: "MM/dd/yyyy",
-      dateFormatLocale: "en"),
-
-  Source(
-      name: "MangaClash",
-      baseUrl: "https://mangaclash.com",
-      lang: "en",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("mangaclash", "en"),
-      dateFormat: "MM/dd/yy",
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "Manga Diyari",
-      baseUrl: "https://manga-diyari.com",
-      lang: "tr",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("mangadiyari", "tr"),
-      dateFormat: "MMM dd, yyyy",
-      dateFormatLocale: "tr"),
-
-  Source(
-      name: "Manga Fenix",
-      baseUrl: "https://manhua-fenix.com",
-      lang: "es",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("mangafenix", "es"),
-      dateFormat: "dd MMMM, yyyy",
-      dateFormatLocale: "es"),
-
-  Source(
-      name: "Manga Galaxy",
-      baseUrl: "https://mangagalaxy.me",
-      lang: "en",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("mangagalaxy", "en"),
-      dateFormat: "MM/dd/yyyy",
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "MangaGo Yaoi",
-      baseUrl: "https://mangagoyaoi.com",
-      lang: "en",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("mangagoyaoi", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "MangaKomi",
-      baseUrl: "https://mangakomi.io",
-      lang: "en",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("mangakomi", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "Mangaland",
-      baseUrl: "https://mangaland.net",
-      lang: "es",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("mangaland", "es"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: "es"),
-
-  Source(
-      name: "Mangá Nanquim",
-      baseUrl: "https://mangananquim.com",
-      lang: "pt-BR",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("mangananquim", "pt"),
-      dateFormat: "dd 'de' MMMMM 'de' yyyy",
-      dateFormatLocale: "pt-br"),
-
-  Source(
-      name: "MangaOwl.one (unoriginal)",
-      baseUrl: "https://mangaowl.one",
-      lang: "en",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("mangaowlone", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "MangaPure",
-      baseUrl: "https://mangapure.net",
-      lang: "en",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("mangapure", "en"),
-      dateFormat: "MMM dd, HH:mm",
-      dateFormatLocale: "en"),
-
-  Source(
-      name: "Manga Queen.com",
-      baseUrl: "https://mangaqueen.com",
-      lang: "en",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("mangaqueencom", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "MangaRead.org",
-      baseUrl: "https://www.mangaread.org",
-      lang: "en",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("mangareadorg", "en"),
-      dateFormat: "dd.MM.yyy",
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "MangaRuby.com",
-      baseUrl: "https://mangaruby.com",
-      lang: "en",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("mangarubycom", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "Mangaryu",
-      baseUrl: "https://mangaryu.com",
-      lang: "en",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("mangaryu", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "Mangas Origines",
-      baseUrl: "https://mangas-origines.xyz",
-      lang: "fr",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("mangasorigines", "fr"),
-      dateFormat: "MMMM d, yyyy",
-      dateFormatLocale: "fr"),
-
-  Source(
-      name: "ROG Mangás",
-      baseUrl: "https://rogmangas.com",
-      lang: "pt-BR",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("mangasoverall", "pt"),
-      dateFormat: "dd/MM/yyyy",
-      dateFormatLocale: "pt-br"),
-
-  Source(
-      name: "Manga Tx.gg (unoriginal)",
-      baseUrl: "https://mangatx.gg",
-      lang: "en",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("mangatxgg", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "Manga-TX",
-      baseUrl: "https://manga-tx.com",
-      lang: "en",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("mangatxunoriginal", "en"),
-      dateFormat: "MMM d, yyyy",
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "MangaTyrant",
-      baseUrl: "https://mangatyrant.com",
-      lang: "en",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("mangatyrant", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "MangaUS",
-      baseUrl: "https://mangaus.xyz",
-      lang: "en",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("mangaus", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "Manga Weebs",
-      baseUrl: "https://mangaweebs.in",
-      lang: "en",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("mangaweebs", "en"),
-      dateFormat: "dd MMMM HH:mm",
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "Mangaxico",
-      baseUrl: "https://mangaxico.com",
-      lang: "es",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("mangaxico", "es"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: "es"),
-
-  Source(
-      name: "Manhua ES",
-      baseUrl: "https://manhuaaz.com",
-      lang: "en",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("manhuaes", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "ManhuaUS",
-      baseUrl: "https://manhuaus.com",
-      lang: "en",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("manhuaus", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "ManhuaZone",
-      baseUrl: "https://manhuazone.org",
-      lang: "en",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("manhuazone", "en"),
-      dateFormat: "MMM d, yyyy",
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "Manhua Zonghe",
-      baseUrl: "https://manhuazonghe.com",
-      lang: "en",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("manhuazonghe", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "Manhwa18.app",
-      baseUrl: "https://manhwa18.app",
-      lang: "en",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("manhwa18app", "en"),
-      dateFormat: "MMMM d, yyyy",
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "Manhwa18.org",
-      baseUrl: "https://manhwa18.org",
-      lang: "en",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("manhwa18org", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "Manhwa68",
-      baseUrl: "https://manhwa68.com",
-      lang: "en",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("manhwa68", "en"),
-      dateFormat: "MMM d, yyyy",
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "ManhwaClan",
-      baseUrl: "https://manhwaclan.com",
-      lang: "en",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("manhwaclan", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "Manhwafull",
-      baseUrl: "https://manhwafull.com",
-      lang: "en",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("manhwafull", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "Manhwahentai.me",
-      baseUrl: "https://manhwahentai.me",
-      lang: "en",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("manhwahentaime", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "ManhwaManhua",
-      baseUrl: "https://manhwamanhua.com",
-      lang: "en",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("manhwamanhua", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "ManhwaNew",
-      baseUrl: "https://manhwanew.com",
-      lang: "en",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("manhwanew", "en"),
-      dateFormat: "dd/MM/yyyy",
-      dateFormatLocale: "en"),
-
-  Source(
-      name: "AQUA Scans",
-      baseUrl: "https://aquascans.com",
-      lang: "en",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("manhwaworld", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "Mantraz Scan",
-      baseUrl: "https://mantrazscan.com",
-      lang: "es",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("mantrazscan", "es"),
-      dateFormat: "dd/MM/yyyy",
-      dateFormatLocale: "es"),
-
-  Source(
-      name: "Momo no Hana Scan",
-      baseUrl: "https://momonohanascan.com",
-      lang: "pt-BR",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("momonohanascan", "pt"),
-      dateFormat: "dd/MM/yyyy",
-      dateFormatLocale: "pt-br"),
-
-  Source(
-      name: "MonarcaManga",
-      baseUrl: "https://monarcamanga.com",
-      lang: "es",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("monarcamanga", "es"),
-      dateFormat: "MMM d, yyy",
-      dateFormatLocale: "es"),
-
-  Source(
-      name: "MoonLovers Scan",
-      baseUrl: "https://moonloversscan.com.br",
-      lang: "pt-BR",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("moonloversscan", "pt"),
-      dateFormat: "MMMMM dd, yyyy",
-      dateFormatLocale: "pt-br"),
-
-  Source(
-      name: "Moon Witch In Love",
-      baseUrl: "https://moonwitchinlovescan.com",
-      lang: "pt-BR",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("moonwitchinlove", "pt"),
-      dateFormat: "dd 'de' MMMMM 'de' yyyy",
-      dateFormatLocale: "pt-br"),
-
-  Source(
-      name: "MurimScan",
-      baseUrl: "https://murimscan.run",
-      lang: "en",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("murimscan", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "NekoPost.co (unoriginal)",
-      baseUrl: "https://www.nekopost.co",
-      lang: "th",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("nekopostco", "th"),
-      dateFormat: "d MMMM yyyy",
-      dateFormatLocale: "th"),
-
-  Source(
-      name: "Niji Translations",
-      baseUrl: "https://niji-translations.com",
-      lang: "ar",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("nijitranslations", "ar")),
-
-  Source(
-      name: "Pantheon Scan",
-      baseUrl: "https://pantheon-scan.com",
-      lang: "fr",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("pantheonscan", "fr"),
-      dateFormat: "d MMMM yyyy",
-      dateFormatLocale: "fr"),
-
-  Source(
-      name: "Paw Manga",
-      baseUrl: "https://pawmanga.com",
-      lang: "en",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("pawmanga", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "Pink Sea Unicorn",
-      baseUrl: "https://psunicorn.com",
-      lang: "pt-BR",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("pinkseaunicorn", "pt"),
-      dateFormat: "MMMMM dd, yyyy",
-      dateFormatLocale: "pt-br"),
-
-  Source(
-      name: "Pojok Manga",
-      baseUrl: "https://pojokmanga.net",
-      lang: "id",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("pojokmanga", "id"),
-      dateFormat: "MMM dd, yyyy",
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "Portal Yaoi",
-      baseUrl: "https://portalyaoi.com",
-      lang: "pt-BR",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("portalyaoi", "pt"),
-      dateFormat: "dd/MM/yyyy",
-      dateFormatLocale: "pt-br"),
-
-  Source(
-      name: "Prisma Hentais",
-      baseUrl: "https://prismahentai.com",
-      lang: "pt-BR",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("prismahentais", "pt"),
-      dateFormat: "dd 'de' MMMMM 'de' yyyy",
-      dateFormatLocale: "pt-br"),
-
-  Source(
-      name: "Projeto Scanlator",
-      baseUrl: "https://projetoscanlator.com",
-      lang: "pt-BR",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("projetoscanlator", "pt"),
-      dateFormat: "dd/MM/yyyy",
-      dateFormatLocale: "pt-br"),
-
-  Source(
-      name: "Ragnarok Scanlation",
-      baseUrl: "https://ragnarokscanlation.com",
-      lang: "es",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("ragnarokscanlation", "es"),
-      dateFormat: "MMMM d, yyyy",
-      dateFormatLocale: "es"),
-
-  Source(
-      name: "Rainbow Fairy Scan",
-      baseUrl: "https://rainbowfairyscan.com",
-      lang: "pt-BR",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("rainbowfairyscan", "pt"),
-      dateFormat: "dd/MM/yyyy",
-      dateFormatLocale: "pt-br"),
-
-  Source(
-      name: "Random Scan",
-      baseUrl: "https://randomscanlators.net",
-      lang: "pt-BR",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("randomscan", "pt"),
-      dateFormat: "MMMMM dd, yyyy",
-      dateFormatLocale: "pt-br"),
-
-  Source(
-      name: "ReaderGen",
-      baseUrl: "https://fr.readergen.fr",
-      lang: "fr",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("readergen", "fr"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "RichtoScan",
-      baseUrl: "https://richtoscan.com",
-      lang: "es",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("richtoscan", "es"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: "es"),
-
-  Source(
-      name: "Rightdark Scan",
-      baseUrl: "https://rightdark-scan.com",
-      lang: "es",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("rightdarkscan", "es"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: "es"),
-
-  Source(
-      name: "S2Manga",
-      baseUrl: "https://www.s2manga.com",
-      lang: "en",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("s2manga", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "SamuraiScan",
-      baseUrl: "https://samuraiscan.com",
-      lang: "es",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("samuraiscan", "es"),
-      dateFormat: "MMMM d, yyyy",
-      dateFormatLocale: "es"),
-
-  Source(
-      name: "ScamberTraslator",
-      baseUrl: "https://scambertraslator.com",
-      lang: "es",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("scambertraslator", "es"),
-      dateFormat: "dd/MM/yyyy",
-      dateFormatLocale: "es"),
-
-  Source(
-      name: "Scantrad-VF",
-      baseUrl: "https://scantrad-vf.co",
-      lang: "fr",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("scantradvf", "fr"),
-      dateFormat: "d MMMM yyyy",
-      dateFormatLocale: "fr"),
-
-  Source(
-      name: "Shadowtrad",
-      baseUrl: "https://shadowtrad.net",
-      lang: "fr",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("shadowtrad", "fr"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: "fr"),
-
-  Source(
-      name: "Shiba Manga",
-      baseUrl: "https://shibamanga.com",
-      lang: "en",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("shibamanga", "en"),
-      dateFormat: "MM/dd/yyyy",
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "Sinensis Scan",
-      baseUrl: "https://sinensisscan.net",
-      lang: "pt-BR",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("sinensis", "pt"),
-      dateFormat: "dd/MM/yyyy",
-      dateFormatLocale: "pt-br"),
-
-  Source(
-      name: "Sweet Time Scan",
-      baseUrl: "https://sweetscan.net",
-      lang: "pt-BR",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("sweettimescan", "pt"),
-      dateFormat: "MMMMM dd, yyyy",
-      dateFormatLocale: "pt-br"),
-
-  Source(
-      name: "Taberu Mangás",
-      baseUrl: "https://taberu.org",
-      lang: "pt-BR",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("taberumangas", "pt"),
-      dateFormat: "dd/MM/yyyy",
-      dateFormatLocale: "pt-br"),
-
-  Source(
-      name: "Tankou Hentai",
-      baseUrl: "https://tankouhentai.com",
-      lang: "pt-BR",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("tankouhentai", "pt"),
-      dateFormat: "dd 'de' MMMMM 'de' YYYY",
-      dateFormatLocale: "pt-br"),
-
-  Source(
-      name: "The Beginning After The End",
-      baseUrl: "https://www.thebeginningaftertheend.fr",
-      lang: "fr",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("thebeginningaftertheend", "fr"),
-      dateFormat: "MMMMM dd, yyyy",
-      dateFormatLocale: "fr"),
-
-  Source(
-      name: "Toonizy",
-      baseUrl: "https://toonizy.com",
-      lang: "en",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("toonizy", "en"),
-      dateFormat: "MMM d, yy",
-      dateFormatLocale: "en"),
-
-  Source(
-      name: "Valkyrie Scan",
-      baseUrl: "https://valkyriescan.com",
-      lang: "pt-BR",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("valkyriescan", "pt"),
-      dateFormat: "dd/MM/yyyy",
-      dateFormatLocale: "pt-br"),
-
-  Source(
-      name: "Ver Manhwas",
-      baseUrl: "https://vermanhwa.es",
-      lang: "es",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("vermanhwas", "es"),
-      dateFormat: "MMMM d, yyyy",
-      dateFormatLocale: "es"),
-
-  Source(
-      name: "VinManga",
-      baseUrl: "https://vinload.com",
-      lang: "en",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("vinmanga", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale),
-
-  Source(
-      name: "Wicked Witch Scan",
-      baseUrl: "https://wickedwitchscan.com",
-      lang: "pt-BR",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("wickedwitchscan", "pt"),
-      dateFormat: "MMMMM dd, yyyy",
-      dateFormatLocale: "pt-br"),
-
-  Source(
-      name: "Winter Scan",
-      baseUrl: "https://winterscan.com",
-      lang: "pt-BR",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("winterscan", "pt"),
-      dateFormat: "dd 'de' MMMM 'de' yyyy",
-      dateFormatLocale: "pt-br"),
-
-  Source(
-      name: "Wonderland Scan",
-      baseUrl: "https://wonderlandscan.com",
-      lang: "pt-BR",
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("wonderlandscan", "pt"),
-      dateFormat: "dd/MM/yyyy",
-      dateFormatLocale: "pt-br"),
-
-  Source(
-      name: "YANP Fansub",
-      baseUrl: "https://yanpfansub.com",
-      lang: "pt-BR",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("yanpfansub", "pt"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: "pt-br"),
-
-  Source(
-      name: "Yaoi Comics",
-      baseUrl: "https://ycscan.com",
-      lang: "pt-BR",
-      isNsfw: true,
-      typeSource: "madara",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl,
-      iconUrl: getIconUrl("yaoicomics", "pt"),
-      dateFormat: "dd 'de' MMMMM 'de' yyyy",
-      dateFormatLocale: "pt-br"),
-
-  //
-
-  Source(
-      name: "AstralManga",
-      baseUrl: "https://astral-manga.fr",
-      lang: "fr",
-      typeSource: "madara",
-      iconUrl: getIconUrl("astralmanga", "fr"),
-      dateFormat: "dd/mm/yyyy",
-      dateFormatLocale: "fr",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl),
-  Source(
-      name: "Akuma no Tenshi",
-      baseUrl: "https://akumanotenshi.com",
-      lang: "pt-BR",
-      typeSource: "madara",
-      iconUrl: getIconUrl("akumanotenshi", "pt"),
-      dateFormat: "dd/MM/yyyy",
-      dateFormatLocale: "pt-BR",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl),
-  Source(
-      name: "Adult Webtoon",
-      baseUrl: "https://adultwebtoon.com",
-      lang: "en",
-      typeSource: "madara",
-      iconUrl: getIconUrl("adultwebtoon", "en"),
-      isNsfw: true,
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale,
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl),
-  Source(
-      name: "ArazNovel",
-      baseUrl: "https://www.araznovel.com",
-      lang: "tr",
-      typeSource: "madara",
-      iconUrl: getIconUrl("araznovel", "tr"),
-      dateFormat: "d MMMM yyyy",
-      dateFormatLocale: "en",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl),
-  Source(
-      name: "BestManga",
-      baseUrl: "https://bestmanga.club",
-      lang: "ru",
-      typeSource: "madara",
-      iconUrl: getIconUrl("bestmanga", "ru"),
-      dateFormat: "dd.MM.yyyy",
-      dateFormatLocale: "ru",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl),
-  Source(
-      name: "Chibi Manga",
-      baseUrl: "https://www.cmreader.info",
-      lang: "en",
-      typeSource: "madara",
-      iconUrl: getIconUrl("chibimanga", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale,
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl),
-  Source(
-      name: "EvaScans",
-      baseUrl: "https://evascans.com",
-      lang: "tr",
-      typeSource: "madara",
-      iconUrl: getIconUrl("evascans", "tr"),
-      dateFormat: "MMM d, yyy",
-      dateFormatLocale: "tr",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl),
-  Source(
-      name: "Final Scans",
-      baseUrl: "https://finalscans.com",
-      lang: "pt-br",
-      typeSource: "madara",
-      iconUrl: getIconUrl("finalscans", "pt"),
-      isNsfw: true,
-      dateFormat: "MMMM d, yyyy",
-      dateFormatLocale: "pt-BR",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl),
-  Source(
-      name: "FR-Scan",
-      baseUrl: "https://fr-scan.com",
-      lang: "fr",
-      typeSource: "madara",
-      iconUrl: getIconUrl("frscan", "fr"),
-      dateFormat: "MMMM d, yyyy",
-      dateFormatLocale: "fr",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl),
-  Source(
-      name: "Glory Manga",
-      baseUrl: "https://glorymanga.com",
-      lang: "tr",
-      typeSource: "madara",
-      iconUrl: getIconUrl("glorymanga", "tr"),
-      dateFormat: "dd/MM/yyy",
-      dateFormatLocale: "tr",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl),
-  Source(
-      name: "Its Your Right Manhua",
-      baseUrl: "https://itsyourightmanhua.com/",
-      lang: "en",
-      typeSource: "madara",
-      iconUrl: getIconUrl("", ""),
-      dateFormat: "MMMM d, yyyy",
-      dateFormatLocale: defaultDateFormatLocale,
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl),
-  Source(
-      name: "Kami Sama Explorer",
-      baseUrl: "https://leitor.kamisama.com.br",
-      lang: "pt-br",
-      typeSource: "madara",
-      iconUrl: getIconUrl("kamisamaexplorer", "pt"),
-      dateFormat: "dd 'de' MMMM 'de' yyyy",
-      dateFormatLocale: "pt-BR",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl),
-  Source(
-      name: "KSGroupScans",
-      baseUrl: "https://ksgroupscans.com",
-      lang: "en",
-      typeSource: "madara",
-      iconUrl: getIconUrl("ksgroupscans", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale,
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl),
-  Source(
-      name: "LHTranslation",
-      baseUrl: "https://lhtranslation.net",
-      lang: "en",
-      typeSource: "madara",
-      iconUrl: getIconUrl("lhtranslation", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale,
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl),
-  Source(
-      name: "Lolicon",
-      baseUrl: "https://lolicon.mobi",
-      lang: "en",
-      isNsfw: true,
-      typeSource: "madara",
-      iconUrl: getIconUrl("lolicon", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale,
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl),
-  Source(
-      name: "MangaVisa",
-      baseUrl: "https://mangavisa.com",
-      lang: "en",
-      typeSource: "madara",
-      iconUrl: getIconUrl("", ""),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale,
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl),
-  Source(
-      name: "Manga District",
-      baseUrl: "https://mangadistrict.com",
-      lang: "en",
-      typeSource: "madara",
-      iconUrl: getIconUrl("mangadistrict", "en"),
-      isNsfw: true,
-      dateFormat: "MMMM d, yyyy",
-      dateFormatLocale: defaultDateFormatLocale,
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl),
-  Source(
-      name: "MangaFreak.online",
-      baseUrl: "https://mangafreak.online",
-      lang: "en",
-      typeSource: "madara",
-      iconUrl: getIconUrl("mangafreakonline", "en"),
-      dateFormat: "d MMMM، yyy",
-      dateFormatLocale: defaultDateFormatLocale,
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl),
-  Source(
-      name: "MangaGreat",
-      baseUrl: "https://mangagreat.com",
-      lang: "en",
-      typeSource: "madara",
-      iconUrl: getIconUrl("mangagreat", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale,
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl),
-  Source(
-      name: "Manga Read",
-      baseUrl: "https://mangaread.co",
-      lang: "en",
-      typeSource: "madara",
-      iconUrl: getIconUrl("mangaread", "en"),
-      dateFormat: "yyyy-MM-dd",
-      dateFormatLocale: defaultDateFormatLocale,
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl),
-  Source(
-      name: "MangaRolls",
-      baseUrl: "https://mangarolls.com",
-      lang: "en",
-      typeSource: "madara",
-      iconUrl: getIconUrl("mangarolls", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale,
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl),
-  Source(
-      name: "Manga Şehri",
-      baseUrl: "https://mangasehri.com",
-      lang: "tr",
-      typeSource: "madara",
-      iconUrl: getIconUrl("mangasehri", "tr"),
-      dateFormat: "dd/MM/yyy",
-      dateFormatLocale: "tr",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl),
-  Source(
-      name: "Mangasushi",
-      baseUrl: "https://mangasushi.org",
-      lang: "en",
-      typeSource: "madara",
-      iconUrl: getIconUrl("mangasushi", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale,
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl),
-  Source(
-      name: "Manhwa68",
-      baseUrl: "https://manhwa68.com",
-      lang: "en",
-      isNsfw: true,
-      typeSource: "madara",
-      iconUrl: getIconUrl("manhwa68", "en"),
-      dateFormat: "MMMM d, yyyy",
-      dateFormatLocale: defaultDateFormatLocale,
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl),
-  Source(
-      name: "Milftoon",
-      baseUrl: "https://milftoon.xxx",
-      lang: "en",
-      isNsfw: true,
-      typeSource: "madara",
-      iconUrl: getIconUrl("milftoon", "en"),
-      dateFormat: "d MMMM, yyyy",
-      dateFormatLocale: defaultDateFormatLocale,
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl),
-  Source(
-      name: "NovelCrow",
-      baseUrl: "https://novelcrow.com",
-      lang: "en",
-      typeSource: "madara",
-      iconUrl: getIconUrl("novelcrow", "en"),
-      isNsfw: true,
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale,
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl),
-  Source(
-      name: "Rio2 Manga",
-      baseUrl: "https://rio2manga.com",
-      lang: "en",
-      typeSource: "madara",
-      iconUrl: getIconUrl("rio2manga", "en"),
-      dateFormat: defaultDateFormat,
-      dateFormatLocale: defaultDateFormatLocale,
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl),
-  Source(
-      name: "Romantik Manga",
-      baseUrl: "https://romantikmanga.com",
-      lang: "tr",
-      typeSource: "madara",
-      iconUrl: getIconUrl("romantikmanga", "tr"),
-      dateFormat: "MMM d, yyy",
-      dateFormatLocale: "tr",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl),
-  Source(
-      name: "Taurus Fansub",
-      baseUrl: "https://taurusfansub.com",
-      lang: "es",
-      typeSource: "madara",
-      iconUrl: getIconUrl("taurusfansub", "es"),
-      dateFormat: "dd/MM/yyy",
-      dateFormatLocale: "es",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl),
-  Source(
-      name: "Tatakae Scan",
-      baseUrl: "https://tatakaescan.com",
-      lang: "pt-BR",
-      typeSource: "madara",
-      iconUrl: getIconUrl("tatakaescan", "pt"),
-      dateFormat: "dd 'de' MMMMM 'de' yyyy",
-      dateFormatLocale: "pt-BR",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl),
-  Source(
-      name: "Tortuga Ceviri",
-      baseUrl: "https://tortuga-ceviri.com",
-      lang: "tr",
-      typeSource: "madara",
-      iconUrl: getIconUrl("tortugaceviri", "tr"),
-      dateFormat: "MMMM d, yyyy",
-      dateFormatLocale: "tr",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl),
-  Source(
-      name: "Yuri Verso",
-      baseUrl: "https://yuri.live",
-      lang: "pt-br",
-      typeSource: "madara",
-      iconUrl: getIconUrl("yuriverso", "pt"),
-      dateFormat: "dd/MM/yyyy",
-      dateFormatLocale: "pt-BR",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl),
-  Source(
-      name: "Zero Scan",
-      baseUrl: "https://zeroscan.com.br",
-      lang: "pt-br",
-      isNsfw: true,
-      typeSource: "madara",
-      iconUrl: getIconUrl("zeroscan", "pt"),
-      dateFormat: "dd/MM/yyyy",
-      dateFormatLocale: "pt-BR",
-      version: madaraVersion,
-      sourceCodeUrl: madaraSourceCodeUrl),
-];
+//1st Kiss-Manga (unoriginal) (EN)
+  firstkissdashmangaSource,
+//1st Manhwa (EN)
+  firstmanhwaSource,
+//AQUA Scans (EN)
+  manhwaworldSource,
+//Adult Webtoon (EN)
+  adultwebtoonSource,
+//Akuma no Tenshi (PT-BR)
+  akumanotenshiSource,
+//Anikiga (TR)
+  anikigaSource,
+//ApollComics (ES)
+  apollcomicsSource,
+//Apolltoons (ES)
+  apolltoonsSource,
+//ArazNovel (TR)
+  araznovelSource,
+//Arthur Scan (PT-BR)
+  arthurscanSource,
+//AstralManga (FR)
+  astralmangaSource,
+//Asura Scans.us (unoriginal) (EN)
+  asurascansusSource,
+//Banana Manga (EN)
+  bananamangaSource,
+//BarManga (ES)
+  barmangaSource,
+//BestManga (RU)
+  bestmangaSource,
+//BirdToon (ID)
+  birdtoonSource,
+//Cerise Scan (PT-BR)
+  cerisescansSource,
+//Chibi Manga (EN)
+  chibimangaSource,
+//Clover Manga (TR)
+  clovermangaSource,
+//Coco Rip (ES)
+  cocoripSource,
+//Coffee Manga (EN)
+  coffeemangaSource,
+//Comicz.net v2 (ALL)
+  comicznetv2Source,
+//Decadence Scans (EN)
+  decadencescansSource,
+//Dessert Scan (PT-BR)
+  dessertscanSource,
+//Doodmanga (TH)
+  doodmangaSource,
+//Elite Manga (EN)
+  elitemangaSource,
+//Emperor Scan (ES)
+  emperorscanSource,
+//EvaScans (TR)
+  evascansSource,
+//FR-Scan (FR)
+  frscanSource,
+//FactManga (EN)
+  factmangaSource,
+//Final Scans (PT-BR)
+  finalscansSource,
+//Flex Tape Scans (EN)
+  flextapescansSource,
+//Free Manga (EN)
+  freemangaSource,
+//FreeMangaTop (EN)
+  freemangatopSource,
+//Ghost Scan (PT-BR)
+  ghostscanSource,
+//Girls Love Manga! (EN)
+  girlslovemangaSource,
+//Glory Manga (TR)
+  glorymangaSource,
+//Goof Fansub (PT-BR)
+  gooffansubSource,
+//HM2D (EN)
+  hm2dSource,
+//Harimanga (EN)
+  harimangaSource,
+//Hentai CB (VI)
+  hentaicubeSource,
+//Hentai Manga (EN)
+  hentaimangaSource,
+//Hentai Teca (PT-BR)
+  hentaitecaSource,
+//Hentai3z (EN)
+  hentai3zSource,
+//HentaiWebtoon (EN)
+  hentaiwebtoonSource,
+//HentaiXComic (EN)
+  hentaixcomicSource,
+//HentaiXYuri (EN)
+  hentaixyuriSource,
+//HentaiZone (FR)
+  hentaizoneSource,
+//HipercooL (PT-BR)
+  hipercoolSource,
+//Hiperdex (EN)
+  hiperdexSource,
+//Immortal Updates (EN)
+  immortalupdatesSource,
+//Império Scans (PT-BR)
+  imperioscansSource,
+//Inmortal Scan (ES)
+  inmortalscanSource,
+//IsekaiScanManga (unoriginal) (EN)
+  isekaiscanmangaSource,
+//Its Your Right Manhua (EN)
+  itsyourrightmanhuaSource,
+//Jiangzaitoon (TR)
+  jiangzaitoonSource,
+//Jimanga (EN)
+  jimangaSource,
+//KSGroupScans (EN)
+  ksgroupscansSource,
+//Kakusei Project (PT-BR)
+  kakuseiprojectSource,
+//Kami Sama Explorer (PT-BR)
+  kamisamaexplorerSource,
+//Komik Chan (EN)
+  komikchanSource,
+//LHTranslation (EN)
+  lhtranslationSource,
+//Lady Estelar Scan (PT-BR)
+  ladyestelarscanSource,
+//Leviatan Scans (EN)
+  leviatanscansSource,
+//Link Start Scan (PT-BR)
+  linkstartscanSource,
+//Lolicon (EN)
+  loliconSource,
+//Luffy Manga (EN)
+  luffymangaSource,
+//Maid Scan (PT-BR)
+  maidscanSource,
+//Manga 18h (EN)
+  manga18hSource,
+//Manga Bee (EN)
+  mangabeeSource,
+//Manga District (EN)
+  mangadistrictSource,
+//Manga Diyari (TR)
+  mangadiyariSource,
+//Manga Fenix (ES)
+  mangafenixSource,
+//Manga Galaxy (EN)
+  mangagalaxySource,
+//Manga Queen.com (EN)
+  mangaqueencomSource,
+//Manga Read (EN)
+  mangareadSource,
+//Manga Tx.gg (unoriginal) (EN)
+  mangatxggSource,
+//Manga Weebs (EN)
+  mangaweebsSource,
+//Manga Şehri (TR)
+  mangasehriSource,
+//Manga-TX (EN)
+  mangatxunoriginalSource,
+//MangaClash (EN)
+  mangaclashSource,
+//MangaFreak.online (EN)
+  mangafreakonlineSource,
+//MangaGo Yaoi (EN)
+  mangagoyaoiSource,
+//MangaGreat (EN)
+  mangagreatSource,
+//MangaKomi (EN)
+  mangakomiSource,
+//MangaOwl.one (unoriginal) (EN)
+  mangaowloneSource,
+//MangaPure (EN)
+  mangapureSource,
+//MangaRead.org (EN)
+  mangareadorgSource,
+//MangaRolls (EN)
+  mangarollsSource,
+//MangaRuby.com (EN)
+  mangarubycomSource,
+//MangaTyrant (EN)
+  mangatyrantSource,
+//MangaUS (EN)
+  mangausSource,
+//MangaVisa (EN)
+  mangavisaSource,
+//Mangaland (ES)
+  mangalandSource,
+//Mangaryu (EN)
+  mangaryuSource,
+//Mangas Origines (FR)
+  mangasoriginesSource,
+//Mangasushi (EN)
+  mangasushiSource,
+//Mangaxico (ES)
+  mangaxicoSource,
+//Mangá Nanquim (PT-BR)
+  mangananquimSource,
+//Manhua ES (EN)
+  manhuaesSource,
+//Manhua Zonghe (EN)
+  manhuazongheSource,
+//ManhuaUS (EN)
+  manhuausSource,
+//ManhuaZone (EN)
+  manhuazoneSource,
+//Manhwa18.app (EN)
+  manhwa18appSource,
+//Manhwa18.org (EN)
+  manhwa18orgSource,
+//Manhwa68 (EN)
+  manhwa68Source,
+//ManhwaClan (EN)
+  manhwaclanSource,
+//ManhwaManhua (EN)
+  manhwamanhuaSource,
+//ManhwaNew (EN)
+  manhwanewSource,
+//Manhwafull (EN)
+  manhwafullSource,
+//Manhwahentai.me (EN)
+  manhwahentaimeSource,
+//Mantraz Scan (ES)
+  mantrazscanSource,
+//Milftoon (EN)
+  milftoonSource,
+//Momo no Hana Scan (PT-BR)
+  momonohanascanSource,
+//MonarcaManga (ES)
+  monarcamangaSource,
+//Moon Witch In Love (PT-BR)
+  moonwitchinloveSource,
+//MoonLovers Scan (PT-BR)
+  moonloversscanSource,
+//MurimScan (EN)
+  murimscanSource,
+//NekoPost.co (unoriginal) (TH)
+  nekopostcoSource,
+//Niji Translations (AR)
+  nijitranslationsSource,
+//NovelCrow (EN)
+  novelcrowSource,
+//Pantheon Scan (FR)
+  pantheonscanSource,
+//Paw Manga (EN)
+  pawmangaSource,
+//Pink Sea Unicorn (PT-BR)
+  pinkseaunicornSource,
+//Pojok Manga (ID)
+  pojokmangaSource,
+//Portal Yaoi (PT-BR)
+  portalyaoiSource,
+//Prisma Hentais (PT-BR)
+  prismahentaisSource,
+//Projeto Scanlator (PT-BR)
+  projetoscanlatorSource,
+//ROG Mangás (PT-BR)
+  mangasoverallSource,
+//Ragnarok Scanlation (ES)
+  ragnarokscanlationSource,
+//Rainbow Fairy Scan (PT-BR)
+  rainbowfairyscanSource,
+//Random Scan (PT-BR)
+  randomscanSource,
+//ReaderGen (FR)
+  readergenSource,
+//RichtoScan (ES)
+  richtoscanSource,
+//Rightdark Scan (ES)
+  rightdarkscanSource,
+//Rio2 Manga (EN)
+  rio2mangaSource,
+//Romantik Manga (TR)
+  romantikmangaSource,
+//S2Manga (EN)
+  s2mangaSource,
+//SamuraiScan (ES)
+  samuraiscanSource,
+//ScamberTraslator (ES)
+  scambertraslatorSource,
+//Scantrad-VF (FR)
+  scantradvfSource,
+//Shadowtrad (FR)
+  shadowtradSource,
+//Shiba Manga (EN)
+  shibamangaSource,
+//Sinensis Scan (PT-BR)
+  sinensisSource,
+//Sweet Time Scan (PT-BR)
+  sweettimescanSource,
+//Taberu Mangás (PT-BR)
+  taberumangasSource,
+//Tankou Hentai (PT-BR)
+  tankouhentaiSource,
+//Tatakae Scan (PT-BR)
+  tatakaescanSource,
+//Taurus Fansub (ES)
+  taurusfansubSource,
+//The Beginning After The End (FR)
+  thebeginningaftertheendSource,
+//Toonizy (EN)
+  toonizySource,
+//Tortuga Ceviri (TR)
+  tortugaceviriSource,
+//Valkyrie Scan (PT-BR)
+  valkyriescanSource,
+//Ver Manhwas (ES)
+  vermanhwasSource,
+//VinManga (EN)
+  vinmangaSource,
+//Wicked Witch Scan (PT-BR)
+  wickedwitchscanSource,
+//Winter Scan (PT-BR)
+  winterscanSource,
+//Wonderland Scan (PT-BR)
+  wonderlandscanSource,
+//YANP Fansub (PT-BR)
+  yanpfansubSource,
+//Yaoi Comics (PT-BR)
+  yaoicomicsSource,
+//Yuri Verso (PT-BR)
+  yuriversoSource,
+//Zero Scan (PT-BR)
+  zeroscanSource,
+//فالكون مانجا (AR)
+  falconmangaSource,
+//كوميك العرب (AR)
+  comicarabSource,
+//مانجا العاشق (AR)
+  manga3asqSource,
+//巴卡漫画 (ZH)
+  bakamhSource
+]
+    .map((e) => e
+      ..sourceCodeUrl = madaraSourceCodeUrl
+      ..version = madaraVersion)
+    .toList();

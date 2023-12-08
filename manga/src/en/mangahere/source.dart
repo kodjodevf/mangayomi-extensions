@@ -1,18 +1,18 @@
 import '../../../../model/source.dart';
-import '../../../../utils/utils.dart';
 
 Source get mangahereSource => _mangahereSource;
-const mangahereVersion = "0.0.4";
-const mangahereSourceCodeUrl =
-    "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/src/en/mangahere/mangahere-v$mangahereVersion.dart";
+const _mangahereVersion = "0.0.4";
+const _mangahereSourceCodeUrl =
+    "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/src/en/mangahere/mangahere-v$_mangahereVersion.dart";
 Source _mangahereSource = Source(
   name: "MangaHere",
   baseUrl: "http://www.mangahere.cc",
   lang: "en",
   typeSource: "single",
-  iconUrl: getIconUrl("mangahere", "en"),
-  sourceCodeUrl: mangahereSourceCodeUrl,
-  version: mangahereVersion,
+  iconUrl:
+      "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/src/en/mangahere/icon.png",
+  sourceCodeUrl: _mangahereSourceCodeUrl,
+  version: _mangahereVersion,
   dateFormat: "MMM dd,yyyy",
   dateFormatLocale: "en",
 );

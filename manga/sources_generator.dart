@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-
 import '../model/source.dart';
 import 'multisrc/heancms/sources.dart';
 import 'multisrc/madara/sources.dart';
@@ -14,19 +13,19 @@ import 'src/all/mangadex/sources.dart';
 import 'src/en/mangahere/source.dart';
 
 void main() {
-  List<Source> _sourcesList = [
+  List<Source> sourcesList = [
     ...madaraSourcesList,
     ...comickSourcesList,
     ...mangaDexSourcesList,
     ...mangareaderSourcesList,
     ...mmrcmsSourcesList,
-    ...heanCmsSourcesList,
+    ...heancmsSourcesList,
     mangahereSource,
     ...batotoSourcesList,
     ...nepnepSourcesList
   ];
   final List<Map<String, dynamic>> jsonList =
-      _sourcesList.map((source) => source.toJson()).toList();
+      sourcesList.map((source) => source.toJson()).toList();
   final jsonString = jsonEncode(jsonList);
 
   final file = File('index.json');

@@ -1,16 +1,16 @@
 import '../../../../model/source.dart';
-import '../../../../utils/utils.dart';
 
 Source get okanimeSource => _okanimeSource;
-const okanimeVersion = "0.0.3";
-const okanimeSourceCodeUrl =
-    "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/anime/src/ar/okanime/okanime-v$okanimeVersion.dart";
+const _okanimeVersion = "0.0.3";
+const _okanimeSourceCodeUrl =
+    "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/anime/src/ar/okanime/okanime-v$_okanimeVersion.dart";
 Source _okanimeSource = Source(
     name: "Okanime",
     baseUrl: "https://www.okanime.xyz",
     lang: "ar",
     typeSource: "single",
-    iconUrl: getIconUrl("okanime", "ar"),
-    sourceCodeUrl: okanimeSourceCodeUrl,
-    version: okanimeVersion,
+    iconUrl:
+        "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/anime/src/ar/okanime/icon.png",
+    sourceCodeUrl: _okanimeSourceCodeUrl,
+    version: _okanimeVersion,
     isManga: false);
