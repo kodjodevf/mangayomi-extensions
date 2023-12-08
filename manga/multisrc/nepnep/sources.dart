@@ -3,7 +3,7 @@ import '../../../model/source.dart';
 import 'src/mangasee/mangasee.dart';
 import 'src/mangalife/mangalife.dart';
 
-const nepnepVersion = "0.0.4";
+const nepnepVersion = "0.0.45";
 const nepnepSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/nepnep/nepnep-v$nepnepVersion.dart";
 
