@@ -1,15 +1,15 @@
 import '../../../../model/source.dart';
-import '../../../../utils/utils.dart';
 
-const apiUrl = 'https://api.mangadex.org';
-const baseUrl = 'https://mangadex.org';
-const isNsfw = true;
-const mangadexVersion = "0.0.5";
-const mangadexSourceCodeUrl =
-    "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/src/all/mangadex/mangadex-v$mangadexVersion.dart";
-String _iconUrl = getIconUrl("mangadex", "all");
+const _apiUrl = 'https://api.mangadex.org';
+const _baseUrl = 'https://mangadex.org';
+const _isNsfw = true;
+const _mangadexVersion = "0.0.5";
+const _mangadexSourceCodeUrl =
+    "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/src/all/mangadex/mangadex-v$_mangadexVersion.dart";
+String _iconUrl =
+    "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/src/all/mangadex/icon.png";
 
-final languages = [
+final _languages = [
   "ar",
   "bn",
   "bg",
@@ -58,17 +58,17 @@ final languages = [
 ];
 
 List<Source> get mangaDexSourcesList => _mangaDexSourcesList;
-List<Source> _mangaDexSourcesList = languages
+List<Source> _mangaDexSourcesList = _languages
     .map((e) => Source(
         name: 'MangaDex',
-        apiUrl: apiUrl,
-        baseUrl: baseUrl,
+        apiUrl: _apiUrl,
+        baseUrl: _baseUrl,
         lang: e,
         typeSource: "mangadex",
         iconUrl: _iconUrl,
         dateFormat: "yyyy-MM-dd'T'HH:mm:ss+SSS",
-        isNsfw: isNsfw,
+        isNsfw: _isNsfw,
         dateFormatLocale: 'en_Us',
-        version: mangadexVersion,
-        sourceCodeUrl: mangadexSourceCodeUrl))
+        version: _mangadexVersion,
+        sourceCodeUrl: _mangadexSourceCodeUrl))
     .toList();

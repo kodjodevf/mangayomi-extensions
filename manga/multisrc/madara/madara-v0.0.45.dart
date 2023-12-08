@@ -321,7 +321,7 @@ class Madara extends MProvider {
         .first;
     final imgs = querySelectorAll(pagesSelectorRes,
         selector: "img", typeElement: 2, attributes: "", typeRegExp: 2);
-    var pageUrls = [];
+    List<String> pageUrls = [];
 
     if (imgs.length == 1) {
       final pages = querySelectorAll(res,

@@ -1,0 +1,14 @@
+import '../../../../../model/source.dart';
+
+  Source get sushiscanSource => _sushiscanSource;
+            
+  Source _sushiscanSource = Source(
+    name: "Sushi-Scan",
+    baseUrl: "https://sushiscan.net",
+    lang: "fr",
+    isNsfw:true,
+    typeSource: "mangareader",
+    iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/mangareader/src/sushiscan/icon.png",
+    dateFormat:"MMMM dd, yyyy",
+    dateFormatLocale:"fr",
+  );
