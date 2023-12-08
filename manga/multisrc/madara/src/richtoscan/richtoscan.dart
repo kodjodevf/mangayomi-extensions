@@ -1,0 +1,14 @@
+import '../../../../../model/source.dart';
+
+  Source get richtoscanSource => _richtoscanSource;
+            
+  Source _richtoscanSource = Source(
+    name: "RichtoScan",
+    baseUrl: "https://richtoscan.com",
+    lang: "es",
+    isNsfw:true,
+    typeSource: "madara",
+    iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/richtoscan/icon.png",
+    dateFormat:"MMMM dd, yyyy",
+    dateFormatLocale:"es",
+  );

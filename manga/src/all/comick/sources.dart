@@ -1,16 +1,16 @@
 import '../../../../model/source.dart';
-import '../../../../utils/utils.dart';
 
-const comickVersion = "0.0.4";
-const comickSourceCodeUrl =
-    "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/src/all/comick/comick-v$comickVersion.dart";
+const _comickVersion = "0.0.4";
+const _comickSourceCodeUrl =
+    "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/src/all/comick/comick-v$_comickVersion.dart";
 
-String iconUrl = getIconUrl("comickfun", "all");
-const apiUrl = 'https://api.comick.fun';
-const baseUrl = 'https://comick.app';
-const isNsfw = true;
+String _iconUrl =
+    "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/src/all/comick/icon.png";
+const _apiUrl = 'https://api.comick.fun';
+const _baseUrl = 'https://comick.app';
+const _isNsfw = true;
 
-List<String> languages = [
+List<String> _languages = [
   "all",
   "en",
   "pt-br",
@@ -55,17 +55,17 @@ List<String> languages = [
 ];
 
 List<Source> get comickSourcesList => _comickSourcesList;
-List<Source> _comickSourcesList = languages
+List<Source> _comickSourcesList = _languages
     .map((e) => Source(
         name: 'Comick',
-        apiUrl: apiUrl,
-        baseUrl: baseUrl,
+        apiUrl: _apiUrl,
+        baseUrl: _baseUrl,
         lang: e,
         typeSource: "comick",
-        iconUrl: iconUrl,
+        iconUrl: _iconUrl,
         dateFormat: "yyyy-MM-dd'T'HH:mm:ss'Z'",
-        isNsfw: isNsfw,
+        isNsfw: _isNsfw,
         dateFormatLocale: "en",
-        version: comickVersion,
-        sourceCodeUrl: comickSourceCodeUrl))
+        version: _comickVersion,
+        sourceCodeUrl: _comickSourceCodeUrl))
     .toList();

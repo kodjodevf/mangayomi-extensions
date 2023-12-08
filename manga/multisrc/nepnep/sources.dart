@@ -1,36 +1,20 @@
 import '../../../model/source.dart';
-import '../../../utils/utils.dart';
+
+import 'src/mangasee/mangasee.dart';
+import 'src/mangalife/mangalife.dart';
 
 const nepnepVersion = "0.0.4";
 const nepnepSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/nepnep/nepnep-v$nepnepVersion.dart";
-const defaultDateFormat = "yyyy-MM-dd HH:mm:ss";
-const defaultDateFormatLocale = "en";
 
 List<Source> get nepnepSourcesList => _nepnepSourcesList;
 List<Source> _nepnepSourcesList = [
-  Source(
-    name: "MangaSee",
-    baseUrl: "https://mangasee123.com",
-    lang: "en",
-    typeSource: "nepnep",
-    iconUrl: getIconUrl("mangasee", "en"),
-    isFullData: true,
-    dateFormat: defaultDateFormat,
-    dateFormatLocale: defaultDateFormatLocale,
-    version: nepnepVersion,
-    sourceCodeUrl: nepnepSourceCodeUrl,
-  ),
-  Source(
-    name: "MangaLife",
-    baseUrl: "https://manga4life.com",
-    lang: "en",
-    typeSource: "nepnep",
-    iconUrl: getIconUrl("mangalife", "en"),
-    isFullData: true,
-    dateFormat: defaultDateFormat,
-    dateFormatLocale: defaultDateFormatLocale,
-    version: nepnepVersion,
-    sourceCodeUrl: nepnepSourceCodeUrl,
-  ),
-];
+//MangaSee (EN)
+  mangaseeSource,
+//MangaLife (EN)
+  mangalifeSource,
+]
+    .map((e) => e
+      ..sourceCodeUrl = nepnepSourceCodeUrl
+      ..version = nepnepVersion)
+    .toList();
