@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Flex Tape Scans",
     baseUrl: "https://flextapescans.com",
     lang: "en",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/flextapescans/icon.png",
     dateFormat:"MM/dd/yyy",

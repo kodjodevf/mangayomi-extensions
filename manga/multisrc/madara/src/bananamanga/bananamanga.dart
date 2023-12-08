@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Banana Manga",
     baseUrl: "https://bananamanga.net",
     lang: "en",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/bananamanga/icon.png",
     dateFormat:"MMMM dd, yyyy",

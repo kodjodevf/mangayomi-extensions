@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Ghost Scan",
     baseUrl: "https://ghostscan.com.br",
     lang: "pt-BR",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/ghostscan/icon.png",
     dateFormat:"dd 'de' MMMMM 'de' yyyy",

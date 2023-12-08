@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Taurus Fansub",
     baseUrl: "https://taurusfansub.com",
     lang: "es",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/taurusfansub/icon.png",
     dateFormat:"dd/MM/yyy",

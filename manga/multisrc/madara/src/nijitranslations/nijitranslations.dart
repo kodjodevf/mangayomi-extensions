@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Niji Translations",
     baseUrl: "https://niji-translations.com",
     lang: "ar",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/nijitranslations/icon.png",
     

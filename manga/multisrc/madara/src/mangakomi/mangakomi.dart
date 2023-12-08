@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "MangaKomi",
     baseUrl: "https://mangakomi.io",
     lang: "en",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/mangakomi/icon.png",
     dateFormat:"MMMM dd, yyyy",

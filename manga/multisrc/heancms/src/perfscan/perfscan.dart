@@ -7,7 +7,6 @@ Source _perfscanSource = Source(
   baseUrl: "https://perf-scan.fr",
   apiUrl: "https://api.perf-scan.fr",
   lang: "fr",
-  isNsfw: true,
   typeSource: "heancms",
   iconUrl:
       "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/heancms/src/perfscan/icon.png",

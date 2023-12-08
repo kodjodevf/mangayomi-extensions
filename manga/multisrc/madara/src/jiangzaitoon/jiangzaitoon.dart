@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Jiangzaitoon",
     baseUrl: "https://jiangzaitoon.cc",
     lang: "tr",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/jiangzaitoon/icon.png",
     dateFormat:"d MMM yyy",

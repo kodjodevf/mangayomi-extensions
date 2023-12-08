@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Projeto Scanlator",
     baseUrl: "https://projetoscanlator.com",
     lang: "pt-BR",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/projetoscanlator/icon.png",
     dateFormat:"dd/MM/yyyy",

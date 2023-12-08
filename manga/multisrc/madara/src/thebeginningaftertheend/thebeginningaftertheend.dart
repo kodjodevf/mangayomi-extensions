@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "The Beginning After The End",
     baseUrl: "https://www.thebeginningaftertheend.fr",
     lang: "fr",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/thebeginningaftertheend/icon.png",
     dateFormat:"MMMMM dd, yyyy",

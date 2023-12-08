@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Yuri Verso",
     baseUrl: "https://yuri.live",
     lang: "pt-br",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/yuriverso/icon.png",
     dateFormat:"dd/MM/yyyy",

@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Anikiga",
     baseUrl: "https://anikiga.com",
     lang: "tr",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/anikiga/icon.png",
     dateFormat:"d MMMMM yyyy",

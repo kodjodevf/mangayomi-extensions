@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "MangaRuby.com",
     baseUrl: "https://mangaruby.com",
     lang: "en",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/mangarubycom/icon.png",
     dateFormat:"MMMM dd, yyyy",

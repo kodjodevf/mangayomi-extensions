@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Portal Yaoi",
     baseUrl: "https://portalyaoi.com",
     lang: "pt-BR",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/portalyaoi/icon.png",
     dateFormat:"dd/MM/yyyy",

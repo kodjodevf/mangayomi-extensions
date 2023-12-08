@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Glory Manga",
     baseUrl: "https://glorymanga.com",
     lang: "tr",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/glorymanga/icon.png",
     dateFormat:"dd/MM/yyy",

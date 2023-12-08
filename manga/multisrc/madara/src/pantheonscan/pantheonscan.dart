@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Pantheon Scan",
     baseUrl: "https://pantheon-scan.com",
     lang: "fr",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/pantheonscan/icon.png",
     dateFormat:"d MMMM yyyy",

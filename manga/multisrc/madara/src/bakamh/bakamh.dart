@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "巴卡漫画",
     baseUrl: "https://bakamh.com",
     lang: "zh",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/bakamh/icon.png",
     

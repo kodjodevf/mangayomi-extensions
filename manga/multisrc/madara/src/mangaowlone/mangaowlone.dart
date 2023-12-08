@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "MangaOwl.one (unoriginal)",
     baseUrl: "https://mangaowl.one",
     lang: "en",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/mangaowlone/icon.png",
     dateFormat:"MMMM dd, yyyy",

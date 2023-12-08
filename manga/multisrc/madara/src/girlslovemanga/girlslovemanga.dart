@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Girls Love Manga!",
     baseUrl: "https://glmanga.com",
     lang: "en",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/girlslovemanga/icon.png",
     dateFormat:"MMMM dd, yyyy",

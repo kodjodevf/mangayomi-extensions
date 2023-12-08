@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Manga Queen.com",
     baseUrl: "https://mangaqueen.com",
     lang: "en",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/mangaqueencom/icon.png",
     dateFormat:"MMMM dd, yyyy",

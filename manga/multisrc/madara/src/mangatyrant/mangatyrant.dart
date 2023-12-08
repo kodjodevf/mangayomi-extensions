@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "MangaTyrant",
     baseUrl: "https://mangatyrant.com",
     lang: "en",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/mangatyrant/icon.png",
     dateFormat:"MMMM dd, yyyy",

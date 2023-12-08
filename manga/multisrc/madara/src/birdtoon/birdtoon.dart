@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "BirdToon",
     baseUrl: "https://birdtoon.net",
     lang: "id",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/birdtoon/icon.png",
     dateFormat:"MMMM dd, yyyy",

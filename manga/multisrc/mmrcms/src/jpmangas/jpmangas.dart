@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Jpmangas",
     baseUrl: "https://jpmangas.cc",
     lang: "fr",
-    isNsfw:true,
+    
     typeSource: "mmrcms",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/mmrcms/src/jpmangas/icon.png",
     dateFormat:"d MMM. yyyy",

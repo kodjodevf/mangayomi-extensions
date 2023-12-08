@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "كوميك العرب",
     baseUrl: "https://comicarab.com",
     lang: "ar",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/comicarab/icon.png",
     

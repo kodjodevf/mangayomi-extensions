@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Hiperdex",
     baseUrl: "https://hiperdex.com",
     lang: "en",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/hiperdex/icon.png",
     dateFormat:"MMMM dd, yyyy",

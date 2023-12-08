@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Manga Tx.gg (unoriginal)",
     baseUrl: "https://mangatx.gg",
     lang: "en",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/mangatxgg/icon.png",
     dateFormat:"MMMM dd, yyyy",

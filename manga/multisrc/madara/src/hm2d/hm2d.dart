@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "HM2D",
     baseUrl: "https://mangadistrict.com/hdoujin",
     lang: "en",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/hm2d/icon.png",
     dateFormat:"MMM d, yyyy",

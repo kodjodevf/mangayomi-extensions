@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "HentaiWebtoon",
     baseUrl: "https://hentaiwebtoon.com",
     lang: "en",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/hentaiwebtoon/icon.png",
     dateFormat:"MMMM dd, yyyy",

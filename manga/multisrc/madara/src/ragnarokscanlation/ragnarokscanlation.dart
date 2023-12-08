@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Ragnarok Scanlation",
     baseUrl: "https://ragnarokscanlation.com",
     lang: "es",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/ragnarokscanlation/icon.png",
     dateFormat:"MMMM d, yyyy",

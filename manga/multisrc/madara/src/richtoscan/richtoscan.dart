@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "RichtoScan",
     baseUrl: "https://richtoscan.com",
     lang: "es",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/richtoscan/icon.png",
     dateFormat:"MMMM dd, yyyy",

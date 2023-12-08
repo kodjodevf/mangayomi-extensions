@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Mangaryu",
     baseUrl: "https://mangaryu.com",
     lang: "en",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/mangaryu/icon.png",
     dateFormat:"MMMM dd, yyyy",

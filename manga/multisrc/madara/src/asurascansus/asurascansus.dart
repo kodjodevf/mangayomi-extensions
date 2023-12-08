@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Asura Scans.us (unoriginal)",
     baseUrl: "https://asurascans.us",
     lang: "en",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/asurascansus/icon.png",
     dateFormat:"MMMM dd, yyyy",

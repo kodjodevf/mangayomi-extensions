@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "VinManga",
     baseUrl: "https://vinload.com",
     lang: "en",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/vinmanga/icon.png",
     dateFormat:"MMMM dd, yyyy",

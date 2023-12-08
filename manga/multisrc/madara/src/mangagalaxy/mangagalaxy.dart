@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Manga Galaxy",
     baseUrl: "https://mangagalaxy.me",
     lang: "en",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/mangagalaxy/icon.png",
     dateFormat:"MM/dd/yyyy",

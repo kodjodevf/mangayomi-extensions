@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Link Start Scan",
     baseUrl: "https://www.linkstartscan.xyz",
     lang: "pt-BR",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/linkstartscan/icon.png",
     dateFormat:"dd/MM/yyyy",

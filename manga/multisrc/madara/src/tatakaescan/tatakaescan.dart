@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Tatakae Scan",
     baseUrl: "https://tatakaescan.com",
     lang: "pt-BR",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/tatakaescan/icon.png",
     dateFormat:"dd 'de' MMMMM 'de' yyyy",

@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "LHTranslation",
     baseUrl: "https://lhtranslation.net",
     lang: "en",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/lhtranslation/icon.png",
     dateFormat:"MMMM dd, yyyy",

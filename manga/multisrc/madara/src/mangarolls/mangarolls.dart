@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "MangaRolls",
     baseUrl: "https://mangarolls.com",
     lang: "en",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/mangarolls/icon.png",
     dateFormat:"MMMM dd, yyyy",

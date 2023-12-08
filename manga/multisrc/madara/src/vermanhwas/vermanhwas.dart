@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Ver Manhwas",
     baseUrl: "https://vermanhwa.es",
     lang: "es",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/vermanhwas/icon.png",
     dateFormat:"MMMM d, yyyy",

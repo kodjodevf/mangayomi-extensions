@@ -1,14 +1,14 @@
 import '../../../../../model/source.dart';
 
-  Source get cosmicscansidSource => _cosmicscansidSource;
-            
-  Source _cosmicscansidSource = Source(
-    name: "CosmicScans.id",
-    baseUrl: "https://cosmicscans.id",
-    lang: "id",
-    isNsfw:true,
-    typeSource: "mangareader",
-    iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/mangareader/src/cosmicscansid/icon.png",
-    dateFormat:"MMMM dd, yyyy",
-    dateFormatLocale:"en_us",
-  );
+Source get cosmicscansidSource => _cosmicscansidSource;
+
+Source _cosmicscansidSource = Source(
+  name: "CosmicScans.id",
+  baseUrl: "https://cosmicscans.id",
+  lang: "id",
+  typeSource: "mangareader",
+  iconUrl:
+      "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/mangareader/src/cosmicscansid/icon.png",
+  dateFormat: "MMMM dd, yyyy",
+  dateFormatLocale: "en_us",
+);

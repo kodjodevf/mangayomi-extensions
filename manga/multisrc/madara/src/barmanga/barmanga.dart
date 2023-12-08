@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "BarManga",
     baseUrl: "https://barmanga.com",
     lang: "es",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/barmanga/icon.png",
     dateFormat:"MM/dd/yyyy",

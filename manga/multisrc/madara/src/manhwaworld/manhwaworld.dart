@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "AQUA Scans",
     baseUrl: "https://aquascans.com",
     lang: "en",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/manhwaworld/icon.png",
     dateFormat:"MMMM dd, yyyy",

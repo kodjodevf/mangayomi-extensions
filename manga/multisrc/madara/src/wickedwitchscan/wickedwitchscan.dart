@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Wicked Witch Scan",
     baseUrl: "https://wickedwitchscan.com",
     lang: "pt-BR",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/wickedwitchscan/icon.png",
     dateFormat:"MMMMM dd, yyyy",

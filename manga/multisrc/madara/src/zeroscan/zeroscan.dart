@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Zero Scan",
     baseUrl: "https://zeroscan.com.br",
     lang: "pt-br",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/zeroscan/icon.png",
     dateFormat:"dd/MM/yyyy",

@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Lelscan-VF",
     baseUrl: "https://www.lelscanvf.cc/",
     lang: "fr",
-    isNsfw:true,
+    
     typeSource: "mmrcms",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/mmrcms/src/lelscanvf/icon.png",
     dateFormat:"d MMM. yyyy",

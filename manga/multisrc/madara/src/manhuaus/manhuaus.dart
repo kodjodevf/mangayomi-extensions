@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "ManhuaUS",
     baseUrl: "https://manhuaus.com",
     lang: "en",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/manhuaus/icon.png",
     dateFormat:"MMMM dd, yyyy",

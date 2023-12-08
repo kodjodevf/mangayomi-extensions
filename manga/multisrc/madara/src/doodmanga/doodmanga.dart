@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Doodmanga",
     baseUrl: "https://www.doodmanga.com",
     lang: "th",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/doodmanga/icon.png",
     dateFormat:"dd MMMMM yyyy",

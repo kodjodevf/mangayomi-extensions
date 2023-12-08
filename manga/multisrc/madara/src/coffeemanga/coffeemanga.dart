@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Coffee Manga",
     baseUrl: "https://coffeemanga.io",
     lang: "en",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/coffeemanga/icon.png",
     dateFormat:"MMMM dd, yyyy",

@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "FR-Scan",
     baseUrl: "https://fr-scan.com",
     lang: "fr",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/frscan/icon.png",
     dateFormat:"MMMM d, yyyy",

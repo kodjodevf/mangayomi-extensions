@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Winter Scan",
     baseUrl: "https://winterscan.com",
     lang: "pt-BR",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/winterscan/icon.png",
     dateFormat:"dd 'de' MMMM 'de' yyyy",

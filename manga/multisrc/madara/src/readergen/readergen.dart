@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "ReaderGen",
     baseUrl: "https://fr.readergen.fr",
     lang: "fr",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/readergen/icon.png",
     dateFormat:"MMMM dd, yyyy",

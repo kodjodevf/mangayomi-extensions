@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Pojok Manga",
     baseUrl: "https://pojokmanga.net",
     lang: "id",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/pojokmanga/icon.png",
     dateFormat:"MMM dd, yyyy",

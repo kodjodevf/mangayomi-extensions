@@ -6,7 +6,6 @@ import '../../../../../model/source.dart';
     name: "Raiki Scan",
     baseUrl: "https://raikiscan.com",
     lang: "es",
-    isNsfw:true,
     typeSource: "mangareader",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/mangareader/src/raikiscan/icon.png",
     dateFormat:"MMMM dd, yyyy",

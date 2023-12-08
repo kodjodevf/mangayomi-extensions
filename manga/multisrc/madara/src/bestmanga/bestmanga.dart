@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "BestManga",
     baseUrl: "https://bestmanga.club",
     lang: "ru",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/bestmanga/icon.png",
     dateFormat:"dd.MM.yyyy",

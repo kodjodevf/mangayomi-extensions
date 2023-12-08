@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "MangaClash",
     baseUrl: "https://mangaclash.com",
     lang: "en",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/mangaclash/icon.png",
     dateFormat:"MM/dd/yy",

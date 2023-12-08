@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "AstralManga",
     baseUrl: "https://astral-manga.fr",
     lang: "fr",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/astralmanga/icon.png",
     dateFormat:"dd/mm/yyyy",

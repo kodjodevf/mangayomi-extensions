@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Harimanga",
     baseUrl: "https://harimanga.com",
     lang: "en",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/harimanga/icon.png",
     dateFormat:"MMMM dd, yyyy",

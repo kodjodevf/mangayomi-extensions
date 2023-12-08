@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Manga Diyari",
     baseUrl: "https://manga-diyari.com",
     lang: "tr",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/mangadiyari/icon.png",
     dateFormat:"MMM dd, yyyy",

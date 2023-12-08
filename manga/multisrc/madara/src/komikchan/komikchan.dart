@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Komik Chan",
     baseUrl: "https://komikchan.com",
     lang: "en",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/komikchan/icon.png",
     dateFormat:"MMMM dd, yyyy",

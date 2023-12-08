@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "KSGroupScans",
     baseUrl: "https://ksgroupscans.com",
     lang: "en",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/ksgroupscans/icon.png",
     dateFormat:"MMMM dd, yyyy",

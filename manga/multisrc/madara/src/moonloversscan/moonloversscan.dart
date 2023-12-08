@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "MoonLovers Scan",
     baseUrl: "https://moonloversscan.com.br",
     lang: "pt-BR",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/moonloversscan/icon.png",
     dateFormat:"MMMMM dd, yyyy",

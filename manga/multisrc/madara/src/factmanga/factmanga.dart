@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "FactManga",
     baseUrl: "https://factmanga.com",
     lang: "en",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/factmanga/icon.png",
     dateFormat:"MMMM dd, yyyy",

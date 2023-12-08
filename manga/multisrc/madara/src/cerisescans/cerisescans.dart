@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Cerise Scan",
     baseUrl: "https://cerisescan.com",
     lang: "pt-BR",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/cerisescans/icon.png",
     dateFormat:"dd 'de' MMMMM 'de' yyyy",

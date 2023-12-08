@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "ApollComics",
     baseUrl: "https://apollcomics.xyz",
     lang: "es",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/apollcomics/icon.png",
     dateFormat:"dd MMMM, yyyy",
