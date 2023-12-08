@@ -166,7 +166,7 @@ import 'src/comicarab/comicarab.dart';
 import 'src/manga3asq/manga3asq.dart';
 import 'src/bakamh/bakamh.dart';
 
-const madaraVersion = "0.0.45";
+const madaraVersion = "0.0.5";
 const madaraSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/madara-v$madaraVersion.dart";
 

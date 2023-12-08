@@ -1,7 +1,7 @@
 import '../../../../model/source.dart';
 
 Source get animesaturn => _animesaturn;
-const _animesaturnVersion = "0.0.1";
+const _animesaturnVersion = "0.0.15";
 const _animesaturnCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/anime/src/it/animesaturn/animesaturn-v$_animesaturnVersion.dart";
 Source _animesaturn = Source(

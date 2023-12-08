@@ -1,7 +1,7 @@
 import '../../../../model/source.dart';
 
 Source get animesultraSource => _animesultraSource;
-const _animesultraVersion = "0.0.4";
+const _animesultraVersion = "0.0.45";
 const _animesultraSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/anime/src/fr/animesultra/animesultra-v$_animesultraVersion.dart";
 Source _animesultraSource = Source(

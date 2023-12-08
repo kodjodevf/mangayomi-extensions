@@ -1,7 +1,7 @@
 import '../../../../model/source.dart';
 
 Source get okanimeSource => _okanimeSource;
-const _okanimeVersion = "0.0.3";
+const _okanimeVersion = "0.0.35";
 const _okanimeSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/anime/src/ar/okanime/okanime-v$_okanimeVersion.dart";
 Source _okanimeSource = Source(
