@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Manhwa18.app",
     baseUrl: "https://manhwa18.app",
     lang: "en",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/manhwa18app/icon.png",
     dateFormat:"MMMM d, yyyy",

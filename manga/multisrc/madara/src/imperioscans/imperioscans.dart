@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Império Scans",
     baseUrl: "https://imperioscans.com.br",
     lang: "pt-BR",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/imperioscans/icon.png",
     dateFormat:"dd/MM/yyyy",

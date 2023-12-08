@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Final Scans",
     baseUrl: "https://finalscans.com",
     lang: "pt-br",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/finalscans/icon.png",
     dateFormat:"MMMM d, yyyy",

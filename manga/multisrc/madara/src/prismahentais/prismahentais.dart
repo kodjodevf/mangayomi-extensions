@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Prisma Hentais",
     baseUrl: "https://prismahentai.com",
     lang: "pt-BR",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/prismahentais/icon.png",
     dateFormat:"dd 'de' MMMMM 'de' yyyy",

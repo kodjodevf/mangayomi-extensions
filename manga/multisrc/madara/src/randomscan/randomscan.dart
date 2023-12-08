@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Random Scan",
     baseUrl: "https://randomscanlators.net",
     lang: "pt-BR",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/randomscan/icon.png",
     dateFormat:"MMMMM dd, yyyy",

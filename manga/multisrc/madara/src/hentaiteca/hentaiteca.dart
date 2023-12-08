@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Hentai Teca",
     baseUrl: "https://hentaiteca.net",
     lang: "pt-BR",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/hentaiteca/icon.png",
     dateFormat:"MMMMM dd, yyyy",

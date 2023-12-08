@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Maid Scan",
     baseUrl: "https://maidscan.com.br",
     lang: "pt-BR",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/maidscan/icon.png",
     dateFormat:"dd 'de' MMMMM 'de' yyyy",

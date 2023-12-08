@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Mangas Origines",
     baseUrl: "https://mangas-origines.xyz",
     lang: "fr",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/mangasorigines/icon.png",
     dateFormat:"MMMM d, yyyy",

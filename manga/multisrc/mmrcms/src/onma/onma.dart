@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "مانجا اون لاين",
     baseUrl: "https://onma.top",
     lang: "ar",
-    isNsfw:true,
+    
     typeSource: "mmrcms",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/mmrcms/src/onma/icon.png",
     dateFormat:"d MMM. yyyy",

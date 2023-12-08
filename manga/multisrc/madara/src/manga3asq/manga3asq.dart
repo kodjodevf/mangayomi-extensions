@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "مانجا العاشق",
     baseUrl: "https://3asq.org",
     lang: "ar",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/manga3asq/icon.png",
     

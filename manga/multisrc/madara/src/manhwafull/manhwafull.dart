@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Manhwafull",
     baseUrl: "https://manhwafull.com",
     lang: "en",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/manhwafull/icon.png",
     dateFormat:"MMMM dd, yyyy",

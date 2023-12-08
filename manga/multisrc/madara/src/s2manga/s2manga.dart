@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "S2Manga",
     baseUrl: "https://www.s2manga.com",
     lang: "en",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/s2manga/icon.png",
     dateFormat:"MMMM dd, yyyy",

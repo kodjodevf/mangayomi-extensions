@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Manga Weebs",
     baseUrl: "https://mangaweebs.in",
     lang: "en",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/mangaweebs/icon.png",
     dateFormat:"dd MMMM HH:mm",

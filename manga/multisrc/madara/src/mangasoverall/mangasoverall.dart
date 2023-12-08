@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "ROG Mangás",
     baseUrl: "https://rogmangas.com",
     lang: "pt-BR",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/mangasoverall/icon.png",
     dateFormat:"dd/MM/yyyy",

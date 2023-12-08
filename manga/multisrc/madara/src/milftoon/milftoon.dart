@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Milftoon",
     baseUrl: "https://milftoon.xxx",
     lang: "en",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/milftoon/icon.png",
     dateFormat:"d MMMM, yyyy",

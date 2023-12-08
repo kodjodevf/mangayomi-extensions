@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Scan VF",
     baseUrl: "https://www.scan-vf.net",
     lang: "fr",
-    isNsfw:true,
+    
     typeSource: "mmrcms",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/mmrcms/src/scanvf/icon.png",
     dateFormat:"d MMM. yyyy",

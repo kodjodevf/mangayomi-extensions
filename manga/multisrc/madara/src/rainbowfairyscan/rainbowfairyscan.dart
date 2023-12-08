@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Rainbow Fairy Scan",
     baseUrl: "https://rainbowfairyscan.com",
     lang: "pt-BR",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/rainbowfairyscan/icon.png",
     dateFormat:"dd/MM/yyyy",

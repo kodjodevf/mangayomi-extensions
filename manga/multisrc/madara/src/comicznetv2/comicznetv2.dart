@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Comicz.net v2",
     baseUrl: "https://v2.comiz.net",
     lang: "all",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/comicznetv2/icon.png",
     dateFormat:"MMMM dd, yyyy",

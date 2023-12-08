@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Manga Read",
     baseUrl: "https://mangaread.co",
     lang: "en",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/mangaread/icon.png",
     dateFormat:"yyyy-MM-dd",

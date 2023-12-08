@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Mangasushi",
     baseUrl: "https://mangasushi.org",
     lang: "en",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/mangasushi/icon.png",
     dateFormat:"MMMM dd, yyyy",

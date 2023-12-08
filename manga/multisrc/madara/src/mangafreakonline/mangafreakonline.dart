@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "MangaFreak.online",
     baseUrl: "https://mangafreak.online",
     lang: "en",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/mangafreakonline/icon.png",
     dateFormat:"d MMMM، yyy",

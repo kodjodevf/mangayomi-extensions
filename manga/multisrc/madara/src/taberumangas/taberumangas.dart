@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Taberu Mangás",
     baseUrl: "https://taberu.org",
     lang: "pt-BR",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/taberumangas/icon.png",
     dateFormat:"dd/MM/yyyy",

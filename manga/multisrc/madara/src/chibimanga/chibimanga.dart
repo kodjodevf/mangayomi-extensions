@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Chibi Manga",
     baseUrl: "https://www.cmreader.info",
     lang: "en",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/chibimanga/icon.png",
     dateFormat:"MMMM dd, yyyy",

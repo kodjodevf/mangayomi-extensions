@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "EvaScans",
     baseUrl: "https://evascans.com",
     lang: "tr",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/evascans/icon.png",
     dateFormat:"MMM d, yyy",

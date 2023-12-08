@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "ScamberTraslator",
     baseUrl: "https://scambertraslator.com",
     lang: "es",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/scambertraslator/icon.png",
     dateFormat:"dd/MM/yyyy",

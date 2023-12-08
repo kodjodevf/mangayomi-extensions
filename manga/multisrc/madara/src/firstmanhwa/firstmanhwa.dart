@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "1st Manhwa",
     baseUrl: "https://1stmanhwa.com",
     lang: "en",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/firstmanhwa/icon.png",
     dateFormat:"MMMM dd, yyyy",

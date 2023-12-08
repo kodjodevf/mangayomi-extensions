@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "HipercooL",
     baseUrl: "https://hipercool.xyz",
     lang: "pt-BR",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/hipercool/icon.png",
     dateFormat:"MMMM dd, yyyy",

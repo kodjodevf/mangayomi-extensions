@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Toonizy",
     baseUrl: "https://toonizy.com",
     lang: "en",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/toonizy/icon.png",
     dateFormat:"MMM d, yy",

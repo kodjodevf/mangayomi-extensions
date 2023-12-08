@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Sinensis Scan",
     baseUrl: "https://sinensisscan.net",
     lang: "pt-BR",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/sinensis/icon.png",
     dateFormat:"dd/MM/yyyy",

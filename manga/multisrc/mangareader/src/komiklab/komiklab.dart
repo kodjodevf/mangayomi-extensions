@@ -7,7 +7,6 @@ Source _komiklabSource = Source(
     name: "KomikLab Scans",
     baseUrl: "https://komiklab.com",
     lang: "en",
-    isNsfw: true,
     typeSource: "mangareader",
     iconUrl:
         "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/mangareader/src/komiklab/icon.png",

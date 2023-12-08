@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Manga Fenix",
     baseUrl: "https://manhua-fenix.com",
     lang: "es",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/mangafenix/icon.png",
     dateFormat:"dd MMMM, yyyy",

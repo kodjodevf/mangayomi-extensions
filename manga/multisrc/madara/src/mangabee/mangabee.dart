@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Manga Bee",
     baseUrl: "https://mangabee.net",
     lang: "en",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/mangabee/icon.png",
     dateFormat:"MM/dd/yyyy",

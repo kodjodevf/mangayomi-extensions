@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Lolicon",
     baseUrl: "https://lolicon.mobi",
     lang: "en",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/lolicon/icon.png",
     dateFormat:"MMMM dd, yyyy",

@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Goof Fansub",
     baseUrl: "https://gooffansub.com",
     lang: "pt-BR",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/gooffansub/icon.png",
     dateFormat:"dd/MM/yyy",

@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Free Manga",
     baseUrl: "https://freemanga.me",
     lang: "en",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/freemanga/icon.png",
     dateFormat:"MMMM dd, yyyy",

@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Arthur Scan",
     baseUrl: "https://arthurscan.xyz",
     lang: "pt-BR",
-    isNsfw:true,
+    
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/arthurscan/icon.png",
     dateFormat:"MMMMM dd, yyyy",

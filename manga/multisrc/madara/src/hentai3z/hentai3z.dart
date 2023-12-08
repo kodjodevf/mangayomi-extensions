@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Hentai3z",
     baseUrl: "https://hentai3z.xyz",
     lang: "en",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/hentai3z/icon.png",
     dateFormat:"MMMM dd, yyyy",

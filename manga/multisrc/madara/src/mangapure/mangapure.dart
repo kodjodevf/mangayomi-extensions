@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "MangaPure",
     baseUrl: "https://mangapure.net",
     lang: "en",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/mangapure/icon.png",
     dateFormat:"MMM dd, HH:mm",

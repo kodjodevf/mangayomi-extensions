@@ -6,7 +6,6 @@ import '../../../../../model/source.dart';
     name: "Sushi-Scans",
     baseUrl: "https://sushiscan.fr",
     lang: "fr",
-    isNsfw:true,
     typeSource: "mangareader",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/mangareader/src/sushiscans/icon.png",
     dateFormat:"MMMM d, yyyy",

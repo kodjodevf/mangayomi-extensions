@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "Valkyrie Scan",
     baseUrl: "https://valkyriescan.com",
     lang: "pt-BR",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/valkyriescan/icon.png",
     dateFormat:"dd/MM/yyyy",

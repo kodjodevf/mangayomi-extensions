@@ -6,7 +6,7 @@ import '../../../../../model/source.dart';
     name: "NovelCrow",
     baseUrl: "https://novelcrow.com",
     lang: "en",
-    
+    isNsfw:true,
     typeSource: "madara",
     iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/novelcrow/icon.png",
     dateFormat:"MMMM dd, yyyy",
