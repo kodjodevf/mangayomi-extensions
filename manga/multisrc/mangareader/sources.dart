@@ -25,7 +25,6 @@ import 'src/mangawt/mangawt.dart';
 import 'src/manhwax/manhwax.dart';
 import 'src/melokomik/melokomik.dart';
 import 'src/mihentai/mihentai.dart';
-import 'src/mundomangakun/mundomangakun.dart';
 import 'src/origamiorpheans/origamiorpheans.dart';
 import 'src/phenixscans/phenixscans.dart';
 import 'src/piscans/piscans.dart';
@@ -99,8 +98,6 @@ List<Source> _mangareaderSourcesList = [
   melokomikSource,
 //Mihentai (ALL)
   mihentaiSource,
-//Mundo Mangá-Kun (PT-BR)
-  mundomangakunSource,
 //Origami Orpheans (PT-BR)
   origamiorpheansSource,
 //PhenixScans (FR)
