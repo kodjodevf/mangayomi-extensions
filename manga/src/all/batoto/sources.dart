@@ -1,15 +1,15 @@
 import '../../../../model/source.dart';
-import '../../../../utils/utils.dart';
 
-const batotoVersion = "0.0.45";
-const batotoSourceCodeUrl =
-    "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/src/all/batoto/batoto-v$batotoVersion.dart";
+const _batotoVersion = "0.0.45";
+const _batotoSourceCodeUrl =
+    "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/src/all/batoto/batoto-v$_batotoVersion.dart";
 
-String _iconUrl = getIconUrl("batoto", "all");
-const baseUrl = 'https://bato.to';
-const isNsfw = true;
+String _iconUrl =
+    "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/src/all/batoto/icon.png";
+const _baseUrl = 'https://bato.to';
+const _isNsfw = true;
 
-List<String> languages = [
+List<String> _languages = [
   "all",
   "en",
   "ar",
@@ -117,16 +117,16 @@ List<String> languages = [
 ];
 
 List<Source> get batotoSourcesList => _batotoSourcesList;
-List<Source> _batotoSourcesList = languages
+List<Source> _batotoSourcesList = _languages
     .map((e) => Source(
         name: 'Bato.to',
-        baseUrl: baseUrl,
+        baseUrl: _baseUrl,
         lang: e,
         typeSource: "bato.to",
         iconUrl: _iconUrl,
         dateFormat: "MMM dd,yyyy",
-        isNsfw: isNsfw,
+        isNsfw: _isNsfw,
         dateFormatLocale: "en",
-        version: batotoVersion,
-        sourceCodeUrl: batotoSourceCodeUrl))
+        version: _batotoVersion,
+        sourceCodeUrl: _batotoSourceCodeUrl))
     .toList();

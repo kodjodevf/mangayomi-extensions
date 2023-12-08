@@ -1,0 +1,14 @@
+import '../../../../../model/source.dart';
+
+  Source get apollcomicsSource => _apollcomicsSource;
+            
+  Source _apollcomicsSource = Source(
+    name: "ApollComics",
+    baseUrl: "https://apollcomics.xyz",
+    lang: "es",
+    
+    typeSource: "madara",
+    iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/apollcomics/icon.png",
+    dateFormat:"dd MMMM, yyyy",
+    dateFormatLocale:"es",
+  );

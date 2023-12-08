@@ -31,6 +31,8 @@ class Source {
 
   String? appMinVerReq;
 
+  String? additionalParams;
+
   Source(
       {this.id = null,
       this.name = "",
@@ -38,8 +40,8 @@ class Source {
       this.lang = "",
       this.typeSource = "",
       this.iconUrl = "",
-      this.dateFormat,
-      this.dateFormatLocale,
+      this.dateFormat = "",
+      this.dateFormatLocale = "",
       this.isNsfw = false,
       this.hasCloudflare = false,
       this.sourceCodeUrl = "",
@@ -47,7 +49,8 @@ class Source {
       this.version = "",
       this.isManga = true,
       this.isFullData = false,
-      this.appMinVerReq = "0.1.2"});
+      this.appMinVerReq = "0.1.2",
+      this.additionalParams = ""});
 
   Map<String, dynamic> toJson() {
     return {
@@ -66,7 +69,8 @@ class Source {
       "version": version,
       "isManga": isManga,
       "isFullData": isFullData,
-      "appMinVerReq": appMinVerReq
+      "appMinVerReq": appMinVerReq,
+      "additionalParams": additionalParams
     };
   }
 }

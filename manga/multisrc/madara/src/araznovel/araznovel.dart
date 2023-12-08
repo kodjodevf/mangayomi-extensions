@@ -1,0 +1,14 @@
+import '../../../../../model/source.dart';
+
+  Source get araznovelSource => _araznovelSource;
+            
+  Source _araznovelSource = Source(
+    name: "ArazNovel",
+    baseUrl: "https://www.araznovel.com",
+    lang: "tr",
+    isNsfw:true,
+    typeSource: "madara",
+    iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/araznovel/icon.png",
+    dateFormat:"d MMMM yyyy",
+    dateFormatLocale:"en",
+  );

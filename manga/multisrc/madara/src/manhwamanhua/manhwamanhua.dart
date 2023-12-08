@@ -1,0 +1,14 @@
+import '../../../../../model/source.dart';
+
+  Source get manhwamanhuaSource => _manhwamanhuaSource;
+            
+  Source _manhwamanhuaSource = Source(
+    name: "ManhwaManhua",
+    baseUrl: "https://manhwamanhua.com",
+    lang: "en",
+    
+    typeSource: "madara",
+    iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/manhwamanhua/icon.png",
+    dateFormat:"MMMM dd, yyyy",
+    dateFormatLocale:"en_us",
+  );
