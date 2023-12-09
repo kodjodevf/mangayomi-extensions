@@ -5,6 +5,7 @@ Source get aniwatchSource => _aniwatchSource;
 Source _aniwatchSource = Source(
   name: "AniWatch.to",
   baseUrl: "https://aniwatch.to",
+  isManga: false,
   lang: "en",
   typeSource: "zorotheme",
   iconUrl:
