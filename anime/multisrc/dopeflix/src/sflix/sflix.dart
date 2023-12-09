@@ -7,6 +7,7 @@ Source _sflixSource = Source(
   baseUrl: "https://sflix.to",
   lang: "en",
   typeSource: "dopeflix",
+  isManga: false,
   iconUrl:
       "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/anime/multisrc/dopeflix/src/sflix/icon.png",
 );
