@@ -16,7 +16,6 @@ import 'src/komikstation/komikstation.dart';
 import 'src/komikmama/komikmama.dart';
 import 'src/kumapoi/kumapoi.dart';
 import 'src/komikucom/komikucom.dart';
-import 'src/legacyscans/legacyscans.dart';
 import 'src/magusmanga/magusmanga.dart';
 import 'src/mangaindome/mangaindome.dart';
 import 'src/mangacim/mangacim.dart';
@@ -80,8 +79,6 @@ List<Source> _mangareaderSourcesList = [
   kumapoiSource,
 //Komiku.com (ID)
   komikucomSource,
-//Legacy Scans (FR)
-  legacyscansSource,
 //Magus Manga (AR)
   magusmangaSource,
 //Manga Indo.me (ID)
