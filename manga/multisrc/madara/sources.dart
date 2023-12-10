@@ -53,7 +53,6 @@ import 'src/immortalupdates/immortalupdates.dart';
 import 'src/imperioscans/imperioscans.dart';
 import 'src/inmortalscan/inmortalscan.dart';
 import 'src/isekaiscanmanga/isekaiscanmanga.dart';
-import 'src/itsyourrightmanhua/itsyourrightmanhua.dart';
 import 'src/jiangzaitoon/jiangzaitoon.dart';
 import 'src/jimanga/jimanga.dart';
 import 'src/ksgroupscans/ksgroupscans.dart';
@@ -91,7 +90,6 @@ import 'src/mangarolls/mangarolls.dart';
 import 'src/mangarubycom/mangarubycom.dart';
 import 'src/mangatyrant/mangatyrant.dart';
 import 'src/mangaus/mangaus.dart';
-import 'src/mangavisa/mangavisa.dart';
 import 'src/mangaland/mangaland.dart';
 import 'src/mangaryu/mangaryu.dart';
 import 'src/mangasorigines/mangasorigines.dart';
@@ -280,8 +278,6 @@ List<Source> _madaraSourcesList = [
   inmortalscanSource,
 //IsekaiScanManga (unoriginal) (EN)
   isekaiscanmangaSource,
-//Its Your Right Manhua (EN)
-  itsyourrightmanhuaSource,
 //Jiangzaitoon (TR)
   jiangzaitoonSource,
 //Jimanga (EN)
@@ -356,8 +352,6 @@ List<Source> _madaraSourcesList = [
   mangatyrantSource,
 //MangaUS (EN)
   mangausSource,
-//MangaVisa (EN)
-  mangavisaSource,
 //Mangaland (ES)
   mangalandSource,
 //Mangaryu (EN)
