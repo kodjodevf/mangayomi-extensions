@@ -3,6 +3,12 @@
 This repository contains the available extension catalogues for the [Mangayomi](https://github.com/kodjodevf/mangayomi) app.
 
 
+# Contributing
+
+Contributions are welcome!
+
+To get started with development, see [CONTRIBUTING.md](./CONTRIBUTING.md).
+
 ## License
 
     Copyright 2023 Moustapha Kodjo Amadou
