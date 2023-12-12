@@ -6,11 +6,8 @@ class OtakuFr extends MProvider {
 
   @override
   Future<MPages> getPopular(MSource source, int page) async {
-    final data = {
-      "url": "${source.baseUrl}/toute-la-liste-affiches/page/$page/?q=."
-    };
+    final data = {"url": "${source.baseUrl}/en-cours/page/$page"};
     final res = await http('GET', json.encode(data));
-
     List<MManga> animeList = [];
     final urls =
         xpath(res, '//*[@class="list"]/article/div/div/figure/a/@href');
@@ -285,7 +282,7 @@ class OtakuFr extends MProvider {
     return [
       ListPreference(
           key: "preferred_quality",
-          title: "Preferred Quality",
+          title: "Qualité préférée",
           summary: "",
           valueIndex: 1,
           entries: ["1080p", "720p", "480p", "360p"],
