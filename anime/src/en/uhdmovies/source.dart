@@ -5,7 +5,7 @@ const _uhdmoviesVersion = "0.0.1";
 const _uhdmoviesSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/anime/src/en/uhdmovies/uhdmovies-v$_uhdmoviesVersion.dart";
 Source _uhdmoviesSource = Source(
-    name: "uhdmovies",
+    name: "UHD Movies",
     baseUrl: "https://uhdmovies.zip",
     lang: "en",
     typeSource: "single",
