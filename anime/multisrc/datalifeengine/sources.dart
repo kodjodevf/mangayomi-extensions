@@ -1,5 +1,5 @@
 import '../../../model/source.dart';
-import '../../src/fr/franime/source.dart';
+import 'src/frenchanime/frenchanime-v0.0.1.dart';
 import 'src/wiflix/wiflix.dart';
 
 const _datalifeengineVersion = "0.0.1";
@@ -9,7 +9,7 @@ const _datalifeengineSourceCodeUrl =
 List<Source> get datalifeengineSourcesList => _datalifeengineSourcesList;
 List<Source> _datalifeengineSourcesList = [
 //French Anime (FR)
-  franimeSource,
+  frenchanimeSource,
 //Wiflix (FR)
   wiflixSource,
 ]
