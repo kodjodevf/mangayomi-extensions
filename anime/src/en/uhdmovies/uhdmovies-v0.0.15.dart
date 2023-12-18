@@ -52,11 +52,18 @@ class UHDMovies extends MProvider {
     }
     List<MChapter>? episodesList = [];
     if (!isSeries) {
-      final moviesTitles = xpath(res,
+      List<String> moviesTitles = [];
+      moviesTitles = xpath(res,
           '//*[contains(@style, "center") or contains(@class, "maxbutton")]/parent::p//preceding-sibling::p[contains(@style, "center")]/text()');
       List<String> titles = [];
+      if (moviesTitles.isEmpty) {
+        moviesTitles = xpath(res, '//p[contains(@style, "center")]/text()');
+      }
       for (var title in moviesTitles) {
-        if (title.isNotEmpty && !title.contains('Download')) {
+        if (title.isNotEmpty &&
+            !title.contains('Download') &&
+            !title.contains('Note:') &&
+            !title.contains('Copyright')) {
           titles.add(title.split('[').first.trim());
         }
       }
