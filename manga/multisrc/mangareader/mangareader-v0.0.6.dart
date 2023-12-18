@@ -127,9 +127,9 @@ class MangaReader extends MProvider {
         "hiatus": 2,
       }
     ];
-
+    url = Uri.parse(url).path;
     MManga manga = MManga();
-    final datas = {"url": url, "sourceId": source.id};
+    final datas = {"url": "${source.baseUrl}$url", "sourceId": source.id};
     final res = await http('GET', json.encode(datas));
 
     final author = xpath(
@@ -200,9 +200,20 @@ class MangaReader extends MProvider {
 
     List<String> pages = [];
     List<String> pagesUrl = [];
+    bool invalidImgs = false;
     pages = xpath(res, '//*[@id="readerarea"]/p/img/@src');
     if (pages.isEmpty || pages.length == 1) {
       pages = xpath(res, '//*[@id="readerarea"]/img/@src');
+    }
+    if (pages.length > 1) {
+      for (var page in pages) {
+        if (page.contains("data:image")) {
+          invalidImgs = true;
+        }
+      }
+      if (invalidImgs) {
+        pages = xpath(res, '//*[@id="readerarea"]/img/@data-src');
+      }
     }
     if (pages.isEmpty || pages.length == 1) {
       final images = regExp(res, "\"images\"\\s*:\\s*(\\[.*?])", "", 1, 1);
@@ -221,8 +232,19 @@ class MangaReader extends MProvider {
     List<MManga> mangaList = [];
     final urls = xpath(res, '//*[ @class="imgu"  or @class="bsx"]/a/@href');
     final names = xpath(res, '//*[ @class="imgu"  or @class="bsx"]/a/@title');
-    final images =
+    List<String> images = [];
+    images =
         xpath(res, '//*[ @class="imgu"  or @class="bsx"]/a/div[1]/img/@src');
+    bool invalidImgs = false;
+    for (var img in images) {
+      if (img.contains("data:image")) {
+        invalidImgs = true;
+      }
+    }
+    if (invalidImgs) {
+      images = xpath(
+          res, '//*[ @class="imgu"  or @class="bsx"]/a/div[1]/img/@data-src');
+    }
 
     for (var i = 0; i < names.length; i++) {
       MManga manga = MManga();
