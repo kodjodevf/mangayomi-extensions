@@ -4,6 +4,7 @@ import 'dart:io';
 import '../model/source.dart';
 import 'multisrc/heancms/sources.dart';
 import 'multisrc/madara/sources.dart';
+import 'multisrc/mangabox/sources.dart';
 import 'multisrc/mangareader/sources.dart';
 import 'multisrc/mmrcms/sources.dart';
 import 'multisrc/nepnep/sources.dart';
@@ -22,7 +23,8 @@ void main() {
     ...heancmsSourcesList,
     mangahereSource,
     ...batotoSourcesList,
-    ...nepnepSourcesList
+    ...nepnepSourcesList,
+    ...mangaboxSourcesList
   ];
   final List<Map<String, dynamic>> jsonList =
       sourcesList.map((source) => source.toJson()).toList();

@@ -69,10 +69,12 @@ class UHDMovies extends MProvider {
       }
       for (var i = 0; i < titles.length; i++) {
         final title = titles[i];
+        final quality = RegExp(r'\d{3,4}p').firstMatch(title)?.group(0) ?? "";
         final url = episodesUrls[i];
         MChapter ep = MChapter();
         ep.name = title;
         ep.url = url;
+        ep.scanlator = quality;
         episodesList.add(ep);
       }
     } else {
@@ -96,12 +98,13 @@ class UHDMovies extends MProvider {
             seasonTitles.add(episode);
           }
           final season =
-              RegExp(r'S(\d{2})').firstMatch(titles[number]).group(1);
+              RegExp(r'S(\d{2})').firstMatch(titles[number])?.group(1) ?? "";
           final quality =
-              RegExp(r'\d{3,4}p').firstMatch(titles[number]).group(0);
+              RegExp(r'\d{3,4}p').firstMatch(titles[number])?.group(0) ?? "";
           MChapter ep = MChapter();
           ep.name = "Season $season $episode $quality";
           ep.url = episodeUrl;
+          ep.scanlator = quality;
           episodesList.add(ep);
         }
       }
