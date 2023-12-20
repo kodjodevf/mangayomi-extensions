@@ -7,7 +7,7 @@ import '../../../../../model/source.dart';
     baseUrl: "https://tukangkomik.id",
     lang: "id",
     typeSource: "mangareader",
-    iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/mangareader/src/tukangkomik/icon.png",
+    iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/manga/multisrc/mangareader/src/tukangkomik/icon.png",
     dateFormat:"MMM d, yyyy",
     dateFormatLocale:"tr",
   );

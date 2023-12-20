@@ -8,7 +8,7 @@ Source _beastscansSource = Source(
   lang: "ar",
   typeSource: "mangareader",
   iconUrl:
-      "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/mangareader/src/beastscans/icon.png",
+      "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/manga/multisrc/mangareader/src/beastscans/icon.png",
   dateFormat: "MMMM dd, yyyy",
   dateFormatLocale: "ar",
 );

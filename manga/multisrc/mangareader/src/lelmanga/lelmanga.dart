@@ -8,7 +8,7 @@ Source _lelmangaSource = Source(
   lang: "fr",
   typeSource: "mangareader",
   iconUrl:
-      "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/mangareader/src/lelmanga/icon.png",
+      "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/manga/multisrc/mangareader/src/lelmanga/icon.png",
   dateFormat: "MMMM d, yyyy",
   dateFormatLocale: "en",
 );

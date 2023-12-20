@@ -7,7 +7,7 @@ import '../../../../../model/source.dart';
     baseUrl: "https://www.tarotscans.com",
     lang: "tr",
     typeSource: "mangareader",
-    iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/mangareader/src/tarotscans/icon.png",
+    iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/manga/multisrc/mangareader/src/tarotscans/icon.png",
     dateFormat:"MMMM dd, yyyy",
     dateFormatLocale:"tr",
   );

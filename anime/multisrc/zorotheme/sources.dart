@@ -2,9 +2,9 @@ import '../../../model/source.dart';
 import 'src/aniwatch/aniwatch.dart';
 import 'src/kaido/kaido.dart';
 
-const _zorothemeVersion = "0.0.6";
+const _zorothemeVersion = "0.0.65";
 const _zorothemeSourceCodeUrl =
-    "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/anime/multisrc/zorotheme/zorotheme-v$_zorothemeVersion.dart";
+    "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/anime/multisrc/zorotheme/zorotheme.dart";
 
 List<Source> get zorothemeSourcesList => _zorothemeSourcesList;
 List<Source> _zorothemeSourcesList = [

@@ -3,9 +3,9 @@ import 'src/yugenmangas/yugenmangas.dart';
 import 'src/omegascans/omegascans.dart';
 import 'src/perfscan/perfscan.dart';
 
-const heancmsVersion = "0.0.45";
+const heancmsVersion = "0.0.5";
 const heancmsSourceCodeUrl =
-    "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/heancms/heancms-v$heancmsVersion.dart";
+    "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/manga/multisrc/heancms/heancms.dart";
 
 List<Source> get heancmsSourcesList => _heancmsSourcesList;
 List<Source> _heancmsSourcesList = [

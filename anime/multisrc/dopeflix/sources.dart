@@ -2,9 +2,9 @@ import '../../../model/source.dart';
 import 'src/dopebox/dopebox.dart';
 import 'src/sflix/sflix.dart';
 
-const _dopeflixVersion = "0.0.25";
+const _dopeflixVersion = "0.0.3";
 const _dopeflixSourceCodeUrl =
-    "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/anime/multisrc/dopeflix/dopeflix-v$_dopeflixVersion.dart";
+    "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/anime/multisrc/dopeflix/dopeflix.dart";
 
 List<Source> get dopeflixSourcesList => _dopeflixSourcesList;
 List<Source> _dopeflixSourcesList = [

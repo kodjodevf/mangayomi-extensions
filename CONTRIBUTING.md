@@ -286,27 +286,44 @@ final String htmlString = '''
   print(xpathRes.first); // https://github.com/kodjodevf
 
 ```
- `String` querySelector(`String html`, {`required String selector`}, {`required int typeElement`},{`required String attributes`})
-```bash
-  if typeElement == 0 // return querySelector text
-  if typeElement == 1 // return querySelector innerHtml
-  if typeElement == 2 // return querySelector outerHtml
-  if typeElement == 3 // return querySelector attributes
-  ```
+### DOM selector
 
- `List<String>` querySelectorAll(`String html`, {`required String selector`}, {`required int typeElement`},{`required String attributes`}, {`required int typeRegExp`})
+Example: 
 ```bash
-  if typeRegExp == 0 you can use :
-  if typeElement == 0 // return list querySelector text
-  if typeElement == 1 // return list querySelector innerHtml
-  if typeElement == 2 // return list querySelector outerHtml
-  if typeElement == 3 // return list querySelector attributes
-  else
-  if typeRegExp == 1 // return list of element of href that match
-  if typeRegExp == 2 // return list of element of src that match
-  if typeRegExp == 3 // return list of element of datasrc that match
-  if typeRegExp == 4 // return list of element of img that match
-  ```
+final String htmlString = '''
+<html lang="en">
+<body>
+<div><a href='https://github.com/kodjodevf'>author</a></div>
+<div class="head">div head</div>
+<div class="container">
+    <table>
+        <tbody>
+          <tr>
+              <td id="td1" class="first1">1</td>
+              <td id="td2" class="first1">2</td>
+              <td id="td3" class="first2">3</td>
+              <td id="td4" class="first2 form">4</td>
+              <td id="td5" class="second1">one</td>
+              <td id="td6" class="second1">two</td>
+              <td id="td7" class="second2">three</td>
+              <td id="td8" class="second2">four</td>
+          </tr>
+        </tbody>
+    </table>
+</div>
+<div class="end">end</div>
+</body>
+</html>
+''';
+
+
+  MDocument document = parseHtml(htmlString);
+  print(document.selecFirst("a").attr("href")); // https://github.com/kodjodevf
+  print(document.selecFirst("td").text); // 1
+
+  See [`MDocument` model](https://github.com/kodjodevf/mangayomi/blob/main/lib/eval/model/document.dart) and  [`MElement` model](https://github.com/kodjodevf/mangayomi/blob/main/lib/eval/model/element.dart) to see aivable methods.
+
+```
 
 
 ### String utils

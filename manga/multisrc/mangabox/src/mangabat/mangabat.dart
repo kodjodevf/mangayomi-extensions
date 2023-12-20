@@ -8,7 +8,7 @@ Source _mangabatSource = Source(
   lang: "en",
   typeSource: "mangabox",
   iconUrl:
-      "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/mangabox/src/mangabat/icon.png",
+      "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/manga/multisrc/mangabox/src/mangabat/icon.png",
   dateFormat: "MMM dd,yy",
   dateFormatLocale: "en",
 );

@@ -3,11 +3,11 @@ import '../../../../model/source.dart';
 const _apiUrl = 'https://api.mangadex.org';
 const _baseUrl = 'https://mangadex.org';
 const _isNsfw = true;
-const _mangadexVersion = "0.0.55";
+const _mangadexVersion = "0.0.6";
 const _mangadexSourceCodeUrl =
-    "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/src/all/mangadex/mangadex-v$_mangadexVersion.dart";
+    "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/manga/src/all/mangadex/mangadex.dart";
 String _iconUrl =
-    "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/src/all/mangadex/icon.png";
+    "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/manga/src/all/mangadex/icon.png";
 
 final _languages = [
   "ar",
