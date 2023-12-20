@@ -148,14 +148,13 @@ class HeanCms extends MProvider {
       res = await http('GET', json.encode(data));
 
       List<String> pageUrls = [];
-      var imagesRes = querySelectorAll(res,
-          selector: "div.min-h-screen > div.container > p.items-center",
-          typeElement: 1,
-          attributes: "",
-          typeRegExp: 0);
-      pageUrls = xpath(imagesRes.first, '//img/@src');
+      var imagesRes = parseHtml(res)
+          .selectFirst("div.min-h-screen > div.container > p.items-center")
+          .innerHtml;
 
-      pageUrls.addAll(xpath(imagesRes.first, '//img/@data-src'));
+      pageUrls = xpath(imagesRes, '//img/@src');
+
+      pageUrls.addAll(xpath(imagesRes, '//img/@data-src'));
 
       return pageUrls.where((e) => e.isNotEmpty).toList();
     }

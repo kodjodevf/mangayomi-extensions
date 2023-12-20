@@ -197,12 +197,7 @@ class AnimeSaturn extends MProvider {
     if (resVid.contains("jwplayer(")) {
       masterUrl = substringBefore(substringAfter(resVid, "file: \""), "\"");
     } else {
-      masterUrl = querySelectorAll(resVid,
-              selector: "source",
-              typeElement: 3,
-              attributes: "src",
-              typeRegExp: 0)
-          .first;
+      masterUrl = parseHtml(resVid).selectFirst("source").attr("src");
     }
 
     List<MVideo> videos = [];

@@ -145,13 +145,10 @@ class DataLifeEngine extends MProvider {
   }
 
   MPages animeFromElement(String res, String baseUrl) {
-    final htmls = querySelectorAll(res,
-        selector: "div#dle-content > div.mov",
-        typeElement: 1,
-        attributes: "",
-        typeRegExp: 0);
+    final htmls = parseHtml(res).select("div#dle-content > div.mov");
     List<MManga> animeList = [];
-    for (var html in htmls) {
+    for (var h in htmls) {
+      final html = h.innerHtml;
       final url = xpath(html, '//a/@href').first;
       final name = xpath(html, '//a/text()').first;
       final image = xpath(html, '//div[contains(@class,"mov")]/img/@src').first;

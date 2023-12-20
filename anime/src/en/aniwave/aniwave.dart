@@ -119,26 +119,21 @@ class Aniwave extends MProvider {
     }
 
     anime.genre = xpath(res, '//div[contains(text(),"Genre")]/span/a/text()');
-    final id = querySelectorAll(res,
-            selector: "div[data-id]",
-            typeElement: 3,
-            attributes: "data-id",
-            typeRegExp: 0)
-        .first;
+    final id = parseHtml(res).selectFirst("div[data-id]").attr("data-id");
     final encrypt = vrfEncrypt(id);
     final vrf = "vrf=${Uri.encodeComponent(encrypt)}";
     final dataEp = {
       "url": "${preferenceBaseUrl(source.id)}/ajax/episode/list/$id?$vrf"
     };
+
     final resEp = await http('GET', json.encode(dataEp));
     final html = json.decode(resEp)["result"];
     List<MChapter>? episodesList = [];
-    final epsHtml = querySelectorAll(html,
-        selector: "div.episodes ul > li",
-        typeElement: 2,
-        attributes: "",
-        typeRegExp: 0);
-    for (var epHtml in epsHtml) {
+
+    final epsHtmls = parseHtml(html).select("div.episodes ul > li");
+
+    for (var epH in epsHtmls) {
+      final epHtml = epH.outerHtml;
       final title = xpath(epHtml, '//li/@title').isNotEmpty
           ? xpath(epHtml, '//li/@title').first
           : "";
@@ -183,13 +178,12 @@ class Aniwave extends MProvider {
           "url": "${preferenceBaseUrl(source.id)}/ajax/server/list/$ids?$vrf"
         }));
     final html = json.decode(res)["result"];
-    final vidsHtml = querySelectorAll(html,
-        selector: "div.servers > div",
-        typeElement: 2,
-        attributes: "",
-        typeRegExp: 0);
+
+    final vidsHtmls = parseHtml(html).select("div.servers > div");
+
     List<MVideo> videos = [];
-    for (var vidHtml in vidsHtml) {
+    for (var vidH in vidsHtmls) {
+      final vidHtml = vidH.outerHtml;
       final type = xpath(vidHtml, '//div/@data-type').first;
       final serversIds = xpath(vidHtml, '//li/@data-link-id');
       for (int i = 0; i < serversIds.length; i++) {
