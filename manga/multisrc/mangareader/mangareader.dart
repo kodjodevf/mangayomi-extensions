@@ -150,7 +150,7 @@ class MangaReader extends MProvider {
         ?.text;
 
     if (description != null) {
-      manga.description = description.first;
+      manga.description = description;
     }
 
     final status = xpath(
