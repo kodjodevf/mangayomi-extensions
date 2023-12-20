@@ -196,34 +196,20 @@ class Batoto extends MProvider {
 
     final mangaElements = parseHtml(res).select("div#series-list div.col");
 
-    List<String> images = [];
-    List<String> urls = [];
-    List<String> names = [];
-
+    List<MManga> mangaList = [];
     for (MElement element in mangaElements) {
       if (source.lang == "all" ||
           source.lang == "en" && element.outerHtml.contains('no-flag') ||
           element.outerHtml.contains('data-lang="$lang"')) {
         final itemHtml = element.selectFirst("a.item-cover").outerHtml;
 
-        final img = parseHtml(itemHtml).selectFirst("img").getSrc;
-
-        final url = parseHtml(itemHtml).selectFirst("a").getHref;
-        images.add(img.replaceAll(";", "&"));
-        urls.add(url);
-        final title = element.selectFirst("a.item-title").text;
-
-        names.add(title);
+        MManga manga = MManga();
+        manga.name = element.selectFirst("a.item-title").text;
+        manga.imageUrl =
+            parseHtml(itemHtml).selectFirst("img").getSrc.replaceAll(";", "&");
+        manga.link = parseHtml(itemHtml).selectFirst("a").getHref;
+        mangaList.add(manga);
       }
-    }
-    List<MManga> mangaList = [];
-
-    for (var i = 0; i < urls.length; i++) {
-      MManga manga = MManga();
-      manga.name = names[i];
-      manga.imageUrl = images[i];
-      manga.link = urls[i];
-      mangaList.add(manga);
     }
 
     return MPages(mangaList, true);
