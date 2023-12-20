@@ -209,8 +209,8 @@ class Batoto extends MProvider {
         final img = parseHtml(itemHtml).selectFirst("img").getSrc;
 
         final url = parseHtml(itemHtml).selectFirst("a").getHref;
-        images.add(img);
-        urls.add(url.replaceAll(";", "&"));
+        images.add(img.replaceAll(";", "&"));
+        urls.add(url);
         final title = element.selectFirst("a.item-title").text;
 
         names.add(title);
