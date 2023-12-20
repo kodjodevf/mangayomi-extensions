@@ -164,9 +164,9 @@ import 'src/comicarab/comicarab.dart';
 import 'src/manga3asq/manga3asq.dart';
 import 'src/bakamh/bakamh.dart';
 
-const madaraVersion = "0.0.5";
+const madaraVersion = "0.0.55";
 const madaraSourceCodeUrl =
-    "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/madara-v$madaraVersion.dart";
+    "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/manga/multisrc/madara/madara.dart";
 
 List<Source> get madaraSourcesList => _madaraSourcesList;
 List<Source> _madaraSourcesList = [

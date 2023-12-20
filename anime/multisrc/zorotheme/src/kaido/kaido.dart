@@ -9,5 +9,5 @@ Source _kaidoSource = Source(
   isManga: false,
   typeSource: "zorotheme",
   iconUrl:
-      "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/anime/multisrc/zorotheme/src/kaido/icon.png",
+      "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/anime/multisrc/zorotheme/src/kaido/icon.png",
 );

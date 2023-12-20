@@ -8,7 +8,7 @@ Source _mangacimSource = Source(
   lang: "tr",
   typeSource: "mangareader",
   iconUrl:
-      "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/mangareader/src/mangacim/icon.png",
+      "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/manga/multisrc/mangareader/src/mangacim/icon.png",
   dateFormat: "MMM d, yyy",
   dateFormatLocale: "tr",
 );

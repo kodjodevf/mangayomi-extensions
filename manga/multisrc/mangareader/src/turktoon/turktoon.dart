@@ -7,7 +7,7 @@ import '../../../../../model/source.dart';
     baseUrl: "https://turktoon.com",
     lang: "tr",
     typeSource: "mangareader",
-    iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/mangareader/src/turktoon/icon.png",
+    iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/manga/multisrc/mangareader/src/turktoon/icon.png",
     dateFormat:"MMMM dd, yyyy",
     dateFormatLocale:"en_us",
   );

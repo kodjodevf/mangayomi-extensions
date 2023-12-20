@@ -8,7 +8,7 @@ Source _komikstationSource = Source(
   lang: "id",
   typeSource: "mangareader",
   iconUrl:
-      "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/mangareader/src/komikstation/icon.png",
+      "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/manga/multisrc/mangareader/src/komikstation/icon.png",
   dateFormat: "MMMM dd, yyyy",
   dateFormatLocale: "id",
 );
