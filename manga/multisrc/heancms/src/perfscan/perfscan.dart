@@ -9,7 +9,7 @@ Source _perfscanSource = Source(
   lang: "fr",
   typeSource: "heancms",
   iconUrl:
-      "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/heancms/src/perfscan/icon.png",
+      "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/manga/multisrc/heancms/src/perfscan/icon.png",
   dateFormat: "yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ",
   dateFormatLocale: "en",
 );

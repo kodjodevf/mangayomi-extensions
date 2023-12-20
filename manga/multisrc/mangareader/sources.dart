@@ -39,9 +39,9 @@ import 'src/turktoon/turktoon.dart';
 import 'src/uzaymanga/uzaymanga.dart';
 import 'src/xcalibrscans/xcalibrscans.dart';
 
-const mangareaderVersion = "0.0.6";
+const mangareaderVersion = "0.0.65";
 const mangareaderSourceCodeUrl =
-    "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/mangareader/mangareader-v$mangareaderVersion.dart";
+    "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/manga/multisrc/mangareader/mangareader.dart";
 
 List<Source> get mangareaderSourcesList => _mangareaderSourcesList;
 List<Source> _mangareaderSourcesList = [

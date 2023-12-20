@@ -219,10 +219,12 @@ All control filters can have a default state set. It's usually recommended if th
 
 ## Example sources that can help you understand how to create your source
 
-- [Example](https://github.com/kodjodevf/mangayomi-extensions/tree/main/anime/src/en/kisskh)
+- [Example](https://github.com/kodjodevf/mangayomi-extensions/blob/main/anime/src/en/kisskh/kisskh.dart)
   of Json API usage.
-- [Example](https://github.com/kodjodevf/mangayomi-extensions/tree/main/manga/src/en/mangahere)
+- [Example](https://github.com/kodjodevf/mangayomi-extensions/blob/main/manga/src/en/mangahere/mangahere.dart)
   of pure HTML parsing using xpath selector.
+- [Example](https://github.com/kodjodevf/mangayomi-extensions/blob/main/manga/multisrc/madara/madara.dart)
+  of pure HTML parsing using HTML DOM selector.
 
   
 ## Some functions already available and usable
@@ -286,27 +288,43 @@ final String htmlString = '''
   print(xpathRes.first); // https://github.com/kodjodevf
 
 ```
- `String` querySelector(`String html`, {`required String selector`}, {`required int typeElement`},{`required String attributes`})
-```bash
-  if typeElement == 0 // return querySelector text
-  if typeElement == 1 // return querySelector innerHtml
-  if typeElement == 2 // return querySelector outerHtml
-  if typeElement == 3 // return querySelector attributes
-  ```
+### HTML DOM selector
 
- `List<String>` querySelectorAll(`String html`, {`required String selector`}, {`required int typeElement`},{`required String attributes`}, {`required int typeRegExp`})
+Example: 
 ```bash
-  if typeRegExp == 0 you can use :
-  if typeElement == 0 // return list querySelector text
-  if typeElement == 1 // return list querySelector innerHtml
-  if typeElement == 2 // return list querySelector outerHtml
-  if typeElement == 3 // return list querySelector attributes
-  else
-  if typeRegExp == 1 // return list of element of href that match
-  if typeRegExp == 2 // return list of element of src that match
-  if typeRegExp == 3 // return list of element of datasrc that match
-  if typeRegExp == 4 // return list of element of img that match
-  ```
+final String htmlString = '''
+<html lang="en">
+<body>
+<div><a href='https://github.com/kodjodevf'>author</a></div>
+<div class="head">div head</div>
+<div class="container">
+    <table>
+        <tbody>
+          <tr>
+              <td id="td1" class="first1">1</td>
+              <td id="td2" class="first1">2</td>
+              <td id="td3" class="first2">3</td>
+              <td id="td4" class="first2 form">4</td>
+              <td id="td5" class="second1">one</td>
+              <td id="td6" class="second1">two</td>
+              <td id="td7" class="second2">three</td>
+              <td id="td8" class="second2">four</td>
+          </tr>
+        </tbody>
+    </table>
+</div>
+<div class="end">end</div>
+</body>
+</html>
+''';
+
+
+  MDocument document = parseHtml(htmlString);
+  print(document.selectFirst("a").attr("href")); // https://github.com/kodjodevf
+  print(document.selectFirst("td").text); // 1
+
+```
+See [`MDocument` model](https://github.com/kodjodevf/mangayomi/blob/main/lib/eval/model/document.dart) and  [`MElement` model](https://github.com/kodjodevf/mangayomi/blob/main/lib/eval/model/element.dart) to see available methods.
 
 
 ### String utils

@@ -8,7 +8,7 @@ import '../../../../../model/source.dart';
     lang: "ar",
     
     typeSource: "madara",
-    iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/madara/src/falconmanga/icon.png",
+    iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/manga/multisrc/madara/src/falconmanga/icon.png",
     
     
   );
