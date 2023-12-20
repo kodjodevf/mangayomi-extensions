@@ -221,9 +221,9 @@ All control filters can have a default state set. It's usually recommended if th
 - [Example](https://github.com/kodjodevf/mangayomi-extensions/blob/main/anime/src/en/kisskh/kisskh.dart)
   of Json API usage.
 - [Example](https://github.com/kodjodevf/mangayomi-extensions/blob/main/manga/src/en/mangahere/mangahere.dart)
-  of pure HTML parsing using xpath selector.
+  of HTML parsing using xpath selector.
 - [Example](https://github.com/kodjodevf/mangayomi-extensions/blob/main/manga/multisrc/madara/madara.dart)
-  of pure HTML parsing using HTML DOM selector.
+  of HTML parsing using HTML DOM selector.
 
   
 ## Some functions already available and usable
