@@ -320,8 +320,8 @@ final String htmlString = '''
 
 
   MDocument document = parseHtml(htmlString);
-  print(document.selecFirst("a").attr("href")); // https://github.com/kodjodevf
-  print(document.selecFirst("td").text); // 1
+  print(document.selectFirst("a").attr("href")); // https://github.com/kodjodevf
+  print(document.selectFirst("td").text); // 1
 
 ```
 See [`MDocument` model](https://github.com/kodjodevf/mangayomi/blob/main/lib/eval/model/document.dart) and  [`MElement` model](https://github.com/kodjodevf/mangayomi/blob/main/lib/eval/model/element.dart) to see aivable methods.
