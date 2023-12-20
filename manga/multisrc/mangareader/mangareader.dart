@@ -145,12 +145,11 @@ class MangaReader extends MProvider {
           .replaceAll("[Add, ]", "");
     }
 
-    final description = querySelectorAll(res,
-        selector: ".desc, .entry-content[itemprop=description]",
-        typeElement: 0,
-        attributes: "",
-        typeRegExp: 0);
-    if (description.isNotEmpty) {
+    final description = parseHtml(res)
+        .selectFirst(".desc, .entry-content[itemprop=description]")
+        ?.text;
+
+    if (description != null) {
       manga.description = description.first;
     }
 

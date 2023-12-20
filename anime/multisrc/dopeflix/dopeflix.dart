@@ -121,14 +121,11 @@ class DopeFlix extends MProvider {
               "${preferenceBaseUrl(source.id)}/ajax/v2/season/episodes/$seasonId"
         };
         final html = await http('GET', json.encode(dataE));
-        final epsHtml = querySelectorAll(html,
-            selector: "div.eps-item",
-            typeElement: 2,
-            attributes: "",
-            typeRegExp: 0);
-        print(
-            "${preferenceBaseUrl(source.id)}/ajax/v2/season/episodes/$seasonId");
-        for (var epHtml in epsHtml) {
+
+        final epsHtmls = parseHtml(html).select("div.eps-item");
+
+        for (var epH in epsHtmls) {
+          final epHtml = epH.outerHtml;
           final episodeId =
               xpath(epHtml, '//div[contains(@class,"eps-item")]/@data-id')
                   .first;
@@ -152,13 +149,11 @@ class DopeFlix extends MProvider {
     url = Uri.parse(url).path;
     final res = await http(
         'GET', json.encode({"url": "${preferenceBaseUrl(source.id)}/$url"}));
-    final vidsHtml = querySelectorAll(res,
-        selector: "ul.fss-list a.btn-play",
-        typeElement: 2,
-        attributes: "",
-        typeRegExp: 0);
+    final vidsHtmls = parseHtml(res).select("ul.fss-list a.btn-play");
+
     List<MVideo> videos = [];
-    for (var vidHtml in vidsHtml) {
+    for (var vidH in vidsHtmls) {
+      final vidHtml = vidH.outerHtml;
       final id = xpath(vidHtml, '//a/@data-id').first;
       final name = xpath(vidHtml, '//span/text()').first;
       final resSource = await http(

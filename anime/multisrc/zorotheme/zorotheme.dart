@@ -155,36 +155,17 @@ class ZoroTheme extends MProvider {
     final resEp = await http('GET', json.encode(dataEp));
 
     final html = json.decode(resEp)["html"];
+    final epElements = parseHtml(html).select("a.ep-item");
 
-    final epUrls = querySelectorAll(html,
-        selector: "a.ep-item",
-        typeElement: 3,
-        attributes: "href",
-        typeRegExp: 0);
-    final numbers = querySelectorAll(html,
-        selector: "a.ep-item",
-        typeElement: 3,
-        attributes: "data-number",
-        typeRegExp: 0);
-
-    final titles = querySelectorAll(html,
-        selector: "a.ep-item",
-        typeElement: 3,
-        attributes: "title",
-        typeRegExp: 0);
-
-    List<String> episodes = [];
-
-    for (var i = 0; i < titles.length; i++) {
-      final number = numbers[i];
-      final title = titles[i];
-      episodes.add("Episode $number: $title");
-    }
     List<MChapter>? episodesList = [];
-    for (var i = 0; i < episodes.length; i++) {
+
+    for (var epElement in epElements) {
+      final number = epElement.attr("data-number");
+      final title = epElement.attr("title");
+
       MChapter episode = MChapter();
-      episode.name = episodes[i];
-      episode.url = epUrls[i];
+      episode.name = "Episode $number: $title";
+      episode.url = epElement.getHref;
       episodesList.add(episode);
     }
 
@@ -204,31 +185,15 @@ class ZoroTheme extends MProvider {
     final res = await http('GET', json.encode(datas));
     final html = json.decode(res)["html"];
 
-    final names = querySelectorAll(html,
-        selector: "div.server-item",
-        typeElement: 0,
-        attributes: "",
-        typeRegExp: 0);
-
-    final ids = querySelectorAll(html,
-        selector: "div.server-item",
-        typeElement: 3,
-        attributes: "data-id",
-        typeRegExp: 0);
-
-    final subDubs = querySelectorAll(html,
-        selector: "div.server-item",
-        typeElement: 3,
-        attributes: "data-type",
-        typeRegExp: 0);
+    final serverElements = parseHtml(html).select("div.server-item");
 
     List<MVideo> videos = [];
     final hosterSelection = preferenceHosterSelection(source.id);
     final typeSelection = preferenceTypeSelection(source.id);
-    for (var i = 0; i < names.length; i++) {
-      final name = names[i];
-      final id = ids[i];
-      final subDub = subDubs[i];
+    for (var serverElement in serverElements) {
+      final name = serverElement.text;
+      final id = serverElement.attr("data-id");
+      final subDub = serverElement.attr("data-type");
       final datasE = {
         "url":
             "${source.baseUrl}/ajax${ajaxRoute('${source.baseUrl}')}/episode/sources?id=$id",
@@ -237,7 +202,6 @@ class ZoroTheme extends MProvider {
 
       final resE = await http('GET', json.encode(datasE));
       String epUrl = substringBefore(substringAfter(resE, "\"link\":\""), "\"");
-
       List<MVideo> a = [];
 
       if (hosterSelection.contains(name) && typeSelection.contains(subDub)) {

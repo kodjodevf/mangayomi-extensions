@@ -197,12 +197,9 @@ class UHDMovies extends MProvider {
           "url": nextUrl,
           "headers": {"referer": url, "Cookie": "$cookieName=$cookieValue"}
         }));
-    final lastRes = querySelectorAll(response,
-            selector: "meta[http-equiv]",
-            typeElement: 3,
-            attributes: "content",
-            typeRegExp: 0)
-        .first;
+
+    final lastRes =
+        parseHtml(response).selectFirst("meta[http-equiv]").attr("content");
     return substringAfter(lastRes, "url=");
   }
 
