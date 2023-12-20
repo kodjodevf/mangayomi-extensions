@@ -134,10 +134,10 @@ class Madara extends MProvider {
         "";
 
     final imageElement = document.selectFirst("div.summary_image img");
-    final image = imageElement?.attr("data-src") ??
+    final image = imageElement?.attr("src") ??
+        imageElement?.attr("data-src") ??
         imageElement?.attr("data-lazy-src") ??
-        imageElement?.attr("srcset") ??
-        imageElement?.getSrc;
+        imageElement?.attr("srcset");
     if (image != null) {
       manga.imageUrl = image;
     }
@@ -172,40 +172,50 @@ class Madara extends MProvider {
       res = await http('POST', json.encode(datasP));
     }
 
-    List<MChapter> chaptersList =
-        parseHtml(res).select('li.wp-manga-chapter').map((MElement e) {
-      String date = "";
-      List<MElement>? dateEList = e
-          .select('img')
-          ?.where((MElement e) => !(e.className.contains("thumb")))
-          .toList();
-      if (dateEList != null && dateEList.isNotEmpty) {
-        final dateE = (dateEList.first as MElement).attr("alt");
-        if (dateE != null) {
-          date = parseDates([dateE], source.dateFormat, source.dateFormatLocale)
-              .first;
+    var chapUrls = xpath(res, '//li[@class^="wp-manga-chapter"]/a/@href');
+    var chaptersNames = xpath(res, '//li[@class^="wp-manga-chapter"]/a/text()');
+    var dateF = xpath(res, '//li[@class^="wp-manga-chapter"]/span/i/text()');
+    if (dateF.isEmpty) {
+      final resWebview = await getHtmlViaWebview(
+          url, "//*[@id='manga-chapters-holder']/div[2]/div/ul/li/a/@href");
+      chapUrls = xpath(resWebview,
+          "//*[@id='manga-chapters-holder']/div[2]/div/ul/li/a/@href");
+      chaptersNames = xpath(resWebview,
+          "//*[@id='manga-chapters-holder']/div[2]/div/ul/li/a/text()");
+      dateF = xpath(resWebview,
+          "//*[@id='manga-chapters-holder']/div[2]/div/ul/li/span/i/text()");
+    }
+    List<String> dateUploads = [];
+    if (source.dateFormat.isNotEmpty) {
+      dateUploads =
+          parseDates(dateF, source.dateFormat, source.dateFormatLocale);
+      if (dateF.length < chaptersNames.length) {
+        final length = chaptersNames.length - dateF.length;
+        String date = "${DateTime.now().millisecondsSinceEpoch}";
+        for (var i = 0; i < length - 1; i++) {
+          date += "--..${DateTime.now().millisecondsSinceEpoch}";
         }
-      }
-      if (date.isEmpty) {
-        final dateE = e.selectFirst('span a')?.attr("title");
-        if (dateE != null) {
-          date = parseDates([dateE], source.dateFormat, source.dateFormatLocale)
-              .first;
+
+        final dateFF =
+            parseDates(dateF, source.dateFormat, source.dateFormatLocale);
+        List<String> chapterDate = date.split('--..');
+
+        for (var date in dateFF) {
+          chapterDate.add(date);
         }
+        dateUploads = chapterDate;
       }
-      if (date.isEmpty) {
-        final dateE = e.selectFirst('span.chapter-release-date')?.text;
-        if (dateE != null) {
-          date = parseDates([dateE], source.dateFormat, source.dateFormatLocale)
-              .first;
-        }
-      }
+    }
+
+    List<MChapter>? chaptersList = [];
+    for (var i = 0; i < chaptersNames.length; i++) {
       MChapter chapter = MChapter();
-      chapter.name = e.selectFirst('a').text;
-      chapter.url = e.selectFirst('a').getHref;
-      if (source.dateFormat.isNotEmpty) chapter.dateUpload = date;
-      return chapter;
-    }).toList();
+      chapter.name = chaptersNames[i];
+      chapter.url = chapUrls[i];
+      if (source.dateFormat.isNotEmpty) chapter.dateUpload = dateUploads[i];
+      chaptersList.add(chapter);
+    }
+
     manga.chapters = chaptersList;
     return manga;
   }
