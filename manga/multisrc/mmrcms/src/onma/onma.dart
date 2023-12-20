@@ -8,7 +8,7 @@ import '../../../../../model/source.dart';
     lang: "ar",
     
     typeSource: "mmrcms",
-    iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/mmrcms/src/onma/icon.png",
+    iconUrl:"https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/manga/multisrc/mmrcms/src/onma/icon.png",
     dateFormat:"d MMM. yyyy",
     dateFormatLocale:"en_us",
   );

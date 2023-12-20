@@ -9,5 +9,5 @@ Source _frenchanimeSource = Source(
   typeSource: "datalifeengine",
   isManga: false,
   iconUrl:
-      "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/anime/multisrc/datalifeengine/src/frenchanime/icon.png",
+      "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/anime/multisrc/datalifeengine/src/frenchanime/icon.png",
 );

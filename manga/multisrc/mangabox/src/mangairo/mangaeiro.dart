@@ -9,7 +9,7 @@ Source _mangairoSource = Source(
   isNsfw: true,
   typeSource: "mangabox",
   iconUrl:
-      "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/mangabox/src/mangairo/icon.png",
+      "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/manga/multisrc/mangabox/src/mangairo/icon.png",
   dateFormat: "MMM-dd-yy",
   dateFormatLocale: "en",
 );

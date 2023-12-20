@@ -128,25 +128,18 @@ class Batoto extends MProvider {
         .split(",");
     manga.description = xpath(res, '//*[@class="limit-html"]/text()').first;
 
-    List<String> chapsElement = querySelectorAll(res,
-        selector: "div.main div.p-2",
-        typeElement: 2,
-        attributes: "",
-        typeRegExp: 0);
+    final chapElements = parseHtml(res).select("div.main div.p-2");
+
     List<String> times = [];
     List<String> chapsUrls = [];
     List<String> chapsNames = [];
     List<String> scanlators = [];
-    for (var element in chapsElement) {
-      final urlElement = querySelectorAll(element,
-              selector: "a.chapt",
-              typeElement: 2,
-              attributes: "",
-              typeRegExp: 0)
-          .first;
+    for (MElement el in chapElements) {
+      final chapHtml = el.selectFirst("a.chapt").outerHtml;
+      final element = el.outerHtml;
       final group = xpath(element, '//*[@class="extra"]/a/text()').first;
-      final name = xpath(urlElement, '//a/text()').first;
-      final url = xpath(urlElement, '//a/@href').first;
+      final name = xpath(chapHtml, '//a/text()').first;
+      final url = xpath(chapHtml, '//a/@href').first;
       final time =
           xpath(element, '//*[@class="extra"]/i[@class="ps-3"]/text()').first;
       times.add(time);
@@ -201,57 +194,22 @@ class Batoto extends MProvider {
   MPages mangaElementM(String res, MSource source) async {
     final lang = source.lang.replaceAll("-", "_");
 
-    var resB = querySelectorAll(res,
-        selector: "div#series-list div.col",
-        typeElement: 2,
-        attributes: "",
-        typeRegExp: 0);
+    final mangaElements = parseHtml(res).select("div#series-list div.col");
 
-    List<String> images = [];
-    List<String> urls = [];
-    List<String> names = [];
-
-    for (var element in resB) {
-      if (source.lang == "all" ||
-          source.lang == "en" && element.contains('no-flag') ||
-          element.contains('data-lang="$lang"')) {
-        final item = querySelectorAll(element,
-                selector: "a.item-cover",
-                typeElement: 2,
-                attributes: "",
-                typeRegExp: 0)
-            .first;
-        final img = querySelectorAll(item,
-                selector: "img",
-                typeElement: 3,
-                attributes: "src",
-                typeRegExp: 0)
-            .first;
-        final url = querySelectorAll(item,
-                selector: "a",
-                typeElement: 3,
-                attributes: "href",
-                typeRegExp: 0)
-            .first;
-        images.add(img);
-        urls.add(url);
-        final title = querySelectorAll(element,
-                selector: "a.item-title",
-                typeElement: 0,
-                attributes: "",
-                typeRegExp: 0)
-            .first;
-        names.add(title);
-      }
-    }
     List<MManga> mangaList = [];
+    for (MElement element in mangaElements) {
+      if (source.lang == "all" ||
+          source.lang == "en" && element.outerHtml.contains('no-flag') ||
+          element.outerHtml.contains('data-lang="$lang"')) {
+        final itemHtml = element.selectFirst("a.item-cover").outerHtml;
 
-    for (var i = 0; i < urls.length; i++) {
-      MManga manga = MManga();
-      manga.name = names[i];
-      manga.imageUrl = images[i];
-      manga.link = urls[i];
-      mangaList.add(manga);
+        MManga manga = MManga();
+        manga.name = element.selectFirst("a.item-title").text;
+        manga.imageUrl =
+            parseHtml(itemHtml).selectFirst("img").getSrc.replaceAll(";", "&");
+        manga.link = parseHtml(itemHtml).selectFirst("a").getHref;
+        mangaList.add(manga);
+      }
     }
 
     return MPages(mangaList, true);

@@ -9,5 +9,5 @@ Source _sflixSource = Source(
   typeSource: "dopeflix",
   isManga: false,
   iconUrl:
-      "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/anime/multisrc/dopeflix/src/sflix/icon.png",
+      "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/anime/multisrc/dopeflix/src/sflix/icon.png",
 );

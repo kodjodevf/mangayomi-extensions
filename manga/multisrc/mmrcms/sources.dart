@@ -8,9 +8,9 @@ import 'src/readcomicsonline/readcomicsonline.dart';
 import 'src/lelscanvf/lelscanvf.dart';
 import 'src/mangafr/mangafr.dart';
 
-const mmrcmsVersion = "0.0.45";
+const mmrcmsVersion = "0.0.5";
 const mmrcmsSourceCodeUrl =
-    "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/manga/multisrc/mmrcms/mmrcms-v$mmrcmsVersion.dart";
+    "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/manga/multisrc/mmrcms/mmrcms.dart";
 
 List<Source> get mmrcmsSourcesList => _mmrcmsSourcesList;
 List<Source> _mmrcmsSourcesList = [
