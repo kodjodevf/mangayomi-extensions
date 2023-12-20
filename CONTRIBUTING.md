@@ -11,7 +11,6 @@ Before you start, please note that the ability to use following technologies is 
 - Web scraping
     - [HTML](https://developer.mozilla.org/en-US/docs/Web/HTML)
     - [CSS selectors](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors)
-    - [Xpath](https://www.blog.datahut.co/post/xpath-for-web-scraping-step-by-step-tutorial)
 
 This project uses the capabilities of the [dart_eval](https://pub.dev/packages/dart_eval) package
 
