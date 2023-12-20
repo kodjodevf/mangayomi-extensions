@@ -219,10 +219,12 @@ All control filters can have a default state set. It's usually recommended if th
 
 ## Example sources that can help you understand how to create your source
 
-- [Example](https://github.com/kodjodevf/mangayomi-extensions/tree/main/anime/src/en/kisskh)
+- [Example](https://github.com/kodjodevf/mangayomi-extensions/blob/main/anime/src/en/kisskh/kisskh.dart)
   of Json API usage.
-- [Example](https://github.com/kodjodevf/mangayomi-extensions/tree/main/manga/src/en/mangahere)
+- [Example](https://github.com/kodjodevf/mangayomi-extensions/blob/main/manga/src/en/mangahere/mangahere.dart)
   of pure HTML parsing using xpath selector.
+- [Example](https://github.com/kodjodevf/mangayomi-extensions/blob/main/manga/multisrc/madara/madara.dart)
+  of pure HTML parsing using HTML DOM selector.
 
   
 ## Some functions already available and usable
@@ -286,7 +288,7 @@ final String htmlString = '''
   print(xpathRes.first); // https://github.com/kodjodevf
 
 ```
-### DOM selector
+### HTML DOM selector
 
 Example: 
 ```bash
@@ -321,9 +323,8 @@ final String htmlString = '''
   print(document.selecFirst("a").attr("href")); // https://github.com/kodjodevf
   print(document.selecFirst("td").text); // 1
 
-  See [`MDocument` model](https://github.com/kodjodevf/mangayomi/blob/main/lib/eval/model/document.dart) and  [`MElement` model](https://github.com/kodjodevf/mangayomi/blob/main/lib/eval/model/element.dart) to see aivable methods.
-
 ```
+See [`MDocument` model](https://github.com/kodjodevf/mangayomi/blob/main/lib/eval/model/document.dart) and  [`MElement` model](https://github.com/kodjodevf/mangayomi/blob/main/lib/eval/model/element.dart) to see aivable methods.
 
 
 ### String utils
