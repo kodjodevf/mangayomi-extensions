@@ -9,6 +9,7 @@ import 'src/ar/okanime/source.dart';
 import 'src/en/aniwave/source.dart';
 import 'src/en/dramacool/source.dart';
 import 'src/en/gogoanime/source.dart';
+import 'src/en/hi/yomovies/source.dart';
 import 'src/en/kisskh/source.dart';
 import 'src/en/uhdmovies/source.dart';
 import 'src/fr/animesultra/source.dart';
@@ -38,7 +39,8 @@ void main() {
     uhdmoviesSource,
     ...datalifeengineSourcesList,
     filma24,
-    dramacoolSource
+    dramacoolSource,
+    yomoviesSource
   ];
   final List<Map<String, dynamic>> jsonList =
       _sourcesList.map((source) => source.toJson()).toList();
