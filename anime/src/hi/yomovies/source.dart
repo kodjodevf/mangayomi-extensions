@@ -1,4 +1,4 @@
-import '../../../../../model/source.dart';
+import '../../../../model/source.dart';
 
 Source get yomoviesSource => _yomoviesSource;
 const _yomoviesVersion = "0.0.1";
