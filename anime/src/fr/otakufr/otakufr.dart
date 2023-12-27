@@ -362,7 +362,7 @@ class OtakuFr extends MProvider {
       return [];
     }
     final masterUrl =
-        substringBefore(substringAfter(evalJs(js.first), "{file:\""), "\"}");
+        substringBefore(substringAfter(unpackJs(js.first), "{file:\""), "\"}");
     final masterPlaylistRes =
         await http('GET', json.encode({"url": masterUrl}));
     List<MVideo> videos = [];
