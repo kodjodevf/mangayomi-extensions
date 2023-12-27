@@ -181,7 +181,7 @@ class MangaHere extends MProvider {
               res, "//script[contains(text(),'function(p,a,c,k,e,d)')]/text()")
           .first
           .replaceAll("eval", "");
-      String deobfuscatedScript = evalJs(script);
+      String deobfuscatedScript = unpackJs(script);
       int a = deobfuscatedScript.indexOf("newImgs=['") + 10;
       int b = deobfuscatedScript.indexOf("'];");
       List<String> urls = deobfuscatedScript.substring(a, b).split("','");
@@ -197,7 +197,7 @@ class MangaHere extends MProvider {
       String secretKeyScript = res
           .substring(secretKeyScriptLocation, secretKeyScriptEndLocation)
           .replaceAll("eval", "");
-      String secretKeyDeobfuscatedScript = evalJs(secretKeyScript);
+      String secretKeyDeobfuscatedScript = unpackJs(secretKeyScript);
       int secretKeyStartLoc = secretKeyDeobfuscatedScript.indexOf("'");
       int secretKeyEndLoc = secretKeyDeobfuscatedScript.indexOf(";");
 
@@ -231,7 +231,7 @@ class MangaHere extends MProvider {
             }
           }
         }
-        String deobfuscatedScript = evalJs(responseText.replaceAll("eval", ""));
+        String deobfuscatedScript = unpackJs(responseText.replaceAll("eval", ""));
 
         int baseLinkStartPos = deobfuscatedScript.indexOf("pix=") + 5;
         int baseLinkEndPos =

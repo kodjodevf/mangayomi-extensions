@@ -168,7 +168,7 @@ class DataLifeEngine extends MProvider {
     final res = await http('GET', json.encode({"url": url}));
     final masterUrl = substringBefore(
         substringAfter(
-            substringAfter(substringAfter(evalJs(res), "sources:"), "file:\""),
+            substringAfter(substringAfter(unpackJs(res), "sources:"), "file:\""),
             "src:\""),
         '"');
     final masterPlaylistRes =
@@ -203,7 +203,7 @@ class DataLifeEngine extends MProvider {
       return [];
     }
     final masterUrl =
-        substringBefore(substringAfter(evalJs(js.first), "{file:\""), "\"}");
+        substringBefore(substringAfter(unpackJs(js.first), "{file:\""), "\"}");
     final masterPlaylistRes =
         await http('GET', json.encode({"url": masterUrl}));
     List<MVideo> videos = [];

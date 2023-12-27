@@ -333,7 +333,8 @@ See [`MDocument` model](https://github.com/kodjodevf/mangayomi/blob/main/lib/eva
 - `String` substringBeforeLast(`String text`, `String pattern`)
 
 ### Crypto utils
-- `String` evalJs(`String code`);
+- `String` unpackJs(`String code`);
+- `Future<String>` evalJs(`String code`);
 - `String` deobfuscateJsPassword(`String inputString`)
 - `String` encryptAESCryptoJS(`String plainText`, `String passphrase`)
 - `String` decryptAESCryptoJS(`String encrypted`, `String passphrase`)

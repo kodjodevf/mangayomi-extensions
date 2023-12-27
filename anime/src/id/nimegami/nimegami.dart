@@ -152,7 +152,7 @@ class NimeGami extends MProvider {
         '//script[contains(text(), "eval") and contains(text(), "p,a,c,k,e,d")]/text()');
     if (script.isNotEmpty) {
       final videoUrl = substringBefore(
-          substringAfter(substringAfter(evalJs(script.first), "sources:[", ""),
+          substringAfter(substringAfter(unpackJs(script.first), "sources:[", ""),
               "file\":\"", ""),
           '"');
       if (videoUrl.isNotEmpty) {

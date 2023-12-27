@@ -204,7 +204,13 @@ class Aniwave extends MProvider {
           final hosterSelection = preferenceHosterSelection(source.id);
           final typeSelection = preferenceTypeSelection(source.id);
           if (typeSelection.contains(type.toLowerCase())) {
-            if (url.contains("mp4upload") &&
+            if (url.contains("vidplay") || url.contains("mcloud")) {
+              final hosterName =
+                  url.contains("vidplay") ? "VidPlay" : "MyCloud";
+              if (hosterSelection.contains(hosterName.toLowerCase())) {
+                a = await vidsrcExtractor(url, hosterName, type);
+              }
+            } else if (url.contains("mp4upload") &&
                 hosterSelection.contains("mp4upload")) {
               a = await mp4UploadExtractor(url, null, "", type);
             } else if (url.contains("streamtape") &&
@@ -303,6 +309,111 @@ class Aniwave extends MProvider {
       }
     }
     return vrf;
+  }
+
+  Future<List<MVideo>> vidsrcExtractor(
+      String url, String name, String type) async {
+    List<String> keys = json.decode(await http(
+        'GET',
+        json.encode({
+          "url":
+              "https://raw.githubusercontent.com/Claudemirovsky/worstsource-keys/keys/keys.json"
+        })));
+    final host = Uri.parse(url).host;
+    final apiUrl = await getApiUrl(url, keys);
+    final headers = {
+      "Accept": "application/json, text/javascript, */*; q=0.01",
+      "Host": host,
+      "Referer": Uri.decodeComponent(url),
+      "X-Requested-With": "XMLHttpRequest"
+    };
+    final res =
+        await http('GET', json.encode({"url": apiUrl, "headers": headers}));
+    if (res == "error") return [];
+    String masterUrl =
+        ((json.decode(res)['result']['sources'] as List<Map<String, dynamic>>)
+            .first)['file'];
+    final tracks = (json.decode(res)['result']['tracks'] as List)
+        .where((e) => e['kind'] == 'captions' ? true : false)
+        .toList();
+    List<MTrack> subtitles = [];
+
+    for (var sub in tracks) {
+      try {
+        MTrack subtitle = MTrack();
+        subtitle
+          ..label = sub["label"]
+          ..file = sub["file"];
+        subtitles.add(subtitle);
+      } catch (_) {}
+    }
+    List<MVideo> videoList = [];
+    final masterPlaylistRes =
+        await http('GET', json.encode({"url": masterUrl}));
+    for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
+        .split("#EXT-X-STREAM-INF:")) {
+      final quality =
+          "${substringBefore(substringBefore(substringAfter(substringAfter(it, "RESOLUTION="), "x"), ","), "\n")}p";
+
+      String videoUrl = substringBefore(substringAfter(it, "\n"), "\n");
+
+      if (!videoUrl.startsWith("http")) {
+        videoUrl =
+            "${masterUrl.split("/").sublist(0, masterUrl.split("/").length - 1).join("/")}/$videoUrl";
+      }
+
+      MVideo video = MVideo();
+      video
+        ..url = videoUrl
+        ..originalUrl = videoUrl
+        ..quality = "$name - $type - $quality"
+        ..headers = {"Referer": "https://$host/"}
+        ..subtitles = subtitles;
+      videoList.add(video);
+    }
+    return videoList;
+  }
+
+  Future<String> getApiUrl(String url, List<String> keyList) async {
+    final host = Uri.parse(url).host;
+    final paramsToString = Uri.parse(url)
+        .queryParameters
+        .entries
+        .map((e) => "${e.key}=${e.value}")
+        .join("&");
+    var vidId = substringBefore(substringAfterLast(url, "/"), "?");
+    var encodedID = encodeID(vidId, keyList);
+    final apiSlug = await callFromFuToken(host, encodedID);
+    String apiUrlString = "";
+    apiUrlString += "https://$host/$apiSlug";
+    if (paramsToString.isNotEmpty) {
+      apiUrlString += "?$paramsToString";
+    }
+
+    return apiUrlString;
+  }
+
+  String encodeID(String vidId, List<String> keyList) {
+    var rc4Key1 = keyList[0];
+    var rc4Key2 = keyList[1];
+    final rc4 = rc4Encrypt(rc4Key1, vidId.codeUnits);
+    final rc41 = rc4Encrypt(rc4Key2, rc4);
+    return base64.encode(rc41).replaceAll("/", "_").trim();
+  }
+
+  Future<String> callFromFuToken(String host, String data) async {
+    final fuTokenScript =
+        await http('GET', json.encode({"url": "https://$host/futoken"}));
+    String js = "";
+    js += "(function";
+    js += substringBefore(
+        substringAfter(substringAfter(fuTokenScript, "window"), "function")
+            .replaceAll("jQuery.ajax(", ""),
+        "+location.search");
+    js += "}(\"$data\"))";
+    final jsRes = await evalJs(js);
+    if (jsRes == "error") return "";
+    return jsRes;
   }
 
   @override
