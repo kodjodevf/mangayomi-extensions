@@ -2,7 +2,7 @@ import '../../../model/source.dart';
 import 'src/frenchanime/frenchanime.dart';
 import 'src/wiflix/wiflix.dart';
 
-const _datalifeengineVersion = "0.0.15";
+const _datalifeengineVersion = "0.0.2";
 const _datalifeengineSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/anime/multisrc/datalifeengine/datalifeengine.dart";
 

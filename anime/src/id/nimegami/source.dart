@@ -1,7 +1,7 @@
 import '../../../../model/source.dart';
 
 Source get nimegami => _nimegami;
-const _nimegamiVersion = "0.0.35";
+const _nimegamiVersion = "0.0.4";
 const _nimegamiCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/anime/src/id/nimegami/nimegami.dart";
 Source _nimegami = Source(
