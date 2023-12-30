@@ -553,19 +553,23 @@ class Aniwave extends MProvider {
   List<dynamic> getSourcePreferences(MSource source) {
     return [
       ListPreference(
-          key: "preferred_domain",
+          key: "preferred_domain1",
           title: "Preferred domain",
           summary: "",
           valueIndex: 0,
           entries: [
             "aniwave.to",
             "aniwave.bz",
-            "aniwave.ws"
+            "aniwave.ws",
+            "aniwave.li",
+            "aniwave.vc"
           ],
           entryValues: [
             "https://aniwave.to",
             "https://aniwave.bz",
-            "https://aniwave.ws"
+            "https://aniwave.ws",
+            "https://aniwave.li",
+            "https://aniwave.vc"
           ]),
       ListPreference(
           key: "preferred_quality",
@@ -636,7 +640,7 @@ class Aniwave extends MProvider {
   }
 
   String preferenceBaseUrl(int sourceId) {
-    return getPreferenceValue(sourceId, "preferred_domain");
+    return getPreferenceValue(sourceId, "preferred_domain1");
   }
 
   List<String> preferenceHosterSelection(int sourceId) {
