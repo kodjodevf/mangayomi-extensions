@@ -4,7 +4,7 @@ Source get sushiscansSource => _sushiscansSource;
 
 Source _sushiscansSource = Source(
   name: "Sushi-Scans",
-  baseUrl: "https://anime-sama.me",
+  baseUrl: "https://sushiscan.fr",
   lang: "fr",
   typeSource: "mangareader",
   iconUrl:
