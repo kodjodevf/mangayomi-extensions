@@ -127,22 +127,23 @@ class MangaReader extends MProvider {
         "hiatus": 2,
       }
     ];
-    url = Uri.parse(url).path;
+    url = getUrlWithoutDomain(url);
     MManga manga = MManga();
     final datas = {"url": "${source.baseUrl}$url", "sourceId": source.id};
     final res = await http('GET', json.encode(datas));
 
-    final author = xpath(
+    List<String> author = xpath(
         res,
-        '//*[@class="imptdt" and contains(text(), "Author") or @class="infotable" and contains(text(), "Author") or @class="infotable" and contains(text(), "Auteur") or @class="fmed" and contains(text(), "Auteur") or @class="infotable" and contains(text(), "Autor")]/text()',
+        "//table[contains(@class, 'infotable')]//tr[contains(text(), 'Author')]/td[last()]/text() | //div[contains(@class, 'tsinfo')]//div[contains(@class, 'imptdt') and contains(text(), 'Author')]//i/text() | //div[contains(@class, 'fmed')]//b[contains(text(), 'Author')]/following-sibling::span[1]/text() | //span[contains(text(), 'Author')]/text()",
         '');
-
+    if (author.isEmpty) {
+      author = xpath(
+          res,
+          "//table[contains(@class, 'infotable')]//tr[contains(text(), '${authorLocalStr(source.lang)}')]/td[last()]/text() | //div[contains(@class, 'tsinfo')]//div[contains(@class, 'imptdt') and contains(text(), '${authorLocalStr(source.lang)}')]//i/text() | //div[contains(@class, 'fmed')]//b[contains(text(), '${authorLocalStr(source.lang)}')]/following-sibling::span[1]/text() | //span[contains(text(), '${authorLocalStr(source.lang)}')]/text()",
+          '');
+    }
     if (author.isNotEmpty) {
-      manga.author = author.first
-          .replaceAll("Autor", "")
-          .replaceAll("Author", "")
-          .replaceAll("Auteur", "")
-          .replaceAll("[Add, ]", "");
+      manga.author = author.first;
     }
 
     final description = parseHtml(res)
@@ -153,30 +154,29 @@ class MangaReader extends MProvider {
       manga.description = description;
     }
 
-    final status = xpath(
+    List<String> status = xpath(
         res,
-        '//*[@class="imptdt" and contains(text(), "Status") or @class="imptdt" and contains(text(), "Estado") or @class="infotable" and contains(text(), "Status") or @class="infotable" and contains(text(), "Statut") or @class="imptdt" and contains(text(), "Statut")]/text()',
+        "//table[contains(@class, 'infotable')]//tr[contains(text(), 'Status')]/td[last()]/text() | //div[contains(@class, 'tsinfo')]//div[contains(@class, 'imptdt') and contains(text(), 'Status')]//i/text() | //div[contains(@class, 'fmed')]//b[contains(text(), 'Status')]/following-sibling::span[1]/text() | //span[contains(text(), 'Status')]/text()",
         '');
+    if (status.isEmpty) {
+      status = xpath(
+          res,
+          "//table[contains(@class, 'infotable')]//tr[contains(text(), '${statusLocalStr(source.lang)}')]/td[last()]/text() | //div[contains(@class, 'tsinfo')]//div[contains(@class, 'imptdt') and contains(text(), '${statusLocalStr(source.lang)}')]//i/text() | //div[contains(@class, 'fmed')]//b[contains(text(), '${statusLocalStr(source.lang)}')]/following-sibling::span[1]/text() | //span[contains(text(), '${statusLocalStr(source.lang)}')]/text()",
+          '');
+    }
 
     if (status.isNotEmpty) {
-      manga.status = parseStatus(
-          status.first
-              .replaceAll("Status", "")
-              .replaceAll("Estado", "")
-              .replaceAll("Statut", ""),
-          statusList);
+      manga.status = parseStatus(status.first, statusList);
     }
 
     manga.genre = xpath(res,
         '//*[@class="gnr"  or @class="mgen"  or @class="seriestugenre" ]/a/text()');
-
     var chapUrls = xpath(res,
-        '//*[@class="bxcl"  or @class="cl"  or @class="chbox" or @class="eph-num" or @id="chapterlist"]/div/a[not(@href="#/chapter-{{number}}")]/@href');
+        '//*[@class="bxcl"  or @class="cl"  or @class="chbox" or @class="eph-num" or @id="chapterlist"]/div/a[not(contains(@href,"{{number}}"))]/@href');
     var chaptersNames = xpath(res,
-        '//*[@class="bxcl"  or @class="cl"  or @class="chbox" or @class="eph-num" or @id="chapterlist"]/div/a/span[@class="chapternum" and not(text()="Chapter {{number}}") or @class="lch" and not(text()="Chapter {{number}}")]/text()');
+        '//*[@class="bxcl"  or @class="cl"  or @class="chbox" or @class="eph-num" or @id="chapterlist"]/div/a/span[@class="chapternum" and not(contains(text(),"{{number}}")) or @class="lch" and not(text()="Chapter {{number}}")]/text()');
     var chapterDates = xpath(res,
-        '//*[@class="bxcl"  or @class="cl"  or @class="chbox" or @class="eph-num" or @id="chapterlist"]/div/a/span[@class="chapterdate" and not(text()="{{date}}")]/text()');
-
+        '//*[@class="bxcl"  or @class="cl"  or @class="chbox" or @class="eph-num" or @id="chapterlist"]/div/a/span[@class="chapterdate" and not(contains(text(),"{{date}}"))]/text()');
     var dateUploads =
         parseDates(chapterDates, source.dateFormat, source.dateFormatLocale);
 
@@ -194,7 +194,8 @@ class MangaReader extends MProvider {
 
   @override
   Future<List<String>> getPageList(MSource source, String url) async {
-    final datas = {"url": url, "sourceId": source.id};
+    url = getUrlWithoutDomain(url);
+    final datas = {"url": '${source.baseUrl}$url', "sourceId": source.id};
     final res = await http('GET', json.encode(datas));
 
     List<String> pages = [];
@@ -244,7 +245,6 @@ class MangaReader extends MProvider {
       images = xpath(
           res, '//*[ @class="imgu"  or @class="bsx"]/a/div[1]/img/@data-src');
     }
-
     for (var i = 0; i < names.length; i++) {
       MManga manga = MManga();
       manga.name = names[i];
@@ -291,6 +291,22 @@ class MangaReader extends MProvider {
     ];
   }
 
+  String authorLocalStr(String lang) {
+    if (lang == "fr") {
+      return "Auteur";
+    }
+    return "Author";
+  }
+
+  String statusLocalStr(String lang) {
+    if (lang == "fr") {
+      return "Statut";
+    } else if (lang == "es") {
+      return "Estado";
+    }
+    return "Status";
+  }
+
   String ll(String url) {
     if (url.contains("?")) {
       return "&";
@@ -303,6 +319,18 @@ class MangaReader extends MProvider {
       return "/catalogue";
     }
     return "/manga";
+  }
+
+  String getUrlWithoutDomain(String orig) {
+    final uri = Uri.parse(orig.replaceAll(' ', '%20'));
+    String out = uri.path;
+    if (uri.query.isNotEmpty) {
+      out += '?${uri.query}';
+    }
+    if (uri.fragment.isNotEmpty) {
+      out += '#${uri.fragment}';
+    }
+    return out;
   }
 }
 
