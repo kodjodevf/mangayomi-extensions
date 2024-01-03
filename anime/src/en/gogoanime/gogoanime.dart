@@ -1117,11 +1117,11 @@ class GogoAnime extends MProvider {
 
     videos.sort((MVideo a, MVideo b) {
       int qualityMatchA = 0;
-      if (a.quality.contains(quality)) {
+      if (a.quality.contains(quality) && a.quality.contains(server)) {
         qualityMatchA = 1;
       }
       int qualityMatchB = 0;
-      if (b.quality.contains(quality)) {
+      if (b.quality.contains(quality) && b.quality.contains(server)) {
         qualityMatchB = 1;
       }
       if (qualityMatchA != qualityMatchB) {
@@ -1136,17 +1136,6 @@ class GogoAnime extends MProvider {
       return qualityNumB - qualityNumA;
     });
 
-    videos.sort((MVideo a, MVideo b) {
-      int serverMatchA = 0;
-      if (a.quality.contains(server)) {
-        serverMatchA = 1;
-      }
-      int serverMatchB = 0;
-      if (b.quality.contains(server)) {
-        serverMatchB = 1;
-      }
-      return serverMatchB - serverMatchA;
-    });
     return videos;
   }
 }
