@@ -655,17 +655,18 @@ class Aniwave extends MProvider {
     String quality = getPreferenceValue(sourceId, "preferred_quality");
     String server = getPreferenceValue(sourceId, "preferred_server");
     String lang = getPreferenceValue(sourceId, "preferred_language");
-    videos = videos
-        .where(
-            (MVideo e) => e.quality.toLowerCase().contains(lang.toLowerCase()))
-        .toList();
     videos.sort((MVideo a, MVideo b) {
       int qualityMatchA = 0;
-      if (a.quality.contains(quality)) {
+
+      if (a.quality.contains(quality) &&
+          a.quality.toLowerCase().contains(lang.toLowerCase()) &&
+          a.quality.toLowerCase().contains(server.toLowerCase())) {
         qualityMatchA = 1;
       }
       int qualityMatchB = 0;
-      if (b.quality.contains(quality)) {
+      if (b.quality.contains(quality) &&
+          b.quality.toLowerCase().contains(lang.toLowerCase()) &&
+          b.quality.toLowerCase().contains(server.toLowerCase())) {
         qualityMatchB = 1;
       }
       if (qualityMatchA != qualityMatchB) {
@@ -680,17 +681,6 @@ class Aniwave extends MProvider {
       return qualityNumB - qualityNumA;
     });
 
-    videos.sort((MVideo a, MVideo b) {
-      int serverMatchA = 0;
-      if (a.quality.toLowerCase().contains(server.toLowerCase())) {
-        serverMatchA = 1;
-      }
-      int serverMatchB = 0;
-      if (b.quality.toLowerCase().contains(server.toLowerCase())) {
-        serverMatchB = 1;
-      }
-      return serverMatchB - serverMatchA;
-    });
     return videos;
   }
 
