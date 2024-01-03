@@ -1,7 +1,7 @@
 import '../../../../model/source.dart';
 
 Source get nineanimetv => _nineanimetv;
-const _nineanimetvVersion = "0.0.1";
+const _nineanimetvVersion = "0.0.15";
 const _nineanimetvCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/anime/src/en/nineanimetv/nineanimetv.dart";
 Source _nineanimetv = Source(
