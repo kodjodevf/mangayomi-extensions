@@ -85,6 +85,29 @@ class AniFlix extends MProvider {
     List<MChapter>? episodesList = [];
     for (var season in seasons) {
       List<Map<String, dynamic>> episodes = season["episodes"];
+      int page = 1;
+      final res = await http(
+          'GET',
+          json.encode({
+            "url": "${source.baseUrl}/api/show/$animeUrl/${season["id"]}/$page"
+          }));
+      bool hasMoreResult =
+          (json.decode(res)["episodes"] as List<Map<String, dynamic>>)
+              .isNotEmpty;
+
+      while (hasMoreResult) {
+        final res = await http(
+            'GET',
+            json.encode({
+              "url":
+                  "${source.baseUrl}/api/show/$animeUrl/${season["id"]}/$page"
+            }));
+        final epList =
+            json.decode(res)["episodes"] as List<Map<String, dynamic>>;
+        page++;
+        episodes.addAll(epList);
+        hasMoreResult = epList.isNotEmpty;
+      }
       for (var episode in episodes) {
         String name = episode["name"] ?? "";
         if (name.toLowerCase().contains("folge") ||
