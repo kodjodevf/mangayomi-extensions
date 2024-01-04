@@ -5,6 +5,7 @@ import '../model/source.dart';
 import 'multisrc/datalifeengine/sources.dart';
 import 'multisrc/dopeflix/sources.dart';
 import 'multisrc/zorotheme/sources.dart';
+import 'src/all/animeworldindia/sources.dart';
 import 'src/ar/okanime/source.dart';
 import 'src/de/aniflix/source.dart';
 import 'src/en/aniwave/source.dart';
@@ -46,7 +47,8 @@ void main() {
     yomoviesSource,
     animesamaSource,
     nineanimetv,
-    aniflix
+    aniflix,
+    ...animeworldindiaSourcesList
   ];
   final List<Map<String, dynamic>> jsonList =
       _sourcesList.map((source) => source.toJson()).toList();
