@@ -1,7 +1,7 @@
 import '../../../../model/source.dart';
 
 Source get aniflix => _aniflix;
-const _aniflixVersion = "0.0.15";
+const _aniflixVersion = "0.0.2";
 const _aniflixCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/anime/src/de/aniflix/aniflix.dart";
 Source _aniflix = Source(

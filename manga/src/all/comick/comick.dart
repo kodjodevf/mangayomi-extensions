@@ -4,21 +4,25 @@ import 'dart:convert';
 class ComickFun extends MProvider {
   ComickFun();
 
+  final Client client = Client();
+
   @override
   Future<MPages> getPopular(MSource source, int page) async {
-    final url =
-        "${source.apiUrl}/v1.0/search?sort=follow&page=$page&tachiyomi=true";
-    final data = {"url": url, "headers": getHeader(source.baseUrl)};
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(
+            Uri.parse(
+                "${source.apiUrl}/v1.0/search?sort=follow&page=$page&tachiyomi=true"),
+            headers: getHeader(source.baseUrl)))
+        .body;
     return mangaRes(res);
   }
 
   @override
   Future<MPages> getLatestUpdates(MSource source, int page) async {
-    final url =
-        "${source.apiUrl}/v1.0/search?sort=uploaded&page=$page&tachiyomi=true";
-    final data = {"url": url, "headers": getHeader(source.baseUrl)};
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(
+            Uri.parse(
+                "${source.apiUrl}/v1.0/search?sort=uploaded&page=$page&tachiyomi=true"),
+            headers: getHeader(source.baseUrl)))
+        .body;
     return mangaRes(res);
   }
 
@@ -100,8 +104,10 @@ class ComickFun extends MProvider {
       }
       url += "${ll(url)}page=$page&tachiyomi=true";
     }
-    final data = {"url": url, "headers": getHeader(source.baseUrl)};
-    final res = await http('GET', json.encode(data));
+
+    final res =
+        (await client.get(Uri.parse(url), headers: getHeader(source.baseUrl)))
+            .body;
     return mangaRes(res);
   }
 
@@ -110,12 +116,12 @@ class ComickFun extends MProvider {
     final statusList = [
       {"1": 0, "2": 1, "3": 3, "4": 2}
     ];
-
     final headers = getHeader(source.baseUrl);
-
-    final urll = "${source.apiUrl}${url.replaceAll("#", '')}?tachiyomi=true";
-    final data = {"url": urll, "headers": headers};
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(
+            Uri.parse(
+                "${source.apiUrl}${url.replaceAll("#", '')}?tachiyomi=true"),
+            headers: headers))
+        .body;
     MManga manga = MManga();
     manga.author = jsonPathToString(res, r'$.authors[*].name', '');
     manga.genre = jsonPathToString(res, r'$.genres[*].name', "_.").split("_.");
@@ -124,15 +130,15 @@ class ComickFun extends MProvider {
         parseStatus(jsonPathToString(res, r'$..comic.status', ''), statusList);
     final chapUrlReq =
         "${source.apiUrl}${url.replaceAll("#", '')}chapters?lang=${source.lang}&tachiyomi=true&page=1";
-    final dataReq = {"url": chapUrlReq, "headers": headers};
-    final request = await http('GET', json.encode(dataReq));
+    final request =
+        (await client.get(Uri.parse(chapUrlReq), headers: headers)).body;
     var total = jsonPathToString(request, r'$.total', '');
     final chapterLimit = int.parse(total);
     final newChapUrlReq =
         "${source.apiUrl}${url.replaceAll("#", '')}chapters?limit=$chapterLimit&lang=${source.lang}&tachiyomi=true&page=1";
 
-    final newDataReq = {"url": newChapUrlReq, "headers": headers};
-    final newRequest = await http('GET', json.encode(newDataReq));
+    final newRequest =
+        (await client.get(Uri.parse(newChapUrlReq), headers: headers)).body;
 
     final chapsUrls =
         jsonPathToString(newRequest, r'$.chapters[*].hid', "_.").split("_.");
@@ -180,9 +186,10 @@ class ComickFun extends MProvider {
 
   @override
   Future<List<String>> getPageList(MSource source, String url) async {
-    final urll = "${source.apiUrl}/chapter/$url?tachiyomi=true";
-    final data = {"url": urll, "headers": getHeader(url)};
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(
+            Uri.parse("${source.apiUrl}/chapter/$url?tachiyomi=true"),
+            headers: getHeader(url)))
+        .body;
     return jsonPathToString(res, r'$.chapter.images[*].url', '_.').split('_.');
   }
 

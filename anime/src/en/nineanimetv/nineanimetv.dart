@@ -4,19 +4,21 @@ import 'dart:convert';
 class NineAnimeTv extends MProvider {
   NineAnimeTv();
 
+  final Client client = Client();
+
   @override
   Future<MPages> getPopular(MSource source, int page) async {
-    final data = {"url": "${source.baseUrl}/filter?sort=all&page=$page"};
-    final res = await http('GET', json.encode(data));
+    final res = (await client
+            .get(Uri.parse("${source.baseUrl}/filter?sort=all&page=$page")))
+        .body;
     return parseAnimeList(res);
   }
 
   @override
   Future<MPages> getLatestUpdates(MSource source, int page) async {
-    final data = {
-      "url": "${source.baseUrl}/filter?sort=recently_updated&page=$page"
-    };
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse(
+            "${source.baseUrl}/filter?sort=recently_updated&page=$page")))
+        .body;
     return parseAnimeList(res);
   }
 
@@ -105,8 +107,8 @@ class NineAnimeTv extends MProvider {
         url += "${ll(url)}sort=$sort";
       }
     }
-    final data = {"url": "$url&page=$page"};
-    final res = await http('GET', json.encode(data));
+
+    final res = (await client.get(Uri.parse("$url&page=$page"))).body;
     return parseAnimeList(res);
   }
 
@@ -115,8 +117,8 @@ class NineAnimeTv extends MProvider {
     final statusList = [
       {"Currently Airing": 0, "Finished Airing": 1}
     ];
-    final data = {"url": "${source.baseUrl}${url}"};
-    final res = await http('GET', json.encode(data));
+
+    final res = (await client.get(Uri.parse("${source.baseUrl}$url"))).body;
     MManga anime = MManga();
     final document = parseHtml(res);
     final infoElement = document.selectFirst("div.film-infor");
@@ -125,7 +127,7 @@ class NineAnimeTv extends MProvider {
         "";
     anime.status = parseStatus(status, statusList);
     anime.description =
-        infoElement.selectFirst("div.film-description > p").text ?? "";
+        infoElement.selectFirst("div.film-description > p")?.text ?? "";
     anime.author = infoElement.xpathFirst(
             '//div[contains(text(),"Studios:")]/following-sibling::div/a/text()') ??
         "";
@@ -134,9 +136,9 @@ class NineAnimeTv extends MProvider {
         '//div[contains(text(),"Genre:")]/following-sibling::div/a/text()');
     final id = parseHtml(res).selectFirst("div[data-id]").attr("data-id");
 
-    final dataEp = {"url": "${source.baseUrl}/ajax/episode/list/$id"};
-
-    final resEp = await http('GET', json.encode(dataEp));
+    final resEp =
+        (await client.get(Uri.parse("${source.baseUrl}/ajax/episode/list/$id")))
+            .body;
     final html = json.decode(resEp)["html"];
 
     List<MChapter>? episodesList = [];
@@ -160,10 +162,10 @@ class NineAnimeTv extends MProvider {
 
   @override
   Future<List<MVideo>> getVideoList(MSource source, String url) async {
-    final res = await http(
-        'GET',
-        json.encode(
-            {"url": "${source.baseUrl}/ajax/episode/servers?episodeId=$url"}));
+    final res = (await client.get(
+            Uri.parse("${source.baseUrl}/ajax/episode/servers?episodeId=$url")))
+        .body;
+
     final html = json.decode(res)["html"];
 
     final serverElements = parseHtml(html).select("div.server-item");
@@ -175,10 +177,9 @@ class NineAnimeTv extends MProvider {
       final name = serverElement.text;
       final id = serverElement.attr("data-id");
       final subDub = serverElement.attr("data-type");
-      final res = await http(
-          'GET',
-          json.encode(
-              {"url": "${source.baseUrl}/ajax/episode/sources?id=$id"}));
+      final res = (await client
+              .get(Uri.parse("${source.baseUrl}/ajax/episode/sources?id=$id")))
+          .body;
       final epUrl = json.decode(res)["link"];
       List<MVideo> a = [];
 

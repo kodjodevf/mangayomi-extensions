@@ -4,21 +4,21 @@ import 'dart:convert';
 class Batoto extends MProvider {
   Batoto();
 
+  final Client client = Client();
+
   @override
   Future<MPages> getPopular(MSource source, int page) async {
-    final url =
-        "${preferenceMirror(source.id)}/browse?${lang(source.lang)}&sort=views_a&page=$page";
-    final data = {"url": url};
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse(
+            "${preferenceMirror(source.id)}/browse?${lang(source.lang)}&sort=views_a&page=$page")))
+        .body;
     return mangaElementM(res, source);
   }
 
   @override
   Future<MPages> getLatestUpdates(MSource source, int page) async {
-    final url =
-        "${preferenceMirror(source.id)}/browse?${lang(source.lang)}&sort=update&page=$page";
-    final data = {"url": url};
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse(
+            "${preferenceMirror(source.id)}/browse?${lang(source.lang)}&sort=update&page=$page")))
+        .body;
     return mangaElementM(res, source);
   }
 
@@ -52,9 +52,7 @@ class Batoto extends MProvider {
             }
             url += "${source.lang}";
           }
-        }
-        //
-        else if (filter.type == "GenreGroupFilter") {
+        } else if (filter.type == "GenreGroupFilter") {
           final included = (filter.state as List)
               .where((e) => e.state == 1 ? true : false)
               .toList();
@@ -100,8 +98,7 @@ class Batoto extends MProvider {
       url += "${ll(url)}chapters=$min-$max";
     }
 
-    final data = {"url": url};
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse(url))).body;
     return mangaElementM(res, source);
   }
 
@@ -111,8 +108,9 @@ class Batoto extends MProvider {
       {"Ongoing": 0, "Completed": 1, "Cancelled": 3, "Hiatus": 2}
     ];
 
-    final data = {"url": "${preferenceMirror(source.id)}$url"};
-    final res = await http('GET', json.encode(data));
+    final res =
+        (await client.get(Uri.parse("${preferenceMirror(source.id)}$url")))
+            .body;
     MManga manga = MManga();
     final workStatus = xpath(res,
             '//*[@class="attr-item"]/b[contains(text(),"Original work")]/following-sibling::span[1]/text()')
@@ -164,9 +162,9 @@ class Batoto extends MProvider {
 
   @override
   Future<List<String>> getPageList(MSource source, String url) async {
-    final datas = {"url": "${preferenceMirror(source.id)}$url"};
-    final res = await http('GET', json.encode(datas));
-
+    final res =
+        (await client.get(Uri.parse("${preferenceMirror(source.id)}$url")))
+            .body;
     final script = xpath(res,
             '//script[contains(text(), "imgHttpLis") and contains(text(), "batoWord") and contains(text(), "batoPass")]/text()')
         .first;

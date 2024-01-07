@@ -4,20 +4,21 @@ import 'dart:convert';
 class DopeFlix extends MProvider {
   DopeFlix();
 
+  final Client client = Client();
+
   @override
   Future<MPages> getPopular(MSource source, int page) async {
-    final data = {
-      "url":
-          "${preferenceBaseUrl(source.id)}/${getPreferenceValue(source.id, "preferred_popular_page")}?page=$page"
-    };
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse(
+            "${preferenceBaseUrl(source.id)}/${getPreferenceValue(source.id, "preferred_popular_page")}?page=$page")))
+        .body;
     return parseAnimeList(res);
   }
 
   @override
   Future<MPages> getLatestUpdates(MSource source, int page) async {
-    final data = {"url": "${preferenceBaseUrl(source.id)}/home"};
-    final res = await http('GET', json.encode(data));
+    final res =
+        (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}/home")))
+            .body;
     List<MManga> animeList = [];
     final path =
         '//section[contains(text(),"${getPreferenceValue(source.id, "preferred_latest_page")}")]/div/div[@class="film_list-wrap"]/div[@class="flw-item"]/div[@class="film-poster"]';
@@ -74,16 +75,17 @@ class DopeFlix extends MProvider {
         }
       }
     }
-    final data = {"url": url};
-    final res = await http('GET', json.encode(data));
+
+    final res = (await client.get(Uri.parse(url))).body;
     return parseAnimeList(res);
   }
 
   @override
   Future<MManga> getDetail(MSource source, String url) async {
     url = Uri.parse(url).path;
-    final data = {"url": "${preferenceBaseUrl(source.id)}$url"};
-    final res = await http('GET', json.encode(data));
+    final res =
+        (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}$url")))
+            .body;
     MManga anime = MManga();
     final description = xpath(res, '//div[@class="description"]/text()');
     if (description.isNotEmpty) {
@@ -104,10 +106,9 @@ class DopeFlix extends MProvider {
       episode.url = "${preferenceBaseUrl(source.id)}/ajax/movie/episodes/$id";
       episodesList.add(episode);
     } else {
-      final dataS = {
-        "url": "${preferenceBaseUrl(source.id)}/ajax/v2/tv/seasons/$id"
-      };
-      final resS = await http('GET', json.encode(dataS));
+      final resS = (await client.get(Uri.parse(
+              "${preferenceBaseUrl(source.id)}/ajax/v2/tv/seasons/$id")))
+          .body;
 
       final seasonIds =
           xpath(resS, '//a[@class="dropdown-item ss-item"]/@data-id');
@@ -116,11 +117,10 @@ class DopeFlix extends MProvider {
       for (int i = 0; i < seasonIds.length; i++) {
         final seasonId = seasonIds[i];
         final seasonName = seasonNames[i];
-        final dataE = {
-          "url":
-              "${preferenceBaseUrl(source.id)}/ajax/v2/season/episodes/$seasonId"
-        };
-        final html = await http('GET', json.encode(dataE));
+
+        final html = (await client.get(Uri.parse(
+                "${preferenceBaseUrl(source.id)}/ajax/v2/season/episodes/$seasonId")))
+            .body;
 
         final epsHtmls = parseHtml(html).select("div.eps-item");
 
@@ -147,8 +147,10 @@ class DopeFlix extends MProvider {
   @override
   Future<List<MVideo>> getVideoList(MSource source, String url) async {
     url = Uri.parse(url).path;
-    final res = await http(
-        'GET', json.encode({"url": "${preferenceBaseUrl(source.id)}/$url"}));
+    final res =
+        (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}/$url")))
+            .body;
+
     final vidsHtmls = parseHtml(res).select("ul.fss-list a.btn-play");
 
     List<MVideo> videos = [];
@@ -156,10 +158,10 @@ class DopeFlix extends MProvider {
       final vidHtml = vidH.outerHtml;
       final id = xpath(vidHtml, '//a/@data-id').first;
       final name = xpath(vidHtml, '//span/text()').first;
-      final resSource = await http(
-          'GET',
-          json.encode(
-              {"url": "${preferenceBaseUrl(source.id)}/ajax/sources/$id"}));
+      final resSource = (await client.get(
+              Uri.parse("${preferenceBaseUrl(source.id)}/ajax/sources/$id")))
+          .body;
+
       final vidUrl =
           substringBefore(substringAfter(resSource, "\"link\":\""), "\"");
       List<MVideo> a = [];
@@ -168,12 +170,11 @@ class DopeFlix extends MProvider {
       } else if (["Vidcloud", "UpCloud"].contains(name)) {
         final id = substringBefore(substringAfter(vidUrl, "/embed-4/"), "?");
         final serverUrl = substringBefore(vidUrl, "/embed");
-        final datasServer = {
-          "url": "$serverUrl/ajax/embed-4/getSources?id=$id",
-          "headers": {"X-Requested-With": "XMLHttpRequest"}
-        };
 
-        final resServer = await http('GET', json.encode(datasServer));
+        final resServer = (await client.get(
+                Uri.parse("$serverUrl/ajax/embed-4/getSources?id=$id"),
+                headers: {"X-Requested-With": "XMLHttpRequest"}))
+            .body;
         final encrypted = getMapValue(resServer, "encrypted");
         String videoResJson = "";
         if (encrypted == "true") {
@@ -220,7 +221,8 @@ class DopeFlix extends MProvider {
         subtitles = sortSubs(subtitles, source.id);
         if (type == "hls") {
           final masterPlaylistRes =
-              await http('GET', json.encode({"url": masterUrl}));
+              (await client.get(Uri.parse(masterUrl))).body;
+
           for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
               .split("#EXT-X-STREAM-INF:")) {
             final quality =
@@ -258,11 +260,10 @@ class DopeFlix extends MProvider {
   }
 
   Future<List<List<int>>> generateIndexPairs() async {
-    final res = await http(
-        'GET',
-        json.encode({
-          "url": "https://rabbitstream.net/js/player/prod/e4-player.min.js"
-        }));
+    final res = (await client.get(Uri.parse(
+            "https://rabbitstream.net/js/player/prod/e4-player.min.js")))
+        .body;
+
     String script = substringBefore(substringAfter(res, "const "), "()");
     script = script.substring(0, script.lastIndexOf(','));
     final list = script

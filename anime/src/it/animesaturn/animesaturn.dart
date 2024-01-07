@@ -4,10 +4,13 @@ import 'dart:convert';
 class AnimeSaturn extends MProvider {
   AnimeSaturn();
 
+  final Client client = Client();
+
   @override
   Future<MPages> getPopular(MSource source, int page) async {
-    final data = {"url": "${source.baseUrl}/animeincorso?page=$page"};
-    final res = await http('GET', json.encode(data));
+    final res = (await client
+            .get(Uri.parse("${source.baseUrl}/animeincorso?page=$page")))
+        .body;
 
     List<MManga> animeList = [];
 
@@ -32,8 +35,9 @@ class AnimeSaturn extends MProvider {
 
   @override
   Future<MPages> getLatestUpdates(MSource source, int page) async {
-    final data = {"url": "${source.baseUrl}/newest?page=$page"};
-    final res = await http('GET', json.encode(data));
+    final res =
+        (await client.get(Uri.parse("${source.baseUrl}/newest?page=$page")))
+            .body;
 
     List<MManga> animeList = [];
 
@@ -101,8 +105,8 @@ class AnimeSaturn extends MProvider {
       }
       url += "&page=$page";
     }
-    final data = {"url": url};
-    final res = await http('GET', json.encode(data));
+
+    final res = (await client.get(Uri.parse(url))).body;
 
     List<MManga> animeList = [];
     List<String> urls = [];
@@ -141,8 +145,8 @@ class AnimeSaturn extends MProvider {
     final statusList = [
       {"In corso": 0, "Finito": 1}
     ];
-    final data = {"url": url};
-    final res = await http('GET', json.encode(data));
+
+    final res = (await client.get(Uri.parse(url))).body;
     MManga anime = MManga();
     final details = xpath(res,
             '//div[@class="container shadow rounded bg-dark-as-box mb-3 p-3 w-100 text-white"]/text()')
@@ -189,10 +193,10 @@ class AnimeSaturn extends MProvider {
 
   @override
   Future<List<MVideo>> getVideoList(MSource source, String url) async {
-    final res = await http('GET', json.encode({"url": url}));
+    final res = (await client.get(Uri.parse(url))).body;
 
     final urlVid = xpath(res, '//a[contains(@href,"/watch")]/@href').first;
-    final resVid = await http('GET', json.encode({"url": urlVid}));
+    final resVid = (await client.get(Uri.parse(urlVid))).body;
     String masterUrl = "";
     if (resVid.contains("jwplayer(")) {
       masterUrl = substringBefore(substringAfter(resVid, "file: \""), "\"");
@@ -202,8 +206,7 @@ class AnimeSaturn extends MProvider {
 
     List<MVideo> videos = [];
     if (masterUrl.endsWith("playlist.m3u8")) {
-      final masterPlaylistRes =
-          await http('GET', json.encode({"url": masterUrl}));
+      final masterPlaylistRes = (await client.get(Uri.parse(masterUrl))).body;
       for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
           .split("#EXT-X-STREAM-INF:")) {
         final quality =

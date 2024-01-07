@@ -4,24 +4,23 @@ import 'dart:convert';
 class AnimeWorldIndia extends MProvider {
   AnimeWorldIndia();
 
+  final Client client = Client();
+
   @override
   Future<MPages> getPopular(MSource source, int page) async {
-    final data = {
-      "url":
-          "${source.baseUrl}/advanced-search/page/$page/?s_lang=${source.lang}&s_orderby=viewed"
-    };
+    final res = (await client.get(Uri.parse(
+            "${source.baseUrl}/advanced-search/page/$page/?s_lang=${source.lang}&s_orderby=viewed")))
+        .body;
 
-    final res = await http('GET', json.encode(data));
     return parseAnimeList(res, source.baseUrl);
   }
 
   @override
   Future<MPages> getLatestUpdates(MSource source, int page) async {
-    final data = {
-      "url":
-          "${source.baseUrl}/advanced-search/page/$page/?s_lang=${source.lang}&s_orderby=update"
-    };
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse(
+            "${source.baseUrl}/advanced-search/page/$page/?s_lang=${source.lang}&s_orderby=update")))
+        .body;
+
     return parseAnimeList(res, source.baseUrl);
   }
 
@@ -63,15 +62,14 @@ class AnimeWorldIndia extends MProvider {
         }
       }
     }
-    final data = {"url": url};
-    final res = await http('GET', json.encode(data));
+
+    final res = (await client.get(Uri.parse(url))).body;
     return parseAnimeList(res, source.baseUrl);
   }
 
   @override
   Future<MManga> getDetail(MSource source, String url) async {
-    final data = {"url": url};
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse(url))).body;
     MManga anime = MManga();
     final document = parseHtml(res);
     final isMovie =
@@ -146,15 +144,13 @@ class AnimeWorldIndia extends MProvider {
 
   @override
   Future<List<MVideo>> getVideoList(MSource source, String url) async {
-    final res =
-        await http('GET', json.encode({"url": "${source.baseUrl}$url"}));
-
+    final res = (await client.get(Uri.parse("${source.baseUrl}$url"))).body;
     var resJson = substringBefore(
         substringAfterLast(res, "\"players\":"), ",\"noplayer\":");
     var streams = (json.decode(resJson) as List<Map<String, dynamic>>)
-        .where((e) => e["type"] == "stream"
-            ? true
-            : false && (e["url"] as String).isNotEmpty)
+        .where((e) =>
+            (e["type"] == "stream" ? true : false) &&
+            (e["url"] as String).isNotEmpty)
         .toList()
         .where((e) => language(source.lang).isEmpty ||
                 language(source.lang) == e["language"]
@@ -220,15 +216,14 @@ class AnimeWorldIndia extends MProvider {
 
   Future<List<MVideo>> mystreamExtractor(String url, String language) async {
     List<MVideo> videos = [];
-
-    final res = await http('GET', json.encode({"url": url}));
+    final res = (await client.get(Uri.parse(url))).body;
     final streamCode = substringBefore(
         substringAfter(substringAfter(res, "sniff("), ", \""), '"');
 
     final streamUrl =
         "${substringBefore(url, "/watch")}/m3u8/$streamCode/master.txt?s=1&cache=1";
-    final masterPlaylistRes =
-        await http('GET', json.encode({"url": streamUrl}));
+    final masterPlaylistRes = (await client.get(Uri.parse(streamUrl))).body;
+
     List<MTrack> audios = [];
     for (var it in substringAfter(masterPlaylistRes, "#EXT-X-MEDIA:TYPE=AUDIO")
         .split("#EXT-X-MEDIA:TYPE=AUDIO")) {

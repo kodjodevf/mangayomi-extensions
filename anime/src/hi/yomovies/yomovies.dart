@@ -4,17 +4,18 @@ import 'dart:convert';
 class YoMovies extends MProvider {
   YoMovies();
 
+  final Client client = Client();
+
   @override
   bool get supportsLatest => false;
 
   @override
   Future<MPages> getPopular(MSource source, int page) async {
     String pageNu = page == 1 ? "" : "page/$page/";
-    final data = {
-      "url": "${preferenceBaseUrl(source.id)}/most-favorites/$pageNu"
-    };
 
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse(
+            "${preferenceBaseUrl(source.id)}/most-favorites/$pageNu")))
+        .body;
     final document = parseHtml(res);
     return animeFromElement(
         document.select("div.movies-list > div.ml-item"),
@@ -46,7 +47,7 @@ class YoMovies extends MProvider {
       }
       url = "${preferenceBaseUrl(source.id)}$url$pageNu";
     }
-    final res = await http('GET', json.encode({"url": url}));
+    final res = (await client.get(Uri.parse(url))).body;
     final document = parseHtml(res);
     return animeFromElement(
         document.select("div.movies-list > div.ml-item"),
@@ -58,8 +59,9 @@ class YoMovies extends MProvider {
   Future<MManga> getDetail(MSource source, String url) async {
     url = Uri.parse(url).path;
 
-    final data = {"url": "${preferenceBaseUrl(source.id)}$url"};
-    final res = await http('GET', json.encode(data));
+    final res =
+        (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}$url")))
+            .body;
     final document = parseHtml(res);
     MManga anime = MManga();
     var infoElement = document.selectFirst("div.mvi-content");
@@ -96,8 +98,9 @@ class YoMovies extends MProvider {
   @override
   Future<List<MVideo>> getVideoList(MSource source, String url) async {
     url = Uri.parse(url).path;
-    final data = {"url": "${preferenceBaseUrl(source.id)}$url"};
-    final res = await http('GET', json.encode(data));
+    final res =
+        (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}$url")))
+            .body;
     final document = parseHtml(res);
     final serverElements = document.select("div.movieplay > iframe");
     List<MVideo> videos = [];
@@ -135,18 +138,14 @@ class YoMovies extends MProvider {
 
   Future<List<MVideo>> minoplresExtractor(String url) async {
     List<MVideo> videos = [];
-    final res = await http(
-        'GET',
-        json.encode({
-          "url": url,
-          "headers": {"Referer": url}
-        }));
+
+    final res =
+        (await client.get(Uri.parse(url), headers: {"Referer": url})).body;
     final script = xpath(res, '//script[contains(text(),"sources:")]/text()');
     if (script.isEmpty) return [];
     final masterUrl =
         substringBefore(substringAfter(script.first, "file:\""), '"');
-    final masterPlaylistRes =
-        await http('GET', json.encode({"url": masterUrl}));
+    final masterPlaylistRes = (await client.get(Uri.parse(masterUrl))).body;
     for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
         .split("#EXT-X-STREAM-INF:")) {
       final quality =

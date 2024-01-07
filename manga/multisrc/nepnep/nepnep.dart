@@ -4,11 +4,11 @@ import 'dart:convert';
 class NepNep extends MProvider {
   NepNep();
 
+  final Client client = Client();
+
   @override
   Future<MPages> getPopular(MSource source, int page) async {
-    final data = {"url": "${source.baseUrl}/search/"};
-    final res = await http('GET', json.encode(data));
-
+    final res = (await client.get(Uri.parse("${source.baseUrl}/search/"))).body;
     final directory = directoryFromDocument(res);
     final resSort = sortMapList(json.decode(directory), "vm", 1);
 
@@ -17,9 +17,7 @@ class NepNep extends MProvider {
 
   @override
   Future<MPages> getLatestUpdates(MSource source, int page) async {
-    final data = {"url": "${source.baseUrl}/search/"};
-    final res = await http('GET', json.encode(data));
-
+    final res = (await client.get(Uri.parse("${source.baseUrl}/search/"))).body;
     final directory = directoryFromDocument(res);
     final resSort = sortMapList(json.decode(directory), "lt", 1);
 
@@ -31,8 +29,7 @@ class NepNep extends MProvider {
       MSource source, String query, int page, FilterList filterList) async {
     final filters = filterList.filters;
     List<dynamic> queryRes = [];
-    final data = {"url": "${source.baseUrl}/search/"};
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse("${source.baseUrl}/search/"))).body;
 
     final directory = directoryFromDocument(res);
     final resSort = sortMapList(json.decode(directory), "lt", 1);
@@ -145,8 +142,9 @@ class NepNep extends MProvider {
       {"Ongoing": 0, "Completed": 1, "Cancelled": 3, "Hiatus": 2}
     ];
     final headers = getHeader(source.baseUrl);
-    final data = {"url": '${source.baseUrl}/manga/$url', "headers": headers};
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse('${source.baseUrl}/manga/$url'),
+            headers: headers))
+        .body;
     MManga manga = MManga();
     manga.author = xpath(res,
             '//li[contains(@class,"list-group-item") and contains(text(),"Author")]/a/text()')
@@ -194,9 +192,9 @@ class NepNep extends MProvider {
   Future<List<String>> getPageList(MSource source, String url) async {
     final headers = getHeader(source.baseUrl);
     List<String> pages = [];
-    final data = {"url": '${source.baseUrl}$url', "headers": headers};
-    print(data);
-    final res = await http('GET', json.encode(data));
+    final res =
+        (await client.get(Uri.parse('${source.baseUrl}$url'), headers: headers))
+            .body;
     final script =
         xpath(res, '//script[contains(text(), "MainFunction")]/text()').first;
     final chapScript =

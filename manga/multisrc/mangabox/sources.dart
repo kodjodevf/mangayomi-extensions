@@ -4,7 +4,7 @@ import 'src/mangairo/mangaeiro.dart';
 import 'src/mangakakalot/mangakakalot.dart';
 import 'src/manganato/manganato.dart';
 
-const mangaboxVersion = "0.0.15";
+const mangaboxVersion = "0.0.2";
 const mangaboxSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/manga/multisrc/mangabox/mangabox.dart";
 

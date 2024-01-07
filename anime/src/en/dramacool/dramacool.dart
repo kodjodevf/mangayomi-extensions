@@ -3,12 +3,14 @@ import 'dart:convert';
 
 class DramaCool extends MProvider {
   DramaCool();
+
+  final Client client = Client();
+
   @override
   Future<MPages> getPopular(MSource source, int page) async {
-    final data = {
-      "url": "${preferenceBaseUrl(source.id)}/most-popular-drama?page=$page"
-    };
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse(
+            "${preferenceBaseUrl(source.id)}/most-popular-drama?page=$page")))
+        .body;
     final document = parseHtml(res);
     return animeFromElement(document.select("ul.list-episode-item li a"),
         document.selectFirst("li.next a")?.attr("href") != null);
@@ -16,10 +18,9 @@ class DramaCool extends MProvider {
 
   @override
   Future<MPages> getLatestUpdates(MSource source, int page) async {
-    final data = {
-      "url": "${preferenceBaseUrl(source.id)}/recently-added?page=$page"
-    };
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse(
+            "${preferenceBaseUrl(source.id)}/recently-added?page=$page")))
+        .body;
     final document = parseHtml(res);
     return animeFromElement(document.select("ul.switch-block a"),
         document.selectFirst("li.next a")?.attr("href") != null);
@@ -28,10 +29,9 @@ class DramaCool extends MProvider {
   @override
   Future<MPages> search(
       MSource source, String query, int page, FilterList filterList) async {
-    final data = {
-      "url": "${preferenceBaseUrl(source.id)}/search?keyword=$query&page=$page"
-    };
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse(
+            "${preferenceBaseUrl(source.id)}/search?keyword=$query&page=$page")))
+        .body;
     final document = parseHtml(res);
     return animeFromElement(document.select("ul.list-episode-item li a"),
         document.selectFirst("li.next a")?.attr("href") != null);
@@ -44,14 +44,16 @@ class DramaCool extends MProvider {
     ];
     url = Uri.parse(url).path;
     if (url.contains("-episode-") && url.endsWith(".html")) {
-      final data = {"url": "${preferenceBaseUrl(source.id)}$url"};
-      final res = await http('GET', json.encode(data));
+      final res =
+          (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}$url")))
+              .body;
       url = parseHtml(res).selectFirst("div.category a").attr("href");
     }
     url = Uri.parse(url).path;
 
-    final data = {"url": "${preferenceBaseUrl(source.id)}$url"};
-    final res = await http('GET', json.encode(data));
+    final res =
+        (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}$url")))
+            .body;
     final document = parseHtml(res);
     MManga anime = MManga();
     anime.description = document
@@ -100,16 +102,17 @@ class DramaCool extends MProvider {
   @override
   Future<List<MVideo>> getVideoList(MSource source, String url) async {
     url = Uri.parse(url).path;
-    final data = {"url": "${preferenceBaseUrl(source.id)}$url"};
-    final res = await http('GET', json.encode(data));
+
+    final res =
+        (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}$url")))
+            .body;
     final document = parseHtml(res);
     String iframeUrl = document.selectFirst("iframe")?.getSrc ?? "";
     if (iframeUrl.isEmpty) return [];
     if (iframeUrl.startsWith("//")) {
       iframeUrl = "https:$iframeUrl";
     }
-    var iframeDoc =
-        parseHtml(await http('GET', json.encode({"url": iframeUrl})));
+    var iframeDoc = parseHtml((await client.get(Uri.parse(iframeUrl))).body);
     final serverElements = iframeDoc.select("ul.list-server-items li");
     List<MVideo> videos = [];
     for (var serverElement in serverElements) {
