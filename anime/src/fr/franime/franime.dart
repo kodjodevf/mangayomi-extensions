@@ -4,13 +4,11 @@ import 'dart:convert';
 class FrAnime extends MProvider {
   FrAnime();
 
+  final Client client = Client();
+
   @override
   Future<MPages> getPopular(MSource source, int page) async {
-    final data = {
-      "url": "https://api.franime.fr/api/animes/",
-      "headers": {"Referer": "https://franime.fr/"}
-    };
-    final res = await http('GET', json.encode(data));
+    final res = await dataBase();
 
     return animeResList(res);
   }
@@ -87,8 +85,8 @@ class FrAnime extends MProvider {
 
   @override
   Future<List<MVideo>> getVideoList(MSource source, String url) async {
-    String language = "vo".toString();
-    String videoBaseUrl = "https://api.franime.fr/api/anime".toString();
+    String language = "vo";
+    String videoBaseUrl = "https://api.franime.fr/api/anime";
     if (url.contains("lang=")) {
       language = substringBefore(substringAfter(url, "lang="), "&");
     }
@@ -136,7 +134,7 @@ class FrAnime extends MProvider {
     } else if (language == "vf" && hasVf) {
       players = vfPlayers;
     }
-    print(players);
+
     List<MVideo> videos = [];
     for (var i = 0; i < players.length; i++) {
       String apiUrl = "$videoBaseUrl/$language/$i";
@@ -144,11 +142,9 @@ class FrAnime extends MProvider {
 
       MVideo video = MVideo();
 
-      final data = {
-        "url": apiUrl,
-        "headers": {"Referer": "https://franime.fr/"}
-      };
-      final playerUrl = await http('GET', json.encode(data));
+      final playerUrl = (await client.get(Uri.parse(apiUrl),
+              headers: {"Referer": "https://franime.fr/"}))
+          .body;
 
       List<MVideo> a = [];
       if (playerName.contains("vido")) {
@@ -324,16 +320,12 @@ class FrAnime extends MProvider {
   }
 
   Future<String> dataBase() async {
-    final data = {
-      "url": "https://api.franime.fr/api/animes/",
-      "headers": {"Referer": "https://franime.fr/"}
-    };
-
-    return await http('GET', json.encode(data));
+    return (await client.get(Uri.parse("https://api.franime.fr/api/animes/"),
+            headers: {"Referer": "https://franime.fr/"}))
+        .body;
   }
 
   String databaseAnimeByTitleO(String res, String titleO) {
-    print(titleO);
     final datas = json.decode(res) as List<Map<String, dynamic>>;
     for (var data in datas) {
       String title =

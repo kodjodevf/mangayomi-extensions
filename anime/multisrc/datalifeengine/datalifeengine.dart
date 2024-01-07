@@ -4,13 +4,16 @@ import 'dart:convert';
 class DataLifeEngine extends MProvider {
   DataLifeEngine();
 
+  final Client client = Client();
+
   @override
   bool get supportsLatest => false;
 
   @override
   Future<MPages> getPopular(MSource source, int page) async {
-    final data = {"url": "${source.baseUrl}${getPath(source)}page/$page"};
-    final res = await http('GET', json.encode(data));
+    final res = (await client
+            .get(Uri.parse("${source.baseUrl}${getPath(source)}page/$page")))
+        .body;
     return animeFromElement(res, source.baseUrl);
   }
 
@@ -34,20 +37,17 @@ class DataLifeEngine extends MProvider {
       };
       final cleanQuery = query.replaceAll(" ", "+");
       if (page == 1) {
-        res = await http(
-            'POST',
-            json.encode({
-              "url": "$baseUrl?do=search&subaction=search&story=$cleanQuery",
-              "headers": headers
-            }));
+        res = (await client.post(
+                Uri.parse(
+                    "$baseUrl?do=search&subaction=search&story=$cleanQuery"),
+                headers: headers))
+            .body;
       } else {
-        res = await http(
-            'POST',
-            json.encode({
-              "url":
-                  "$baseUrl?do=search&subaction=search&search_start=$page&full_search=0&result_from=11&story=$cleanQuery",
-              "headers": headers
-            }));
+        res = (await client.post(
+                Uri.parse(
+                    "$baseUrl?do=search&subaction=search&search_start=$page&full_search=0&result_from=11&story=$cleanQuery"),
+                headers: headers))
+            .body;
       }
     } else {
       String url = "";
@@ -62,7 +62,7 @@ class DataLifeEngine extends MProvider {
           }
         }
       }
-      res = await http('GET', json.encode({"url": url}));
+      res = (await client.get(Uri.parse(url))).body;
     }
 
     return animeFromElement(res, baseUrl);
@@ -70,8 +70,7 @@ class DataLifeEngine extends MProvider {
 
   @override
   Future<MManga> getDetail(MSource source, String url) async {
-    final data = {"url": url};
-    String res = await http('GET', json.encode(data));
+    String res = (await client.get(Uri.parse(url))).body;
     MManga anime = MManga();
     final description = xpath(res, '//span[@itemprop="description"]/text()');
     anime.description = description.isNotEmpty ? description.first : "";
@@ -165,14 +164,14 @@ class DataLifeEngine extends MProvider {
   }
 
   Future<List<MVideo>> streamHideExtractor(String url) async {
-    final res = await http('GET', json.encode({"url": url}));
+    final res = (await client.get(Uri.parse(url))).body;
     final masterUrl = substringBefore(
         substringAfter(
-            substringAfter(substringAfter(unpackJs(res), "sources:"), "file:\""),
+            substringAfter(
+                substringAfter(unpackJs(res), "sources:"), "file:\""),
             "src:\""),
         '"');
-    final masterPlaylistRes =
-        await http('GET', json.encode({"url": masterUrl}));
+    final masterPlaylistRes = (await client.get(Uri.parse(masterUrl))).body;
     List<MVideo> videos = [];
     for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
         .split("#EXT-X-STREAM-INF:")) {
@@ -197,15 +196,14 @@ class DataLifeEngine extends MProvider {
   }
 
   Future<List<MVideo>> upstreamExtractor(String url) async {
-    final res = await http('GET', json.encode({"url": url}));
+    final res = (await client.get(Uri.parse(url))).body;
     final js = xpath(res, '//script[contains(text(), "m3u8")]/text()');
     if (js.isEmpty) {
       return [];
     }
     final masterUrl =
         substringBefore(substringAfter(unpackJs(js.first), "{file:\""), "\"}");
-    final masterPlaylistRes =
-        await http('GET', json.encode({"url": masterUrl}));
+    final masterPlaylistRes = (await client.get(Uri.parse(masterUrl))).body;
     List<MVideo> videos = [];
     for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
         .split("#EXT-X-STREAM-INF:")) {
@@ -230,7 +228,7 @@ class DataLifeEngine extends MProvider {
   }
 
   Future<List<MVideo>> uqloadExtractor(String url) async {
-    final res = await http('GET', json.encode({"url": url}));
+    final res = (await client.get(Uri.parse(url))).body;
     final js = xpath(res, '//script[contains(text(), "sources:")]/text()');
     if (js.isEmpty) {
       return [];

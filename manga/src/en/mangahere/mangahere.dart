@@ -4,13 +4,14 @@ import 'dart:convert';
 class MangaHere extends MProvider {
   MangaHere();
 
+  final Client client = Client();
+
   @override
   Future<MPages> getPopular(MSource source, int page) async {
-    final headers = getHeader(source.baseUrl);
-    final url = "${source.baseUrl}/directory/$page.htm";
-
-    final data = {"url": url, "headers": headers};
-    final res = await http('POST', json.encode(data));
+    final res = (await client.get(
+            Uri.parse("${source.baseUrl}/directory/$page.htm"),
+            headers: getHeader(source.baseUrl)))
+        .body;
 
     List<MManga> mangaList = [];
     final names =
@@ -33,11 +34,10 @@ class MangaHere extends MProvider {
 
   @override
   Future<MPages> getLatestUpdates(MSource source, int page) async {
-    final headers = getHeader(source.baseUrl);
-    final url = "${source.baseUrl}/directory/$page.htm?latest";
-
-    final data = {"url": url, "headers": headers};
-    final res = await http('POST', json.encode(data));
+    final res = (await client.get(
+            Uri.parse("${source.baseUrl}/directory/$page.htm?latest"),
+            headers: getHeader(source.baseUrl)))
+        .body;
 
     List<MManga> mangaList = [];
     final names =
@@ -61,8 +61,6 @@ class MangaHere extends MProvider {
   @override
   Future<MPages> search(
       MSource source, String query, int page, FilterList filterList) async {
-    final headers = getHeader(source.baseUrl);
-
     final filters = filterList.filters;
     String url = "${source.baseUrl}/search";
 
@@ -108,8 +106,9 @@ class MangaHere extends MProvider {
       }
     }
     url += "${ll(url)}title=$query&page=$page";
-    final data = {"url": url, "headers": headers};
-    final res = await http('POST', json.encode(data));
+    final res =
+        (await client.get(Uri.parse(url), headers: getHeader(source.baseUrl)))
+            .body;
 
     List<MManga> mangaList = [];
     final names =
@@ -135,9 +134,9 @@ class MangaHere extends MProvider {
     final statusList = [
       {"Ongoing": 0, "Completed": 1}
     ];
-    final headers = getHeader(source.baseUrl);
-    final data = {"url": "${source.baseUrl}/$url", "headers": headers};
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse("${source.baseUrl}/$url"),
+            headers: headers))
+        .body;
     MManga manga = MManga();
     manga.author =
         xpath(res, '//*[@class="detail-info-right-say"]/a/text()').first;
@@ -172,8 +171,7 @@ class MangaHere extends MProvider {
   Future<List<String>> getPageList(MSource source, String url) async {
     final headers = getHeader(source.baseUrl);
     final urll = "${source.baseUrl}$url";
-    final data = {"url": urll, "headers": headers};
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse(urll), headers: headers)).body;
     final pages = xpath(res, "//body/div/div/span/a/text()");
     List<String> pageUrls = [];
     if (pages.isEmpty) {
@@ -221,8 +219,9 @@ class MangaHere extends MProvider {
               "Host": "www.mangahere.cc",
               "X-Requested-With": "XMLHttpRequest"
             };
-            final data = {"url": pageLink, "headers": headers};
-            final ress = await http('GET', json.encode(data));
+
+            final ress =
+                (await client.get(Uri.parse(pageLink), headers: headers)).body;
 
             responseText = ress;
 
@@ -231,7 +230,8 @@ class MangaHere extends MProvider {
             }
           }
         }
-        String deobfuscatedScript = unpackJs(responseText.replaceAll("eval", ""));
+        String deobfuscatedScript =
+            unpackJs(responseText.replaceAll("eval", ""));
 
         int baseLinkStartPos = deobfuscatedScript.indexOf("pix=") + 5;
         int baseLinkEndPos =

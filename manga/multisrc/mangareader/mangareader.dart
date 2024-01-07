@@ -4,23 +4,21 @@ import 'dart:convert';
 class MangaReader extends MProvider {
   MangaReader();
 
+  final Client client = Client();
+
   @override
   Future<MPages> getPopular(MSource source, int page) async {
-    final url =
-        "${source.baseUrl}${getMangaUrlDirectory(source.name)}/?page=$page&order=popular";
-    final data = {"url": url, "sourceId": source.id};
-    final res = await http('GET', json.encode(data));
-
+    final res = (await client.get(Uri.parse(
+            "${source.baseUrl}${getMangaUrlDirectory(source.name)}/?page=$page&order=popular")))
+        .body;
     return mangaRes(res);
   }
 
   @override
   Future<MPages> getLatestUpdates(MSource source, int page) async {
-    final url =
-        "${source.baseUrl}${getMangaUrlDirectory(source.name)}/?page=$page&order=update";
-    final data = {"url": url, "sourceId": source.id};
-    final res = await http('GET', json.encode(data));
-
+    final res = (await client.get(Uri.parse(
+            "${source.baseUrl}${getMangaUrlDirectory(source.name)}/?page=$page&order=update")))
+        .body;
     return mangaRes(res);
   }
 
@@ -68,9 +66,7 @@ class MangaReader extends MProvider {
       }
     }
 
-    final data = {"url": url, "sourceId": source.id};
-    final res = await http('GET', json.encode(data));
-
+    final res = (await client.get(Uri.parse(url))).body;
     return mangaRes(res);
   }
 
@@ -129,9 +125,8 @@ class MangaReader extends MProvider {
     ];
     url = getUrlWithoutDomain(url);
     MManga manga = MManga();
-    final datas = {"url": "${source.baseUrl}$url", "sourceId": source.id};
-    final res = await http('GET', json.encode(datas));
 
+    final res = (await client.get(Uri.parse("${source.baseUrl}$url"))).body;
     List<String> author = xpath(
         res,
         "//table[contains(@class, 'infotable')]//tr[contains(text(), 'Author')]/td[last()]/text() | //div[contains(@class, 'tsinfo')]//div[contains(@class, 'imptdt') and contains(text(), 'Author')]//i/text() | //div[contains(@class, 'fmed')]//b[contains(text(), 'Author')]/following-sibling::span[1]/text() | //span[contains(text(), 'Author')]/text()",
@@ -195,8 +190,7 @@ class MangaReader extends MProvider {
   @override
   Future<List<String>> getPageList(MSource source, String url) async {
     url = getUrlWithoutDomain(url);
-    final datas = {"url": '${source.baseUrl}$url', "sourceId": source.id};
-    final res = await http('GET', json.encode(datas));
+    final res = (await client.get(Uri.parse('${source.baseUrl}$url'))).body;
 
     List<String> pages = [];
     List<String> pagesUrl = [];

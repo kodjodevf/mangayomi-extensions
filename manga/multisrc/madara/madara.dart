@@ -4,20 +4,22 @@ import 'dart:convert';
 class Madara extends MProvider {
   Madara();
 
+  final Client client = Client();
+
   @override
   Future<MPages> getPopular(MSource source, int page) async {
-    final url = "${source.baseUrl}/manga/page/$page/?m_orderby=views";
-    final data = {"url": url, "sourceId": source.id};
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(
+            Uri.parse("${source.baseUrl}/manga/page/$page/?m_orderby=views")))
+        .body;
     final document = parseHtml(res);
     return mangaFromElements(document.select("div.page-item-detail"));
   }
 
   @override
   Future<MPages> getLatestUpdates(MSource source, int page) async {
-    final url = "${source.baseUrl}/manga/page/$page/?m_orderby=latest";
-    final data = {"url": url, "sourceId": source.id};
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(
+            Uri.parse("${source.baseUrl}/manga/page/$page/?m_orderby=latest")))
+        .body;
     final document = parseHtml(res);
     return mangaFromElements(document.select("div.page-item-detail"));
   }
@@ -68,8 +70,8 @@ class Madara extends MProvider {
         }
       }
     }
-    final data = {"url": url, "sourceId": source.id};
-    final res = await http('GET', json.encode(data));
+
+    final res = (await client.get(Uri.parse(url))).body;
     final document = parseHtml(res);
     return mangaFromElements(document.select("div.c-tabs-item__content"));
   }
@@ -122,8 +124,7 @@ class Madara extends MProvider {
     ];
     MManga manga = MManga();
     String res = "";
-    final datas = {"url": url, "sourceId": source.id};
-    res = await http('GET', json.encode(datas));
+    res = (await client.get(Uri.parse(url))).body;
     final document = parseHtml(res);
     manga.author = document.selectFirst("div.author-content > a")?.text ?? "";
 
@@ -162,14 +163,17 @@ class Madara extends MProvider {
       "Content-Type": "application/x-www-form-urlencoded",
       "X-Requested-With": "XMLHttpRequest"
     };
-    final urll =
-        "${baseUrl}wp-admin/admin-ajax.php?action=manga_get_chapters&manga=$mangaId";
-    final datasP = {"url": urll, "headers": headers, "sourceId": source.id};
-    res = await http('POST', json.encode(datasP));
-    if (res == "error" || mangaId.isEmpty) {
-      final urlP = "${url}ajax/chapters";
-      final datasP = {"url": urlP, "headers": headers, "sourceId": source.id};
-      res = await http('POST', json.encode(datasP));
+
+    final resP = await client.post(
+        Uri.parse(
+            "${baseUrl}wp-admin/admin-ajax.php?action=manga_get_chapters&manga=$mangaId"),
+        headers: headers);
+    if (resP != 200 || mangaId.isEmpty) {
+      res = (await client.post(Uri.parse("${url}ajax/chapters"),
+              headers: headers))
+          .body;
+    } else {
+      res = resP.body;
     }
 
     var chapUrls = xpath(res, '//li[@class^="wp-manga-chapter"]/a/@href');
@@ -222,8 +226,7 @@ class Madara extends MProvider {
 
   @override
   Future<List<String>> getPageList(MSource source, String url) async {
-    final datas = {"url": url, "sourceId": source.id};
-    final res = await http('GET', json.encode(datas));
+    final res = (await client.get(Uri.parse(url))).body;
     final document = parseHtml(res);
     final pageElement = document.selectFirst(
         "div.page-break, li.blocks-gallery-item, .reading-content, .text-left img");

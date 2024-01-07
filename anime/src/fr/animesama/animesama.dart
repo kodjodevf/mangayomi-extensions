@@ -4,10 +4,11 @@ import 'dart:convert';
 class AnimeSama extends MProvider {
   AnimeSama();
 
+  final Client client = Client();
+
   @override
   Future<MPages> getPopular(MSource source, int page) async {
-    final data = {"url": "${source.baseUrl}/#$page"};
-    final doc = await http('GET', json.encode(data));
+    final doc = (await client.get(Uri.parse("${source.baseUrl}/#$page"))).body;
     final regex = RegExp(r"""^\s*carteClassique\(\s*.*?\s*,\s*"(.*?)".*\)""",
         multiLine: true);
     var matches = regex.allMatches(doc).toList();
@@ -24,7 +25,7 @@ class AnimeSama extends MProvider {
 
   @override
   Future<MPages> getLatestUpdates(MSource source, int page) async {
-    final res = await http('GET', json.encode({"url": source.baseUrl}));
+    final res = (await client.get(Uri.parse(source.baseUrl))).body;
     var document = parseHtml(res);
     final latest = document
         .select("h2")
@@ -46,8 +47,9 @@ class AnimeSama extends MProvider {
   Future<MPages> search(
       MSource source, String query, int page, FilterList filterList) async {
     final filters = filterList.filters;
-    final res = await http('GET',
-        json.encode({"url": "${source.baseUrl}/catalogue/listing_all.php"}));
+    final res = (await client
+            .get(Uri.parse("${source.baseUrl}/catalogue/listing_all.php")))
+        .body;
     var databaseElements = parseHtml(res).select(".cardListAnime");
     List<MElement> elements = [];
     elements = databaseElements
@@ -236,7 +238,8 @@ class AnimeSama extends MProvider {
   }
 
   Future<List<MManga>> fetchAnimeSeasons(String url) async {
-    final res = await http('GET', json.encode({"url": url}));
+    final res = (await client.get(Uri.parse(url))).body;
+
     var document = parseHtml(res);
     String animeName = document.getElementById("titreOeuvre")?.text ?? "";
 
@@ -259,7 +262,7 @@ class AnimeSama extends MProvider {
         if (movies.isNotEmpty) {
           var movieNameRegex =
               RegExp("^\\s*newSPF\\(\"(.*)\"\\);", multiLine: true);
-          var moviesDoc = await http('GET', json.encode({"url": moviesUrl}));
+          var moviesDoc = (await client.get(Uri.parse(moviesUrl))).body;
           List<RegExpMatch> matches =
               movieNameRegex.allMatches(moviesDoc).toList();
 
@@ -312,7 +315,7 @@ class AnimeSama extends MProvider {
   Future<List<List<String>>> fetchPlayers(String url) async {
     var docUrl = "$url/episodes.js";
     List<List<String>> players = [];
-    var response = await http('GET', json.encode({"url": docUrl}));
+    var response = (await client.get(Uri.parse(docUrl))).body;
 
     if (response == "error") {
       return [];

@@ -4,10 +4,11 @@ import 'dart:convert';
 class AnimesUltra extends MProvider {
   AnimesUltra();
 
+  final Client client = Client();
+
   @override
   Future<MPages> getPopular(MSource source, int page) async {
-    final data = {"url": "${source.baseUrl}/"};
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse(source.baseUrl))).body;
 
     List<MManga> animeList = [];
     final urls = xpath(res,
@@ -30,8 +31,7 @@ class AnimesUltra extends MProvider {
 
   @override
   Future<MPages> getLatestUpdates(MSource source, int page) async {
-    final data = {"url": "${source.baseUrl}/"};
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse(source.baseUrl))).body;
 
     List<MManga> animeList = [];
     final urls = xpath(res,
@@ -55,8 +55,7 @@ class AnimesUltra extends MProvider {
   @override
   Future<MPages> search(
       MSource source, String query, int page, FilterList filterList) async {
-    final data = {"url": "${source.baseUrl}/"};
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse(source.baseUrl))).body;
 
     List<MManga> animeList = [];
     final urls = xpath(res, '//*[@class="film-poster"]/a/@href');
@@ -77,13 +76,10 @@ class AnimesUltra extends MProvider {
   @override
   Future<MManga> getDetail(MSource source, String url) async {
     final statusList = [
-      {
-        "En cours": 0,
-        "Terminé": 1,
-      }
+      {"En cours": 0, "Terminé": 1}
     ];
-    final data = {"url": url};
-    final res = await http('GET', json.encode(data));
+
+    final res = (await client.get(Uri.parse(url))).body;
     MManga anime = MManga();
     anime.description =
         xpath(res, '//*[@class="film-description m-hide"]/text()').first;

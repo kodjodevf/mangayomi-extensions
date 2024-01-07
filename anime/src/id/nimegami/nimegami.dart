@@ -4,10 +4,12 @@ import 'dart:convert';
 class NimeGami extends MProvider {
   NimeGami();
 
+  final Client client = Client();
+
   @override
   Future<MPages> getPopular(MSource source, int page) async {
-    final data = {"url": "${source.baseUrl}/page/$page"};
-    final res = await http('GET', json.encode(data));
+    final res =
+        (await client.get(Uri.parse("${source.baseUrl}/page/$page"))).body;
     List<MManga> animeList = [];
     final urls = xpath(res, '//div[@class="wrapper-2-a"]/article/a/@href');
     final names = xpath(res, '//div[@class="wrapper-2-a"]/article/a/@title');
@@ -26,8 +28,8 @@ class NimeGami extends MProvider {
 
   @override
   Future<MPages> getLatestUpdates(MSource source, int page) async {
-    final data = {"url": "${source.baseUrl}/page/$page"};
-    final res = await http('GET', json.encode(data));
+    final res =
+        (await client.get(Uri.parse("${source.baseUrl}/page/$page"))).body;
     List<MManga> animeList = [];
     final urls = xpath(res, '//div[@class="post-article"]/article/div/a/@href');
     final names =
@@ -48,10 +50,9 @@ class NimeGami extends MProvider {
   @override
   Future<MPages> search(
       MSource source, String query, int page, FilterList filterList) async {
-    final data = {
-      "url": "${source.baseUrl}/page/$page/?s=$query&post_type=post"
-    };
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(
+            Uri.parse("${source.baseUrl}/page/$page/?s=$query&post_type=post")))
+        .body;
     List<MManga> animeList = [];
     final urls = xpath(res, '//div[@class="archive-a"]/article/div/a/@href');
     final names = xpath(res, '//div[@class="archive-a"]/article/h2/a/@title');
@@ -70,8 +71,7 @@ class NimeGami extends MProvider {
 
   @override
   Future<MManga> getDetail(MSource source, String url) async {
-    final data = {"url": url};
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse(url))).body;
     MManga anime = MManga();
     final description = xpath(res, '//*[@id="Sinopsis"]/p/text()');
     if (description.isNotEmpty) {
@@ -123,14 +123,13 @@ class NimeGami extends MProvider {
 
   Future<List<MVideo>> extractVideos(String quality, String url) async {
     List<MVideo> videos = [];
-    List<MVideo> a = [];
     if (url.contains("video.nimegami.id")) {
       final realUrl = utf8.decode(
           base64Url.decode(substringBefore(substringAfter(url, "url="), "&")));
       final a = await extractHXFileVideos(realUrl, quality);
       videos.addAll(a);
     } else if (url.contains("berkasdrive") || url.contains("drive.nimegami")) {
-      final res = await http('GET', json.encode({"url": url}));
+      final res = (await client.get(Uri.parse(url))).body;
       final source = xpath(res, '//source/@src');
       if (source.isNotEmpty) {
         videos.add(toVideo(source.first, "Berkasdrive - $quality"));
@@ -147,13 +146,15 @@ class NimeGami extends MProvider {
     if (!url.contains("embed-")) {
       url = url.replaceAll(".co/", ".co/embed-") + ".html";
     }
-    final res = await http('GET', json.encode({"url": url}));
+    final res = (await client.get(Uri.parse(url))).body;
     final script = xpath(res,
         '//script[contains(text(), "eval") and contains(text(), "p,a,c,k,e,d")]/text()');
     if (script.isNotEmpty) {
       final videoUrl = substringBefore(
-          substringAfter(substringAfter(unpackJs(script.first), "sources:[", ""),
-              "file\":\"", ""),
+          substringAfter(
+              substringAfter(unpackJs(script.first), "sources:[", ""),
+              "file\":\"",
+              ""),
           '"');
       if (videoUrl.isNotEmpty) {
         return [toVideo(videoUrl, "HXFile - $quality")];

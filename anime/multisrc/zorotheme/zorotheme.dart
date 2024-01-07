@@ -4,18 +4,22 @@ import 'dart:convert';
 class ZoroTheme extends MProvider {
   ZoroTheme();
 
+  final Client client = Client();
+
   @override
   Future<MPages> getPopular(MSource source, int page) async {
-    final data = {"url": "${source.baseUrl}/most-popular?page=$page"};
-    final res = await http('GET', json.encode(data));
+    final res = (await client
+            .get(Uri.parse("${source.baseUrl}/most-popular?page=$page")))
+        .body;
 
     return animeElementM(res);
   }
 
   @override
   Future<MPages> getLatestUpdates(MSource source, int page) async {
-    final data = {"url": "${source.baseUrl}/recently-updated?page=$page"};
-    final res = await http('GET', json.encode(data));
+    final res = (await client
+            .get(Uri.parse("${source.baseUrl}/recently-updated?page=$page")))
+        .body;
 
     return animeElementM(res);
   }
@@ -109,8 +113,7 @@ class ZoroTheme extends MProvider {
       }
     }
     url += "${ll(url)}page=$page";
-    final data = {"url": url};
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse(url))).body;
 
     return animeElementM(res);
   }
@@ -118,13 +121,9 @@ class ZoroTheme extends MProvider {
   @override
   Future<MManga> getDetail(MSource source, String url) async {
     final statusList = [
-      {
-        "Currently Airing": 0,
-        "Finished Airing": 1,
-      }
+      {"Currently Airing": 0, "Finished Airing": 1}
     ];
-    final data = {"url": "${source.baseUrl}$url"};
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse("${source.baseUrl}$url"))).body;
     MManga anime = MManga();
     final status = xpath(res,
             '//*[@class="anisc-info"]/div[contains(text(),"Status:")]/span[2]/text()')
@@ -148,11 +147,8 @@ class ZoroTheme extends MProvider {
     final urlEp =
         "${source.baseUrl}/ajax${ajaxRoute('${source.baseUrl}')}/episode/list/$id";
 
-    final dataEp = {
-      "url": urlEp,
-      "headers": {"referer": url}
-    };
-    final resEp = await http('GET', json.encode(dataEp));
+    final resEp =
+        (await client.get(Uri.parse(urlEp), headers: {"referer": url})).body;
 
     final html = json.decode(resEp)["html"];
     final epElements = parseHtml(html).select("a.ep-item");
@@ -177,12 +173,11 @@ class ZoroTheme extends MProvider {
   Future<List<MVideo>> getVideoList(MSource source, String url) async {
     final id = substringAfterLast(url, '?ep=');
 
-    final datas = {
-      "url":
-          "${source.baseUrl}/ajax${ajaxRoute('${source.baseUrl}')}/episode/servers?episodeId=$id",
-      "headers": {"referer": "${source.baseUrl}/$url"}
-    };
-    final res = await http('GET', json.encode(datas));
+    final res = (await client.get(
+            Uri.parse(
+                "${source.baseUrl}/ajax${ajaxRoute('${source.baseUrl}')}/episode/servers?episodeId=$id"),
+            headers: {"referer": "${source.baseUrl}/$url"}))
+        .body;
     final html = json.decode(res)["html"];
 
     final serverElements = parseHtml(html).select("div.server-item");
@@ -194,13 +189,12 @@ class ZoroTheme extends MProvider {
       final name = serverElement.text;
       final id = serverElement.attr("data-id");
       final subDub = serverElement.attr("data-type");
-      final datasE = {
-        "url":
-            "${source.baseUrl}/ajax${ajaxRoute('${source.baseUrl}')}/episode/sources?id=$id",
-        "headers": {"referer": "${source.baseUrl}/$url"}
-      };
 
-      final resE = await http('GET', json.encode(datasE));
+      final resE = (await client.get(
+              Uri.parse(
+                  "${source.baseUrl}/ajax${ajaxRoute('${source.baseUrl}')}/episode/sources?id=$id"),
+              headers: {"referer": "${source.baseUrl}/$url"}))
+          .body;
       String epUrl = substringBefore(substringAfter(resE, "\"link\":\""), "\"");
       List<MVideo> a = [];
 

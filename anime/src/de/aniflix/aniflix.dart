@@ -4,14 +4,15 @@ import 'dart:convert';
 class AniFlix extends MProvider {
   AniFlix();
 
+  final Client client = Client();
+
   @override
   Future<MPages> getPopular(MSource source, int page) async {
     final headers = getHeader(source.baseUrl);
-    final data = {
-      "url": "${source.baseUrl}/api/show/new/${page - 1}",
-      "headers": headers
-    };
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(
+            Uri.parse("${source.baseUrl}/api/show/new/${page - 1}"),
+            headers: headers))
+        .body;
 
     return parseAnimeList(res, source.baseUrl, true);
   }
@@ -19,11 +20,10 @@ class AniFlix extends MProvider {
   @override
   Future<MPages> getLatestUpdates(MSource source, int page) async {
     final headers = getHeader(source.baseUrl);
-    final data = {
-      "url": "${source.baseUrl}/api/show/airing/${page - 1}",
-      "headers": headers
-    };
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(
+            Uri.parse("${source.baseUrl}/api/show/airing/${page - 1}"),
+            headers: headers))
+        .body;
     final datas = json.decode(res);
     List<MManga> animeList = [];
     List<String> ids = [];
@@ -52,24 +52,16 @@ class AniFlix extends MProvider {
   @override
   Future<MPages> search(
       MSource source, String query, int page, FilterList filterList) async {
-    final data = {
-      "url": "${source.baseUrl}/api/show/search",
-      "body": {"search": query},
-      "headers": {
-        'Referer': source.baseUrl,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
-    };
-    final res = await http('POST', json.encode(data));
-    return parseAnimeList(res, source.baseUrl, false);
+    final res = await client.post(
+        Uri.parse("${source.baseUrl}/api/show/search"),
+        headers: {'Referer': source.baseUrl},
+        body: {"search": query});
+    return parseAnimeList(res.body, source.baseUrl, false);
   }
 
   @override
   Future<MManga> getDetail(MSource source, String url) async {
-    final data = {"url": "${source.baseUrl}$url"};
-
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse("${source.baseUrl}$url"))).body;
     MManga anime = MManga();
     final jsonRes = json.decode(res);
     anime.name = jsonRes["name"];
@@ -86,22 +78,18 @@ class AniFlix extends MProvider {
     for (var season in seasons) {
       List<Map<String, dynamic>> episodes = season["episodes"];
       int page = 1;
-      final res = await http(
-          'GET',
-          json.encode({
-            "url": "${source.baseUrl}/api/show/$animeUrl/${season["id"]}/$page"
-          }));
+      final res = (await client.get(Uri.parse(
+              "${source.baseUrl}/api/show/$animeUrl/${season["id"]}/$page")))
+          .body;
+
       bool hasMoreResult =
           (json.decode(res)["episodes"] as List<Map<String, dynamic>>)
               .isNotEmpty;
 
       while (hasMoreResult) {
-        final res = await http(
-            'GET',
-            json.encode({
-              "url":
-                  "${source.baseUrl}/api/show/$animeUrl/${season["id"]}/$page"
-            }));
+        final res = (await client.get(Uri.parse(
+                "${source.baseUrl}/api/show/$animeUrl/${season["id"]}/$page")))
+            .body;
         final epList =
             json.decode(res)["episodes"] as List<Map<String, dynamic>>;
         page++;
@@ -130,9 +118,10 @@ class AniFlix extends MProvider {
 
   @override
   Future<List<MVideo>> getVideoList(MSource source, String url) async {
-    final headers = getHeader(source.baseUrl);
-    final data = {"url": "${source.baseUrl}$url", "headers": headers};
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse("${source.baseUrl}$url"),
+            headers: getHeader(source.baseUrl)))
+        .body;
+    print(res);
     final jsonRes = json.decode(res)["streams"];
     List<MVideo> videos = [];
     final hosterSelection = preferenceHosterSelection(source.id);
@@ -140,8 +129,7 @@ class AniFlix extends MProvider {
       List<MVideo> a = [];
       String quality = '${stream["hoster"]["name"]} - ${stream["lang"]}';
       String link = stream["link"];
-      print(link);
-      if (link.contains("https://dood") &&
+      if ((link.contains("https://dood") || link.contains("https://d0")) &&
           hosterSelection.contains("doodstream")) {
         a = await doodExtractor(link, quality);
       } else if (link.contains("https://streamtape") &&

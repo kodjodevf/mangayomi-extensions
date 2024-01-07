@@ -8,7 +8,7 @@ import 'src/readcomicsonline/readcomicsonline.dart';
 import 'src/lelscanvf/lelscanvf.dart';
 import 'src/mangafr/mangafr.dart';
 
-const mmrcmsVersion = "0.0.5";
+const mmrcmsVersion = "0.0.55";
 const mmrcmsSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/manga/multisrc/mmrcms/mmrcms.dart";
 
