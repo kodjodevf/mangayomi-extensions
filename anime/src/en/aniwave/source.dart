@@ -13,5 +13,4 @@ Source _aniwave = Source(
         "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/anime/src/en/aniwave/icon.png",
     sourceCodeUrl: _aniwaveCodeUrl,
     version: _aniwaveVersion,
-    appMinVerReq: "0.1.5",
     isManga: false);

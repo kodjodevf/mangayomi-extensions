@@ -12,6 +12,5 @@ Source _animesama = Source(
     iconUrl:
         "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/anime/src/fr/animesama/icon.png",
     sourceCodeUrl: animesamaCodeUrl,
-    appMinVerReq: "0.1.5",
     version: animesamaVersion,
     isManga: false);
