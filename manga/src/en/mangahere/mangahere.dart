@@ -135,7 +135,7 @@ class MangaHere extends MProvider {
       {"Ongoing": 0, "Completed": 1}
     ];
     final res = (await client.get(Uri.parse("${source.baseUrl}/$url"),
-            headers: headers))
+            headers: getHeader(source.baseUrl)))
         .body;
     MManga manga = MManga();
     manga.author =

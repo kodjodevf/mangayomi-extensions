@@ -311,58 +311,60 @@ class Aniwave extends MProvider {
     List<String> keys = json.decode((await client.get(Uri.parse(
             "https://raw.githubusercontent.com/Claudemirovsky/worstsource-keys/keys/keys.json")))
         .body);
+    List<MVideo> videoList = [];
     final host = Uri.parse(url).host;
     final apiUrl = await getApiUrl(url, keys);
 
-    final res = await client.get(Uri.parse(apiUrl, headers: {
+    final res = await client.get(Uri.parse(apiUrl), headers: {
       "Host": host,
       "Referer": Uri.decodeComponent(url),
       "X-Requested-With": "XMLHttpRequest"
-    }));
+    });
+    final result = json.decode(res.body)['result'];
 
-    if (res.statusCode != 200) return [];
+    if (result != 404) {
+      String masterUrl =
+          ((result['sources'] as List<Map<String, dynamic>>).first)['file'];
+      final tracks = (result['tracks'] as List)
+          .where((e) => e['kind'] == 'captions' ? true : false)
+          .toList();
+      List<MTrack> subtitles = [];
 
-    String masterUrl = ((json.decode(res.body)['result']['sources']
-            as List<Map<String, dynamic>>)
-        .first)['file'];
-    final tracks = (json.decode(res.body)['result']['tracks'] as List)
-        .where((e) => e['kind'] == 'captions' ? true : false)
-        .toList();
-    List<MTrack> subtitles = [];
-
-    for (var sub in tracks) {
-      try {
-        MTrack subtitle = MTrack();
-        subtitle
-          ..label = sub["label"]
-          ..file = sub["file"];
-        subtitles.add(subtitle);
-      } catch (_) {}
-    }
-    List<MVideo> videoList = [];
-    final masterPlaylistRes = (await client.get(Uri.parse(masterUrl))).body;
-
-    for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
-        .split("#EXT-X-STREAM-INF:")) {
-      final quality =
-          "${substringBefore(substringBefore(substringAfter(substringAfter(it, "RESOLUTION="), "x"), ","), "\n")}p";
-
-      String videoUrl = substringBefore(substringAfter(it, "\n"), "\n");
-
-      if (!videoUrl.startsWith("http")) {
-        videoUrl =
-            "${masterUrl.split("/").sublist(0, masterUrl.split("/").length - 1).join("/")}/$videoUrl";
+      for (var sub in tracks) {
+        try {
+          MTrack subtitle = MTrack();
+          subtitle
+            ..label = sub["label"]
+            ..file = sub["file"];
+          subtitles.add(subtitle);
+        } catch (_) {}
       }
 
-      MVideo video = MVideo();
-      video
-        ..url = videoUrl
-        ..originalUrl = videoUrl
-        ..quality = "$name - $type - $quality"
-        ..headers = {"Referer": "https://$host/"}
-        ..subtitles = subtitles;
-      videoList.add(video);
+      final masterPlaylistRes = (await client.get(Uri.parse(masterUrl))).body;
+
+      for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
+          .split("#EXT-X-STREAM-INF:")) {
+        final quality =
+            "${substringBefore(substringBefore(substringAfter(substringAfter(it, "RESOLUTION="), "x"), ","), "\n")}p";
+
+        String videoUrl = substringBefore(substringAfter(it, "\n"), "\n");
+
+        if (!videoUrl.startsWith("http")) {
+          videoUrl =
+              "${masterUrl.split("/").sublist(0, masterUrl.split("/").length - 1).join("/")}/$videoUrl";
+        }
+
+        MVideo video = MVideo();
+        video
+          ..url = videoUrl
+          ..originalUrl = videoUrl
+          ..quality = "$name - $type - $quality"
+          ..headers = {"Referer": "https://$host/"}
+          ..subtitles = subtitles;
+        videoList.add(video);
+      }
     }
+
     return videoList;
   }
 

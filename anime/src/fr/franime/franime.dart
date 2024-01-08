@@ -104,7 +104,6 @@ class FrAnime extends MProvider {
     if (url.contains("s=")) {
       int seasonNumber =
           int.parse(substringBefore(substringAfter(url, "s="), "&"));
-      print(seasonNumber);
       videoBaseUrl += "${seasonNumber - 1}/";
       seasonsJson = seasons[seasonNumber - 1];
     } else {
@@ -114,7 +113,6 @@ class FrAnime extends MProvider {
     var episode = episodesJson.first;
     if (url.contains("ep=")) {
       int episodeNumber = int.parse(substringAfter(url, "ep="));
-      print(episodeNumber);
       episode = episodesJson[episodeNumber - 1];
       videoBaseUrl += "${episodeNumber - 1}";
     } else {

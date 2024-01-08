@@ -201,6 +201,7 @@ class Filma24 extends MProvider {
     final playlistUrl =
         RegExp(r'file:"(\S+?)"').firstMatch(playListUrlResponse)?.group(1) ??
             "";
+    if (playlistUrl.isEmpty) return [];
     final masterPlaylistRes =
         await client.get(Uri.parse(playlistUrl), headers: headers);
 
@@ -232,6 +233,7 @@ class Filma24 extends MProvider {
     final playlistUrl =
         RegExp(r'file:"(\S+?)"').firstMatch(playListUrlResponse)?.group(1) ??
             "";
+    if (playlistUrl.isEmpty) return [];
     final masterPlaylistRes = (await client.get(Uri.parse(playlistUrl))).body;
     for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
         .split("#EXT-X-STREAM-INF:")) {

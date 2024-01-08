@@ -40,7 +40,6 @@ class OploVerz extends MProvider {
     final res = (await client.get(Uri.parse(url))).body;
     MManga anime = MManga();
     final status = xpath(res, '//*[@class="alternati"]/span[2]/text()');
-    print(status);
     if (status.isNotEmpty) {
       anime.status = parseStatus(status.first, statusList);
     }

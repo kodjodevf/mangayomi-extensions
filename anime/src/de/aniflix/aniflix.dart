@@ -121,7 +121,6 @@ class AniFlix extends MProvider {
     final res = (await client.get(Uri.parse("${source.baseUrl}$url"),
             headers: getHeader(source.baseUrl)))
         .body;
-    print(res);
     final jsonRes = json.decode(res)["streams"];
     List<MVideo> videos = [];
     final hosterSelection = preferenceHosterSelection(source.id);
@@ -181,7 +180,6 @@ class AniFlix extends MProvider {
   }
 
   List<MVideo> sortVideos(List<MVideo> videos, int sourceId) {
-    print(videos.length);
     String hoster = getPreferenceValue(sourceId, "preferred_hoster");
     String sub = getPreferenceValue(sourceId, "preferred_sub");
     videos.sort((MVideo a, MVideo b) {
