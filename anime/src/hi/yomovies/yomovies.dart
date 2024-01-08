@@ -57,7 +57,7 @@ class YoMovies extends MProvider {
 
   @override
   Future<MManga> getDetail(MSource source, String url) async {
-    url = Uri.parse(url).path;
+    url = getUrlWithoutDomain(url);
 
     final res =
         (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}$url")))
@@ -97,7 +97,7 @@ class YoMovies extends MProvider {
 
   @override
   Future<List<MVideo>> getVideoList(MSource source, String url) async {
-    url = Uri.parse(url).path;
+    url = getUrlWithoutDomain(url);
     final res =
         (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}$url")))
             .body;

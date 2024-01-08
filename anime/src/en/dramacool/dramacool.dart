@@ -42,14 +42,14 @@ class DramaCool extends MProvider {
     final statusList = [
       {"Ongoing": 0, "Completed": 1}
     ];
-    url = Uri.parse(url).path;
+    url = getUrlWithoutDomain(url);
     if (url.contains("-episode-") && url.endsWith(".html")) {
       final res =
           (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}$url")))
               .body;
       url = parseHtml(res).selectFirst("div.category a").attr("href");
     }
-    url = Uri.parse(url).path;
+    url = getUrlWithoutDomain(url);
 
     final res =
         (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}$url")))
@@ -101,7 +101,7 @@ class DramaCool extends MProvider {
 
   @override
   Future<List<MVideo>> getVideoList(MSource source, String url) async {
-    url = Uri.parse(url).path;
+    url = getUrlWithoutDomain(url);
 
     final res =
         (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}$url")))

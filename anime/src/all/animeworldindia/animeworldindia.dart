@@ -168,18 +168,6 @@ class AnimeWorldIndia extends MProvider {
     return sortVideos(videos, source.id);
   }
 
-  String getUrlWithoutDomain(String orig) {
-    final uri = Uri.parse(orig.replaceAll(' ', '%20'));
-    String out = uri.path;
-    if (uri.query.isNotEmpty) {
-      out += '?${uri.query}';
-    }
-    if (uri.fragment.isNotEmpty) {
-      out += '#${uri.fragment}';
-    }
-    return out;
-  }
-
   MPages parseAnimeList(String res, String baseUrl) {
     List<MManga> animeList = [];
     final document = parseHtml(res);

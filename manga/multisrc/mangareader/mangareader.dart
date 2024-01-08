@@ -314,18 +314,6 @@ class MangaReader extends MProvider {
     }
     return "/manga";
   }
-
-  String getUrlWithoutDomain(String orig) {
-    final uri = Uri.parse(orig.replaceAll(' ', '%20'));
-    String out = uri.path;
-    if (uri.query.isNotEmpty) {
-      out += '?${uri.query}';
-    }
-    if (uri.fragment.isNotEmpty) {
-      out += '#${uri.fragment}';
-    }
-    return out;
-  }
 }
 
 MangaReader main() {
