@@ -4,23 +4,23 @@ import 'dart:convert';
 class MangaDex extends MProvider {
   MangaDex();
 
+  final Client client = Client();
+
   @override
   Future<MPages> getPopular(MSource source, int page) async {
     page = (20 * (page - 1));
     final url =
         "https://api.mangadex.org/manga?limit=20&offset=$page&availableTranslatedLanguage[]=${source.lang}&includes[]=cover_art${preferenceContentRating(source.id)}${preferenceOriginalLanguages(source.id)}&order[followedCount]=desc";
-    final datas = {"url": url};
-    final res = await http('GET', json.encode(datas));
+    final res = (await client.get(Uri.parse(url))).body;
     return mangaRes(res, source);
   }
 
   @override
   Future<MPages> getLatestUpdates(MSource source, int page) async {
     page = (20 * (page - 1));
-    final urll =
+    final url =
         "https://api.mangadex.org/chapter?limit=20&offset=$page&translatedLanguage[]=${source.lang}&includeFutureUpdates=0&order[publishAt]=desc&includeFuturePublishAt=0&includeEmptyPages=0";
-    final datas = {"url": urll};
-    final ress = await http('GET', json.encode(datas));
+    final ress = (await client.get(Uri.parse(url))).body;
     final mangaIds =
         jsonPathToString(ress, r'$.data[*].relationships[*].id', '.--')
             .split('.--');
@@ -30,7 +30,7 @@ class MangaDex extends MProvider {
     }
     final newUrl =
         "https://api.mangadex.org/manga?includes[]=cover_art&limit=${mangaIds.length}${preferenceContentRating(source.id)}${preferenceOriginalLanguages(source.id)}$mangaIdss";
-    final res = await http('GET', json.encode({"url": newUrl}));
+    final res = (await client.get(Uri.parse(newUrl))).body;
     return mangaRes(res, source);
   }
 
@@ -139,7 +139,7 @@ class MangaDex extends MProvider {
       }
     }
 
-    final res = await http('GET', json.encode({"url": url}));
+    final res = (await client.get(Uri.parse(url))).body;
     return mangaRes(res, source);
   }
 
@@ -149,9 +149,9 @@ class MangaDex extends MProvider {
       {"ongoing": 0, "completed": 1, "hiatus": 2, "cancelled": 3}
     ];
 
-    final urll =
-        "https://api.mangadex.org$url?includes[]=cover_art&includes[]=author&includes[]=artist";
-    final res = await http('GET', json.encode({"url": urll}));
+    final res = (await client.get(Uri.parse(
+            "https://api.mangadex.org$url?includes[]=cover_art&includes[]=author&includes[]=artist")))
+        .body;
     MManga manga = MManga();
     manga.author = jsonPathToString(
         res, r'$..data.relationships[*].attributes.name', ', ');
@@ -223,11 +223,10 @@ class MangaDex extends MProvider {
 
   @override
   Future<List<String>> getPageList(MSource source, String url) async {
-    final urll = "https://api.mangadex.org/at-home/server/$url";
+    final res = (await client
+            .get(Uri.parse("https://api.mangadex.org/at-home/server/$url")))
+        .body;
 
-    final res = await http('GET', json.encode({"url": urll}));
-
-    // final dataRes = json.decode(res);
     final host = getMapValue(res, "baseUrl");
     final chapter = getMapValue(res, "chapter", encode: true);
     final hash = getMapValue(chapter, "hash");
@@ -322,7 +321,7 @@ class MangaDex extends MProvider {
       String mangaId, int offset, String lang, int sourceId) async {
     final url =
         'https://api.mangadex.org/manga/$mangaId/feed?limit=500&offset=$offset&includes[]=user&includes[]=scanlation_group&order[volume]=desc&order[chapter]=desc&translatedLanguage[]=$lang&includeFuturePublishAt=0&includeEmptyPages=0${preferenceContentRating(sourceId)}';
-    final res = await http('GET', json.encode({"url": url}));
+    final res = (await client.get(Uri.parse(url))).body;
     return res;
   }
 

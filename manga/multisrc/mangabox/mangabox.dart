@@ -4,21 +4,21 @@ import 'dart:convert';
 class MangaBox extends MProvider {
   MangaBox();
 
+  final Client client = Client();
+
   @override
   Future<MPages> getPopular(MSource source, int page) async {
-    final url = "${source.baseUrl}/${popularUrlPath(source.name, page)}";
-    final data = {"url": url};
-    final res = await http('GET', json.encode(data));
-
+    final res = (await client.get(Uri.parse(
+            "${source.baseUrl}/${popularUrlPath(source.name, page)}")))
+        .body;
     return mangaRes(res);
   }
 
   @override
   Future<MPages> getLatestUpdates(MSource source, int page) async {
-    final url = "${source.baseUrl}/${latestUrlPath(source.name, page)}";
-    final data = {"url": url, "sourceId": source.id};
-    final res = await http('GET', json.encode(data));
-
+    final res = (await client.get(
+            Uri.parse("${source.baseUrl}/${latestUrlPath(source.name, page)}")))
+        .body;
     return mangaRes(res);
   }
 
@@ -84,8 +84,8 @@ class MangaBox extends MProvider {
         }
       }
     }
-    final data = {"url": url};
-    final res = await http('GET', json.encode(data));
+
+    final res = (await client.get(Uri.parse(url))).body;
 
     List<MManga> mangaList = [];
     List<String> urls = [];
@@ -125,8 +125,7 @@ class MangaBox extends MProvider {
       {"Ongoing": 0, "Completed": 1}
     ];
     MManga manga = MManga();
-    final datas = {"url": url};
-    final res = await http('GET', json.encode(datas));
+    final res = (await client.get(Uri.parse(url))).body;
 
     List<String> author = xpath(res,
         '//*[@class="table-label" and contains(text(), "Author")]/parent::tr/td[2]/text()');
@@ -204,8 +203,7 @@ class MangaBox extends MProvider {
 
   @override
   Future<List<String>> getPageList(MSource source, String url) async {
-    final datas = {"url": url};
-    final res = await http('GET', json.encode(datas));
+    final res = (await client.get(Uri.parse(url))).body;
     List<String> pageUrls = [];
     final urls = xpath(res,
         '//div[@class="container-chapter-reader" or @class="panel-read-story"]/img/@src');

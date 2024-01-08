@@ -8,7 +8,6 @@ import 'multisrc/mangabox/sources.dart';
 import 'multisrc/mangareader/sources.dart';
 import 'multisrc/mmrcms/sources.dart';
 import 'multisrc/nepnep/sources.dart';
-import 'src/all/batoto/sources.dart';
 import 'src/all/comick/sources.dart';
 import 'src/all/mangadex/sources.dart';
 import 'src/en/mangahere/source.dart';
@@ -22,7 +21,6 @@ void main() {
     ...mmrcmsSourcesList,
     ...heancmsSourcesList,
     mangahereSource,
-    ...batotoSourcesList,
     ...nepnepSourcesList,
     ...mangaboxSourcesList
   ];

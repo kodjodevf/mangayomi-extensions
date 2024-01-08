@@ -4,31 +4,30 @@ import 'dart:convert';
 class OploVerz extends MProvider {
   OploVerz();
 
+  final Client client = Client();
+
   @override
   Future<MPages> getPopular(MSource source, int page) async {
-    final data = {
-      "url": "${source.baseUrl}/anime-list/page/$page/?order=popular"
-    };
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse(
+            "${source.baseUrl}/anime-list/page/$page/?order=popular")))
+        .body;
     return parseAnimeList(res);
   }
 
   @override
   Future<MPages> getLatestUpdates(MSource source, int page) async {
-    final data = {
-      "url": "${source.baseUrl}/anime-list/page/$page/?order=latest"
-    };
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(
+            Uri.parse("${source.baseUrl}/anime-list/page/$page/?order=latest")))
+        .body;
     return parseAnimeList(res);
   }
 
   @override
   Future<MPages> search(
       MSource source, String query, int page, FilterList filterList) async {
-    final data = {
-      "url": "${source.baseUrl}/anime-list/page/$page/?title=$query"
-    };
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(
+            Uri.parse("${source.baseUrl}/anime-list/page/$page/?title=$query")))
+        .body;
     return parseAnimeList(res);
   }
 
@@ -37,11 +36,10 @@ class OploVerz extends MProvider {
     final statusList = [
       {"ongoing": 0, "completed": 1}
     ];
-    final data = {"url": url};
-    final res = await http('GET', json.encode(data));
+
+    final res = (await client.get(Uri.parse(url))).body;
     MManga anime = MManga();
     final status = xpath(res, '//*[@class="alternati"]/span[2]/text()');
-    print(status);
     if (status.isNotEmpty) {
       anime.status = parseStatus(status.first, statusList);
     }
@@ -70,7 +68,7 @@ class OploVerz extends MProvider {
 
   @override
   Future<List<MVideo>> getVideoList(MSource source, String url) async {
-    final res = await http('GET', json.encode({"url": url}));
+    final res = (await client.get(Uri.parse(url))).body;
     final dataPost = xpath(res,
             '//*[@id="server"]/ul/li/div[contains(@id,"player-option")]/@data-post')
         .first;
@@ -80,23 +78,21 @@ class OploVerz extends MProvider {
     final dataType = xpath(res,
             '//*[@id="server"]/ul/li/div[contains(@id,"player-option")]/@data-type')
         .first;
-    final body = {
-      "action": "player_ajax",
-      "post": dataPost,
-      "nume": dataNume,
-      "type": dataType
-    };
 
-    final ress = await http(
-        'POST',
-        json.encode({
-          "useFormBuilder": true,
-          "body": body,
-          "url": "${source.baseUrl}/wp-admin/admin-ajax.php"
-        }));
+    final ress = (await client.post(
+            Uri.parse("${source.baseUrl}/wp-admin/admin-ajax.php"),
+            headers: null,
+            body: {
+          "action": "player_ajax",
+          "post": dataPost,
+          "nume": dataNume,
+          "type": dataType
+        }))
+        .body;
+
     final playerLink =
         xpath(ress, '//iframe[@class="playeriframe"]/@src').first;
-    final resPlayer = await http('GET', json.encode({"url": playerLink}));
+    final resPlayer = (await client.get(Uri.parse(playerLink))).body;
     var resJson = substringBefore(substringAfter(resPlayer, "= "), "<");
     var streams = json.decode(resJson)["streams"] as List<Map<String, dynamic>>;
     List<MVideo> videos = [];

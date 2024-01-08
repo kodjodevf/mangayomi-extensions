@@ -4,11 +4,11 @@ import 'dart:convert';
 class OkAnime extends MProvider {
   OkAnime();
 
+  final Client client = Client();
+
   @override
   Future<MPages> getPopular(MSource source, int page) async {
-    final data = {"url": source.baseUrl};
-    final res = await http('GET', json.encode(data));
-
+    final res = (await client.get(Uri.parse(source.baseUrl))).body;
     List<MManga> animeList = [];
     String path =
         '//div[@class="section" and contains(text(),"افضل انميات")]/div[@class="section-content"]/div/div/div[contains(@class,"anime-card")]';
@@ -28,9 +28,9 @@ class OkAnime extends MProvider {
 
   @override
   Future<MPages> getLatestUpdates(MSource source, int page) async {
-    final data = {"url": "${source.baseUrl}/espisode-list?page=$page"};
-    final res = await http('GET', json.encode(data));
-
+    final res = (await client
+            .get(Uri.parse("${source.baseUrl}/espisode-list?page=$page")))
+        .body;
     List<MManga> animeList = [];
     String path = '//*[contains(@class,"anime-card")]';
     final urls = xpath(res, '$path/div[@class="anime-title")]/h4/a/@href');
@@ -56,8 +56,8 @@ class OkAnime extends MProvider {
     if (page > 1) {
       url += "&page=$page";
     }
-    final data = {"url": url};
-    final res = await http('GET', json.encode(data));
+
+    final res = (await client.get(Uri.parse(url))).body;
 
     List<MManga> animeList = [];
     String path = '//*[contains(@class,"anime-card")]';
@@ -82,8 +82,7 @@ class OkAnime extends MProvider {
     final statusList = [
       {"يعرض الان": 0, "مكتمل": 1}
     ];
-    final data = {"url": url};
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse(url))).body;
     MManga anime = MManga();
     final status = xpath(res,
         '//*[@class="full-list-info" and contains(text(),"حالة الأنمي")]/small/a/text()');
@@ -116,8 +115,7 @@ class OkAnime extends MProvider {
 
   @override
   Future<List<MVideo>> getVideoList(MSource source, String url) async {
-    final res = await http('GET', json.encode({"url": url}));
-
+    final res = (await client.get(Uri.parse(url))).body;
     final urls = xpath(res, '//*[@id="streamlinks"]/a/@data-src');
     final qualities = xpath(res, '//*[@id="streamlinks"]/a/span/text()');
     final hosterSelection = preferenceHosterSelection(source.id);

@@ -4,25 +4,30 @@ import 'dart:convert';
 class OtakuDesu extends MProvider {
   OtakuDesu();
 
+  final Client client = Client();
+
   @override
   Future<MPages> getPopular(MSource source, int page) async {
-    final data = {"url": "${source.baseUrl}/complete-anime/page/$page"};
-    final res = await http('GET', json.encode(data));
+    final res = (await client
+            .get(Uri.parse("${source.baseUrl}/complete-anime/page/$page")))
+        .body;
     return parseAnimeList(res);
   }
 
   @override
   Future<MPages> getLatestUpdates(MSource source, int page) async {
-    final data = {"url": "${source.baseUrl}/ongoing-anime/page/$page"};
-    final res = await http('GET', json.encode(data));
+    final res = (await client
+            .get(Uri.parse("${source.baseUrl}/ongoing-anime/page/$page")))
+        .body;
     return parseAnimeList(res);
   }
 
   @override
   Future<MPages> search(
       MSource source, String query, int page, FilterList filterList) async {
-    final data = {"url": "${source.baseUrl}/?s=$query&post_type=anime"};
-    final res = await http('GET', json.encode(data));
+    final res = (await client
+            .get(Uri.parse("${source.baseUrl}/?s=$query&post_type=anime")))
+        .body;
     List<MManga> animeList = [];
     final images = xpath(res, '//ul[@class="chivsrc"]/li/img/@src');
     final names = xpath(res, '//ul[@class="chivsrc"]/li/h2/a/text()');
@@ -43,8 +48,7 @@ class OtakuDesu extends MProvider {
     final statusList = [
       {"Ongoing": 0, "Completed": 1}
     ];
-    final data = {"url": url};
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse(url))).body;
     MManga anime = MManga();
     final status = xpath(
         res, '//*[@class="infozingle"]/p[contains(text(), "Status")]/text()');
@@ -83,20 +87,18 @@ class OtakuDesu extends MProvider {
   @override
   Future<List<MVideo>> getVideoList(MSource source, String url) async {
     List<MVideo> videos = [];
-    final res = await http('GET', json.encode({"url": url}));
+    final res = (await client.get(Uri.parse(url))).body;
     final script =
         xpath(res, '//script[contains(text(), "{action:")]/text()').first;
     final nonceAction =
         substringBefore(substringAfter(script, "{action:\""), '"');
     final action = substringBefore(substringAfter(script, "action:\""), '"');
 
-    final resNonceAction = await http(
-        'POST',
-        json.encode({
-          "useFormBuilder": true,
-          "body": {"action": nonceAction},
-          "url": "${source.baseUrl}/wp-admin/admin-ajax.php"
-        }));
+    final resNonceAction = (await client.post(
+            Uri.parse("${source.baseUrl}/wp-admin/admin-ajax.php"),
+            headers: null,
+            body: {"action": nonceAction}))
+        .body;
     final nonce = substringBefore(substringAfter(resNonceAction, ":\""), '"');
     final mirrorstream =
         xpath(res, '//*[@class="mirrorstream"]/ul/li/a/@data-content');
@@ -106,18 +108,21 @@ class OtakuDesu extends MProvider {
       final q = decodedData["q"];
       final id = decodedData["id"];
       final i = decodedData["i"];
-      final body = {"i": i, "id": id, "q": q, "nonce": nonce, "action": action};
 
-      final res = await http(
-          'POST',
-          json.encode({
-            "useFormBuilder": true,
-            "body": body,
-            "url": "${source.baseUrl}/wp-admin/admin-ajax.php"
-          }));
+      final res = (await client.post(
+              Uri.parse("${source.baseUrl}/wp-admin/admin-ajax.php"),
+              headers: null,
+              body: {
+            "i": i,
+            "id": id,
+            "q": q,
+            "nonce": nonce,
+            "action": action
+          }))
+          .body;
       final html = utf8.decode(
           base64Url.decode(substringBefore(substringAfter(res, ":\""), '"')));
-      final url = xpath(html, '//iframe/@src').first;
+      String url = xpath(html, '//iframe/@src').first;
 
       if (url.contains("yourupload")) {
         final id = substringBefore(substringAfter(url, "id="), "&");
@@ -126,7 +131,7 @@ class OtakuDesu extends MProvider {
       } else if (url.contains("filelions")) {
         a = await streamWishExtractor(url, "FileLions");
       } else if (url.contains("desustream")) {
-        final res = await http('GET', json.encode({"url": url}));
+        final res = (await client.get(Uri.parse(url))).body;
         final script =
             xpath(res, '//script[contains(text(), "sources")]/text()').first;
         final videoUrl = substringBefore(
@@ -140,7 +145,7 @@ class OtakuDesu extends MProvider {
           ..subtitles = [];
         videos.add(video);
       } else if (url.contains("mp4upload")) {
-        final res = await http('GET', json.encode({"url": url}));
+        final res = (await client.get(Uri.parse(url))).body;
         final script =
             xpath(res, '//script[contains(text(), "player.src")]/text()').first;
         final videoUrl =

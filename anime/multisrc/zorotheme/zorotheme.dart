@@ -4,18 +4,22 @@ import 'dart:convert';
 class ZoroTheme extends MProvider {
   ZoroTheme();
 
+  final Client client = Client();
+
   @override
   Future<MPages> getPopular(MSource source, int page) async {
-    final data = {"url": "${source.baseUrl}/most-popular?page=$page"};
-    final res = await http('GET', json.encode(data));
+    final res = (await client
+            .get(Uri.parse("${source.baseUrl}/most-popular?page=$page")))
+        .body;
 
     return animeElementM(res);
   }
 
   @override
   Future<MPages> getLatestUpdates(MSource source, int page) async {
-    final data = {"url": "${source.baseUrl}/recently-updated?page=$page"};
-    final res = await http('GET', json.encode(data));
+    final res = (await client
+            .get(Uri.parse("${source.baseUrl}/recently-updated?page=$page")))
+        .body;
 
     return animeElementM(res);
   }
@@ -109,8 +113,7 @@ class ZoroTheme extends MProvider {
       }
     }
     url += "${ll(url)}page=$page";
-    final data = {"url": url};
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse(url))).body;
 
     return animeElementM(res);
   }
@@ -118,13 +121,9 @@ class ZoroTheme extends MProvider {
   @override
   Future<MManga> getDetail(MSource source, String url) async {
     final statusList = [
-      {
-        "Currently Airing": 0,
-        "Finished Airing": 1,
-      }
+      {"Currently Airing": 0, "Finished Airing": 1}
     ];
-    final data = {"url": "${source.baseUrl}$url"};
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse("${source.baseUrl}$url"))).body;
     MManga anime = MManga();
     final status = xpath(res,
             '//*[@class="anisc-info"]/div[contains(text(),"Status:")]/span[2]/text()')
@@ -148,11 +147,8 @@ class ZoroTheme extends MProvider {
     final urlEp =
         "${source.baseUrl}/ajax${ajaxRoute('${source.baseUrl}')}/episode/list/$id";
 
-    final dataEp = {
-      "url": urlEp,
-      "headers": {"referer": url}
-    };
-    final resEp = await http('GET', json.encode(dataEp));
+    final resEp =
+        (await client.get(Uri.parse(urlEp), headers: {"referer": url})).body;
 
     final html = json.decode(resEp)["html"];
     final epElements = parseHtml(html).select("a.ep-item");
@@ -177,12 +173,11 @@ class ZoroTheme extends MProvider {
   Future<List<MVideo>> getVideoList(MSource source, String url) async {
     final id = substringAfterLast(url, '?ep=');
 
-    final datas = {
-      "url":
-          "${source.baseUrl}/ajax${ajaxRoute('${source.baseUrl}')}/episode/servers?episodeId=$id",
-      "headers": {"referer": "${source.baseUrl}/$url"}
-    };
-    final res = await http('GET', json.encode(datas));
+    final res = (await client.get(
+            Uri.parse(
+                "${source.baseUrl}/ajax${ajaxRoute('${source.baseUrl}')}/episode/servers?episodeId=$id"),
+            headers: {"referer": "${source.baseUrl}/$url"}))
+        .body;
     final html = json.decode(res)["html"];
 
     final serverElements = parseHtml(html).select("div.server-item");
@@ -194,16 +189,14 @@ class ZoroTheme extends MProvider {
       final name = serverElement.text;
       final id = serverElement.attr("data-id");
       final subDub = serverElement.attr("data-type");
-      final datasE = {
-        "url":
-            "${source.baseUrl}/ajax${ajaxRoute('${source.baseUrl}')}/episode/sources?id=$id",
-        "headers": {"referer": "${source.baseUrl}/$url"}
-      };
 
-      final resE = await http('GET', json.encode(datasE));
+      final resE = (await client.get(
+              Uri.parse(
+                  "${source.baseUrl}/ajax${ajaxRoute('${source.baseUrl}')}/episode/sources?id=$id"),
+              headers: {"referer": "${source.baseUrl}/$url"}))
+          .body;
       String epUrl = substringBefore(substringAfter(resE, "\"link\":\""), "\"");
       List<MVideo> a = [];
-
       if (hosterSelection.contains(name) && typeSelection.contains(subDub)) {
         if (name.contains("Vidstreaming")) {
           a = await rapidCloudExtractor(epUrl, "Vidstreaming - $subDub");
@@ -217,6 +210,141 @@ class ZoroTheme extends MProvider {
     }
 
     return sortVideos(videos, source.id);
+  }
+
+  Future<List<MVideo>> rapidCloudExtractor(String url, String name) async {
+    final serverUrl = ['https://megacloud.tv', 'https://rapid-cloud.co'];
+
+    final serverType = url.startsWith('https://megacloud.tv') ? 0 : 1;
+    final sourceUrl = [
+      '/embed-2/ajax/e-1/getSources?id=',
+      '/ajax/embed-6-v2/getSources?id='
+    ];
+    final sourceSpliter = ['/e-1/', '/embed-6-v2/'];
+    final id = url.split(sourceSpliter[serverType]).last.split('?').first;
+    final resServer = (await client.get(
+            Uri.parse('${serverUrl[serverType]}${sourceUrl[serverType]}$id'),
+            headers: {"X-Requested-With": "XMLHttpRequest"}))
+        .body;
+    final encrypted = getMapValue(resServer, "encrypted");
+    String videoResJson = "";
+    List<MVideo> videos = [];
+    if (encrypted == "true") {
+      final ciphered = getMapValue(resServer, "sources");
+      List<List<int>> indexPairs = await generateIndexPairs(serverType);
+      var password = '';
+      String ciphertext = ciphered;
+      int index = 0;
+      for (List<int> item in json.decode(json.encode(indexPairs))) {
+        int start = item.first + index;
+        int end = start + item.last;
+        String passSubstr = ciphered.substring(start, end);
+        password += passSubstr;
+        ciphertext = ciphertext.replaceFirst(passSubstr, "");
+        index += item.last;
+      }
+      videoResJson = decryptAESCryptoJS(ciphertext, password);
+    } else {
+      videoResJson = resServer;
+    }
+
+    String masterUrl =
+        ((json.decode(videoResJson) as List<Map<String, dynamic>>)
+            .first)['file'];
+    String type = ((json.decode(videoResJson) as List<Map<String, dynamic>>)
+        .first)['type'];
+
+    final tracks = (json.decode(resServer)['tracks'] as List)
+        .where((e) => e['kind'] == 'captions' ? true : false)
+        .toList();
+    List<MTrack> subtitles = [];
+
+    for (var sub in tracks) {
+      try {
+        MTrack subtitle = MTrack();
+        subtitle
+          ..label = sub["label"]
+          ..file = sub["file"];
+        subtitles.add(subtitle);
+      } catch (_) {}
+    }
+
+    if (type == "hls") {
+      final masterPlaylistRes = (await client.get(Uri.parse(masterUrl))).body;
+
+      for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
+          .split("#EXT-X-STREAM-INF:")) {
+        final quality =
+            "${substringBefore(substringBefore(substringAfter(substringAfter(it, "RESOLUTION="), "x"), ","), "\n")}p";
+
+        String videoUrl = substringBefore(substringAfter(it, "\n"), "\n");
+
+        if (!videoUrl.startsWith("http")) {
+          videoUrl =
+              "${masterUrl.split("/").sublist(0, masterUrl.split("/").length - 1).join("/")}/$videoUrl";
+        }
+
+        MVideo video = MVideo();
+        video
+          ..url = videoUrl
+          ..originalUrl = videoUrl
+          ..quality = "$name - $quality"
+          ..subtitles = subtitles;
+        videos.add(video);
+      }
+    } else {
+      MVideo video = MVideo();
+      video
+        ..url = masterUrl
+        ..originalUrl = masterUrl
+        ..quality = "$name - Default"
+        ..subtitles = subtitles;
+      videos.add(video);
+    }
+    return videos;
+  }
+
+  Future<List<List<int>>> generateIndexPairs(int serverType) async {
+    final jsPlayerUrl = [
+      "https://megacloud.tv/js/player/a/prod/e1-player.min.js",
+      "https://rapid-cloud.co/js/player/prod/e6-player-v2.min.js"
+    ];
+    final scriptText =
+        (await client.get(Uri.parse(jsPlayerUrl[serverType]))).body;
+
+    final switchCode = scriptText.substring(
+        scriptText.lastIndexOf('switch'), scriptText.indexOf('=partKey'));
+
+    List<int> indexes = [];
+    for (var variableMatch
+        in RegExp(r'=(\w+)').allMatches(switchCode).toList()) {
+      final regex = RegExp(
+          ',${(variableMatch as RegExpMatch).group(1)}=((?:0x)?([0-9a-fA-F]+))');
+      Match? match = regex.firstMatch(scriptText);
+
+      if (match != null) {
+        String value = match.group(1);
+        if (value.contains("0x")) {
+          indexes.add(int.parse(substringAfter(value, "0x"), radix: 16));
+        } else {
+          indexes.add(int.parse(value));
+        }
+      }
+    }
+
+    return chunked(indexes, 2);
+  }
+
+  List<List<int>> chunked(List<int> list, int size) {
+    List<List<int>> chunks = [];
+    for (int i = 0; i < list.length; i += size) {
+      int end = list.length;
+      if (i + size < list.length) {
+        end = i + size;
+      }
+      chunks.add(list.sublist(i, end));
+    }
+    return chunks;
   }
 
   MPages animeElementM(String res) {
