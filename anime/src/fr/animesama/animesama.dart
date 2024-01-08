@@ -106,7 +106,7 @@ class AnimeSama extends MProvider {
   @override
   Future<MManga> getDetail(MSource source, String url) async {
     var animeUrl =
-        "${source.baseUrl}${substringBeforeLast(Uri.parse(url).path, "/")}";
+        "${source.baseUrl}${substringBeforeLast(getUrlWithoutDomain(url), "/")}";
     var movie =
         int.tryParse(url.split("#").length >= 2 ? url.split("#")[1] : "");
     List<Map<String, dynamic>> playersList = [];
