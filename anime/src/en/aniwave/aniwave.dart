@@ -554,14 +554,12 @@ class Aniwave extends MProvider {
           valueIndex: 0,
           entries: [
             "aniwave.to",
-            "aniwave.bz",
             "aniwave.ws",
             "aniwave.li",
             "aniwave.vc"
           ],
           entryValues: [
             "https://aniwave.to",
-            "https://aniwave.bz",
             "https://aniwave.ws",
             "https://aniwave.li",
             "https://aniwave.vc"
