@@ -3,19 +3,24 @@ import 'dart:convert';
 
 class Filma24 extends MProvider {
   Filma24();
+
+  final Client client = Client();
+
   @override
   Future<MPages> getPopular(MSource source, int page) async {
     String pageNu = page == 1 ? "" : "/page/$page/";
-    final data = {"url": "${preferenceBaseUrl(source.id)}$pageNu"};
-    final res = await http('GET', json.encode(data));
+    final res =
+        (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}$pageNu")))
+            .body;
     return animeFromRes(res);
   }
 
   @override
   Future<MPages> getLatestUpdates(MSource source, int page) async {
     String pageNu = page == 1 ? "" : "page/$page/";
-    final data = {"url": "${preferenceBaseUrl(source.id)}/$pageNu?sort=trendy"};
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(
+            Uri.parse("${preferenceBaseUrl(source.id)}/$pageNu?sort=trendy")))
+        .body;
     return animeFromRes(res);
   }
 
@@ -46,8 +51,7 @@ class Filma24 extends MProvider {
 
     url += pageNu;
 
-    final data = {"url": url};
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse(url))).body;
     return animeFromRes(res);
   }
 
@@ -60,8 +64,7 @@ class Filma24 extends MProvider {
       episode.url = url;
       episodesList.add(episode);
     } else {
-      final data = {"url": url};
-      final res = await http('GET', json.encode(data));
+      final res = (await client.get(Uri.parse(url))).body;
       final document = parseHtml(res);
       final resultElements = document.select("div.row");
 
@@ -84,14 +87,12 @@ class Filma24 extends MProvider {
 
   @override
   Future<List<MVideo>> getVideoList(MSource source, String url) async {
-    final data = {"url": url};
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse(url))).body;
     List<MVideo> videos = [];
     final serverUrls = xpath(res, '//*[@class="player"]/div[1]/a/@href');
     for (var serverUrl in serverUrls) {
       List<MVideo> a = [];
-      final serVdata = {"url": "$url/$serverUrl"};
-      final serVres = await http('GET', json.encode(serVdata));
+      final serVres = (await client.get(Uri.parse("$url/$serverUrl"))).body;
       List<String> iframe = xpath(serVres, '//*[@id="plx"]/p/iframe/@src');
       if (iframe.isNotEmpty) {
         String i = iframe.first;
@@ -196,15 +197,18 @@ class Filma24 extends MProvider {
       'Referer': 'https://vidmoly.to',
     };
     List<MVideo> videos = [];
-    final playListUrlResponse = await http('GET', json.encode({"url": url}));
+    final playListUrlResponse = (await client.get(Uri.parse(url))).body;
     final playlistUrl =
         RegExp(r'file:"(\S+?)"').firstMatch(playListUrlResponse)?.group(1) ??
             "";
-    final masterPlaylistRes = await http(
-        'GET', json.encode({"url": playlistUrl, "headers": headers}));
-    if (masterPlaylistRes != "error") {
-      for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
-          .split("#EXT-X-STREAM-INF:")) {
+    if (playlistUrl.isEmpty) return [];
+    final masterPlaylistRes =
+        await client.get(Uri.parse(playlistUrl), headers: headers);
+
+    if (masterPlaylistRes.statusCode == 200) {
+      for (var it
+          in substringAfter(masterPlaylistRes.body, "#EXT-X-STREAM-INF:")
+              .split("#EXT-X-STREAM-INF:")) {
         final quality =
             "${substringBefore(substringBefore(substringAfter(substringAfter(it, "RESOLUTION="), "x"), ","), "\n")}p";
 
@@ -225,12 +229,12 @@ class Filma24 extends MProvider {
 
   Future<List<MVideo>> oneuploadExtractor(String url) async {
     List<MVideo> videos = [];
-    final playListUrlResponse = await http('GET', json.encode({"url": url}));
+    final playListUrlResponse = (await client.get(Uri.parse(url))).body;
     final playlistUrl =
         RegExp(r'file:"(\S+?)"').firstMatch(playListUrlResponse)?.group(1) ??
             "";
-    final masterPlaylistRes =
-        await http('GET', json.encode({"url": playlistUrl}));
+    if (playlistUrl.isEmpty) return [];
+    final masterPlaylistRes = (await client.get(Uri.parse(playlistUrl))).body;
     for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
         .split("#EXT-X-STREAM-INF:")) {
       final quality =
@@ -249,7 +253,7 @@ class Filma24 extends MProvider {
   }
 
   Future<List<MVideo>> uqloadExtractor(String url) async {
-    final res = await http('GET', json.encode({"url": url}));
+    final res = (await client.get(Uri.parse(url))).body;
     final js = xpath(res, '//script[contains(text(), "sources:")]/text()');
     if (js.isEmpty) {
       return [];

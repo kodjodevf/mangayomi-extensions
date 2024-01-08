@@ -4,13 +4,13 @@ import 'dart:convert';
 class KissKh extends MProvider {
   KissKh();
 
+  final Client client = Client();
+
   @override
   Future<MPages> getPopular(MSource source, int page) async {
-    final data = {
-      "url":
-          "${source.baseUrl}/api/DramaList/List?page=$page&type=0&sub=0&country=0&status=0&order=1&pageSize=40"
-    };
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse(
+            "${source.baseUrl}/api/DramaList/List?page=$page&type=0&sub=0&country=0&status=0&order=1&pageSize=40")))
+        .body;
     final jsonRes = json.decode(res);
     final datas = jsonRes["data"];
     List<MManga> animeList = [];
@@ -31,12 +31,9 @@ class KissKh extends MProvider {
 
   @override
   Future<MPages> getLatestUpdates(MSource source, int page) async {
-    final data = {
-      "url":
-          "${source.baseUrl}/api/DramaList/List?page=$page&type=0&sub=0&country=0&status=0&order=12&pageSize=40",
-      "header": {"ee": "eee"}
-    };
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse(
+            "${source.baseUrl}/api/DramaList/List?page=$page&type=0&sub=0&country=0&status=0&order=12&pageSize=40")))
+        .body;
     final jsonRes = json.decode(res);
     final datas = jsonRes["data"];
 
@@ -59,10 +56,9 @@ class KissKh extends MProvider {
   @override
   Future<MPages> search(
       MSource source, String query, int page, FilterList filterList) async {
-    final data = {
-      "url": "${source.baseUrl}/api/DramaList/Search?q=$query&type=0"
-    };
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse(
+            "${source.baseUrl}/api/DramaList/Search?q=$query&type=0")))
+        .body;
     final jsonRes = json.decode(res);
     List<MManga> animeList = [];
     for (var data in jsonRes) {
@@ -81,8 +77,7 @@ class KissKh extends MProvider {
     final statusList = [
       {"Ongoing": 0, "Completed": 1}
     ];
-    final data = {"url": url};
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse(url))).body;
     MManga anime = MManga();
     final jsonRes = json.decode(res);
     final status = jsonRes["status"] ?? "";
@@ -120,14 +115,12 @@ class KissKh extends MProvider {
 
   @override
   Future<List<MVideo>> getVideoList(MSource source, String url) async {
-    final datas = {"url": url};
-
-    final res = await http('GET', json.encode(datas));
+    final res = (await client.get(Uri.parse(url))).body;
     final id = substringAfter(substringBefore(url, ".png"), "Episode/");
     final jsonRes = json.decode(res);
 
-    final subRes = await http(
-        'GET', json.encode({"url": "${source.baseUrl}/api/Sub/$id"}));
+    final subRes =
+        (await client.get(Uri.parse("${source.baseUrl}/api/Sub/$id"))).body;
     var jsonSubRes = json.decode(subRes);
 
     List<MTrack> subtitles = [];

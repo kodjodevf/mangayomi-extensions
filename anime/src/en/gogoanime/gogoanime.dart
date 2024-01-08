@@ -4,12 +4,13 @@ import 'dart:convert';
 class GogoAnime extends MProvider {
   GogoAnime();
 
+  final Client client = Client();
+
   @override
   Future<MPages> getPopular(MSource source, int page) async {
-    final data = {
-      "url": "${preferenceBaseUrl(source.id)}/popular.html?page=$page"
-    };
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse(
+            "${preferenceBaseUrl(source.id)}/popular.html?page=$page")))
+        .body;
 
     List<MManga> animeList = [];
     final urls = xpath(res, '//*[@class="img"]/a/@href');
@@ -29,11 +30,9 @@ class GogoAnime extends MProvider {
 
   @override
   Future<MPages> getLatestUpdates(MSource source, int page) async {
-    final data = {
-      "url":
-          "https://ajax.gogo-load.com/ajax/page-recent-release-ongoing.html?page=$page&type=1"
-    };
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse(
+            "https://ajax.gogo-load.com/ajax/page-recent-release-ongoing.html?page=$page&type=1")))
+        .body;
 
     List<MManga> animeList = [];
     final urls =
@@ -143,8 +142,7 @@ class GogoAnime extends MProvider {
           "${preferenceBaseUrl(source.id)}/filter.html?keyword=$query$filterStr&page=$page";
     }
 
-    final data = {"url": url};
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse(url))).body;
 
     List<MManga> animeList = [];
     final urls = xpath(res, '//*[@class="img"]/a/@href');
@@ -165,13 +163,12 @@ class GogoAnime extends MProvider {
   @override
   Future<MManga> getDetail(MSource source, String url) async {
     final statusList = [
-      {
-        "Ongoing": 0,
-        "Completed": 1,
-      }
+      {"Ongoing": 0, "Completed": 1}
     ];
-    final data = {"url": "${preferenceBaseUrl(source.id)}$url"};
-    final res = await http('GET', json.encode(data));
+
+    final res =
+        (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}$url")))
+            .body;
     MManga anime = MManga();
     final status = xpath(
             res, '//*[@class="anime_info_body_bg"]/p[@class="type"][5]/text()')
@@ -191,8 +188,8 @@ class GogoAnime extends MProvider {
     final id = xpath(res, '//*[@id="movie_id"]/@value').first;
     final urlEp =
         "https://ajax.gogo-load.com/ajax/load-list-episode?ep_start=0&ep_end=4000&id=$id";
-    final dataEp = {"url": urlEp};
-    final resEp = await http('GET', json.encode(dataEp));
+
+    final resEp = (await client.get(Uri.parse(urlEp))).body;
 
     final epUrls = xpath(resEp, '//*[@id="episode_related"]/li/a/@href');
     final names = xpath(
@@ -216,9 +213,9 @@ class GogoAnime extends MProvider {
 
   @override
   Future<List<MVideo>> getVideoList(MSource source, String url) async {
-    final datas = {"url": "${preferenceBaseUrl(source.id)}$url"};
-
-    final res = await http('GET', json.encode(datas));
+    final res =
+        (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}$url")))
+            .body;
     final serverUrls =
         xpath(res, '//*[@class="anime_muti_link"]/ul/li/a/@data-video');
     final serverNames =

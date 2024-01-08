@@ -4,12 +4,13 @@ import 'dart:convert';
 class MMRCMS extends MProvider {
   MMRCMS();
 
+  final Client client = Client();
+
   @override
   Future<MPages> getPopular(MSource source, int page) async {
-    final url =
-        "${source.baseUrl}/filterList?page=$page&sortBy=views&asc=false";
-    final data = {"url": url, "sourceId": source.id};
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse(
+            "${source.baseUrl}/filterList?page=$page&sortBy=views&asc=false")))
+        .body;
 
     List<MManga> mangaList = [];
     final urls = xpath(res, '//*[ @class="chart-title"]/@href');
@@ -38,9 +39,9 @@ class MMRCMS extends MProvider {
 
   @override
   Future<MPages> getLatestUpdates(MSource source, int page) async {
-    final url = "${source.baseUrl}/latest-release?page=$page";
-    final data = {"url": url, "sourceId": source.id};
-    final res = await http('GET', json.encode(data));
+    final res = (await client
+            .get(Uri.parse("${source.baseUrl}/latest-release?page=$page")))
+        .body;
 
     List<MManga> mangaList = [];
     final urls = xpath(res, '//*[@class="manga-item"]/h3/a/@href');
@@ -96,8 +97,8 @@ class MMRCMS extends MProvider {
         }
       }
     }
-    final data = {"url": url, "sourceId": source.id};
-    final res = await http('GET', json.encode(data));
+
+    final res = (await client.get(Uri.parse(url))).body;
 
     List<MManga> mangaList = [];
 
@@ -170,8 +171,7 @@ class MMRCMS extends MProvider {
       }
     ];
     MManga manga = MManga();
-    final datas = {"url": url, "sourceId": source.id};
-    final res = await http('GET', json.encode(datas));
+    final res = (await client.get(Uri.parse(url))).body;
 
     final author = xpath(res,
         '//*[@class="dl-horizontal"]/dt[contains(text(), "Auteur(s)") or contains(text(), "Author(s)") or contains(text(), "Autor(es)") or contains(text(), "Yazar(lar) or contains(text(), "Mangaka(lar)")]//following-sibling::dd[1]/text()');
@@ -215,8 +215,7 @@ class MMRCMS extends MProvider {
 
   @override
   Future<List<String>> getPageList(MSource source, String url) async {
-    final datas = {"url": url, "sourceId": source.id};
-    final res = await http('GET', json.encode(datas));
+    final res = (await client.get(Uri.parse(url))).body;
 
     List<String> pagesUrl = [];
     final pages =

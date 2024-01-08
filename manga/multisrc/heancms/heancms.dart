@@ -4,6 +4,8 @@ import 'dart:convert';
 class HeanCms extends MProvider {
   HeanCms();
 
+  final Client client = Client();
+
   @override
   Future<MPages> getPopular(MSource source, int page) async {
     final headers = getHeader(source.baseUrl);
@@ -18,14 +20,13 @@ class HeanCms extends MProvider {
         "series_status": "Ongoing",
         "series_type": "Comic"
       };
-      final data = {"url": url, "headers": headers, "body": body};
-      res = await http('POST', json.encode(data));
+      res = (await client.post(Uri.parse(url), headers: headers, body: body))
+          .body;
     } else {
       final newEndpointUrl =
           "${source.apiUrl}/query/?page=$page&query_string=&series_status=All&order=desc&orderBy=total_views&perPage=12&tags_ids=[]&series_type=Comic";
-
-      final newEndpointData = {"url": newEndpointUrl, "headers": headers};
-      res = await http('GET', json.encode(newEndpointData));
+      res =
+          (await client.get(Uri.parse(newEndpointUrl), headers: headers)).body;
     }
     return mMangaRes(res, source);
   }
@@ -43,14 +44,13 @@ class HeanCms extends MProvider {
         "series_status": "Ongoing",
         "series_type": "Comic"
       };
-      final data = {"url": url, "headers": headers, "body": body};
-      res = await http('POST', json.encode(data));
+      res = (await client.post(Uri.parse(url), headers: headers, body: body))
+          .body;
     } else {
       final newEndpointUrl =
           "${source.apiUrl}/query/?page=$page&query_string=&series_status=All&order=desc&orderBy=latest&perPage=12&tags_ids=[]&series_type=Comic";
-
-      final newEndpointData = {"url": newEndpointUrl, "headers": headers};
-      res = await http('GET', json.encode(newEndpointData));
+      res =
+          (await client.get(Uri.parse(newEndpointUrl), headers: headers)).body;
     }
     return mMangaRes(res, source);
   }
@@ -63,14 +63,13 @@ class HeanCms extends MProvider {
     if (!useNewQueryEndpoint(source.source)) {
       final url = "${source.apiUrl}/series/search";
       final body = {"term": query};
-      final data = {"url": url, "headers": headers, "body": body};
-      res = await http('POST', json.encode(data));
+      res = (await client.post(Uri.parse(url), headers: headers, body: body))
+          .body;
     } else {
       final newEndpointUrl =
           "${source.apiUrl}/query/?page=$page&query_string=$query&series_status=All&order=desc&orderBy=total_views&perPage=12&tags_ids=[]&series_type=Comic";
-
-      final newEndpointData = {"url": newEndpointUrl, "headers": headers};
-      res = await http('GET', json.encode(newEndpointData));
+      res =
+          (await client.get(Uri.parse(newEndpointUrl), headers: headers)).body;
     }
     return mMangaRes(res, source);
   }
@@ -80,11 +79,10 @@ class HeanCms extends MProvider {
     MManga manga = MManga();
     String currentSlug = substringAfterLast(url, "/");
     final headers = getHeader(source.baseUrl);
-    final data = {
-      "url": "${source.apiUrl}/series/$currentSlug",
-      "headers": headers
-    };
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(
+            Uri.parse("${source.apiUrl}/series/$currentSlug"),
+            headers: headers))
+        .body;
     manga.author = getMapValue(res, "author");
     manga.description = getMapValue(res, "description");
     manga.genre = jsonPathToString(res, r"$.tags[*].name", "._").split("._");
@@ -138,14 +136,14 @@ class HeanCms extends MProvider {
     String res = "".toString();
     if (!useslugStrategy(source.name)) {
       String chapterId = substringAfter(url, '#');
-      final data = {
-        "url": "${source.apiUrl}/series/chapter/$chapterId",
-        "headers": headers
-      };
-      res = await http('GET', json.encode(data));
+      res = (await client.get(
+              Uri.parse("${source.apiUrl}/series/chapter/$chapterId"),
+              headers: headers))
+          .body;
     } else {
-      final data = {"url": "${source.baseUrl}$url", "headers": headers};
-      res = await http('GET', json.encode(data));
+      res = (await client.get(Uri.parse("${source.baseUrl}$url"),
+              headers: headers))
+          .body;
 
       List<String> pageUrls = [];
       var imagesRes = parseHtml(res)

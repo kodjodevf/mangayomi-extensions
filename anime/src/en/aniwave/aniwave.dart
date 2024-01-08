@@ -4,22 +4,21 @@ import 'dart:convert';
 class Aniwave extends MProvider {
   Aniwave();
 
+  final Client client = Client();
+
   @override
   Future<MPages> getPopular(MSource source, int page) async {
-    final data = {
-      "url": "${preferenceBaseUrl(source.id)}/filter?sort=trending&page=$page"
-    };
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse(
+            "${preferenceBaseUrl(source.id)}/filter?sort=trending&page=$page")))
+        .body;
     return parseAnimeList(res);
   }
 
   @override
   Future<MPages> getLatestUpdates(MSource source, int page) async {
-    final data = {
-      "url":
-          "${preferenceBaseUrl(source.id)}/filter?sort=recently_updated&page=$page"
-    };
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse(
+            "${preferenceBaseUrl(source.id)}/filter?sort=recently_updated&page=$page")))
+        .body;
     return parseAnimeList(res);
   }
 
@@ -91,8 +90,8 @@ class Aniwave extends MProvider {
         }
       }
     }
-    final data = {"url": "$url&page=$page"};
-    final res = await http('GET', json.encode(data));
+
+    final res = (await client.get(Uri.parse("$url&page=$page"))).body;
     return parseAnimeList(res);
   }
 
@@ -101,8 +100,9 @@ class Aniwave extends MProvider {
     final statusList = [
       {"Releasing": 0, "Completed": 1}
     ];
-    final data = {"url": "${preferenceBaseUrl(source.id)}${url}"};
-    final res = await http('GET', json.encode(data));
+    final res =
+        (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}$url")))
+            .body;
     MManga anime = MManga();
     final status = xpath(res, '//div[contains(text(),"Status")]/span/text()');
     if (status.isNotEmpty) {
@@ -122,11 +122,11 @@ class Aniwave extends MProvider {
     final id = parseHtml(res).selectFirst("div[data-id]").attr("data-id");
     final encrypt = vrfEncrypt(id);
     final vrf = "vrf=${Uri.encodeComponent(encrypt)}";
-    final dataEp = {
-      "url": "${preferenceBaseUrl(source.id)}/ajax/episode/list/$id?$vrf"
-    };
 
-    final resEp = await http('GET', json.encode(dataEp));
+    final resEp = (await client.get(Uri.parse(
+            "${preferenceBaseUrl(source.id)}/ajax/episode/list/$id?$vrf")))
+        .body;
+
     final html = json.decode(resEp)["result"];
     List<MChapter>? episodesList = [];
 
@@ -172,11 +172,9 @@ class Aniwave extends MProvider {
     final ids = substringBefore(url, "&");
     final encrypt = vrfEncrypt(ids);
     final vrf = "vrf=${Uri.encodeComponent(encrypt)}";
-    final res = await http(
-        'GET',
-        json.encode({
-          "url": "${preferenceBaseUrl(source.id)}/ajax/server/list/$ids?$vrf"
-        }));
+    final res = (await client.get(Uri.parse(
+            "${preferenceBaseUrl(source.id)}/ajax/server/list/$ids?$vrf")))
+        .body;
     final html = json.decode(res)["result"];
 
     final vidsHtmls = parseHtml(html).select("div.servers > div");
@@ -191,12 +189,9 @@ class Aniwave extends MProvider {
 
         final encrypt = vrfEncrypt(serverId);
         final vrf = "vrf=${Uri.encodeComponent(encrypt)}";
-        final res = await http(
-            'GET',
-            json.encode({
-              "url":
-                  "${preferenceBaseUrl(source.id)}/ajax/server/$serverId?$vrf"
-            }));
+        final res = (await client.get(Uri.parse(
+                "${preferenceBaseUrl(source.id)}/ajax/server/$serverId?$vrf")))
+            .body;
         final status = json.decode(res)["status"];
         if (status == 200) {
           List<MVideo> a = [];
@@ -313,64 +308,63 @@ class Aniwave extends MProvider {
 
   Future<List<MVideo>> vidsrcExtractor(
       String url, String name, String type) async {
-    List<String> keys = json.decode(await http(
-        'GET',
-        json.encode({
-          "url":
-              "https://raw.githubusercontent.com/Claudemirovsky/worstsource-keys/keys/keys.json"
-        })));
+    List<String> keys = json.decode((await client.get(Uri.parse(
+            "https://raw.githubusercontent.com/Claudemirovsky/worstsource-keys/keys/keys.json")))
+        .body);
+    List<MVideo> videoList = [];
     final host = Uri.parse(url).host;
     final apiUrl = await getApiUrl(url, keys);
-    final headers = {
-      "Accept": "application/json, text/javascript, */*; q=0.01",
+
+    final res = await client.get(Uri.parse(apiUrl), headers: {
       "Host": host,
       "Referer": Uri.decodeComponent(url),
       "X-Requested-With": "XMLHttpRequest"
-    };
-    final res =
-        await http('GET', json.encode({"url": apiUrl, "headers": headers}));
-    if (res == "error") return [];
-    String masterUrl =
-        ((json.decode(res)['result']['sources'] as List<Map<String, dynamic>>)
-            .first)['file'];
-    final tracks = (json.decode(res)['result']['tracks'] as List)
-        .where((e) => e['kind'] == 'captions' ? true : false)
-        .toList();
-    List<MTrack> subtitles = [];
+    });
+    final result = json.decode(res.body)['result'];
 
-    for (var sub in tracks) {
-      try {
-        MTrack subtitle = MTrack();
-        subtitle
-          ..label = sub["label"]
-          ..file = sub["file"];
-        subtitles.add(subtitle);
-      } catch (_) {}
-    }
-    List<MVideo> videoList = [];
-    final masterPlaylistRes =
-        await http('GET', json.encode({"url": masterUrl}));
-    for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
-        .split("#EXT-X-STREAM-INF:")) {
-      final quality =
-          "${substringBefore(substringBefore(substringAfter(substringAfter(it, "RESOLUTION="), "x"), ","), "\n")}p";
+    if (result != 404) {
+      String masterUrl =
+          ((result['sources'] as List<Map<String, dynamic>>).first)['file'];
+      final tracks = (result['tracks'] as List)
+          .where((e) => e['kind'] == 'captions' ? true : false)
+          .toList();
+      List<MTrack> subtitles = [];
 
-      String videoUrl = substringBefore(substringAfter(it, "\n"), "\n");
-
-      if (!videoUrl.startsWith("http")) {
-        videoUrl =
-            "${masterUrl.split("/").sublist(0, masterUrl.split("/").length - 1).join("/")}/$videoUrl";
+      for (var sub in tracks) {
+        try {
+          MTrack subtitle = MTrack();
+          subtitle
+            ..label = sub["label"]
+            ..file = sub["file"];
+          subtitles.add(subtitle);
+        } catch (_) {}
       }
 
-      MVideo video = MVideo();
-      video
-        ..url = videoUrl
-        ..originalUrl = videoUrl
-        ..quality = "$name - $type - $quality"
-        ..headers = {"Referer": "https://$host/"}
-        ..subtitles = subtitles;
-      videoList.add(video);
+      final masterPlaylistRes = (await client.get(Uri.parse(masterUrl))).body;
+
+      for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
+          .split("#EXT-X-STREAM-INF:")) {
+        final quality =
+            "${substringBefore(substringBefore(substringAfter(substringAfter(it, "RESOLUTION="), "x"), ","), "\n")}p";
+
+        String videoUrl = substringBefore(substringAfter(it, "\n"), "\n");
+
+        if (!videoUrl.startsWith("http")) {
+          videoUrl =
+              "${masterUrl.split("/").sublist(0, masterUrl.split("/").length - 1).join("/")}/$videoUrl";
+        }
+
+        MVideo video = MVideo();
+        video
+          ..url = videoUrl
+          ..originalUrl = videoUrl
+          ..quality = "$name - $type - $quality"
+          ..headers = {"Referer": "https://$host/"}
+          ..subtitles = subtitles;
+        videoList.add(video);
+      }
     }
+
     return videoList;
   }
 
@@ -403,7 +397,8 @@ class Aniwave extends MProvider {
 
   Future<String> callFromFuToken(String host, String data) async {
     final fuTokenScript =
-        await http('GET', json.encode({"url": "https://$host/futoken"}));
+        (await client.get(Uri.parse("https://$host/futoken"))).body;
+
     String js = "";
     js += "(function";
     js += substringBefore(
@@ -559,14 +554,12 @@ class Aniwave extends MProvider {
           valueIndex: 0,
           entries: [
             "aniwave.to",
-            "aniwave.bz",
             "aniwave.ws",
             "aniwave.li",
             "aniwave.vc"
           ],
           entryValues: [
             "https://aniwave.to",
-            "https://aniwave.bz",
             "https://aniwave.ws",
             "https://aniwave.li",
             "https://aniwave.vc"

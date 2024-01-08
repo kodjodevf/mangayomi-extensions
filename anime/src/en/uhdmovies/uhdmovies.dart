@@ -4,13 +4,16 @@ import 'dart:convert';
 class UHDMovies extends MProvider {
   UHDMovies();
 
+  final Client client = Client();
+
   @override
   bool get supportsLatest => false;
 
   @override
   Future<MPages> getPopular(MSource source, int page) async {
-    final data = {"url": "${preferenceBaseUrl(source.id)}/page/$page"};
-    final res = await http('GET', json.encode(data));
+    final res = (await client
+            .get(Uri.parse("${preferenceBaseUrl(source.id)}/page/$page")))
+        .body;
     return animeFromElement(res);
   }
 
@@ -22,18 +25,18 @@ class UHDMovies extends MProvider {
   @override
   Future<MPages> search(
       MSource source, String query, int page, FilterList filterList) async {
-    final url =
-        '${preferenceBaseUrl(source.id)}/page/$page/?s=${query.replaceAll(" ", "+")}';
-    final data = {"url": url};
-    final res = await http('GET', json.encode(data));
+    final res = (await client.get(Uri.parse(
+            "${preferenceBaseUrl(source.id)}/page/$page/?s=${query.replaceAll(" ", "+")}")))
+        .body;
     return animeFromElement(res);
   }
 
   @override
   Future<MManga> getDetail(MSource source, String url) async {
-    url = Uri.parse(url).path;
-    final data = {"url": "${preferenceBaseUrl(source.id)}${url}"};
-    String res = await http('GET', json.encode(data));
+    url = getUrlWithoutDomain(url);
+    final res =
+        (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}${url}")))
+            .body;
     MManga anime = MManga();
     final description = xpath(res, '//pre/span/text()');
     if (description.isNotEmpty) {
@@ -141,7 +144,7 @@ class UHDMovies extends MProvider {
     List<MVideo> videos = [];
     for (int type = 1; type < 3; type++) {
       url = url.replaceAll("/file/", "/wfile/") + "?type=$type";
-      final res = await http('GET', json.encode({"url": url}));
+      final res = (await client.get(Uri.parse(url))).body;
       final links = xpath(res, '//div[@class="mb-4"]/a/@href');
       for (int i = 0; i < links.length; i++) {
         final link = links[i];
@@ -167,9 +170,9 @@ class UHDMovies extends MProvider {
     if (url.contains("?sid=")) {
       final finalUrl = await redirectorBypasser(url);
       host = Uri.parse(finalUrl).host;
-      res = await http('GET', json.encode({"url": finalUrl}));
+      res = (await client.get(Uri.parse(finalUrl))).body;
     } else if (url.contains("r?key=")) {
-      res = await http('GET', json.encode({"url": url}));
+      res = (await client.get(Uri.parse(url))).body;
       host = Uri.parse(url).host;
     } else {
       return "";
@@ -180,7 +183,7 @@ class UHDMovies extends MProvider {
   }
 
   Future<String> redirectorBypasser(String url) async {
-    final res = await http('GET', json.encode({"url": url}));
+    final res = (await client.get(Uri.parse(url))).body;
     String lastDoc = await recursiveDoc(url, res);
     final js = xpath(lastDoc, '//script[contains(text(), "/?go=")]/text()');
     if (js.isEmpty) return "";
@@ -191,12 +194,9 @@ class UHDMovies extends MProvider {
     String cookieName = substringAfter(nextUrl, "go=");
     String cookieValue =
         substringBefore(substringAfter(script, "'$cookieName', '"), "'");
-    final response = await http(
-        'GET',
-        json.encode({
-          "url": nextUrl,
-          "headers": {"referer": url, "Cookie": "$cookieName=$cookieValue"}
-        }));
+    final response = (await client.get(Uri.parse(nextUrl),
+            headers: {"referer": url, "Cookie": "$cookieName=$cookieValue"}))
+        .body;
 
     final lastRes =
         parseHtml(response).selectFirst("meta[http-equiv]").attr("content");
@@ -226,14 +226,9 @@ class UHDMovies extends MProvider {
     final name = xpath(html, '//input/@name').first;
     final value = xpath(html, '//input/@value').first;
     final body = {"$name": value};
-    final response = await http(
-        'POST',
-        json.encode({
-          "useFormBuilder": true,
-          "body": body,
-          "url": urlR.first,
-          "headers": {"referer": url}
-        }));
+    final response = (await client.post(Uri.parse(urlR.first),
+            headers: {"referer": url}, body: body))
+        .body;
     return recursiveDoc(url, response);
   }
 }

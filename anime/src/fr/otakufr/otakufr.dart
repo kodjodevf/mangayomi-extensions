@@ -4,10 +4,13 @@ import 'dart:convert';
 class OtakuFr extends MProvider {
   OtakuFr();
 
+  final Client client = Client();
+
   @override
   Future<MPages> getPopular(MSource source, int page) async {
-    final data = {"url": "${source.baseUrl}/en-cours/page/$page"};
-    final res = await http('GET', json.encode(data));
+    final res =
+        (await client.get(Uri.parse("${source.baseUrl}/en-cours/page/$page")))
+            .body;
     List<MManga> animeList = [];
     final urls =
         xpath(res, '//*[@class="list"]/article/div/div/figure/a/@href');
@@ -29,8 +32,8 @@ class OtakuFr extends MProvider {
 
   @override
   Future<MPages> getLatestUpdates(MSource source, int page) async {
-    final data = {"url": "${source.baseUrl}/page/$page/"};
-    final res = await http('GET', json.encode(data));
+    final res =
+        (await client.get(Uri.parse("${source.baseUrl}/page/$page/"))).body;
 
     List<MManga> animeList = [];
     final urls = xpath(res, '//*[@class="episode"]/div/a/@href');
@@ -91,8 +94,8 @@ class OtakuFr extends MProvider {
         }
       }
     }
-    final data = {"url": url};
-    final res = await http('GET', json.encode(data));
+
+    final res = (await client.get(Uri.parse(url))).body;
 
     List<MManga> animeList = [];
     final urls =
@@ -118,14 +121,12 @@ class OtakuFr extends MProvider {
     final statusList = [
       {"En cours": 0, "Terminé": 1}
     ];
-    final data = {"url": url};
-    String res = await http('GET', json.encode(data));
+    String res = (await client.get(Uri.parse(url))).body;
     MManga anime = MManga();
     final originalUrl = xpath(res,
         '//*[@class="breadcrumb"]/li[@class="breadcrumb-item"][2]/a/@href');
     if (originalUrl.isNotEmpty) {
-      final newData = {"url": originalUrl.first};
-      res = await http('GET', json.encode(newData));
+      res = (await client.get(Uri.parse(originalUrl.first))).body;
     }
     final description =
         xpath(res, '//*[@class="episode fz-sm synop"]/p/text()');
@@ -171,18 +172,15 @@ class OtakuFr extends MProvider {
 
   @override
   Future<List<MVideo>> getVideoList(MSource source, String url) async {
-    final res = await http('GET', json.encode({"url": url}));
+    final res = (await client.get(Uri.parse(url))).body;
 
     final servers = xpath(res, '//*[@id="nav-tabContent"]/div/iframe/@src');
     List<MVideo> videos = [];
     final hosterSelection = preferenceHosterSelection(source.id);
     for (var url in servers) {
-      final datasServer = {
-        "url": fixUrl(url),
-        "headers": {"X-Requested-With": "XMLHttpRequest"}
-      };
-
-      final resServer = await http('GET', json.encode(datasServer));
+      final resServer = (await client.get(Uri.parse(fixUrl(url)),
+              headers: {"X-Requested-With": "XMLHttpRequest"}))
+          .body;
       final serverUrl =
           fixUrl(regExp(resServer, r"data-url='([^']+)'", '', 1, 1));
       List<MVideo> a = [];
@@ -356,15 +354,14 @@ class OtakuFr extends MProvider {
   }
 
   Future<List<MVideo>> upstreamExtractor(String url) async {
-    final res = await http('GET', json.encode({"url": url}));
+    final res = (await client.get(Uri.parse(url))).body;
     final js = xpath(res, '//script[contains(text(), "m3u8")]/text()');
     if (js.isEmpty) {
       return [];
     }
     final masterUrl =
         substringBefore(substringAfter(unpackJs(js.first), "{file:\""), "\"}");
-    final masterPlaylistRes =
-        await http('GET', json.encode({"url": masterUrl}));
+    final masterPlaylistRes = (await client.get(Uri.parse(masterUrl))).body;
     List<MVideo> videos = [];
     for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
         .split("#EXT-X-STREAM-INF:")) {
@@ -389,7 +386,7 @@ class OtakuFr extends MProvider {
   }
 
   Future<List<MVideo>> vidbmExtractor(String url) async {
-    final res = await http('GET', json.encode({"url": url}));
+    final res = (await client.get(Uri.parse(url))).body;
     final js = xpath(res,
         '//script[contains(text(), "m3u8") or contains(text(), "mp4")]/text()');
     if (js.isEmpty) {
@@ -405,8 +402,7 @@ class OtakuFr extends MProvider {
         "\"");
     List<MVideo> videos = [];
     if (masterUrl.contains("m3u8")) {
-      final masterPlaylistRes =
-          await http('GET', json.encode({"url": masterUrl}));
+      final masterPlaylistRes = (await client.get(Uri.parse(masterUrl))).body;
 
       for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
           .split("#EXT-X-STREAM-INF:")) {
