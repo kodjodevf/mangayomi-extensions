@@ -45,7 +45,7 @@ final testSourceModelList = [
       sourceCode: testSourceCode,
       // Example: en
       lang: "",
-      // Example: false for true for manga
+      // Example: false for anime true for manga
       isManga: false)
 ];
 
@@ -55,6 +55,9 @@ import 'dart:convert';
 
 class TestSource extends MProvider {
   TestSource();
+
+  @override
+  bool get supportsLatest => true;
 
   @override
   Future<MPages> getPopular(MSource source, int page) async {
@@ -229,25 +232,34 @@ All control filters can have a default state set. It's usually recommended if th
 ## Some functions already available and usable
 
 
-### http  
+### http client  
 
-Return a body response as `String`
+Return a body response as Response
 ```bash
 - Simple request
 
-String res = await http('GET', json.encode({'url': 'http://example.com'}));
+final client = Client();
+
+final res = await client.get(Uri.parse("http://example.com"));
+
+print(res.body);
 
 - With headers 
 
-String res = await http('GET', json.encode({'url': 'http://example.com','headers':{'Referer': 'http://example.com'}}));
+final client = Client();
+
+final res = await client.get(Uri.parse("http://example.com"),headers:{"Referer": "http://example.com"});
+
+print(res.body);
 
 - With body
 
-String res = await http('POST', json.encode({'url': 'http://example.com','body':{'name':'test'}}));
+final client = Client();
 
-- With FormBuilder
+final res = await client.post(Uri.parse("http://example.com"),headers:{"Referer": "http://example.com"},'body':{'name':'test'});
 
-String res = await http('POST',json.encode({'useFormBuilder': true,'body': {'name':'test'},'url': 'http://example.com'}));
+print(res.body);
+
 ```
 
 ### xpath selector
@@ -331,6 +343,7 @@ See [`MDocument` model](https://github.com/kodjodevf/mangayomi/blob/main/lib/eva
 - `String` substringAfterLast(`String text`, `String pattern`)
 - `String` substringBefore(`String text`, `String pattern`)
 - `String` substringBeforeLast(`String text`, `String pattern`)
+- `String` getUrlWithoutDomain(`String url`)
 
 ### Crypto utils
 - `String` unpackJs(`String code`);
