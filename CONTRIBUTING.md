@@ -234,7 +234,7 @@ All control filters can have a default state set. It's usually recommended if th
 
 ### http client  
 
-Return a body response as Response
+Return Response
 ```bash
 - Simple request
 
