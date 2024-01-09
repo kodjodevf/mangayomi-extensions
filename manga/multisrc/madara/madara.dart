@@ -237,14 +237,14 @@ class Madara extends MProvider {
 
     if (imgs.length == 1) {
       final pagesNumber =
-          document.selectFirst("#single-pager").select("option");
-
-      for (var i = 0; i < pagesNumber.length; i++) {
+          document.selectFirst("#single-pager").select("option").length;
+      final imgUrl = pageElement.selectFirst("img").getSrc;
+      for (var i = 0; i < pagesNumber; i++) {
         final val = i + 1;
         if (i.toString().length == 1) {
-          pageUrls.add(imgs.first.replaceAll("01", '0$val'));
+          pageUrls.add(imgUrl.replaceAll("01", '0$val'));
         } else {
-          pageUrls.add(imgs.first.replaceAll("01", val.toString()));
+          pageUrls.add(imgUrl.replaceAll("01", val.toString()));
         }
       }
     } else {
