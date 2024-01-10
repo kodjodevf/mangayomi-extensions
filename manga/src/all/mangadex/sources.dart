@@ -33,6 +33,7 @@ final _languages = [
   "it",
   "ja",
   "kk",
+  "ko",
   "la",
   "lt",
   "ms",
