@@ -158,61 +158,52 @@ class Madara extends MProvider {
             [];
 
     final baseUrl = "${source.baseUrl}/";
-    final headers = {
-      "Referer": baseUrl,
-      "Content-Type": "application/x-www-form-urlencoded",
-      "X-Requested-With": "XMLHttpRequest"
-    };
+    final headers = {"Referer": baseUrl, "X-Requested-With": "XMLHttpRequest"};
 
-    final resP = await client.post(
-        Uri.parse(
-            "${baseUrl}wp-admin/admin-ajax.php?action=manga_get_chapters&manga=$mangaId"),
-        headers: headers);
-    if (resP != 200 || mangaId.isEmpty) {
+    final oldXhrChaptersRequest = await client.post(
+        Uri.parse("${baseUrl}wp-admin/admin-ajax.php"),
+        headers: headers,
+        body: {"action": "manga_get_chapters", "manga": mangaId});
+    if (oldXhrChaptersRequest.statusCode == 400) {
       res = (await client.post(Uri.parse("${url}ajax/chapters"),
               headers: headers))
           .body;
     } else {
-      res = resP.body;
+      res = oldXhrChaptersRequest.body;
     }
 
-    var chapUrls = xpath(res, '//li[@class^="wp-manga-chapter"]/a/@href');
-    var chaptersNames = xpath(res, '//li[@class^="wp-manga-chapter"]/a/text()');
-    var dateF = xpath(res, '//li[@class^="wp-manga-chapter"]/span/i/text()');
-    if (dateF.isEmpty) {
-      final resWebview = await getHtmlViaWebview(
-          url, "//*[@id='manga-chapters-holder']/div[2]/div/ul/li/a/@href");
-      chapUrls = xpath(resWebview,
-          "//*[@id='manga-chapters-holder']/div[2]/div/ul/li/a/@href");
-      chaptersNames = xpath(resWebview,
-          "//*[@id='manga-chapters-holder']/div[2]/div/ul/li/a/text()");
-      dateF = xpath(resWebview,
-          "//*[@id='manga-chapters-holder']/div[2]/div/ul/li/span/i/text()");
-    }
+    final chapDoc = parseHtml(res);
+    var chapUrls =
+        chapDoc.xpath('//li[contains(@class,"wp-manga-chapter")]/a/@href');
+    var chaptersNames =
+        chapDoc.xpath('//li[contains(@class,"wp-manga-chapter")]/a/text()');
+    var chapDates = chapDoc
+        .xpath('//li[contains(@class,"wp-manga-chapter")]/span/i/text()');
     List<String> dateUploads = [];
     if (source.dateFormat.isNotEmpty) {
+      List<String> chaptersDate = [];
       dateUploads =
-          parseDates(dateF, source.dateFormat, source.dateFormatLocale);
-      if (dateF.length < chaptersNames.length) {
-        final length = chaptersNames.length - dateF.length;
-        String date = "${DateTime.now().millisecondsSinceEpoch}";
-        for (var i = 0; i < length - 1; i++) {
-          date += "--..${DateTime.now().millisecondsSinceEpoch}";
+          parseDates(chapDates, source.dateFormat, source.dateFormatLocale);
+      if (chapDates.length < chaptersNames.length) {
+        final length = chaptersNames.length - chapDates.length;
+        for (var i = 0; i < length; i++) {
+          chaptersDate.add("${DateTime.now().millisecondsSinceEpoch}");
         }
-
-        final dateFF =
-            parseDates(dateF, source.dateFormat, source.dateFormatLocale);
-        List<String> chapterDate = date.split('--..');
-
-        for (var date in dateFF) {
-          chapterDate.add(date);
+        final parsedDates =
+            parseDates(chapDates, source.dateFormat, source.dateFormatLocale);
+        for (var date in parsedDates) {
+          chaptersDate.add(date);
         }
-        dateUploads = chapterDate;
+        dateUploads = chaptersDate;
       }
     }
 
     List<MChapter>? chaptersList = [];
     for (var i = 0; i < chaptersNames.length; i++) {
+      String url = substringBefore(chapUrls[i], "?style=paged");
+      if (!chapUrls[i].endsWith("?style=paged")) {
+        url = url + "?style=paged";
+      }
       MChapter chapter = MChapter();
       chapter.name = chaptersNames[i];
       chapter.url = chapUrls[i];
