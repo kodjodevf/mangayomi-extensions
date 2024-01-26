@@ -309,7 +309,7 @@ class Aniwave extends MProvider {
   Future<List<MVideo>> vidsrcExtractor(
       String url, String name, String type) async {
     List<String> keys = json.decode((await client.get(Uri.parse(
-            "https://raw.githubusercontent.com/Claudemirovsky/worstsource-keys/keys/keys.json")))
+            "https://raw.githubusercontent.com/KillerDogeEmpire/vidplay-keys/keys/keys.json")))
         .body);
     List<MVideo> videoList = [];
     final host = Uri.parse(url).host;
