@@ -1,6 +1,4 @@
 import 'package:mangayomi/bridge_lib.dart';
-import 'dart:convert';
-
 class MangaBox extends MProvider {
   MangaBox();
 
@@ -137,9 +135,6 @@ class MangaBox extends MProvider {
     }
     final alternative = xpath(res,
         '//*[@class="table-label" and contains(text(), "Alternative")]/parent::tr/td[2]/text()');
-    if (author.isNotEmpty) {
-      manga.author = author.first;
-    }
 
     List<String> description =
         xpath(res, '//*[@id="panel-story-info-description" ]/text()');
@@ -147,7 +142,9 @@ class MangaBox extends MProvider {
       description = xpath(res, '//*[@id="story_discription" ]/text()');
     }
     if (description.isNotEmpty) {
-      manga.description = description.first.replaceAll("\n", ' ');
+      manga.description = description.first
+          .replaceAll("\n", ' ')
+          .replaceAll("Description :", "");
       if (alternative.isNotEmpty) {
         manga.description =
             "${manga.description}\n\nAlternative Name: ${alternative.first}";
