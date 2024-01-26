@@ -112,7 +112,8 @@ class HeanCms extends MProvider {
         chapterDates.add(createdAt);
       }
     }
-    final dateUploads = parseDates(chapterDates, "dd MMMM yyyy", "fr");
+    final dateUploads =
+        parseDates(chapterDates, source.dateFormat, source.dateFormatLocale);
     List<MChapter>? chaptersList = [];
     for (var i = 0; i < chapterTitles.length; i++) {
       MChapter chapter = MChapter();
@@ -225,12 +226,7 @@ class HeanCms extends MProvider {
 }
 
 Map<String, String> getHeader(String url) {
-  final headers = {
-    'Origin': url,
-    'Referer': '$url/',
-    'Accept': 'application/json, text/plain, */*',
-    'Content-Type': 'application/json'
-  };
+  final headers = {'Origin': url, 'Referer': '$url/'};
   return headers;
 }
 
