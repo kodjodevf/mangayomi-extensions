@@ -124,7 +124,9 @@ class ComickFun extends MProvider {
         .body;
     MManga manga = MManga();
     manga.author = jsonPathToString(res, r'$.authors[*].name', '');
-    manga.genre = jsonPathToString(res, r'$.genres[*].name', "_.").split("_.");
+    manga.genre = jsonPathToString(
+            res, r'$.comic.md_comic_md_genres[*].md_genres.name', "_.")
+        .split("_.");
     manga.description = jsonPathToString(res, r'$..desc', '');
     manga.status =
         parseStatus(jsonPathToString(res, r'$..comic.status', ''), statusList);
