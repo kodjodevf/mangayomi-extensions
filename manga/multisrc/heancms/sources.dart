@@ -3,7 +3,7 @@ import 'src/yugenmangas/yugenmangas.dart';
 import 'src/omegascans/omegascans.dart';
 import 'src/perfscan/perfscan.dart';
 
-const heancmsVersion = "0.0.6";
+const heancmsVersion = "0.0.65";
 const heancmsSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/manga/multisrc/heancms/heancms.dart";
 
