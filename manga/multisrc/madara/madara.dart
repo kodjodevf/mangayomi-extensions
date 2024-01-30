@@ -135,12 +135,20 @@ class Madara extends MProvider {
         "";
 
     final imageElement = document.selectFirst("div.summary_image img");
-    final image = imageElement?.attr("src") ??
+    var image = imageElement?.attr("src") ??
         imageElement?.attr("data-src") ??
         imageElement?.attr("data-lazy-src") ??
         imageElement?.attr("srcset");
     if (image != null) {
-      manga.imageUrl = image;
+      if (image.contains("dflazy")) {
+        image = imageElement?.attr("data-src") ??
+            imageElement?.attr("data-src") ??
+            imageElement?.attr("data-lazy-src") ??
+            imageElement?.attr("srcset");
+      }
+      if (image != null) {
+        manga.imageUrl = image;
+      }
     }
 
     final id = document
@@ -171,14 +179,38 @@ class Madara extends MProvider {
     } else {
       res = oldXhrChaptersRequest.body;
     }
-
-    final chapDoc = parseHtml(res);
-    var chapUrls =
-        chapDoc.xpath('//li[contains(@class,"wp-manga-chapter")]/a/@href');
-    var chaptersNames =
-        chapDoc.xpath('//li[contains(@class,"wp-manga-chapter")]/a/text()');
-    var chapDates = chapDoc
-        .xpath('//li[contains(@class,"wp-manga-chapter")]/span/i/text()');
+    MDocument chapDoc = parseHtml(res);
+    List<String> chapUrls = [];
+    List<String> chaptersNames = [];
+    List<String> chapDates = [];
+    for (MElement element in chapDoc.select("li.wp-manga-chapter") ?? []) {
+      final ch = element.selectFirst("a");
+      if (ch != null) {
+        chapUrls.add(ch.attr("href"));
+      }
+    }
+    if (chapUrls.isEmpty) {
+      res = (await client.post(Uri.parse("${url}ajax/chapters"),
+              headers: headers))
+          .body;
+      chapDoc = parseHtml(res);
+      for (MElement element in chapDoc.select("li.wp-manga-chapter") ?? []) {
+        final ch = element.selectFirst("a");
+        if (ch != null) {
+          chapUrls.add(ch.attr("href"));
+        }
+      }
+    }
+    for (MElement element in chapDoc.select("li.wp-manga-chapter") ?? []) {
+      final ch = element.selectFirst("a");
+      final chd = element.selectFirst("span.chapter-release-date");
+      if (ch != null) {
+        chaptersNames.add(ch.text);
+      }
+      if (chd != null) {
+        chapDates.add(chd.text);
+      }
+    }
     List<String> dateUploads = [];
     if (source.dateFormat.isNotEmpty) {
       List<String> chaptersDate = [];
