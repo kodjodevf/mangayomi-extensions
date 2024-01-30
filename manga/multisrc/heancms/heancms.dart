@@ -215,12 +215,22 @@ class HeanCms extends MProvider {
   }
 
   bool useNewQueryEndpoint(String sourceName) {
-    List<String> sources = ["YugenMangas", "Perf Scan", "Reaper Scans"];
+    List<String> sources = [
+      "YugenMangas",
+      "Perf Scan",
+      "Reaper Scans",
+      "OmegaScans"
+    ];
     return sources.contains(sourceName);
   }
 
   bool useslugStrategy(String sourceName) {
-    List<String> sources = ["YugenMangas", "Reaper Scans", "Perf Scan"];
+    List<String> sources = [
+      "YugenMangas",
+      "Reaper Scans",
+      "Perf Scan",
+      "OmegaScans"
+    ];
     return sources.contains(sourceName);
   }
 }
