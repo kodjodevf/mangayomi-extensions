@@ -2,12 +2,14 @@ import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
 class MangaHere extends MProvider {
-  MangaHere();
+  MangaHere({required this.source});
 
-  final Client client = Client();
+  MSource source;
+
+  final Client client = Client(source);
 
   @override
-  Future<MPages> getPopular(MSource source, int page) async {
+  Future<MPages> getPopular(int page) async {
     final res = (await client.get(
             Uri.parse("${source.baseUrl}/directory/$page.htm"),
             headers: getHeader(source.baseUrl)))
@@ -33,7 +35,7 @@ class MangaHere extends MProvider {
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource source, int page) async {
+  Future<MPages> getLatestUpdates(int page) async {
     final res = (await client.get(
             Uri.parse("${source.baseUrl}/directory/$page.htm?latest"),
             headers: getHeader(source.baseUrl)))
@@ -59,8 +61,7 @@ class MangaHere extends MProvider {
   }
 
   @override
-  Future<MPages> search(
-      MSource source, String query, int page, FilterList filterList) async {
+  Future<MPages> search(String query, int page, FilterList filterList) async {
     final filters = filterList.filters;
     String url = "${source.baseUrl}/search";
 
@@ -130,7 +131,7 @@ class MangaHere extends MProvider {
   }
 
   @override
-  Future<MManga> getDetail(MSource source, String url) async {
+  Future<MManga> getDetail(String url) async {
     final statusList = [
       {"Ongoing": 0, "Completed": 1}
     ];
@@ -168,7 +169,7 @@ class MangaHere extends MProvider {
   }
 
   @override
-  Future<List<String>> getPageList(MSource source, String url) async {
+  Future<List<String>> getPageList(String url) async {
     final headers = getHeader(source.baseUrl);
     final urll = "${source.baseUrl}$url";
     final res = (await client.get(Uri.parse(urll), headers: headers)).body;
@@ -259,7 +260,7 @@ class MangaHere extends MProvider {
   }
 
   @override
-  List<dynamic> getFilterList(MSource source) {
+  List<dynamic> getFilterList() {
     return [
       SelectFilter("TypeList", "Type", 1, [
         SelectFilterOption("American Manga", "5"),
@@ -335,6 +336,6 @@ Map<String, String> getHeader(String url) {
   return headers;
 }
 
-MangaHere main() {
-  return MangaHere();
+MangaHere main(MSource source) {
+  return MangaHere(source: source);
 }

@@ -2,15 +2,17 @@ import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
 class UHDMovies extends MProvider {
-  UHDMovies();
+  UHDMovies({required this.source});
 
-  final Client client = Client();
+  MSource source;
+
+  final Client client = Client(source);
 
   @override
   bool get supportsLatest => false;
 
   @override
-  Future<MPages> getPopular(MSource source, int page) async {
+  Future<MPages> getPopular(int page) async {
     final res = (await client
             .get(Uri.parse("${preferenceBaseUrl(source.id)}/page/$page")))
         .body;
@@ -18,13 +20,12 @@ class UHDMovies extends MProvider {
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource source, int page) async {
+  Future<MPages> getLatestUpdates(int page) async {
     return MPages([], false);
   }
 
   @override
-  Future<MPages> search(
-      MSource source, String query, int page, FilterList filterList) async {
+  Future<MPages> search(String query, int page, FilterList filterList) async {
     final res = (await client.get(Uri.parse(
             "${preferenceBaseUrl(source.id)}/page/$page/?s=${query.replaceAll(" ", "+")}")))
         .body;
@@ -32,7 +33,7 @@ class UHDMovies extends MProvider {
   }
 
   @override
-  Future<MManga> getDetail(MSource source, String url) async {
+  Future<MManga> getDetail(String url) async {
     url = getUrlWithoutDomain(url);
     final res =
         (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}${url}")))
@@ -117,13 +118,13 @@ class UHDMovies extends MProvider {
   }
 
   @override
-  Future<List<MVideo>> getVideoList(MSource source, String url) async {
+  Future<List<MVideo>> getVideoList(String url) async {
     final res = await getMediaUrl(url);
     return await extractVideos(res);
   }
 
   @override
-  List<dynamic> getSourcePreferences(MSource source) {
+  List<dynamic> getSourcePreferences() {
     return [
       EditTextPreference(
           key: "pref_domain",
@@ -233,6 +234,6 @@ class UHDMovies extends MProvider {
   }
 }
 
-UHDMovies main() {
-  return UHDMovies();
+UHDMovies main(MSource source) {
+  return UHDMovies(source: source);
 }

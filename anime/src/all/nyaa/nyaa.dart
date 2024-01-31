@@ -1,29 +1,30 @@
 import 'package:mangayomi/bridge_lib.dart';
 
 class Nyaa extends MProvider {
-  Nyaa();
+  Nyaa({required this.source});
 
-  final Client client = Client();
+  MSource source;
+
+  final Client client = Client(source);
 
   @override
-  Future<MPages> getPopular(MSource source, int page) async {
+  Future<MPages> getPopular(int page) async {
     final res = (await client.get(Uri.parse(
             "${source.baseUrl}/?f=0&c=${getPreferenceValue(source.id, "preferred_categorie_page")}&q=&s=downloads&o=desc&p=$page")))
         .body;
-    return parseAnimeList(res, source.baseUrl);
+    return parseAnimeList(res);
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource source, int page) async {
+  Future<MPages> getLatestUpdates(int page) async {
     final res = (await client.get(Uri.parse(
             "${source.baseUrl}/?f=0&c=${getPreferenceValue(source.id, "preferred_categorie_page")}&q=$page")))
         .body;
-    return parseAnimeList(res, source.baseUrl);
+    return parseAnimeList(res);
   }
 
   @override
-  Future<MPages> search(
-      MSource source, String query, int page, FilterList filterList) async {
+  Future<MPages> search(String query, int page, FilterList filterList) async {
     final filters = filterList.filters;
     String url = "";
     url =
@@ -36,11 +37,11 @@ class Nyaa extends MProvider {
       }
     }
     final res = (await client.get(Uri.parse(url))).body;
-    return parseAnimeList(res, source.baseUrl);
+    return parseAnimeList(res);
   }
 
   @override
-  Future<MManga> getDetail(MSource source, String url) async {
+  Future<MManga> getDetail(String url) async {
     MManga anime = MManga();
     final res = (await client.get(Uri.parse(url))).body;
     final document = parseHtml(res);
@@ -59,7 +60,7 @@ class Nyaa extends MProvider {
   }
 
   @override
-  List<dynamic> getFilterList(MSource source) {
+  List<dynamic> getFilterList() {
     return [
       SortFilter("SortFilter", "Sort by", SortState(0, true), [
         SelectFilterOption("None", ""),
@@ -73,7 +74,7 @@ class Nyaa extends MProvider {
   }
 
   @override
-  List<dynamic> getSourcePreferences(MSource source) {
+  List<dynamic> getSourcePreferences() {
     return [
       ListPreference(
           key: "preferred_categorie_page",
@@ -85,7 +86,7 @@ class Nyaa extends MProvider {
     ];
   }
 
-  MPages parseAnimeList(String res, String baseUrl) {
+  MPages parseAnimeList(String res) {
     List<MManga> animeList = [];
     final document = parseHtml(res);
 
@@ -94,7 +95,7 @@ class Nyaa extends MProvider {
     for (var value in values) {
       MManga anime = MManga();
       anime.imageUrl =
-          "$baseUrl${getUrlWithoutDomain(value.selectFirst("td:nth-child(1) > a > img").getSrc)}";
+          "${source.baseUrl}${getUrlWithoutDomain(value.selectFirst("td:nth-child(1) > a > img").getSrc)}";
       MElement firstElement = value
           .select("td > a")
           .where((MElement e) =>
@@ -102,7 +103,8 @@ class Nyaa extends MProvider {
               !e.outerHtml.contains("#comments"))
           .toList()
           .first;
-      anime.link = "$baseUrl${getUrlWithoutDomain(firstElement.getHref)}";
+      anime.link =
+          "${source.baseUrl}${getUrlWithoutDomain(firstElement.getHref)}";
       anime.name = firstElement.attr("title");
       animeList.add(anime);
     }
@@ -121,6 +123,6 @@ class Nyaa extends MProvider {
   }
 }
 
-Nyaa main() {
-  return Nyaa();
+Nyaa main(MSource source) {
+  return Nyaa(source: source);
 }

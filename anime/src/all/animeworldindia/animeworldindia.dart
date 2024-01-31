@@ -2,31 +2,32 @@ import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
 class AnimeWorldIndia extends MProvider {
-  AnimeWorldIndia();
+  AnimeWorldIndia({required this.source});
 
-  final Client client = Client();
+  MSource source;
+
+  final Client client = Client(source);
 
   @override
-  Future<MPages> getPopular(MSource source, int page) async {
+  Future<MPages> getPopular(int page) async {
     final res = (await client.get(Uri.parse(
             "${source.baseUrl}/advanced-search/page/$page/?s_lang=${source.lang}&s_orderby=viewed")))
         .body;
 
-    return parseAnimeList(res, source.baseUrl);
+    return parseAnimeList(res);
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource source, int page) async {
+  Future<MPages> getLatestUpdates(int page) async {
     final res = (await client.get(Uri.parse(
             "${source.baseUrl}/advanced-search/page/$page/?s_lang=${source.lang}&s_orderby=update")))
         .body;
 
-    return parseAnimeList(res, source.baseUrl);
+    return parseAnimeList(res);
   }
 
   @override
-  Future<MPages> search(
-      MSource source, String query, int page, FilterList filterList) async {
+  Future<MPages> search(String query, int page, FilterList filterList) async {
     final filters = filterList.filters;
     String url =
         "${source.baseUrl}/advanced-search/page/$page/?s_keyword=$query&s_lang=${source.lang}";
@@ -64,11 +65,11 @@ class AnimeWorldIndia extends MProvider {
     }
 
     final res = (await client.get(Uri.parse(url))).body;
-    return parseAnimeList(res, source.baseUrl);
+    return parseAnimeList(res);
   }
 
   @override
-  Future<MManga> getDetail(MSource source, String url) async {
+  Future<MManga> getDetail(String url) async {
     final res = (await client.get(Uri.parse(url))).body;
     MManga anime = MManga();
     final document = parseHtml(res);
@@ -143,7 +144,7 @@ class AnimeWorldIndia extends MProvider {
   }
 
   @override
-  Future<List<MVideo>> getVideoList(MSource source, String url) async {
+  Future<List<MVideo>> getVideoList(String url) async {
     final res = (await client.get(Uri.parse("${source.baseUrl}$url"))).body;
     var resJson = substringBefore(
         substringAfterLast(res, "\"players\":"), ",\"noplayer\":");
@@ -168,7 +169,7 @@ class AnimeWorldIndia extends MProvider {
     return sortVideos(videos, source.id);
   }
 
-  MPages parseAnimeList(String res, String baseUrl) {
+  MPages parseAnimeList(String res) {
     List<MManga> animeList = [];
     final document = parseHtml(res);
 
@@ -178,7 +179,7 @@ class AnimeWorldIndia extends MProvider {
           element.selectFirst("div.font-medium.line-clamp-2.mb-3").text;
       anime.link = element.selectFirst("a").getHref;
       anime.imageUrl =
-          "$baseUrl${getUrlWithoutDomain(element.selectFirst("img").getSrc)}";
+          "${source.baseUrl}${getUrlWithoutDomain(element.selectFirst("img").getSrc)}";
       animeList.add(anime);
     }
     final hasNextPage = xpath(res,
@@ -244,7 +245,7 @@ class AnimeWorldIndia extends MProvider {
   }
 
   @override
-  List<dynamic> getFilterList(MSource source) {
+  List<dynamic> getFilterList() {
     return [
       SelectFilter("TypeFilter", "Type", 0, [
         SelectFilterOption("Any", "all"),
@@ -343,7 +344,7 @@ class AnimeWorldIndia extends MProvider {
   }
 
   @override
-  List<dynamic> getSourcePreferences(MSource source) {
+  List<dynamic> getSourcePreferences() {
     return [
       ListPreference(
           key: "preferred_quality",
@@ -389,6 +390,6 @@ class AnimeWorldIndia extends MProvider {
   }
 }
 
-AnimeWorldIndia main() {
-  return AnimeWorldIndia();
+AnimeWorldIndia main(MSource source) {
+  return AnimeWorldIndia(source: source);
 }

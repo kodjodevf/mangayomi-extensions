@@ -1,7 +1,7 @@
 import '../../../../model/source.dart';
 
 Source get otakudesu => _otakudesu;
-const _otakudesuVersion = "0.0.4";
+const _otakudesuVersion = "0.0.45";
 const _otakudesuCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/anime/src/id/otakudesu/otakudesu.dart";
 Source _otakudesu = Source(

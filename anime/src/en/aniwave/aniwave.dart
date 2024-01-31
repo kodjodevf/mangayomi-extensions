@@ -2,12 +2,14 @@ import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
 class Aniwave extends MProvider {
-  Aniwave();
+  Aniwave({required this.source});
 
-  final Client client = Client();
+  MSource source;
+
+  final Client client = Client(source);
 
   @override
-  Future<MPages> getPopular(MSource source, int page) async {
+  Future<MPages> getPopular(int page) async {
     final res = (await client.get(Uri.parse(
             "${preferenceBaseUrl(source.id)}/filter?sort=trending&page=$page")))
         .body;
@@ -15,7 +17,7 @@ class Aniwave extends MProvider {
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource source, int page) async {
+  Future<MPages> getLatestUpdates(int page) async {
     final res = (await client.get(Uri.parse(
             "${preferenceBaseUrl(source.id)}/filter?sort=recently_updated&page=$page")))
         .body;
@@ -23,8 +25,7 @@ class Aniwave extends MProvider {
   }
 
   @override
-  Future<MPages> search(
-      MSource source, String query, int page, FilterList filterList) async {
+  Future<MPages> search(String query, int page, FilterList filterList) async {
     final filters = filterList.filters;
     String url = "${preferenceBaseUrl(source.id)}/filter?keyword=$query";
 
@@ -96,7 +97,7 @@ class Aniwave extends MProvider {
   }
 
   @override
-  Future<MManga> getDetail(MSource source, String url) async {
+  Future<MManga> getDetail(String url) async {
     final statusList = [
       {"Releasing": 0, "Completed": 1}
     ];
@@ -168,7 +169,7 @@ class Aniwave extends MProvider {
   }
 
   @override
-  Future<List<MVideo>> getVideoList(MSource source, String url) async {
+  Future<List<MVideo>> getVideoList(String url) async {
     final ids = substringBefore(url, "&");
     final encrypt = vrfEncrypt(ids);
     final vrf = "vrf=${Uri.encodeComponent(encrypt)}";
@@ -412,7 +413,7 @@ class Aniwave extends MProvider {
   }
 
   @override
-  List<dynamic> getFilterList(MSource source) {
+  List<dynamic> getFilterList() {
     return [
       SelectFilter("OrderFilter", "Sort order", 0, [
         SelectFilterOption("Most relevance", "most_relevance"),
@@ -545,7 +546,7 @@ class Aniwave extends MProvider {
   }
 
   @override
-  List<dynamic> getSourcePreferences(MSource source) {
+  List<dynamic> getSourcePreferences() {
     return [
       ListPreference(
           key: "preferred_domain1",
@@ -685,6 +686,6 @@ class Aniwave extends MProvider {
   }
 }
 
-Aniwave main() {
-  return Aniwave();
+Aniwave main(MSource source) {
+  return Aniwave(source: source);
 }

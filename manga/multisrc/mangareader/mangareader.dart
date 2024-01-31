@@ -2,12 +2,14 @@ import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
 class MangaReader extends MProvider {
-  MangaReader();
+  MangaReader({required this.source});
 
-  final Client client = Client();
+  MSource source;
+
+  final Client client = Client(source);
 
   @override
-  Future<MPages> getPopular(MSource source, int page) async {
+  Future<MPages> getPopular(int page) async {
     final res = (await client.get(Uri.parse(
             "${source.baseUrl}${getMangaUrlDirectory(source.name)}/?page=$page&order=popular")))
         .body;
@@ -15,7 +17,7 @@ class MangaReader extends MProvider {
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource source, int page) async {
+  Future<MPages> getLatestUpdates(int page) async {
     final res = (await client.get(Uri.parse(
             "${source.baseUrl}${getMangaUrlDirectory(source.name)}/?page=$page&order=update")))
         .body;
@@ -23,8 +25,7 @@ class MangaReader extends MProvider {
   }
 
   @override
-  Future<MPages> search(
-      MSource source, String query, int page, FilterList filterList) async {
+  Future<MPages> search(String query, int page, FilterList filterList) async {
     final filters = filterList.filters;
 
     String url =
@@ -71,7 +72,7 @@ class MangaReader extends MProvider {
   }
 
   @override
-  Future<MManga> getDetail(MSource source, String url) async {
+  Future<MManga> getDetail(String url) async {
     final statusList = [
       {
         "مستمرة": 0,
@@ -188,7 +189,7 @@ class MangaReader extends MProvider {
   }
 
   @override
-  Future<List<String>> getPageList(MSource source, String url) async {
+  Future<List<String>> getPageList(String url) async {
     url = getUrlWithoutDomain(url);
     final res = (await client.get(Uri.parse('${source.baseUrl}$url'))).body;
 
@@ -251,7 +252,7 @@ class MangaReader extends MProvider {
   }
 
   @override
-  List<dynamic> getFilterList(MSource source) {
+  List<dynamic> getFilterList() {
     return [
       SeparatorFilter(),
       TextFilter("AuthorFilter", "Author"),
@@ -316,6 +317,6 @@ class MangaReader extends MProvider {
   }
 }
 
-MangaReader main() {
-  return MangaReader();
+MangaReader main(MSource source) {
+  return MangaReader(source: source);
 }

@@ -2,12 +2,14 @@ import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
 class ZoroTheme extends MProvider {
-  ZoroTheme();
+  ZoroTheme({required this.source});
 
-  final Client client = Client();
+  MSource source;
+
+  final Client client = Client(source);
 
   @override
-  Future<MPages> getPopular(MSource source, int page) async {
+  Future<MPages> getPopular(int page) async {
     final res = (await client
             .get(Uri.parse("${source.baseUrl}/most-popular?page=$page")))
         .body;
@@ -16,7 +18,7 @@ class ZoroTheme extends MProvider {
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource source, int page) async {
+  Future<MPages> getLatestUpdates(int page) async {
     final res = (await client
             .get(Uri.parse("${source.baseUrl}/recently-updated?page=$page")))
         .body;
@@ -25,8 +27,7 @@ class ZoroTheme extends MProvider {
   }
 
   @override
-  Future<MPages> search(
-      MSource source, String query, int page, FilterList filterList) async {
+  Future<MPages> search(String query, int page, FilterList filterList) async {
     final filters = filterList.filters;
     String url = "${source.baseUrl}/";
 
@@ -119,7 +120,7 @@ class ZoroTheme extends MProvider {
   }
 
   @override
-  Future<MManga> getDetail(MSource source, String url) async {
+  Future<MManga> getDetail(String url) async {
     final statusList = [
       {"Currently Airing": 0, "Finished Airing": 1}
     ];
@@ -170,7 +171,7 @@ class ZoroTheme extends MProvider {
   }
 
   @override
-  Future<List<MVideo>> getVideoList(MSource source, String url) async {
+  Future<List<MVideo>> getVideoList(String url) async {
     final id = substringAfterLast(url, '?ep=');
 
     final res = (await client.get(
@@ -384,7 +385,7 @@ class ZoroTheme extends MProvider {
   ];
 
   @override
-  List<dynamic> getFilterList(MSource source) {
+  List<dynamic> getFilterList() {
     return [
       SelectFilter("TypeFilter", "Type", 0, [
         SelectFilterOption("All", ""),
@@ -518,7 +519,7 @@ class ZoroTheme extends MProvider {
   }
 
   @override
-  List<dynamic> getSourcePreferences(MSource source) {
+  List<dynamic> getSourcePreferences() {
     return [
       ListPreference(
           key: "preferred_quality",
@@ -606,6 +607,6 @@ class ZoroTheme extends MProvider {
   }
 }
 
-ZoroTheme main() {
-  return ZoroTheme();
+ZoroTheme main(MSource source) {
+  return ZoroTheme(source: source);
 }

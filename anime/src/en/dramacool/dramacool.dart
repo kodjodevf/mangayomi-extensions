@@ -2,12 +2,14 @@ import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
 class DramaCool extends MProvider {
-  DramaCool();
+  DramaCool({required this.source});
 
-  final Client client = Client();
+  MSource source;
+
+  final Client client = Client(source);
 
   @override
-  Future<MPages> getPopular(MSource source, int page) async {
+  Future<MPages> getPopular(int page) async {
     final res = (await client.get(Uri.parse(
             "${preferenceBaseUrl(source.id)}/most-popular-drama?page=$page")))
         .body;
@@ -17,7 +19,7 @@ class DramaCool extends MProvider {
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource source, int page) async {
+  Future<MPages> getLatestUpdates(int page) async {
     final res = (await client.get(Uri.parse(
             "${preferenceBaseUrl(source.id)}/recently-added?page=$page")))
         .body;
@@ -27,8 +29,7 @@ class DramaCool extends MProvider {
   }
 
   @override
-  Future<MPages> search(
-      MSource source, String query, int page, FilterList filterList) async {
+  Future<MPages> search(String query, int page, FilterList filterList) async {
     final res = (await client.get(Uri.parse(
             "${preferenceBaseUrl(source.id)}/search?keyword=$query&page=$page")))
         .body;
@@ -38,7 +39,7 @@ class DramaCool extends MProvider {
   }
 
   @override
-  Future<MManga> getDetail(MSource source, String url) async {
+  Future<MManga> getDetail(String url) async {
     final statusList = [
       {"Ongoing": 0, "Completed": 1}
     ];
@@ -100,7 +101,7 @@ class DramaCool extends MProvider {
   }
 
   @override
-  Future<List<MVideo>> getVideoList(MSource source, String url) async {
+  Future<List<MVideo>> getVideoList(String url) async {
     url = getUrlWithoutDomain(url);
 
     final res =
@@ -131,7 +132,7 @@ class DramaCool extends MProvider {
   }
 
   @override
-  List<dynamic> getSourcePreferences(MSource source) {
+  List<dynamic> getSourcePreferences() {
     return [
       EditTextPreference(
           key: "overrideBaseUrl",
@@ -211,6 +212,6 @@ class DramaCool extends MProvider {
   }
 }
 
-DramaCool main() {
-  return DramaCool();
+DramaCool main(MSource source) {
+  return DramaCool(source: source);
 }

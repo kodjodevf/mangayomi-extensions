@@ -2,12 +2,14 @@ import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
 class AnimesUltra extends MProvider {
-  AnimesUltra();
+  AnimesUltra({required this.source});
 
-  final Client client = Client();
+  MSource source;
+
+  final Client client = Client(source);
 
   @override
-  Future<MPages> getPopular(MSource source, int page) async {
+  Future<MPages> getPopular(int page) async {
     final res = (await client.get(Uri.parse(source.baseUrl))).body;
 
     List<MManga> animeList = [];
@@ -30,7 +32,7 @@ class AnimesUltra extends MProvider {
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource source, int page) async {
+  Future<MPages> getLatestUpdates(int page) async {
     final res = (await client.get(Uri.parse(source.baseUrl))).body;
 
     List<MManga> animeList = [];
@@ -53,8 +55,7 @@ class AnimesUltra extends MProvider {
   }
 
   @override
-  Future<MPages> search(
-      MSource source, String query, int page, FilterList filterList) async {
+  Future<MPages> search(String query, int page, FilterList filterList) async {
     final res = (await client.get(Uri.parse(source.baseUrl))).body;
 
     List<MManga> animeList = [];
@@ -74,7 +75,7 @@ class AnimesUltra extends MProvider {
   }
 
   @override
-  Future<MManga> getDetail(MSource source, String url) async {
+  Future<MManga> getDetail(String url) async {
     final statusList = [
       {"En cours": 0, "Terminé": 1}
     ];
@@ -116,7 +117,7 @@ class AnimesUltra extends MProvider {
   }
 
   @override
-  Future<List<MVideo>> getVideoList(MSource source, String url) async {
+  Future<List<MVideo>> getVideoList(String url) async {
     final resWebview = await getHtmlViaWebview(
         url, '//*[@class="ps__-list"]/div/@data-server-id');
 
@@ -152,6 +153,6 @@ class AnimesUltra extends MProvider {
   }
 }
 
-AnimesUltra main() {
-  return AnimesUltra();
+AnimesUltra main(MSource source) {
+  return AnimesUltra(source: source);
 }

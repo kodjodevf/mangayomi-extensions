@@ -2,12 +2,14 @@ import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
 class Madara extends MProvider {
-  Madara();
+  Madara({required this.source});
 
-  final Client client = Client();
+  MSource source;
+
+  final Client client = Client(source);
 
   @override
-  Future<MPages> getPopular(MSource source, int page) async {
+  Future<MPages> getPopular(int page) async {
     final res = (await client.get(
             Uri.parse("${source.baseUrl}/manga/page/$page/?m_orderby=views")))
         .body;
@@ -16,7 +18,7 @@ class Madara extends MProvider {
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource source, int page) async {
+  Future<MPages> getLatestUpdates(int page) async {
     final res = (await client.get(
             Uri.parse("${source.baseUrl}/manga/page/$page/?m_orderby=latest")))
         .body;
@@ -25,8 +27,7 @@ class Madara extends MProvider {
   }
 
   @override
-  Future<MPages> search(
-      MSource source, String query, int page, FilterList filterList) async {
+  Future<MPages> search(String query, int page, FilterList filterList) async {
     final filters = filterList.filters;
 
     String url = "${source.baseUrl}/?s=$query&post_type=wp-manga";
@@ -77,7 +78,7 @@ class Madara extends MProvider {
   }
 
   @override
-  Future<MManga> getDetail(MSource source, String url) async {
+  Future<MManga> getDetail(String url) async {
     final statusList = [
       {
         "OnGoing": 0,
@@ -248,7 +249,7 @@ class Madara extends MProvider {
   }
 
   @override
-  Future<List<String>> getPageList(MSource source, String url) async {
+  Future<List<String>> getPageList(String url) async {
     final res = (await client.get(Uri.parse(url))).body;
     final document = parseHtml(res);
     final pageElement = document.selectFirst(
@@ -298,7 +299,7 @@ class Madara extends MProvider {
   }
 
   @override
-  List<dynamic> getFilterList(MSource source) {
+  List<dynamic> getFilterList() {
     return [
       TextFilter("AuthorFilter", "Author"),
       TextFilter("ArtistFilter", "Artist"),
@@ -334,6 +335,6 @@ class Madara extends MProvider {
   }
 }
 
-Madara main() {
-  return Madara();
+Madara main(MSource source) {
+  return Madara(source: source);
 }

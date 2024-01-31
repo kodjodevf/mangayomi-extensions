@@ -2,19 +2,21 @@ import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
 class FrAnime extends MProvider {
-  FrAnime();
+  FrAnime({required this.source});
 
-  final Client client = Client();
+  MSource source;
+
+  final Client client = Client(source);
 
   @override
-  Future<MPages> getPopular(MSource source, int page) async {
+  Future<MPages> getPopular(int page) async {
     final res = await dataBase();
 
     return animeResList(res);
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource source, int page) async {
+  Future<MPages> getLatestUpdates(int page) async {
     final res = await dataBase();
 
     List list = json.decode(res);
@@ -22,15 +24,14 @@ class FrAnime extends MProvider {
   }
 
   @override
-  Future<MPages> search(
-      MSource source, String query, int page, FilterList filterList) async {
+  Future<MPages> search(String query, int page, FilterList filterList) async {
     final res = await dataBase();
 
     return animeSeachFetch(res, query);
   }
 
   @override
-  Future<MManga> getDetail(MSource source, String url) async {
+  Future<MManga> getDetail(String url) async {
     MManga anime = MManga();
     String language = "vo".toString();
     if (url.contains("lang=")) {
@@ -84,7 +85,7 @@ class FrAnime extends MProvider {
   }
 
   @override
-  Future<List<MVideo>> getVideoList(MSource source, String url) async {
+  Future<List<MVideo>> getVideoList(String url) async {
     String language = "vo";
     String videoBaseUrl = "https://api.franime.fr/api/anime";
     if (url.contains("lang=")) {
@@ -336,6 +337,6 @@ class FrAnime extends MProvider {
   }
 }
 
-FrAnime main() {
-  return FrAnime();
+FrAnime main(MSource source) {
+  return FrAnime(source: source);
 }

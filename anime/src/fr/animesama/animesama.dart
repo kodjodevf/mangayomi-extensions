@@ -2,12 +2,14 @@ import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
 class AnimeSama extends MProvider {
-  AnimeSama();
+  AnimeSama({required this.source});
 
-  final Client client = Client();
+  MSource source;
+
+  final Client client = Client(source);
 
   @override
-  Future<MPages> getPopular(MSource source, int page) async {
+  Future<MPages> getPopular(int page) async {
     final doc = (await client.get(Uri.parse("${source.baseUrl}/#$page"))).body;
     final regex = RegExp(r"""^\s*carteClassique\(\s*.*?\s*,\s*"(.*?)".*\)""",
         multiLine: true);
@@ -24,7 +26,7 @@ class AnimeSama extends MProvider {
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource source, int page) async {
+  Future<MPages> getLatestUpdates(int page) async {
     final res = (await client.get(Uri.parse(source.baseUrl))).body;
     var document = parseHtml(res);
     final latest = document
@@ -44,8 +46,7 @@ class AnimeSama extends MProvider {
   }
 
   @override
-  Future<MPages> search(
-      MSource source, String query, int page, FilterList filterList) async {
+  Future<MPages> search(String query, int page, FilterList filterList) async {
     final filters = filterList.filters;
     final res = (await client
             .get(Uri.parse("${source.baseUrl}/catalogue/listing_all.php")))
@@ -104,7 +105,7 @@ class AnimeSama extends MProvider {
   }
 
   @override
-  Future<MManga> getDetail(MSource source, String url) async {
+  Future<MManga> getDetail(String url) async {
     var animeUrl =
         "${source.baseUrl}${substringBeforeLast(getUrlWithoutDomain(url), "/")}";
     var movie =
@@ -152,7 +153,7 @@ class AnimeSama extends MProvider {
   }
 
   @override
-  Future<List<MVideo>> getVideoList(MSource source, String url) async {
+  Future<List<MVideo>> getVideoList(String url) async {
     final players = json.decode(url);
     List<MVideo> videos = [];
     for (var player in players) {
@@ -178,7 +179,7 @@ class AnimeSama extends MProvider {
   }
 
   @override
-  List<dynamic> getFilterList(MSource source) {
+  List<dynamic> getFilterList() {
     return [
       GroupFilter("TypeFilter", "Type", [
         CheckBoxFilter("Anime", "Anime"),
@@ -218,7 +219,7 @@ class AnimeSama extends MProvider {
   }
 
   @override
-  List<dynamic> getSourcePreferences(MSource source) {
+  List<dynamic> getSourcePreferences() {
     return [
       ListPreference(
           key: "preferred_quality",
@@ -403,6 +404,6 @@ class AnimeSama extends MProvider {
   }
 }
 
-AnimeSama main() {
-  return AnimeSama();
+AnimeSama main(MSource source) {
+  return AnimeSama(source: source);
 }
