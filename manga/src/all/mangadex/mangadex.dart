@@ -2,21 +2,23 @@ import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
 class MangaDex extends MProvider {
-  MangaDex();
+  MangaDex({required this.source});
 
-  final Client client = Client();
+  MSource source;
+
+  final Client client = Client(source);
 
   @override
-  Future<MPages> getPopular(MSource source, int page) async {
+  Future<MPages> getPopular(int page) async {
     page = (20 * (page - 1));
     final url =
         "https://api.mangadex.org/manga?limit=20&offset=$page&availableTranslatedLanguage[]=${source.lang}&includes[]=cover_art${preferenceContentRating(source.id)}${preferenceOriginalLanguages(source.id)}&order[followedCount]=desc";
     final res = (await client.get(Uri.parse(url))).body;
-    return mangaRes(res, source);
+    return mangaRes(res);
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource source, int page) async {
+  Future<MPages> getLatestUpdates(int page) async {
     page = (20 * (page - 1));
     final url =
         "https://api.mangadex.org/chapter?limit=20&offset=$page&translatedLanguage[]=${source.lang}&includeFutureUpdates=0&order[publishAt]=desc&includeFuturePublishAt=0&includeEmptyPages=0";
@@ -31,12 +33,11 @@ class MangaDex extends MProvider {
     final newUrl =
         "https://api.mangadex.org/manga?includes[]=cover_art&limit=${mangaIds.length}${preferenceContentRating(source.id)}${preferenceOriginalLanguages(source.id)}$mangaIdss";
     final res = (await client.get(Uri.parse(newUrl))).body;
-    return mangaRes(res, source);
+    return mangaRes(res);
   }
 
   @override
-  Future<MPages> search(
-      MSource source, String query, int page, FilterList filterList) async {
+  Future<MPages> search(String query, int page, FilterList filterList) async {
     page = (20 * (page - 1));
     final filters = filterList.filters;
     String url = "";
@@ -140,11 +141,11 @@ class MangaDex extends MProvider {
     }
 
     final res = (await client.get(Uri.parse(url))).body;
-    return mangaRes(res, source);
+    return mangaRes(res);
   }
 
   @override
-  Future<MManga> getDetail(MSource source, String url) async {
+  Future<MManga> getDetail(String url) async {
     final statusList = [
       {"ongoing": 0, "completed": 1, "hiatus": 2, "cancelled": 3}
     ];
@@ -222,7 +223,7 @@ class MangaDex extends MProvider {
   }
 
   @override
-  Future<List<String>> getPageList(MSource source, String url) async {
+  Future<List<String>> getPageList(String url) async {
     final res = (await client
             .get(Uri.parse("https://api.mangadex.org/at-home/server/$url")))
         .body;
@@ -235,7 +236,7 @@ class MangaDex extends MProvider {
     return chapterDatas.map((e) => "$host/data/$hash/$e").toList();
   }
 
-  MPages mangaRes(String res, MSource source) {
+  MPages mangaRes(String res) {
     final datasRes = getMapValue(res, "data", encode: true);
 
     final resJson = json.decode(datasRes) as List;
@@ -362,7 +363,7 @@ class MangaDex extends MProvider {
   }
 
   @override
-  List<dynamic> getFilterList(MSource source) {
+  List<dynamic> getFilterList() {
     return [
       CheckBoxFilter(
           "Has available chapters", "", "HasAvailableChaptersFilter"),
@@ -505,7 +506,7 @@ class MangaDex extends MProvider {
   }
 
   @override
-  List<dynamic> getSourcePreferences(MSource source) {
+  List<dynamic> getSourcePreferences() {
     return [
       ListPreference(
           key: "cover_quality",
@@ -589,6 +590,6 @@ class MangaDex extends MProvider {
   }
 }
 
-MangaDex main() {
-  return MangaDex();
+MangaDex main(MSource source) {
+  return MangaDex(source: source);
 }

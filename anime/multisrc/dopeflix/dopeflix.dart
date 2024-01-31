@@ -2,12 +2,14 @@ import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
 class DopeFlix extends MProvider {
-  DopeFlix();
+  DopeFlix({required this.source});
 
-  final Client client = Client();
+  MSource source;
+
+  final Client client = Client(source);
 
   @override
-  Future<MPages> getPopular(MSource source, int page) async {
+  Future<MPages> getPopular(int page) async {
     final res = (await client.get(Uri.parse(
             "${preferenceBaseUrl(source.id)}/${getPreferenceValue(source.id, "preferred_popular_page")}?page=$page")))
         .body;
@@ -15,7 +17,7 @@ class DopeFlix extends MProvider {
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource source, int page) async {
+  Future<MPages> getLatestUpdates(int page) async {
     final res =
         (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}/home")))
             .body;
@@ -37,8 +39,7 @@ class DopeFlix extends MProvider {
   }
 
   @override
-  Future<MPages> search(
-      MSource source, String query, int page, FilterList filterList) async {
+  Future<MPages> search(String query, int page, FilterList filterList) async {
     final filters = filterList.filters;
     String url = "${preferenceBaseUrl(source.id)}";
 
@@ -81,7 +82,7 @@ class DopeFlix extends MProvider {
   }
 
   @override
-  Future<MManga> getDetail(MSource source, String url) async {
+  Future<MManga> getDetail(String url) async {
     url = getUrlWithoutDomain(url);
     final res =
         (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}$url")))
@@ -145,7 +146,7 @@ class DopeFlix extends MProvider {
   }
 
   @override
-  Future<List<MVideo>> getVideoList(MSource source, String url) async {
+  Future<List<MVideo>> getVideoList(String url) async {
     url = getUrlWithoutDomain(url);
     final res =
         (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}/$url")))
@@ -317,7 +318,7 @@ class DopeFlix extends MProvider {
   }
 
   @override
-  List<dynamic> getFilterList(MSource source) {
+  List<dynamic> getFilterList() {
     return [
       SelectFilter("TypeFilter", "Type", 0, [
         SelectFilterOption("All", "all"),
@@ -413,7 +414,7 @@ class DopeFlix extends MProvider {
   }
 
   @override
-  List<dynamic> getSourcePreferences(MSource source) {
+  List<dynamic> getSourcePreferences() {
     return [
       if (source.name == "DopeBox")
         ListPreference(
@@ -542,6 +543,6 @@ class DopeFlix extends MProvider {
   }
 }
 
-DopeFlix main() {
-  return DopeFlix();
+DopeFlix main(MSource source) {
+  return DopeFlix(source: source);
 }

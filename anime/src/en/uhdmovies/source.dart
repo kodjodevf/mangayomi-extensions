@@ -1,7 +1,7 @@
 import '../../../../model/source.dart';
 
 Source get uhdmoviesSource => _uhdmoviesSource;
-const _uhdmoviesVersion = "0.0.25";
+const _uhdmoviesVersion = "0.0.3";
 const _uhdmoviesSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/anime/src/en/uhdmovies/uhdmovies.dart";
 Source _uhdmoviesSource = Source(

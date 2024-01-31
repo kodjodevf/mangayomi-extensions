@@ -2,23 +2,25 @@ import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
 class AniFlix extends MProvider {
-  AniFlix();
+  AniFlix({required this.source});
 
-  final Client client = Client();
+  MSource source;
+
+  final Client client = Client(source);
 
   @override
-  Future<MPages> getPopular(MSource source, int page) async {
+  Future<MPages> getPopular(int page) async {
     final headers = getHeader(source.baseUrl);
     final res = (await client.get(
             Uri.parse("${source.baseUrl}/api/show/new/${page - 1}"),
             headers: headers))
         .body;
 
-    return parseAnimeList(res, source.baseUrl, true);
+    return parseAnimeList(res, true);
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource source, int page) async {
+  Future<MPages> getLatestUpdates(int page) async {
     final headers = getHeader(source.baseUrl);
     final res = (await client.get(
             Uri.parse("${source.baseUrl}/api/show/airing/${page - 1}"),
@@ -50,17 +52,16 @@ class AniFlix extends MProvider {
   }
 
   @override
-  Future<MPages> search(
-      MSource source, String query, int page, FilterList filterList) async {
+  Future<MPages> search(String query, int page, FilterList filterList) async {
     final res = await client.post(
         Uri.parse("${source.baseUrl}/api/show/search"),
         headers: {'Referer': source.baseUrl},
         body: {"search": query});
-    return parseAnimeList(res.body, source.baseUrl, false);
+    return parseAnimeList(res.body, false);
   }
 
   @override
-  Future<MManga> getDetail(MSource source, String url) async {
+  Future<MManga> getDetail(String url) async {
     final res = (await client.get(Uri.parse("${source.baseUrl}$url"))).body;
     MManga anime = MManga();
     final jsonRes = json.decode(res);
@@ -117,7 +118,7 @@ class AniFlix extends MProvider {
   }
 
   @override
-  Future<List<MVideo>> getVideoList(MSource source, String url) async {
+  Future<List<MVideo>> getVideoList(String url) async {
     final res = (await client.get(Uri.parse("${source.baseUrl}$url"),
             headers: getHeader(source.baseUrl)))
         .body;
@@ -147,15 +148,17 @@ class AniFlix extends MProvider {
     return sortVideos(videos, source.id);
   }
 
-  MPages parseAnimeList(String res, String baseUrl, bool hasNextPage) {
+  MPages parseAnimeList(String res, bool hasNextPage) {
     final datas = json.decode(res);
     List<MManga> animeList = [];
 
     for (var data in datas) {
       MManga anime = MManga();
       anime.name = data["name"];
-      anime.imageUrl = "$baseUrl/storage/" + (data["cover_portrait"] ?? "");
-      anime.link = getUrlWithoutDomain("$baseUrl/api/show/${data['url']}");
+      anime.imageUrl =
+          "${source.baseUrl}/storage/" + (data["cover_portrait"] ?? "");
+      anime.link =
+          getUrlWithoutDomain("${source.baseUrl}/api/show/${data['url']}");
       anime.description = data["description"];
       if (data["airing"] == 0) {
         anime.status = MStatus.completed;
@@ -191,7 +194,7 @@ class AniFlix extends MProvider {
   }
 
   @override
-  List<dynamic> getSourcePreferences(MSource source) {
+  List<dynamic> getSourcePreferences() {
     return [
       ListPreference(
           key: "preferred_hoster",
@@ -232,6 +235,6 @@ Map<String, String> getHeader(String url) {
   return {'Referer': url};
 }
 
-AniFlix main() {
-  return AniFlix();
+AniFlix main(MSource source) {
+  return AniFlix(source: source);
 }

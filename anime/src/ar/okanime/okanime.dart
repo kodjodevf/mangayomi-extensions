@@ -2,12 +2,14 @@ import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
 class OkAnime extends MProvider {
-  OkAnime();
+  OkAnime({required this.source});
 
-  final Client client = Client();
+  MSource source;
+
+  final Client client = Client(source);
 
   @override
-  Future<MPages> getPopular(MSource source, int page) async {
+  Future<MPages> getPopular(int page) async {
     final res = (await client.get(Uri.parse(source.baseUrl))).body;
     List<MManga> animeList = [];
     String path =
@@ -27,7 +29,7 @@ class OkAnime extends MProvider {
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource source, int page) async {
+  Future<MPages> getLatestUpdates(int page) async {
     final res = (await client
             .get(Uri.parse("${source.baseUrl}/espisode-list?page=$page")))
         .body;
@@ -50,8 +52,7 @@ class OkAnime extends MProvider {
   }
 
   @override
-  Future<MPages> search(
-      MSource source, String query, int page, FilterList filterList) async {
+  Future<MPages> search(String query, int page, FilterList filterList) async {
     String url = "${source.baseUrl}/search/?s=$query";
     if (page > 1) {
       url += "&page=$page";
@@ -78,7 +79,7 @@ class OkAnime extends MProvider {
   }
 
   @override
-  Future<MManga> getDetail(MSource source, String url) async {
+  Future<MManga> getDetail(String url) async {
     final statusList = [
       {"يعرض الان": 0, "مكتمل": 1}
     ];
@@ -114,7 +115,7 @@ class OkAnime extends MProvider {
   }
 
   @override
-  Future<List<MVideo>> getVideoList(MSource source, String url) async {
+  Future<List<MVideo>> getVideoList(String url) async {
     final res = (await client.get(Uri.parse(url))).body;
     final urls = xpath(res, '//*[@id="streamlinks"]/a/@data-src');
     final qualities = xpath(res, '//*[@id="streamlinks"]/a/span/text()');
@@ -143,7 +144,7 @@ class OkAnime extends MProvider {
   }
 
   @override
-  List<dynamic> getSourcePreferences(MSource source) {
+  List<dynamic> getSourcePreferences() {
     return [
       ListPreference(
           key: "preferred_quality",
@@ -217,6 +218,6 @@ class OkAnime extends MProvider {
   }
 }
 
-OkAnime main() {
-  return OkAnime();
+OkAnime main(MSource source) {
+  return OkAnime(source: source);
 }

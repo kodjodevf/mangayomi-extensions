@@ -2,7 +2,7 @@ import '../../../model/source.dart';
 import 'src/dopebox/dopebox.dart';
 import 'src/sflix/sflix.dart';
 
-const _dopeflixVersion = "0.0.35";
+const _dopeflixVersion = "0.0.4";
 const _dopeflixSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/anime/multisrc/dopeflix/dopeflix.dart";
 
