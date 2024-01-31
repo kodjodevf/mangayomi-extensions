@@ -33,7 +33,7 @@ and you will see this :
 import 'package:mangayomi/models/source.dart';
 
 //For testing purposes, set to true
-const useTestSourceCode = false;
+const useTestSourceCode = true;
 
 final testSourceModelList = [
   Source(
@@ -51,10 +51,13 @@ final testSourceModelList = [
 
 const testSourceCode = r'''
 import 'package:mangayomi/bridge_lib.dart';
-import 'dart:convert';
 
 class TestSource extends MProvider {
-  TestSource();
+  TestSource({required this.source});
+
+  MSource source;
+
+  final Client client = Client(source);
 
   @override
   bool get supportsLatest => true;
@@ -70,8 +73,7 @@ class TestSource extends MProvider {
   }
 
   @override
-  Future<MPages> search(
-      String query, int page, FilterList filterList) async {
+  Future<MPages> search(String query, int page, FilterList filterList) async {
     // TODO: implement
   }
 
@@ -104,7 +106,7 @@ class TestSource extends MProvider {
 }
 
 TestSource main(MSource source) {
-  return TestSource();
+  return TestSource(source:source);
 }
 
 ''';
@@ -238,7 +240,7 @@ Return Response
 ```bash
 - Simple request
 
-final client = Client();
+final Client client = Client();
 
 final res = await client.get(Uri.parse("http://example.com"));
 
@@ -246,7 +248,7 @@ print(res.body);
 
 - With headers 
 
-final client = Client();
+final Client client = Client();
 
 final res = await client.get(Uri.parse("http://example.com"),headers:{"Referer": "http://example.com"});
 
@@ -254,7 +256,7 @@ print(res.body);
 
 - With body
 
-final client = Client();
+final Client client = Client();
 
 final res = await client.post(Uri.parse("http://example.com"),headers:{"Referer": "http://example.com"},'body':{'name':'test'});
 
