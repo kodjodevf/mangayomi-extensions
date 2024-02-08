@@ -9,10 +9,13 @@ class GogoAnime extends MProvider {
   final Client client = Client(source);
 
   @override
+  String get baseUrl =>
+      getPreferenceValue(source.id, "override_baseurl_v${source.id}");
+
+  @override
   Future<MPages> getPopular(int page) async {
-    final res = (await client.get(Uri.parse(
-            "${preferenceBaseUrl(source.id)}/popular.html?page=$page")))
-        .body;
+    final res =
+        (await client.get(Uri.parse("$baseUrl/popular.html?page=$page"))).body;
 
     List<MManga> animeList = [];
     final urls = xpath(res, '//*[@class="img"]/a/@href');
@@ -132,15 +135,14 @@ class GogoAnime extends MProvider {
       }
     }
     if (genre.isNotEmpty) {
-      url = "${preferenceBaseUrl(source.id)}/genre/$genre?page=$page";
+      url = "$baseUrl/genre/$genre?page=$page";
     } else if (recent.isNotEmpty) {
       url =
           "https://ajax.gogo-load.com/ajax/page-recent-release.html?page=$page&type=$recent";
     } else if (season.isNotEmpty) {
-      url = "${preferenceBaseUrl(source.id)}/$season?page=$page";
+      url = "$baseUrl/$season?page=$page";
     } else {
-      url =
-          "${preferenceBaseUrl(source.id)}/filter.html?keyword=$query$filterStr&page=$page";
+      url = "$baseUrl/filter.html?keyword=$query$filterStr&page=$page";
     }
 
     final res = (await client.get(Uri.parse(url))).body;
@@ -167,9 +169,7 @@ class GogoAnime extends MProvider {
       {"Ongoing": 0, "Completed": 1}
     ];
 
-    final res =
-        (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}$url")))
-            .body;
+    final res = (await client.get(Uri.parse("$baseUrl$url"))).body;
     MManga anime = MManga();
     final status = xpath(
             res, '//*[@class="anime_info_body_bg"]/p[@class="type"][5]/text()')
@@ -214,9 +214,7 @@ class GogoAnime extends MProvider {
 
   @override
   Future<List<MVideo>> getVideoList(String url) async {
-    final res =
-        (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}$url")))
-            .body;
+    final res = (await client.get(Uri.parse("$baseUrl$url"))).body;
     final serverUrls =
         xpath(res, '//*[@class="anime_muti_link"]/ul/li/a/@data-video');
     final serverNames =
@@ -1099,10 +1097,6 @@ class GogoAnime extends MProvider {
             "filelions"
           ]),
     ];
-  }
-
-  String preferenceBaseUrl(int sourceId) {
-    return getPreferenceValue(sourceId, "override_baseurl_v$sourceId");
   }
 
   List<String> preferenceHosterSelection(int sourceId) {

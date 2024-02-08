@@ -12,10 +12,11 @@ class UHDMovies extends MProvider {
   bool get supportsLatest => false;
 
   @override
+  String get baseUrl => getPreferenceValue(source.id, "pref_domain");
+
+  @override
   Future<MPages> getPopular(int page) async {
-    final res = (await client
-            .get(Uri.parse("${preferenceBaseUrl(source.id)}/page/$page")))
-        .body;
+    final res = (await client.get(Uri.parse("$baseUrl/page/$page"))).body;
     return animeFromElement(res);
   }
 
@@ -26,8 +27,8 @@ class UHDMovies extends MProvider {
 
   @override
   Future<MPages> search(String query, int page, FilterList filterList) async {
-    final res = (await client.get(Uri.parse(
-            "${preferenceBaseUrl(source.id)}/page/$page/?s=${query.replaceAll(" ", "+")}")))
+    final res = (await client.get(
+            Uri.parse("$baseUrl/page/$page/?s=${query.replaceAll(" ", "+")}")))
         .body;
     return animeFromElement(res);
   }
@@ -35,9 +36,7 @@ class UHDMovies extends MProvider {
   @override
   Future<MManga> getDetail(String url) async {
     url = getUrlWithoutDomain(url);
-    final res =
-        (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}${url}")))
-            .body;
+    final res = (await client.get(Uri.parse("$baseUrl${url}"))).body;
     MManga anime = MManga();
     final description = xpath(res, '//pre/span/text()');
     if (description.isNotEmpty) {
@@ -135,10 +134,6 @@ class UHDMovies extends MProvider {
           dialogMessage: "",
           text: "https://uhdmovies.zip"),
     ];
-  }
-
-  String preferenceBaseUrl(int sourceId) {
-    return getPreferenceValue(sourceId, "pref_domain");
   }
 
   Future<List<MVideo>> extractVideos(String url) async {

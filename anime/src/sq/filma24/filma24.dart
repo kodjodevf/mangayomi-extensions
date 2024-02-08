@@ -9,20 +9,20 @@ class Filma24 extends MProvider {
   final Client client = Client(source);
 
   @override
+  String get baseUrl => getPreferenceValue(source.id, "pref_domain");
+
+  @override
   Future<MPages> getPopular(int page) async {
     String pageNu = page == 1 ? "" : "/page/$page/";
-    final res =
-        (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}$pageNu")))
-            .body;
+    final res = (await client.get(Uri.parse("$baseUrl$pageNu"))).body;
     return animeFromRes(res);
   }
 
   @override
   Future<MPages> getLatestUpdates(int page) async {
     String pageNu = page == 1 ? "" : "page/$page/";
-    final res = (await client.get(
-            Uri.parse("${preferenceBaseUrl(source.id)}/$pageNu?sort=trendy")))
-        .body;
+    final res =
+        (await client.get(Uri.parse("$baseUrl/$pageNu?sort=trendy"))).body;
     return animeFromRes(res);
   }
 
@@ -32,7 +32,7 @@ class Filma24 extends MProvider {
     String url = "";
     String pageNu = page == 1 ? "" : "page/$page/";
     if (query.isNotEmpty) {
-      url += "${preferenceBaseUrl(source.id)}/search/$query/";
+      url += "$baseUrl/search/$query/";
     } else {
       for (var filter in filters) {
         if (filter.type == "ReleaseFilter") {
@@ -47,7 +47,7 @@ class Filma24 extends MProvider {
           }
         }
       }
-      url = "${preferenceBaseUrl(source.id)}$url";
+      url = "$baseUrl$url";
     }
 
     url += pageNu;
@@ -129,10 +129,6 @@ class Filma24 extends MProvider {
           dialogMessage: "",
           text: "https://www.filma24.pl"),
     ];
-  }
-
-  String preferenceBaseUrl(int sourceId) {
-    return getPreferenceValue(sourceId, "pref_domain");
   }
 
   @override
