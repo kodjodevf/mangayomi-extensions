@@ -9,17 +9,20 @@ class Aniwave extends MProvider {
   final Client client = Client(source);
 
   @override
+  String get baseUrl => getPreferenceValue(source.id, "preferred_domain1");
+
+  @override
   Future<MPages> getPopular(int page) async {
-    final res = (await client.get(Uri.parse(
-            "${preferenceBaseUrl(source.id)}/filter?sort=trending&page=$page")))
+    final res = (await client
+            .get(Uri.parse("$baseUrl/filter?sort=trending&page=$page")))
         .body;
     return parseAnimeList(res);
   }
 
   @override
   Future<MPages> getLatestUpdates(int page) async {
-    final res = (await client.get(Uri.parse(
-            "${preferenceBaseUrl(source.id)}/filter?sort=recently_updated&page=$page")))
+    final res = (await client
+            .get(Uri.parse("$baseUrl/filter?sort=recently_updated&page=$page")))
         .body;
     return parseAnimeList(res);
   }
@@ -27,7 +30,7 @@ class Aniwave extends MProvider {
   @override
   Future<MPages> search(String query, int page, FilterList filterList) async {
     final filters = filterList.filters;
-    String url = "${preferenceBaseUrl(source.id)}/filter?keyword=$query";
+    String url = "$baseUrl/filter?keyword=$query";
 
     for (var filter in filters) {
       if (filter.type == "OrderFilter") {
@@ -101,9 +104,7 @@ class Aniwave extends MProvider {
     final statusList = [
       {"Releasing": 0, "Completed": 1}
     ];
-    final res =
-        (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}$url")))
-            .body;
+    final res = (await client.get(Uri.parse("$baseUrl$url"))).body;
     MManga anime = MManga();
     final status = xpath(res, '//div[contains(text(),"Status")]/span/text()');
     if (status.isNotEmpty) {
@@ -124,9 +125,9 @@ class Aniwave extends MProvider {
     final encrypt = vrfEncrypt(id);
     final vrf = "vrf=${Uri.encodeComponent(encrypt)}";
 
-    final resEp = (await client.get(Uri.parse(
-            "${preferenceBaseUrl(source.id)}/ajax/episode/list/$id?$vrf")))
-        .body;
+    final resEp =
+        (await client.get(Uri.parse("$baseUrl/ajax/episode/list/$id?$vrf")))
+            .body;
 
     final html = json.decode(resEp)["result"];
     List<MChapter>? episodesList = [];
@@ -173,9 +174,9 @@ class Aniwave extends MProvider {
     final ids = substringBefore(url, "&");
     final encrypt = vrfEncrypt(ids);
     final vrf = "vrf=${Uri.encodeComponent(encrypt)}";
-    final res = (await client.get(Uri.parse(
-            "${preferenceBaseUrl(source.id)}/ajax/server/list/$ids?$vrf")))
-        .body;
+    final res =
+        (await client.get(Uri.parse("$baseUrl/ajax/server/list/$ids?$vrf")))
+            .body;
     final html = json.decode(res)["result"];
 
     final vidsHtmls = parseHtml(html).select("div.servers > div");
@@ -190,9 +191,9 @@ class Aniwave extends MProvider {
 
         final encrypt = vrfEncrypt(serverId);
         final vrf = "vrf=${Uri.encodeComponent(encrypt)}";
-        final res = (await client.get(Uri.parse(
-                "${preferenceBaseUrl(source.id)}/ajax/server/$serverId?$vrf")))
-            .body;
+        final res =
+            (await client.get(Uri.parse("$baseUrl/ajax/server/$serverId?$vrf")))
+                .body;
         final status = json.decode(res)["status"];
         if (status == 200) {
           List<MVideo> a = [];
@@ -631,10 +632,6 @@ class Aniwave extends MProvider {
           entryValues: ["sub", "softsub", "dub"],
           values: ["sub", "softsub", "dub"]),
     ];
-  }
-
-  String preferenceBaseUrl(int sourceId) {
-    return getPreferenceValue(sourceId, "preferred_domain1");
   }
 
   List<String> preferenceHosterSelection(int sourceId) {

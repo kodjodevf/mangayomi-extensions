@@ -9,15 +9,17 @@ class YoMovies extends MProvider {
   final Client client = Client(source);
 
   @override
+  String get baseUrl => getPreferenceValue(source.id, "overrideBaseUrl");
+
+  @override
   bool get supportsLatest => false;
 
   @override
   Future<MPages> getPopular(int page) async {
     String pageNu = page == 1 ? "" : "page/$page/";
 
-    final res = (await client.get(Uri.parse(
-            "${preferenceBaseUrl(source.id)}/most-favorites/$pageNu")))
-        .body;
+    final res =
+        (await client.get(Uri.parse("$baseUrl/most-favorites/$pageNu"))).body;
     final document = parseHtml(res);
     return animeFromElement(
         document.select("div.movies-list > div.ml-item"),
@@ -36,7 +38,7 @@ class YoMovies extends MProvider {
     String url = "";
     String pageNu = page == 1 ? "" : "/page/$page";
     if (query.isNotEmpty) {
-      url = "${preferenceBaseUrl(source.id)}$pageNu/?s=$query";
+      url = "$baseUrl$pageNu/?s=$query";
     } else {
       for (var filter in filters) {
         if (filter.type.isNotEmpty) {
@@ -46,7 +48,7 @@ class YoMovies extends MProvider {
           }
         }
       }
-      url = "${preferenceBaseUrl(source.id)}$url$pageNu";
+      url = "$baseUrl$url$pageNu";
     }
     final res = (await client.get(Uri.parse(url))).body;
     final document = parseHtml(res);
@@ -60,9 +62,7 @@ class YoMovies extends MProvider {
   Future<MManga> getDetail(String url) async {
     url = getUrlWithoutDomain(url);
 
-    final res =
-        (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}$url")))
-            .body;
+    final res = (await client.get(Uri.parse("$baseUrl$url"))).body;
     final document = parseHtml(res);
     MManga anime = MManga();
     var infoElement = document.selectFirst("div.mvi-content");
@@ -99,9 +99,7 @@ class YoMovies extends MProvider {
   @override
   Future<List<MVideo>> getVideoList(String url) async {
     url = getUrlWithoutDomain(url);
-    final res =
-        (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}$url")))
-            .body;
+    final res = (await client.get(Uri.parse("$baseUrl$url"))).body;
     final document = parseHtml(res);
     final serverElements = document.select("div.movieplay > iframe");
     List<MVideo> videos = [];
@@ -162,10 +160,6 @@ class YoMovies extends MProvider {
       videos.add(video);
     }
     return videos;
-  }
-
-  String preferenceBaseUrl(int sourceId) {
-    return getPreferenceValue(sourceId, "overrideBaseUrl");
   }
 
   MPages animeFromElement(List<MElement> elements, bool hasNextPage) {
