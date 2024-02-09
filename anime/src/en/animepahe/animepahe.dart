@@ -149,7 +149,7 @@ class AnimePahe extends MProvider {
               .first,
           "eval(function(");
       final videoUrl = substringBefore(
-          substringAfter(unpackJs("eval(function($script"), "const source=\\'"),
+          substringAfter(unpackJsAndCombine("eval(function($script"), "const source=\\'"),
           "\\';");
       MVideo video = MVideo();
       video
