@@ -2,12 +2,14 @@ import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
 class MMRCMS extends MProvider {
-  MMRCMS();
+  MMRCMS({required this.source});
 
-  final Client client = Client();
+  MSource source;
+
+  final Client client = Client(source);
 
   @override
-  Future<MPages> getPopular(MSource source, int page) async {
+  Future<MPages> getPopular(int page) async {
     final res = (await client.get(Uri.parse(
             "${source.baseUrl}/filterList?page=$page&sortBy=views&asc=false")))
         .body;
@@ -38,7 +40,7 @@ class MMRCMS extends MProvider {
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource source, int page) async {
+  Future<MPages> getLatestUpdates(int page) async {
     final res = (await client
             .get(Uri.parse("${source.baseUrl}/latest-release?page=$page")))
         .body;
@@ -69,8 +71,7 @@ class MMRCMS extends MProvider {
   }
 
   @override
-  Future<MPages> search(
-      MSource source, String query, int page, FilterList filterList) async {
+  Future<MPages> search(String query, int page, FilterList filterList) async {
     final filters = filterList.filters;
     String url = "";
     if (query.isNotEmpty) {
@@ -152,7 +153,7 @@ class MMRCMS extends MProvider {
   }
 
   @override
-  Future<MManga> getDetail(MSource source, String url) async {
+  Future<MManga> getDetail(String url) async {
     final statusList = [
       {
         "complete": 1,
@@ -214,7 +215,7 @@ class MMRCMS extends MProvider {
   }
 
   @override
-  Future<List<String>> getPageList(MSource source, String url) async {
+  Future<List<String>> getPageList(String url) async {
     final res = (await client.get(Uri.parse(url))).body;
 
     List<String> pagesUrl = [];
@@ -231,7 +232,7 @@ class MMRCMS extends MProvider {
     return pagesUrl;
   }
 
-  List<dynamic> getFilterList(MSource source) {
+  List<dynamic> getFilterList() {
     return [
       HeaderFilter("NOTE: Ignored if using text search!"),
       SeparatorFilter(),
@@ -317,6 +318,6 @@ class MMRCMS extends MProvider {
   }
 }
 
-MMRCMS main() {
-  return MMRCMS();
+MMRCMS main(MSource source) {
+  return MMRCMS(source: source);
 }

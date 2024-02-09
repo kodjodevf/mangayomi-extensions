@@ -2,35 +2,39 @@ import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
 class DramaCool extends MProvider {
-  DramaCool();
+  DramaCool({required this.source});
 
-  final Client client = Client();
+  MSource source;
+
+  final Client client = Client(source);
 
   @override
-  Future<MPages> getPopular(MSource source, int page) async {
-    final res = (await client.get(Uri.parse(
-            "${preferenceBaseUrl(source.id)}/most-popular-drama?page=$page")))
-        .body;
+  String get baseUrl => getPreferenceValue(source.id, "overrideBaseUrl");
+
+  @override
+  Future<MPages> getPopular(int page) async {
+    final res =
+        (await client.get(Uri.parse("$baseUrl/most-popular-drama?page=$page")))
+            .body;
     final document = parseHtml(res);
     return animeFromElement(document.select("ul.list-episode-item li a"),
         document.selectFirst("li.next a")?.attr("href") != null);
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource source, int page) async {
-    final res = (await client.get(Uri.parse(
-            "${preferenceBaseUrl(source.id)}/recently-added?page=$page")))
-        .body;
+  Future<MPages> getLatestUpdates(int page) async {
+    final res =
+        (await client.get(Uri.parse("$baseUrl/recently-added?page=$page")))
+            .body;
     final document = parseHtml(res);
     return animeFromElement(document.select("ul.switch-block a"),
         document.selectFirst("li.next a")?.attr("href") != null);
   }
 
   @override
-  Future<MPages> search(
-      MSource source, String query, int page, FilterList filterList) async {
-    final res = (await client.get(Uri.parse(
-            "${preferenceBaseUrl(source.id)}/search?keyword=$query&page=$page")))
+  Future<MPages> search(String query, int page, FilterList filterList) async {
+    final res = (await client
+            .get(Uri.parse("$baseUrl/search?keyword=$query&page=$page")))
         .body;
     final document = parseHtml(res);
     return animeFromElement(document.select("ul.list-episode-item li a"),
@@ -38,22 +42,18 @@ class DramaCool extends MProvider {
   }
 
   @override
-  Future<MManga> getDetail(MSource source, String url) async {
+  Future<MManga> getDetail(String url) async {
     final statusList = [
       {"Ongoing": 0, "Completed": 1}
     ];
     url = getUrlWithoutDomain(url);
     if (url.contains("-episode-") && url.endsWith(".html")) {
-      final res =
-          (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}$url")))
-              .body;
+      final res = (await client.get(Uri.parse("$baseUrl$url"))).body;
       url = parseHtml(res).selectFirst("div.category a").attr("href");
     }
     url = getUrlWithoutDomain(url);
 
-    final res =
-        (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}$url")))
-            .body;
+    final res = (await client.get(Uri.parse("$baseUrl$url"))).body;
     final document = parseHtml(res);
     MManga anime = MManga();
     anime.description = document
@@ -100,12 +100,10 @@ class DramaCool extends MProvider {
   }
 
   @override
-  Future<List<MVideo>> getVideoList(MSource source, String url) async {
+  Future<List<MVideo>> getVideoList(String url) async {
     url = getUrlWithoutDomain(url);
 
-    final res =
-        (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}$url")))
-            .body;
+    final res = (await client.get(Uri.parse("$baseUrl$url"))).body;
     final document = parseHtml(res);
     String iframeUrl = document.selectFirst("iframe")?.getSrc ?? "";
     if (iframeUrl.isEmpty) return [];
@@ -131,7 +129,7 @@ class DramaCool extends MProvider {
   }
 
   @override
-  List<dynamic> getSourcePreferences(MSource source) {
+  List<dynamic> getSourcePreferences() {
     return [
       EditTextPreference(
           key: "overrideBaseUrl",
@@ -163,10 +161,6 @@ class DramaCool extends MProvider {
             "StreamTape"
           ])
     ];
-  }
-
-  String preferenceBaseUrl(int sourceId) {
-    return getPreferenceValue(sourceId, "overrideBaseUrl");
   }
 
   MPages animeFromElement(List<MElement> elements, bool hasNextPage) {
@@ -211,6 +205,6 @@ class DramaCool extends MProvider {
   }
 }
 
-DramaCool main() {
-  return DramaCool();
+DramaCool main(MSource source) {
+  return DramaCool(source: source);
 }

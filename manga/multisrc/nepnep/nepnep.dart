@@ -2,12 +2,14 @@ import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
 class NepNep extends MProvider {
-  NepNep();
+  NepNep({required this.source});
 
-  final Client client = Client();
+  MSource source;
+
+  final Client client = Client(source);
 
   @override
-  Future<MPages> getPopular(MSource source, int page) async {
+  Future<MPages> getPopular(int page) async {
     final res = (await client.get(Uri.parse("${source.baseUrl}/search/"))).body;
     final directory = directoryFromDocument(res);
     final resSort = sortMapList(json.decode(directory), "vm", 1);
@@ -16,7 +18,7 @@ class NepNep extends MProvider {
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource source, int page) async {
+  Future<MPages> getLatestUpdates(int page) async {
     final res = (await client.get(Uri.parse("${source.baseUrl}/search/"))).body;
     final directory = directoryFromDocument(res);
     final resSort = sortMapList(json.decode(directory), "lt", 1);
@@ -25,8 +27,7 @@ class NepNep extends MProvider {
   }
 
   @override
-  Future<MPages> search(
-      MSource source, String query, int page, FilterList filterList) async {
+  Future<MPages> search(String query, int page, FilterList filterList) async {
     final filters = filterList.filters;
     List<dynamic> queryRes = [];
     final res = (await client.get(Uri.parse("${source.baseUrl}/search/"))).body;
@@ -137,7 +138,7 @@ class NepNep extends MProvider {
   }
 
   @override
-  Future<MManga> getDetail(MSource source, String url) async {
+  Future<MManga> getDetail(String url) async {
     final statusList = [
       {"Ongoing": 0, "Completed": 1, "Cancelled": 3, "Hiatus": 2}
     ];
@@ -189,7 +190,7 @@ class NepNep extends MProvider {
   }
 
   @override
-  Future<List<String>> getPageList(MSource source, String url) async {
+  Future<List<String>> getPageList(String url) async {
     final headers = getHeader(source.baseUrl);
     List<String> pages = [];
     final res =
@@ -306,7 +307,7 @@ class NepNep extends MProvider {
   }
 
   @override
-  List<dynamic> getFilterList(MSource source) {
+  List<dynamic> getFilterList() {
     return [
       TextFilter("YearFilter", "Years"),
       TextFilter("AuthorFilter", "Author"),
@@ -405,6 +406,6 @@ Map<String, String> getHeader(String url) {
   return headers;
 }
 
-NepNep main() {
-  return NepNep();
+NepNep main(MSource source) {
+  return NepNep(source: source);
 }

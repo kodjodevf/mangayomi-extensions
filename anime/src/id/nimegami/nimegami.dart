@@ -2,12 +2,14 @@ import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
 class NimeGami extends MProvider {
-  NimeGami();
+  NimeGami({required this.source});
 
-  final Client client = Client();
+  MSource source;
+
+  final Client client = Client(source);
 
   @override
-  Future<MPages> getPopular(MSource source, int page) async {
+  Future<MPages> getPopular(int page) async {
     final res =
         (await client.get(Uri.parse("${source.baseUrl}/page/$page"))).body;
     List<MManga> animeList = [];
@@ -27,7 +29,7 @@ class NimeGami extends MProvider {
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource source, int page) async {
+  Future<MPages> getLatestUpdates(int page) async {
     final res =
         (await client.get(Uri.parse("${source.baseUrl}/page/$page"))).body;
     List<MManga> animeList = [];
@@ -48,8 +50,7 @@ class NimeGami extends MProvider {
   }
 
   @override
-  Future<MPages> search(
-      MSource source, String query, int page, FilterList filterList) async {
+  Future<MPages> search(String query, int page, FilterList filterList) async {
     final res = (await client.get(
             Uri.parse("${source.baseUrl}/page/$page/?s=$query&post_type=post")))
         .body;
@@ -70,7 +71,7 @@ class NimeGami extends MProvider {
   }
 
   @override
-  Future<MManga> getDetail(MSource source, String url) async {
+  Future<MManga> getDetail(String url) async {
     final res = (await client.get(Uri.parse(url))).body;
     MManga anime = MManga();
     final description = xpath(res, '//*[@id="Sinopsis"]/p/text()');
@@ -106,7 +107,7 @@ class NimeGami extends MProvider {
   }
 
   @override
-  Future<List<MVideo>> getVideoList(MSource source, String url) async {
+  Future<List<MVideo>> getVideoList(String url) async {
     final resJson = json.decode(url);
     final urls = resJson["urls"];
     List<MVideo> videos = [];
@@ -176,6 +177,6 @@ class NimeGami extends MProvider {
   }
 }
 
-NimeGami main() {
-  return NimeGami();
+NimeGami main(MSource source) {
+  return NimeGami(source: source);
 }

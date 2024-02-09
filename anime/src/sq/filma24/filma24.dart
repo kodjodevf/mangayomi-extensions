@@ -2,36 +2,37 @@ import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
 class Filma24 extends MProvider {
-  Filma24();
+  Filma24({required this.source});
 
-  final Client client = Client();
+  MSource source;
+
+  final Client client = Client(source);
 
   @override
-  Future<MPages> getPopular(MSource source, int page) async {
+  String get baseUrl => getPreferenceValue(source.id, "pref_domain");
+
+  @override
+  Future<MPages> getPopular(int page) async {
     String pageNu = page == 1 ? "" : "/page/$page/";
-    final res =
-        (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}$pageNu")))
-            .body;
+    final res = (await client.get(Uri.parse("$baseUrl$pageNu"))).body;
     return animeFromRes(res);
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource source, int page) async {
+  Future<MPages> getLatestUpdates(int page) async {
     String pageNu = page == 1 ? "" : "page/$page/";
-    final res = (await client.get(
-            Uri.parse("${preferenceBaseUrl(source.id)}/$pageNu?sort=trendy")))
-        .body;
+    final res =
+        (await client.get(Uri.parse("$baseUrl/$pageNu?sort=trendy"))).body;
     return animeFromRes(res);
   }
 
   @override
-  Future<MPages> search(
-      MSource source, String query, int page, FilterList filterList) async {
+  Future<MPages> search(String query, int page, FilterList filterList) async {
     final filters = filterList.filters;
     String url = "";
     String pageNu = page == 1 ? "" : "page/$page/";
     if (query.isNotEmpty) {
-      url += "${preferenceBaseUrl(source.id)}/search/$query/";
+      url += "$baseUrl/search/$query/";
     } else {
       for (var filter in filters) {
         if (filter.type == "ReleaseFilter") {
@@ -46,7 +47,7 @@ class Filma24 extends MProvider {
           }
         }
       }
-      url = "${preferenceBaseUrl(source.id)}$url";
+      url = "$baseUrl$url";
     }
 
     url += pageNu;
@@ -56,7 +57,7 @@ class Filma24 extends MProvider {
   }
 
   @override
-  Future<MManga> getDetail(MSource source, String url) async {
+  Future<MManga> getDetail(String url) async {
     List<MChapter>? episodesList = [];
     if (!url.contains("seriale")) {
       MChapter episode = MChapter();
@@ -86,7 +87,7 @@ class Filma24 extends MProvider {
   }
 
   @override
-  Future<List<MVideo>> getVideoList(MSource source, String url) async {
+  Future<List<MVideo>> getVideoList(String url) async {
     final res = (await client.get(Uri.parse(url))).body;
     List<MVideo> videos = [];
     final serverUrls = xpath(res, '//*[@class="player"]/div[1]/a/@href');
@@ -117,7 +118,7 @@ class Filma24 extends MProvider {
   }
 
   @override
-  List<dynamic> getSourcePreferences(MSource source) {
+  List<dynamic> getSourcePreferences() {
     return [
       EditTextPreference(
           key: "pref_domain",
@@ -130,12 +131,8 @@ class Filma24 extends MProvider {
     ];
   }
 
-  String preferenceBaseUrl(int sourceId) {
-    return getPreferenceValue(sourceId, "pref_domain");
-  }
-
   @override
-  List<dynamic> getFilterList(MSource source) {
+  List<dynamic> getFilterList() {
     return [
       SelectFilter("ReleaseFilter", "Viti", 0, [
         SelectFilterOption("<Select>", ""),
@@ -289,6 +286,6 @@ class Filma24 extends MProvider {
   }
 }
 
-Filma24 main() {
-  return Filma24();
+Filma24 main(MSource source) {
+  return Filma24(source: source);
 }

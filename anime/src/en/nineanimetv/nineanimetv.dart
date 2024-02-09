@@ -2,12 +2,14 @@ import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
 class NineAnimeTv extends MProvider {
-  NineAnimeTv();
+  NineAnimeTv({required this.source});
 
-  final Client client = Client();
+  MSource source;
+
+  final Client client = Client(source);
 
   @override
-  Future<MPages> getPopular(MSource source, int page) async {
+  Future<MPages> getPopular(int page) async {
     final res = (await client
             .get(Uri.parse("${source.baseUrl}/filter?sort=all&page=$page")))
         .body;
@@ -15,7 +17,7 @@ class NineAnimeTv extends MProvider {
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource source, int page) async {
+  Future<MPages> getLatestUpdates(int page) async {
     final res = (await client.get(Uri.parse(
             "${source.baseUrl}/filter?sort=recently_updated&page=$page")))
         .body;
@@ -23,8 +25,7 @@ class NineAnimeTv extends MProvider {
   }
 
   @override
-  Future<MPages> search(
-      MSource source, String query, int page, FilterList filterList) async {
+  Future<MPages> search(String query, int page, FilterList filterList) async {
     final filters = filterList.filters;
     String url = "${source.baseUrl}/filter?keyword=$query";
 
@@ -113,7 +114,7 @@ class NineAnimeTv extends MProvider {
   }
 
   @override
-  Future<MManga> getDetail(MSource source, String url) async {
+  Future<MManga> getDetail(String url) async {
     final statusList = [
       {"Currently Airing": 0, "Finished Airing": 1}
     ];
@@ -161,7 +162,7 @@ class NineAnimeTv extends MProvider {
   }
 
   @override
-  Future<List<MVideo>> getVideoList(MSource source, String url) async {
+  Future<List<MVideo>> getVideoList(String url) async {
     final res = (await client.get(
             Uri.parse("${source.baseUrl}/ajax/episode/servers?episodeId=$url")))
         .body;
@@ -346,7 +347,7 @@ class NineAnimeTv extends MProvider {
   }
 
   @override
-  List<dynamic> getFilterList(MSource source) {
+  List<dynamic> getFilterList() {
     return [
       GroupFilter("GenreFilter", "Genre", [
         CheckBoxFilter("Action", "1"),
@@ -452,7 +453,7 @@ class NineAnimeTv extends MProvider {
   }
 
   @override
-  List<dynamic> getSourcePreferences(MSource source) {
+  List<dynamic> getSourcePreferences() {
     return [
       ListPreference(
           key: "preferred_quality",
@@ -540,6 +541,6 @@ class NineAnimeTv extends MProvider {
   }
 }
 
-NineAnimeTv main() {
-  return NineAnimeTv();
+NineAnimeTv main(MSource source) {
+  return NineAnimeTv(source: source);
 }

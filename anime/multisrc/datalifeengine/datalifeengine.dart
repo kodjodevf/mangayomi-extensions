@@ -2,29 +2,30 @@ import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
 class DataLifeEngine extends MProvider {
-  DataLifeEngine();
+  DataLifeEngine({required this.source});
 
-  final Client client = Client();
+  MSource source;
+
+  final Client client = Client(source);
 
   @override
   bool get supportsLatest => false;
 
   @override
-  Future<MPages> getPopular(MSource source, int page) async {
+  Future<MPages> getPopular(int page) async {
     final res = (await client
             .get(Uri.parse("${source.baseUrl}${getPath(source)}page/$page")))
         .body;
-    return animeFromElement(res, source.baseUrl);
+    return animeFromElement(res);
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource source, int page) async {
+  Future<MPages> getLatestUpdates(int page) async {
     return MPages([], false);
   }
 
   @override
-  Future<MPages> search(
-      MSource source, String query, int page, FilterList filterList) async {
+  Future<MPages> search(String query, int page, FilterList filterList) async {
     final filters = filterList.filters;
     final baseUrl = source.baseUrl;
     String res = "";
@@ -65,11 +66,11 @@ class DataLifeEngine extends MProvider {
       res = (await client.get(Uri.parse(url))).body;
     }
 
-    return animeFromElement(res, baseUrl);
+    return animeFromElement(res);
   }
 
   @override
-  Future<MManga> getDetail(MSource source, String url) async {
+  Future<MManga> getDetail(String url) async {
     String res = (await client.get(Uri.parse(url))).body;
     MManga anime = MManga();
     final description = xpath(res, '//span[@itemprop="description"]/text()');
@@ -116,7 +117,7 @@ class DataLifeEngine extends MProvider {
   }
 
   @override
-  Future<List<MVideo>> getVideoList(MSource source, String url) async {
+  Future<List<MVideo>> getVideoList(String url) async {
     List<MVideo> videos = [];
     final sUrls = url.split(',');
     for (var sUrl in sUrls) {
@@ -143,7 +144,7 @@ class DataLifeEngine extends MProvider {
     return videos;
   }
 
-  MPages animeFromElement(String res, String baseUrl) {
+  MPages animeFromElement(String res) {
     final htmls = parseHtml(res).select("div#dle-content > div.mov");
     List<MManga> animeList = [];
     for (var h in htmls) {
@@ -155,7 +156,7 @@ class DataLifeEngine extends MProvider {
       MManga anime = MManga();
       anime.name =
           "$name ${season.isNotEmpty ? season.first.replaceAll("\n", " ") : ""}";
-      anime.imageUrl = "$baseUrl$image";
+      anime.imageUrl = "${source.baseUrl}$image";
       anime.link = url;
       animeList.add(anime);
     }
@@ -245,13 +246,13 @@ class DataLifeEngine extends MProvider {
     return [video];
   }
 
-  String getPath(MSource source) {
+  String getPath() {
     if (source.name == "French Anime") return "/animes-vostfr/";
     return "/serie-en-streaming/";
   }
 
   @override
-  List<dynamic> getFilterList(MSource source) {
+  List<dynamic> getFilterList() {
     return [
       HeaderFilter("La recherche de texte ignore les filtres"),
       if (source.name == "French Anime")
@@ -326,6 +327,6 @@ class DataLifeEngine extends MProvider {
   }
 }
 
-DataLifeEngine main() {
-  return DataLifeEngine();
+DataLifeEngine main(MSource source) {
+  return DataLifeEngine(source: source);
 }

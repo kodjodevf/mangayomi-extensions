@@ -2,20 +2,24 @@ import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
 class YoMovies extends MProvider {
-  YoMovies();
+  YoMovies({required this.source});
 
-  final Client client = Client();
+  MSource source;
+
+  final Client client = Client(source);
+
+  @override
+  String get baseUrl => getPreferenceValue(source.id, "overrideBaseUrl");
 
   @override
   bool get supportsLatest => false;
 
   @override
-  Future<MPages> getPopular(MSource source, int page) async {
+  Future<MPages> getPopular(int page) async {
     String pageNu = page == 1 ? "" : "page/$page/";
 
-    final res = (await client.get(Uri.parse(
-            "${preferenceBaseUrl(source.id)}/most-favorites/$pageNu")))
-        .body;
+    final res =
+        (await client.get(Uri.parse("$baseUrl/most-favorites/$pageNu"))).body;
     final document = parseHtml(res);
     return animeFromElement(
         document.select("div.movies-list > div.ml-item"),
@@ -24,18 +28,17 @@ class YoMovies extends MProvider {
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource source, int page) async {
+  Future<MPages> getLatestUpdates(int page) async {
     return MPages([], false);
   }
 
   @override
-  Future<MPages> search(
-      MSource source, String query, int page, FilterList filterList) async {
+  Future<MPages> search(String query, int page, FilterList filterList) async {
     final filters = filterList.filters;
     String url = "";
     String pageNu = page == 1 ? "" : "/page/$page";
     if (query.isNotEmpty) {
-      url = "${preferenceBaseUrl(source.id)}$pageNu/?s=$query";
+      url = "$baseUrl$pageNu/?s=$query";
     } else {
       for (var filter in filters) {
         if (filter.type.isNotEmpty) {
@@ -45,7 +48,7 @@ class YoMovies extends MProvider {
           }
         }
       }
-      url = "${preferenceBaseUrl(source.id)}$url$pageNu";
+      url = "$baseUrl$url$pageNu";
     }
     final res = (await client.get(Uri.parse(url))).body;
     final document = parseHtml(res);
@@ -56,12 +59,10 @@ class YoMovies extends MProvider {
   }
 
   @override
-  Future<MManga> getDetail(MSource source, String url) async {
+  Future<MManga> getDetail(String url) async {
     url = getUrlWithoutDomain(url);
 
-    final res =
-        (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}$url")))
-            .body;
+    final res = (await client.get(Uri.parse("$baseUrl$url"))).body;
     final document = parseHtml(res);
     MManga anime = MManga();
     var infoElement = document.selectFirst("div.mvi-content");
@@ -96,11 +97,9 @@ class YoMovies extends MProvider {
   }
 
   @override
-  Future<List<MVideo>> getVideoList(MSource source, String url) async {
+  Future<List<MVideo>> getVideoList(String url) async {
     url = getUrlWithoutDomain(url);
-    final res =
-        (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}$url")))
-            .body;
+    final res = (await client.get(Uri.parse("$baseUrl$url"))).body;
     final document = parseHtml(res);
     final serverElements = document.select("div.movieplay > iframe");
     List<MVideo> videos = [];
@@ -116,7 +115,7 @@ class YoMovies extends MProvider {
   }
 
   @override
-  List<dynamic> getSourcePreferences(MSource source) {
+  List<dynamic> getSourcePreferences() {
     return [
       EditTextPreference(
           key: "overrideBaseUrl",
@@ -163,10 +162,6 @@ class YoMovies extends MProvider {
     return videos;
   }
 
-  String preferenceBaseUrl(int sourceId) {
-    return getPreferenceValue(sourceId, "overrideBaseUrl");
-  }
-
   MPages animeFromElement(List<MElement> elements, bool hasNextPage) {
     List<MManga> animeList = [];
     for (var element in elements) {
@@ -209,7 +204,7 @@ class YoMovies extends MProvider {
   }
 
   @override
-  List<dynamic> getFilterList(MSource source) {
+  List<dynamic> getFilterList() {
     return [
       HeaderFilter(
           "Note: Only one selection at a time works, and it ignores text search"),
@@ -340,6 +335,6 @@ class YoMovies extends MProvider {
   }
 }
 
-YoMovies main() {
-  return YoMovies();
+YoMovies main(MSource source) {
+  return YoMovies(source: source);
 }

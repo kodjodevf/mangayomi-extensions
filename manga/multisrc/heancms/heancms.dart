@@ -2,12 +2,14 @@ import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
 class HeanCms extends MProvider {
-  HeanCms();
+  HeanCms({required this.source});
 
-  final Client client = Client();
+  MSource source;
+
+  final Client client = Client(source);
 
   @override
-  Future<MPages> getPopular(MSource source, int page) async {
+  Future<MPages> getPopular(int page) async {
     final headers = getHeader(source.baseUrl);
     String res = "";
     if (!useNewQueryEndpoint(source.name)) {
@@ -28,11 +30,11 @@ class HeanCms extends MProvider {
       res =
           (await client.get(Uri.parse(newEndpointUrl), headers: headers)).body;
     }
-    return mMangaRes(res, source);
+    return mMangaRes(res);
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource source, int page) async {
+  Future<MPages> getLatestUpdates(int page) async {
     final headers = getHeader(source.baseUrl);
     String res = "";
     if (!useNewQueryEndpoint(source.name)) {
@@ -52,12 +54,11 @@ class HeanCms extends MProvider {
       res =
           (await client.get(Uri.parse(newEndpointUrl), headers: headers)).body;
     }
-    return mMangaRes(res, source);
+    return mMangaRes(res);
   }
 
   @override
-  Future<MPages> search(
-      MSource source, String query, int page, FilterList filterList) async {
+  Future<MPages> search(String query, int page, FilterList filterList) async {
     final headers = getHeader(source.baseUrl);
     String res = "";
     if (!useNewQueryEndpoint(source.source)) {
@@ -71,11 +72,11 @@ class HeanCms extends MProvider {
       res =
           (await client.get(Uri.parse(newEndpointUrl), headers: headers)).body;
     }
-    return mMangaRes(res, source);
+    return mMangaRes(res);
   }
 
   @override
-  Future<MManga> getDetail(MSource source, String url) async {
+  Future<MManga> getDetail(String url) async {
     MManga manga = MManga();
     String currentSlug = substringAfterLast(url, "/");
     final headers = getHeader(source.baseUrl);
@@ -131,7 +132,7 @@ class HeanCms extends MProvider {
   }
 
   @override
-  Future<List<String>> getPageList(MSource source, String url) async {
+  Future<List<String>> getPageList(String url) async {
     final headers = getHeader(source.baseUrl);
 
     String res = "".toString();
@@ -171,7 +172,7 @@ class HeanCms extends MProvider {
     return pageUrls;
   }
 
-  MPages mMangaRes(String res, MSource source) {
+  MPages mMangaRes(String res) {
     bool hasNextPage = true;
     List<MManga> mangaList = [];
     List<String> names = [];
@@ -240,6 +241,6 @@ Map<String, String> getHeader(String url) {
   return headers;
 }
 
-HeanCms main() {
-  return HeanCms();
+HeanCms main(MSource source) {
+  return HeanCms(source: source);
 }

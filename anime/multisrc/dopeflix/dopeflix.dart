@@ -2,23 +2,26 @@ import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
 class DopeFlix extends MProvider {
-  DopeFlix();
+  DopeFlix({required this.source});
 
-  final Client client = Client();
+  MSource source;
+
+  final Client client = Client(source);
 
   @override
-  Future<MPages> getPopular(MSource source, int page) async {
+  String get baseUrl => getPreferenceValue(source.id, "preferred_domain");
+
+  @override
+  Future<MPages> getPopular(int page) async {
     final res = (await client.get(Uri.parse(
-            "${preferenceBaseUrl(source.id)}/${getPreferenceValue(source.id, "preferred_popular_page")}?page=$page")))
+            "$baseUrl/${getPreferenceValue(source.id, "preferred_popular_page")}?page=$page")))
         .body;
     return parseAnimeList(res);
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource source, int page) async {
-    final res =
-        (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}/home")))
-            .body;
+  Future<MPages> getLatestUpdates(int page) async {
+    final res = (await client.get(Uri.parse("$baseUrl/home"))).body;
     List<MManga> animeList = [];
     final path =
         '//section[contains(text(),"${getPreferenceValue(source.id, "preferred_latest_page")}")]/div/div[@class="film_list-wrap"]/div[@class="flw-item"]/div[@class="film-poster"]';
@@ -37,10 +40,9 @@ class DopeFlix extends MProvider {
   }
 
   @override
-  Future<MPages> search(
-      MSource source, String query, int page, FilterList filterList) async {
+  Future<MPages> search(String query, int page, FilterList filterList) async {
     final filters = filterList.filters;
-    String url = "${preferenceBaseUrl(source.id)}";
+    String url = "$baseUrl";
 
     if (query.isNotEmpty) {
       url += "/search/${query.replaceAll(" ", "-")}?page=$page";
@@ -81,11 +83,9 @@ class DopeFlix extends MProvider {
   }
 
   @override
-  Future<MManga> getDetail(MSource source, String url) async {
+  Future<MManga> getDetail(String url) async {
     url = getUrlWithoutDomain(url);
-    final res =
-        (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}$url")))
-            .body;
+    final res = (await client.get(Uri.parse("$baseUrl$url"))).body;
     MManga anime = MManga();
     final description = xpath(res, '//div[@class="description"]/text()');
     if (description.isNotEmpty) {
@@ -103,12 +103,11 @@ class DopeFlix extends MProvider {
     if (dataType == "1") {
       MChapter episode = MChapter();
       episode.name = "Movie";
-      episode.url = "${preferenceBaseUrl(source.id)}/ajax/movie/episodes/$id";
+      episode.url = "$baseUrl/ajax/movie/episodes/$id";
       episodesList.add(episode);
     } else {
-      final resS = (await client.get(Uri.parse(
-              "${preferenceBaseUrl(source.id)}/ajax/v2/tv/seasons/$id")))
-          .body;
+      final resS =
+          (await client.get(Uri.parse("$baseUrl/ajax/v2/tv/seasons/$id"))).body;
 
       final seasonIds =
           xpath(resS, '//a[@class="dropdown-item ss-item"]/@data-id');
@@ -118,8 +117,8 @@ class DopeFlix extends MProvider {
         final seasonId = seasonIds[i];
         final seasonName = seasonNames[i];
 
-        final html = (await client.get(Uri.parse(
-                "${preferenceBaseUrl(source.id)}/ajax/v2/season/episodes/$seasonId")))
+        final html = (await client
+                .get(Uri.parse("$baseUrl/ajax/v2/season/episodes/$seasonId")))
             .body;
 
         final epsHtmls = parseHtml(html).select("div.eps-item");
@@ -134,8 +133,7 @@ class DopeFlix extends MProvider {
           final epName = xpath(epHtml, '//h3[@class="film-name"]/text()').first;
           MChapter episode = MChapter();
           episode.name = "$seasonName $epNum $epName";
-          episode.url =
-              "${preferenceBaseUrl(source.id)}/ajax/v2/episode/servers/$episodeId";
+          episode.url = "$baseUrl/ajax/v2/episode/servers/$episodeId";
           episodesList.add(episode);
         }
       }
@@ -145,11 +143,9 @@ class DopeFlix extends MProvider {
   }
 
   @override
-  Future<List<MVideo>> getVideoList(MSource source, String url) async {
+  Future<List<MVideo>> getVideoList(String url) async {
     url = getUrlWithoutDomain(url);
-    final res =
-        (await client.get(Uri.parse("${preferenceBaseUrl(source.id)}/$url")))
-            .body;
+    final res = (await client.get(Uri.parse("$baseUrl/$url"))).body;
 
     final vidsHtmls = parseHtml(res).select("ul.fss-list a.btn-play");
 
@@ -158,9 +154,8 @@ class DopeFlix extends MProvider {
       final vidHtml = vidH.outerHtml;
       final id = xpath(vidHtml, '//a/@data-id').first;
       final name = xpath(vidHtml, '//span/text()').first;
-      final resSource = (await client.get(
-              Uri.parse("${preferenceBaseUrl(source.id)}/ajax/sources/$id")))
-          .body;
+      final resSource =
+          (await client.get(Uri.parse("$baseUrl/ajax/sources/$id"))).body;
 
       final vidUrl =
           substringBefore(substringAfter(resSource, "\"link\":\""), "\"");
@@ -317,7 +312,7 @@ class DopeFlix extends MProvider {
   }
 
   @override
-  List<dynamic> getFilterList(MSource source) {
+  List<dynamic> getFilterList() {
     return [
       SelectFilter("TypeFilter", "Type", 0, [
         SelectFilterOption("All", "all"),
@@ -413,7 +408,7 @@ class DopeFlix extends MProvider {
   }
 
   @override
-  List<dynamic> getSourcePreferences(MSource source) {
+  List<dynamic> getSourcePreferences() {
     return [
       if (source.name == "DopeBox")
         ListPreference(
@@ -530,10 +525,6 @@ class DopeFlix extends MProvider {
     return subs;
   }
 
-  String preferenceBaseUrl(int sourceId) {
-    return getPreferenceValue(sourceId, "preferred_domain");
-  }
-
   String ll(String url) {
     if (url.contains("?")) {
       return "&";
@@ -542,6 +533,6 @@ class DopeFlix extends MProvider {
   }
 }
 
-DopeFlix main() {
-  return DopeFlix();
+DopeFlix main(MSource source) {
+  return DopeFlix(source: source);
 }

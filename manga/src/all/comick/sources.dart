@@ -1,6 +1,6 @@
 import '../../../../model/source.dart';
 
-const _comickVersion = "0.0.6";
+const _comickVersion = "0.0.65";
 const _comickSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/manga/src/all/comick/comick.dart";
 

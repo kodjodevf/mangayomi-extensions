@@ -2,12 +2,14 @@ import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
 class ComickFun extends MProvider {
-  ComickFun();
+  ComickFun({required this.source});
 
-  final Client client = Client();
+  MSource source;
+
+  final Client client = Client(source);
 
   @override
-  Future<MPages> getPopular(MSource source, int page) async {
+  Future<MPages> getPopular(int page) async {
     final res = (await client.get(
             Uri.parse(
                 "${source.apiUrl}/v1.0/search?sort=follow&page=$page&tachiyomi=true"),
@@ -17,7 +19,7 @@ class ComickFun extends MProvider {
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource source, int page) async {
+  Future<MPages> getLatestUpdates(int page) async {
     final res = (await client.get(
             Uri.parse(
                 "${source.apiUrl}/v1.0/search?sort=uploaded&page=$page&tachiyomi=true"),
@@ -27,8 +29,7 @@ class ComickFun extends MProvider {
   }
 
   @override
-  Future<MPages> search(
-      MSource source, String query, int page, FilterList filterList) async {
+  Future<MPages> search(String query, int page, FilterList filterList) async {
     final filters = filterList.filters;
     String url = "";
     if (query.isNotEmpty) {
@@ -112,7 +113,7 @@ class ComickFun extends MProvider {
   }
 
   @override
-  Future<MManga> getDetail(MSource source, String url) async {
+  Future<MManga> getDetail(String url) async {
     final statusList = [
       {"1": 0, "2": 1, "3": 3, "4": 2}
     ];
@@ -187,7 +188,7 @@ class ComickFun extends MProvider {
   }
 
   @override
-  Future<List<String>> getPageList(MSource source, String url) async {
+  Future<List<String>> getPageList(String url) async {
     final res = (await client.get(
             Uri.parse("${source.apiUrl}/chapter/$url?tachiyomi=true"),
             headers: getHeader(url)))
@@ -224,7 +225,7 @@ class ComickFun extends MProvider {
   }
 
   @override
-  List<dynamic> getFilterList(MSource source) {
+  List<dynamic> getFilterList() {
     return [
       HeaderFilter("The filter is ignored when using text search."),
       GroupFilter("GenreFilter", "Genre", [
@@ -652,6 +653,6 @@ Map<String, String> getHeader(String url) {
   return headers;
 }
 
-ComickFun main() {
-  return ComickFun();
+ComickFun main(MSource source) {
+  return ComickFun(source: source);
 }

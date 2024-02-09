@@ -2,27 +2,28 @@ import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
 class Batoto extends MProvider {
-  Batoto();
+  Batoto({required this.source});
 
-  final Client client = Client();
+  MSource source;
+
+  final Client client = Client(source);
 
   @override
-  Future<MPages> getPopular(MSource source, int page) async {
+  Future<MPages> getPopular(int page) async {
     final res = await client.get(Uri.parse(
         "${preferenceMirror(source.id)}/browse?${lang(source.lang)}&sort=views_a&page=$page"));
-    return mangaElementM(res.body, source);
+    return mangaElementM(res.body);
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource source, int page) async {
+  Future<MPages> getLatestUpdates(int page) async {
     final res = await client.get(Uri.parse(
         "${preferenceMirror(source.id)}/browse?${lang(source.lang)}&sort=update&page=$page"));
-    return mangaElementM(res.body, source);
+    return mangaElementM(res.body);
   }
 
   @override
-  Future<MPages> search(
-      MSource source, String query, int page, FilterList filterList) async {
+  Future<MPages> search(String query, int page, FilterList filterList) async {
     final filters = filterList.filters;
     String url = "";
     String min = "";
@@ -99,11 +100,11 @@ class Batoto extends MProvider {
     }
 
     final res = await client.get(Uri.parse(url));
-    return mangaElementM(res.body, source);
+    return mangaElementM(res.body);
   }
 
   @override
-  Future<MManga> getDetail(MSource source, String url) async {
+  Future<MManga> getDetail(String url) async {
     final statusList = [
       {"Ongoing": 0, "Completed": 1, "Cancelled": 3, "Hiatus": 2}
     ];
@@ -161,7 +162,7 @@ class Batoto extends MProvider {
   }
 
   @override
-  Future<List<String>> getPageList(MSource source, String url) async {
+  Future<List<String>> getPageList(String url) async {
     final res =
         (await client.get(Uri.parse("${preferenceMirror(source.id)}$url")))
             .body;
@@ -190,7 +191,7 @@ class Batoto extends MProvider {
     return pagesUrl;
   }
 
-  MPages mangaElementM(String res, MSource source) async {
+  MPages mangaElementM(String res) async {
     final lang = source.lang.replaceAll("-", "_");
 
     final mangaElements = parseHtml(res).select("div#series-list div.col");
@@ -230,7 +231,7 @@ class Batoto extends MProvider {
   }
 
   @override
-  List<dynamic> getFilterList(MSource source) {
+  List<dynamic> getFilterList() {
     return [
       SelectFilter("LetterFilter", "Letter matching mode (Slow)", 0, [
         SelectFilterOption("Disabled", "disabled"),
@@ -1622,7 +1623,7 @@ class Batoto extends MProvider {
   }
 
   @override
-  List<dynamic> getSourcePreferences(MSource source) {
+  List<dynamic> getSourcePreferences() {
     return [
       ListPreference(
           key: "mirror",
@@ -1667,6 +1668,6 @@ class Batoto extends MProvider {
   }
 }
 
-Batoto main() {
-  return Batoto();
+Batoto main(MSource source) {
+  return Batoto(source: source);
 }

@@ -1,11 +1,14 @@
 import 'package:mangayomi/bridge_lib.dart';
-class MangaBox extends MProvider {
-  MangaBox();
 
-  final Client client = Client();
+class MangaBox extends MProvider {
+  MangaBox({required this.source});
+
+  MSource source;
+
+  final Client client = Client(source);
 
   @override
-  Future<MPages> getPopular(MSource source, int page) async {
+  Future<MPages> getPopular(int page) async {
     final res = (await client.get(Uri.parse(
             "${source.baseUrl}/${popularUrlPath(source.name, page)}")))
         .body;
@@ -13,7 +16,7 @@ class MangaBox extends MProvider {
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource source, int page) async {
+  Future<MPages> getLatestUpdates(int page) async {
     final res = (await client.get(
             Uri.parse("${source.baseUrl}/${latestUrlPath(source.name, page)}")))
         .body;
@@ -21,8 +24,7 @@ class MangaBox extends MProvider {
   }
 
   @override
-  Future<MPages> search(
-      MSource source, String query, int page, FilterList filterList) async {
+  Future<MPages> search(String query, int page, FilterList filterList) async {
     final filters = filterList.filters;
 
     String url = "";
@@ -118,7 +120,7 @@ class MangaBox extends MProvider {
   }
 
   @override
-  Future<MManga> getDetail(MSource source, String url) async {
+  Future<MManga> getDetail(String url) async {
     final statusList = [
       {"Ongoing": 0, "Completed": 1}
     ];
@@ -199,7 +201,7 @@ class MangaBox extends MProvider {
   }
 
   @override
-  Future<List<String>> getPageList(MSource source, String url) async {
+  Future<List<String>> getPageList(String url) async {
     final res = (await client.get(Uri.parse(url))).body;
     List<String> pageUrls = [];
     final urls = xpath(res,
@@ -297,7 +299,7 @@ class MangaBox extends MProvider {
   }
 
   @override
-  List<dynamic> getFilterList(MSource source) {
+  List<dynamic> getFilterList() {
     if (source.name == "Mangairo") {
       return [];
     }
@@ -422,6 +424,6 @@ Map<String, String> getHeader(String url) {
   return headers;
 }
 
-MangaBox main() {
-  return MangaBox();
+MangaBox main(MSource source) {
+  return MangaBox(source: source);
 }

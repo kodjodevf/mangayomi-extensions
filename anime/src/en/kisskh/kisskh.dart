@@ -2,12 +2,14 @@ import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
 class KissKh extends MProvider {
-  KissKh();
+  KissKh({required this.source});
 
-  final Client client = Client();
+  MSource source;
+
+  final Client client = Client(source);
 
   @override
-  Future<MPages> getPopular(MSource source, int page) async {
+  Future<MPages> getPopular(int page) async {
     final res = (await client.get(Uri.parse(
             "${source.baseUrl}/api/DramaList/List?page=$page&type=0&sub=0&country=0&status=0&order=1&pageSize=40")))
         .body;
@@ -30,7 +32,7 @@ class KissKh extends MProvider {
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource source, int page) async {
+  Future<MPages> getLatestUpdates(int page) async {
     final res = (await client.get(Uri.parse(
             "${source.baseUrl}/api/DramaList/List?page=$page&type=0&sub=0&country=0&status=0&order=12&pageSize=40")))
         .body;
@@ -54,8 +56,7 @@ class KissKh extends MProvider {
   }
 
   @override
-  Future<MPages> search(
-      MSource source, String query, int page, FilterList filterList) async {
+  Future<MPages> search(String query, int page, FilterList filterList) async {
     final res = (await client.get(Uri.parse(
             "${source.baseUrl}/api/DramaList/Search?q=$query&type=0")))
         .body;
@@ -73,7 +74,7 @@ class KissKh extends MProvider {
   }
 
   @override
-  Future<MManga> getDetail(MSource source, String url) async {
+  Future<MManga> getDetail(String url) async {
     final statusList = [
       {"Ongoing": 0, "Completed": 1}
     ];
@@ -114,7 +115,7 @@ class KissKh extends MProvider {
   }
 
   @override
-  Future<List<MVideo>> getVideoList(MSource source, String url) async {
+  Future<List<MVideo>> getVideoList(String url) async {
     final res = (await client.get(Uri.parse(url))).body;
     final id = substringAfter(substringBefore(url, ".png"), "Episode/");
     final jsonRes = json.decode(res);
@@ -151,6 +152,6 @@ class KissKh extends MProvider {
   }
 }
 
-KissKh main() {
-  return KissKh();
+KissKh main(MSource source) {
+  return KissKh(source: source);
 }

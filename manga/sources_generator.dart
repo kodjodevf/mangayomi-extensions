@@ -11,6 +11,7 @@ import 'multisrc/nepnep/sources.dart';
 import 'src/all/batoto/sources.dart';
 import 'src/all/comick/sources.dart';
 import 'src/all/mangadex/sources.dart';
+import 'src/all/nhentai/sources.dart';
 import 'src/en/mangahere/source.dart';
 
 void main() {
@@ -24,7 +25,8 @@ void main() {
     mangahereSource,
     ...nepnepSourcesList,
     ...mangaboxSourcesList,
-    ...batotoSourcesList
+    ...batotoSourcesList,
+    ...nhentaiSourcesList
   ];
   final List<Map<String, dynamic>> jsonList =
       sourcesList.map((source) => source.toJson()).toList();

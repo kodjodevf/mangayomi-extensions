@@ -2,12 +2,14 @@ import 'package:mangayomi/bridge_lib.dart';
 import 'dart:convert';
 
 class OploVerz extends MProvider {
-  OploVerz();
+  OploVerz({required this.source});
 
-  final Client client = Client();
+  MSource source;
+
+  final Client client = Client(source);
 
   @override
-  Future<MPages> getPopular(MSource source, int page) async {
+  Future<MPages> getPopular(int page) async {
     final res = (await client.get(Uri.parse(
             "${source.baseUrl}/anime-list/page/$page/?order=popular")))
         .body;
@@ -15,7 +17,7 @@ class OploVerz extends MProvider {
   }
 
   @override
-  Future<MPages> getLatestUpdates(MSource source, int page) async {
+  Future<MPages> getLatestUpdates(int page) async {
     final res = (await client.get(
             Uri.parse("${source.baseUrl}/anime-list/page/$page/?order=latest")))
         .body;
@@ -23,8 +25,7 @@ class OploVerz extends MProvider {
   }
 
   @override
-  Future<MPages> search(
-      MSource source, String query, int page, FilterList filterList) async {
+  Future<MPages> search(String query, int page, FilterList filterList) async {
     final res = (await client.get(
             Uri.parse("${source.baseUrl}/anime-list/page/$page/?title=$query")))
         .body;
@@ -32,7 +33,7 @@ class OploVerz extends MProvider {
   }
 
   @override
-  Future<MManga> getDetail(MSource source, String url) async {
+  Future<MManga> getDetail(String url) async {
     final statusList = [
       {"ongoing": 0, "completed": 1}
     ];
@@ -67,7 +68,7 @@ class OploVerz extends MProvider {
   }
 
   @override
-  Future<List<MVideo>> getVideoList(MSource source, String url) async {
+  Future<List<MVideo>> getVideoList(String url) async {
     final res = (await client.get(Uri.parse(url))).body;
     final dataPost = xpath(res,
             '//*[@id="server"]/ul/li/div[contains(@id,"player-option")]/@data-post')
@@ -147,6 +148,6 @@ class OploVerz extends MProvider {
   }
 }
 
-OploVerz main() {
-  return OploVerz();
+OploVerz main(MSource source) {
+  return OploVerz(source: source);
 }
