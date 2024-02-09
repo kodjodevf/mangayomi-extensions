@@ -10,6 +10,7 @@ import 'src/all/nyaa/source.dart';
 import 'src/all/yomiroll/source.dart';
 import 'src/ar/okanime/source.dart';
 import 'src/de/aniflix/source.dart';
+import 'src/en/animepahe/source.dart';
 import 'src/en/aniwave/source.dart';
 import 'src/en/dramacool/source.dart';
 import 'src/en/gogoanime/source.dart';
@@ -52,7 +53,8 @@ void main() {
     aniflix,
     ...animeworldindiaSourcesList,
     nyaaSource,
-    yomirollSource
+    yomirollSource,
+    animepaheSource
   ];
   final List<Map<String, dynamic>> jsonList =
       _sourcesList.map((source) => source.toJson()).toList();
