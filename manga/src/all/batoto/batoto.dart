@@ -184,8 +184,11 @@ class Batoto extends MProvider {
     List<String> pagesUrl = [];
     for (int i = 0; i < imageUrls.length; i++) {
       String imgUrl = imageUrls[i];
-      String imgAcc = imgAccList[i];
-      pagesUrl.add("$imgUrl?$imgAcc");
+      String imgAcc = "";
+      if (imgAccList.length >= (i + 1)) {
+        imgAcc = "?${imgAccList[i]}";
+      }
+      pagesUrl.add("$imgUrl$imgAcc");
     }
 
     return pagesUrl;
