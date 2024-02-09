@@ -1,7 +1,7 @@
 import '../../../../model/source.dart';
 
 Source get franimeSource => _franimeSource;
-const _franimeVersion = "0.0.6";
+const _franimeVersion = "0.0.65";
 const _franimeSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/anime/src/fr/franime/franime.dart";
 Source _franimeSource = Source(

@@ -1,7 +1,7 @@
 import '../../../../model/source.dart';
 
 Source get dramacoolSource => _dramacoolSource;
-const _dramacoolVersion = "0.0.15";
+const _dramacoolVersion = "0.0.2";
 const _dramacoolSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/anime/src/en/dramacool/dramacool.dart";
 Source _dramacoolSource = Source(

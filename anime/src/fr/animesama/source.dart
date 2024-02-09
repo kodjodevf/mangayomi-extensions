@@ -1,7 +1,7 @@
 import '../../../../model/source.dart';
 
 Source get animesamaSource => _animesama;
-const animesamaVersion = "0.0.15";
+const animesamaVersion = "0.0.2";
 const animesamaCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/anime/src/fr/animesama/animesama.dart";
 Source _animesama = Source(
