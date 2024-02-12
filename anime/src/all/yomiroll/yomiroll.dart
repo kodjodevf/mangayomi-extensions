@@ -33,11 +33,12 @@ class YomiRoll extends MProvider {
     String url = "";
     final start = page != 1 ? "start=${(page - 1) * 36}&" : "";
     if (query.isNotEmpty) {
-      final typeFilter = filters
-          .where((e) => e.type == "TypeFilter" ? true : false)
-          .toList()
-          .first;
-      final type = typeFilter.values[typeFilter.state].value;
+      final typeFilter =
+          filters.where((e) => e.type == "TypeFilter" ? true : false).toList();
+      String type = "top_results";
+      if (typeFilter.isNotEmpty) {
+        type = typeFilter.first.values[typeFilter.first.state].value;
+      }
       url =
           "$crApiUrl/discover/search?${start}n=36&q=${query.toLowerCase().replaceAll(" ", "+")}&type=$type";
     } else {
