@@ -234,6 +234,8 @@ class YomiRoll extends MProvider {
         String hardsub = getMapValue(json.encode(ok.value), "hardsub_locale");
         if (hardsub.isNotEmpty) {
           hardsub = " - HardSub: $hardsub";
+        } else {
+          hardsub = " - SoftSub";
         }
 
         final res = await client.get(Uri.parse(url));
@@ -422,8 +424,7 @@ class YomiRoll extends MProvider {
       "policy": policyJson['cms']['policy'],
       "signature": policyJson['cms']['signature'],
       "key_pair_id": policyJson['cms']['key_pair_id'],
-      "bucket": policyJson['cms']['bucket'],
-      "expires": DateTime.parse("2024-02-02T14:06:52Z").microsecondsSinceEpoch,
+      "bucket": policyJson['cms']['bucket']
     });
   }
 
@@ -431,29 +432,40 @@ class YomiRoll extends MProvider {
     String quality = getPreferenceValue(source.id, "preferred_quality");
     String dub = getPreferenceValue(source.id, "preferred_audioLang");
     String sub = getPreferenceValue(source.id, "preferred_subLang");
-    String subType = getPreferenceValue(source.id, "preferred_sub_type");
+    String subType = getPreferenceValue(source.id, "preferred_sub_type1");
     videos.sort((MVideo a, MVideo b) {
-      int qualityMatchA = 0;
-
-      if (a.quality.contains(quality) &&
-          a.quality
-              .toLowerCase()
-              .contains("Aud: ${getLocale(dub)}".toLowerCase()) &&
-          a.quality.toLowerCase().contains(subType.toLowerCase()) &&
-          a.quality.toLowerCase().contains(sub.toLowerCase())) {
-        qualityMatchA = 1;
-      }
-      int qualityMatchB = 0;
-      if (b.quality.contains(quality) &&
-          b.quality
-              .toLowerCase()
-              .contains("Aud: ${getLocale(dub)}".toLowerCase()) &&
-          b.quality.toLowerCase().contains(subType.toLowerCase()) &&
-          b.quality.toLowerCase().contains(sub.toLowerCase())) {
-        qualityMatchB = 1;
-      }
-      if (qualityMatchA != qualityMatchB) {
-        return qualityMatchB - qualityMatchA;
+      if (subType == "HardSub") {
+        int qualityMatchA = 0;
+        if (a.quality.contains(quality) &&
+            a.quality.contains("Aud: ${getLocale(dub)}") &&
+            a.quality.contains("HardSub: $sub")) {
+          qualityMatchA = 1;
+        }
+        int qualityMatchB = 0;
+        if (b.quality.contains(quality) &&
+            b.quality.contains("Aud: ${getLocale(dub)}") &&
+            b.quality.contains("HardSub: $sub")) {
+          qualityMatchB = 1;
+        }
+        if (qualityMatchA != qualityMatchB) {
+          return qualityMatchB - qualityMatchA;
+        }
+      } else {
+        int qualityMatchA = 0;
+        if (a.quality.contains(quality) &&
+            a.quality.contains("Aud: ${getLocale(dub)}") &&
+            a.quality.contains(subType)) {
+          qualityMatchA = 1;
+        }
+        int qualityMatchB = 0;
+        if (b.quality.contains(quality) &&
+            b.quality.contains("Aud: ${getLocale(dub)}") &&
+            b.quality.contains(subType)) {
+          qualityMatchB = 1;
+        }
+        if (qualityMatchA != qualityMatchB) {
+          return qualityMatchB - qualityMatchA;
+        }
       }
 
       final regex = RegExp(r'(\d+)p');
@@ -1138,12 +1150,12 @@ class YomiRoll extends MProvider {
           entries: locale.entries.map((e) => e.value).toList(),
           entryValues: locale.entries.map((e) => e.key).toList()),
       ListPreference(
-          key: "preferred_sub_type",
+          key: "preferred_sub_type1",
           title: "Preferred Sub Type",
           summary: "",
           valueIndex: 0,
           entries: ["Softsub", "Hardsub"],
-          entryValues: ["", "Hardsub"]),
+          entryValues: ["SoftSub", "HardSub"]),
     ];
   }
 }

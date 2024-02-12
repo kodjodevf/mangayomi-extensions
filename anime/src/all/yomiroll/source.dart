@@ -1,6 +1,6 @@
 import '../../../../model/source.dart';
 
-const _yomirollVersion = "0.0.1";
+const _yomirollVersion = "0.0.15";
 const _yomirollSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/anime/src/all/yomiroll/yomiroll.dart";
 
