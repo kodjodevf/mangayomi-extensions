@@ -136,7 +136,7 @@ class MangaBox extends MProvider {
         "";
 
     final description = document.xpathFirst(
-            '//*[@id="panel-story-info-description" ]/text() | //*[@id="story_discription" ]/text()') ??
+            '//*[@id="panel-story-info-description" ]/text() | //*[@id="story_discription" ]/text() | //div[@id="noidungm"]/text()') ??
         "";
 
     if (description.isNotEmpty) {
