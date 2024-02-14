@@ -126,74 +126,58 @@ class MangaBox extends MProvider {
     ];
     MManga manga = MManga();
     final res = (await client.get(Uri.parse(url))).body;
+    final document = parseHtml(res);
+    manga.author = document.xpathFirst(
+            '//*[@class="table-label" and contains(text(), "Author")]/parent::tr/td[2]/text()|//li[contains(text(), "Author")]/a/text()') ??
+        "";
 
-    List<String> author = xpath(res,
-        '//*[@class="table-label" and contains(text(), "Author")]/parent::tr/td[2]/text()');
-    if (author.isEmpty) {
-      author = xpath(res, '//li[contains(text(), "Author")]/a/text()');
-    }
-    if (author.isNotEmpty) {
-      manga.author = author.first;
-    }
-    final alternative = xpath(res,
-        '//*[@class="table-label" and contains(text(), "Alternative")]/parent::tr/td[2]/text()');
+    final alternative = document.xpathFirst(
+            '//*[@class="table-label" and contains(text(), "Alternative")]/parent::tr/td[2]/text()') ??
+        "";
 
-    List<String> description =
-        xpath(res, '//*[@id="panel-story-info-description" ]/text()');
-    if (description.isEmpty) {
-      description = xpath(res, '//*[@id="story_discription" ]/text()');
-    }
+    final description = document.xpathFirst(
+            '//*[@id="panel-story-info-description" ]/text() | //*[@id="story_discription" ]/text()') ??
+        "";
+
     if (description.isNotEmpty) {
-      manga.description = description.first
+      manga.description = description
+          .split("summary:", ' ')
+          .last
+          .split("Summary:", ' ')
+          .last
           .replaceAll("\n", ' ')
           .replaceAll("Description :", "");
       if (alternative.isNotEmpty) {
         manga.description =
-            "${manga.description}\n\nAlternative Name: ${alternative.first}";
+            "${manga.description}\n\nAlternative Name: $alternative";
       }
     }
-    List<String> status = xpath(
-        res,
-        '//*[@class="table-label" and contains(text(), "Status")]/parent::tr/td[2]/text()',
-        '');
-    if (status.isEmpty) {
-      status = xpath(res, '//li[contains(text(), "Status")]/a/text()', '');
-    }
+    final status = document.xpathFirst(
+            '//*[@class="table-label" and contains(text(), "Status")]/parent::tr/td[2]/text() | //li[contains(text(), "Status")]/text() | //li[contains(text(), "Status")]/a/text()') ??
+        "";
     if (status.isNotEmpty) {
-      manga.status = parseStatus(status.first, statusList);
+      manga.status = parseStatus(status.split(":").last.trim(), statusList);
     }
-
-    manga.genre = xpath(res,
-        '//*[@class="table-label" and contains(text(), "Genres")]/parent::tr/td[2]/a/text()');
-
-    if (manga.genre.isEmpty) {
-      manga.genre = xpath(res, '//li[contains(text(), "Genres")]/a/text()');
-    }
-    List<String> chapUrls =
-        xpath(res, '//*[@class="row-content-chapter"]/li/a/@href');
-    if (chapUrls.isEmpty) {
-      chapUrls = xpath(res, '//div[@id="chapter_list"]/ul/li/a/@href');
-    }
-    List<String> chaptersNames =
-        xpath(res, '//*[@class="row-content-chapter"]/li/a/text()');
-    if (chaptersNames.isEmpty) {
-      chaptersNames = xpath(res, '//div[@id="chapter_list"]/ul/li/a/text()');
-    }
-    List<String> chapterDates =
-        xpath(res, '//*[@class="row-content-chapter"]/li/span[last()]/text()');
-
-    if (chapterDates.isEmpty) {
-      chapterDates = xpath(res, '//div[@id="chapter_list"]/ul/li/p/text()');
-    }
-    List<String> dateUploads =
-        parseDates(chapterDates, source.dateFormat, source.dateFormatLocale);
-
+    manga.genre = document.xpath(
+        '//*[@class="table-label" and contains(text(), "Genres")]/parent::tr/td[2]/a/text() | //li[contains(text(), "Genres")]/a/text()');
+    final chaptersElements = document.select(
+        "div.chapter-list div.row, ul.row-content-chapter li, div#chapter_list li");
     List<MChapter>? chaptersList = [];
-    for (var i = 0; i < chaptersNames.length; i++) {
+    for (var element in chaptersElements) {
+      final a = element.selectFirst("a");
       MChapter chapter = MChapter();
-      chapter.name = chaptersNames[i];
-      chapter.url = chapUrls[i];
-      chapter.dateUpload = dateUploads[i];
+      chapter.name = a.text;
+      final dates = element.select("span");
+      String dateStr = "";
+      if (dates != null && dates.isNotEmpty) {
+        dateStr = dates.last.text;
+      } else {
+        dateStr = element.selectFirst("ul > li > p")?.text ??
+            DateTime.now().toString();
+      }
+      chapter.url = a.getHref;
+      chapter.dateUpload =
+          parseDates([dateStr], source.dateFormat, source.dateFormatLocale)[0];
       chaptersList.add(chapter);
     }
     manga.chapters = chaptersList;
