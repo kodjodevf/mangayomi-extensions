@@ -82,7 +82,9 @@ class OploVerz extends MProvider {
 
     final ress = (await client.post(
             Uri.parse("${source.baseUrl}/wp-admin/admin-ajax.php"),
-            headers: null,
+            headers: {
+          "_": "_"
+        },
             body: {
           "action": "player_ajax",
           "post": dataPost,
@@ -105,8 +107,7 @@ class OploVerz extends MProvider {
       video
         ..url = videoUrl
         ..originalUrl = videoUrl
-        ..quality = quality
-        ..subtitles = [];
+        ..quality = quality;
       videos.add(video);
     }
 
