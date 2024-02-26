@@ -9,26 +9,28 @@ class OtakuDesu extends MProvider {
   final Client client = Client(source);
 
   @override
+  String get baseUrl => getPreferenceValue(source.id, "overrideBaseUrl");
+
+  @override
   Future<MPages> getPopular(int page) async {
-    final res = (await client
-            .get(Uri.parse("${source.baseUrl}/complete-anime/page/$page")))
-        .body;
+    final res =
+        (await client.get(Uri.parse("$baseUrl/complete-anime/page/$page")))
+            .body;
     return parseAnimeList(res);
   }
 
   @override
   Future<MPages> getLatestUpdates(int page) async {
-    final res = (await client
-            .get(Uri.parse("${source.baseUrl}/ongoing-anime/page/$page")))
-        .body;
+    final res =
+        (await client.get(Uri.parse("$baseUrl/ongoing-anime/page/$page"))).body;
     return parseAnimeList(res);
   }
 
   @override
   Future<MPages> search(String query, int page, FilterList filterList) async {
-    final res = (await client
-            .get(Uri.parse("${source.baseUrl}/?s=$query&post_type=anime")))
-        .body;
+    final res =
+        (await client.get(Uri.parse("$baseUrl/?s=$query&post_type=anime")))
+            .body;
     List<MManga> animeList = [];
     final images = xpath(res, '//ul[@class="chivsrc"]/li/img/@src');
     final names = xpath(res, '//ul[@class="chivsrc"]/li/h2/a/text()');
@@ -96,8 +98,8 @@ class OtakuDesu extends MProvider {
     final action = substringBefore(substringAfter(script, "action:\""), '"');
 
     final resNonceAction = (await client.post(
-            Uri.parse("${source.baseUrl}/wp-admin/admin-ajax.php"),
-            headers: null,
+            Uri.parse("$baseUrl/wp-admin/admin-ajax.php"),
+            headers: {"_": "_"},
             body: {"action": nonceAction}))
         .body;
     final nonce = substringBefore(substringAfter(resNonceAction, ":\""), '"');
@@ -110,21 +112,20 @@ class OtakuDesu extends MProvider {
       final id = decodedData["id"];
       final i = decodedData["i"];
 
-      final res = (await client.post(
-              Uri.parse("${source.baseUrl}/wp-admin/admin-ajax.php"),
-              headers: null,
-              body: {
-            "i": i,
-            "id": id,
-            "q": q,
-            "nonce": nonce,
-            "action": action
-          }))
+      final res = (await client
+              .post(Uri.parse("$baseUrl/wp-admin/admin-ajax.php"), headers: {
+        "_": "_"
+      }, body: {
+        "i": i,
+        "id": id,
+        "q": q,
+        "nonce": nonce,
+        "action": action
+      }))
           .body;
       final html = utf8.decode(
           base64Url.decode(substringBefore(substringAfter(res, ":\""), '"')));
       String url = xpath(html, '//iframe/@src').first;
-
       if (url.contains("yourupload")) {
         final id = substringBefore(substringAfter(url, "id="), "&");
         url = "https://yourupload.com/embed/$id";
@@ -132,19 +133,21 @@ class OtakuDesu extends MProvider {
       } else if (url.contains("filelions")) {
         a = await streamWishExtractor(url, "FileLions");
       } else if (url.contains("desustream")) {
-        final res = (await client.get(Uri.parse(url))).body;
+        final response = (await Client().get(Uri.parse(url)));
+        final res = response.body;
         final script =
             xpath(res, '//script[contains(text(), "sources")]/text()').first;
         final videoUrl = substringBefore(
             substringAfter(substringAfter(script, "sources:[{"), "file':'"),
             "'");
-        MVideo video = MVideo();
-        video
-          ..url = videoUrl
-          ..originalUrl = videoUrl
-          ..quality = "DesuStream - $q"
-          ..subtitles = [];
-        videos.add(video);
+        if (videoUrl.endsWith(".mp4")) {
+          MVideo video = MVideo();
+          video
+            ..url = videoUrl
+            ..originalUrl = videoUrl
+            ..quality = "DesuStream - $q";
+          videos.add(video);
+        }
       } else if (url.contains("mp4upload")) {
         final res = (await client.get(Uri.parse(url))).body;
         final script =
@@ -155,12 +158,38 @@ class OtakuDesu extends MProvider {
         video
           ..url = videoUrl
           ..originalUrl = videoUrl
-          ..quality = "Mp4upload - $q"
-          ..subtitles = [];
+          ..quality = "Mp4upload - $q";
         videos.add(video);
       }
       videos.addAll(a);
     }
+
+    return sortVideos(videos);
+  }
+
+  List<MVideo> sortVideos(List<MVideo> videos) {
+    String quality = getPreferenceValue(source.id, "preferred_quality");
+
+    videos.sort((MVideo a, MVideo b) {
+      int qualityMatchA = 0;
+      if (a.quality.contains(quality)) {
+        qualityMatchA = 1;
+      }
+      int qualityMatchB = 0;
+      if (b.quality.contains(quality)) {
+        qualityMatchB = 1;
+      }
+      if (qualityMatchA != qualityMatchB) {
+        return qualityMatchB - qualityMatchA;
+      }
+
+      final regex = RegExp(r'(\d+)p');
+      final matchA = regex.firstMatch(a.quality);
+      final matchB = regex.firstMatch(b.quality);
+      final int qualityNumA = int.tryParse(matchA?.group(1) ?? '0') ?? 0;
+      final int qualityNumB = int.tryParse(matchB?.group(1) ?? '0') ?? 0;
+      return qualityNumB - qualityNumA;
+    });
 
     return videos;
   }
@@ -184,6 +213,26 @@ class OtakuDesu extends MProvider {
     final pages = xpath(
         res, '//div[@class="pagenavix"]/a[@class="next page-numbers"]/@href');
     return MPages(animeList, pages.isNotEmpty);
+  }
+
+  List<dynamic> getSourcePreferences() {
+    return [
+      EditTextPreference(
+          key: "overrideBaseUrl",
+          title: "Override BaseUrl",
+          summary: "",
+          value: "https://otakudesu.cloud",
+          dialogTitle: "Override BaseUrl",
+          dialogMessage: "",
+          text: "https://otakudesu.cloud"),
+      ListPreference(
+          key: "preferred_quality",
+          title: "Preferred quality",
+          summary: "",
+          valueIndex: 1,
+          entries: ["1080p", "720p", "480p", "360p"],
+          entryValues: ["1080", "720", "480", "360"])
+    ];
   }
 }
 
