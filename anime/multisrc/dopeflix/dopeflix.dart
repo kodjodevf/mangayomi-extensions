@@ -160,6 +160,8 @@ class DopeFlix extends MProvider {
       final vidUrl =
           substringBefore(substringAfter(resSource, "\"link\":\""), "\"");
       List<MVideo> a = [];
+      String masterUrl = "";
+      String type = "";
       if (name.contains("DoodStream")) {
         a = await doodExtractor(vidUrl, "DoodStream");
       } else if (["Vidcloud", "UpCloud"].contains(name)) {
@@ -171,6 +173,7 @@ class DopeFlix extends MProvider {
                 headers: {"X-Requested-With": "XMLHttpRequest"}))
             .body;
         final encrypted = getMapValue(resServer, "encrypted");
+
         String videoResJson = "";
         if (encrypted == "true") {
           final ciphered = getMapValue(resServer, "sources");
@@ -189,15 +192,20 @@ class DopeFlix extends MProvider {
             index += item.last;
           }
           videoResJson = decryptAESCryptoJS(ciphertext, password);
-        } else {
-          videoResJson = resServer;
-        }
+          masterUrl = ((json.decode(videoResJson) as List<Map<String, dynamic>>)
+              .first)['file'];
 
-        String masterUrl =
-            ((json.decode(videoResJson) as List<Map<String, dynamic>>)
-                .first)['file'];
-        String type = ((json.decode(videoResJson) as List<Map<String, dynamic>>)
-            .first)['type'];
+          type = ((json.decode(videoResJson) as List<Map<String, dynamic>>)
+              .first)['type'];
+        } else {
+          masterUrl =
+              ((json.decode(resServer)["sources"] as List<Map<String, dynamic>>)
+                  .first)['file'];
+
+          type =
+              ((json.decode(resServer)["sources"] as List<Map<String, dynamic>>)
+                  .first)['type'];
+        }
 
         final tracks = (json.decode(resServer)['tracks'] as List)
             .where((e) => e['kind'] == 'captions' ? true : false)
@@ -213,6 +221,7 @@ class DopeFlix extends MProvider {
             subtitles.add(subtitle);
           } catch (_) {}
         }
+
         subtitles = sortSubs(subtitles, source.id);
         if (type == "hls") {
           final masterPlaylistRes =
@@ -227,7 +236,7 @@ class DopeFlix extends MProvider {
 
             if (!videoUrl.startsWith("http")) {
               videoUrl =
-                  "${masterUrl.split("/").sublist(0, masterUrl.split("/").length - 1).join("/")}/$videoUrl";
+                  "${(masterUrl as String).split("/").sublist(0, (masterUrl as String).split("/").length - 1).join("/")}/$videoUrl";
             }
 
             MVideo video = MVideo();
