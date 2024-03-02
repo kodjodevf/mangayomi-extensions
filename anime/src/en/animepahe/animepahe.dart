@@ -133,7 +133,7 @@ class AnimePahe extends MProvider {
 
   @override
   Future<List<MVideo>> getVideoList(String url) async {
-    final res = (await client.get(Uri.parse("${source.baseUrl}$url")));
+    final res = (await client.get(Uri.parse("$baseUrl$url")));
 
     final document = parseHtml(res.body);
     final buttons = document.select("div#resolutionMenu > button");
@@ -149,7 +149,8 @@ class AnimePahe extends MProvider {
               .first,
           "eval(function(");
       final videoUrl = substringBefore(
-          substringAfter(unpackJsAndCombine("eval(function($script"), "const source=\\'"),
+          substringAfter(
+              unpackJsAndCombine("eval(function($script"), "const source=\\'"),
           "\\';");
       MVideo video = MVideo();
       video
