@@ -60,9 +60,7 @@ class AnimePahe extends MProvider {
     MManga anime = MManga();
     final id = substringBefore(substringAfterLast(url, "?anime_id="), "&name=");
     final name = substringAfterLast(url, "&name=");
-    print(name);
     final session = await getSession(name, id);
-    print(session);
     final res =
         (await client.get(Uri.parse("$baseUrl/anime/$session?anime_id=$id")))
             .body;
@@ -134,33 +132,123 @@ class AnimePahe extends MProvider {
   @override
   Future<List<MVideo>> getVideoList(String url) async {
     final res = (await client.get(Uri.parse("$baseUrl$url")));
-
     final document = parseHtml(res.body);
+    final downloadLinks = document.select("div#pickDownload > a");
     final buttons = document.select("div#resolutionMenu > button");
     List<MVideo> videos = [];
     for (var i = 0; i < buttons.length; i++) {
       final btn = buttons[i];
       final kwikLink = btn.attr("data-src");
       final quality = btn.text;
-      final ress = (await client.get(Uri.parse(kwikLink),
-          headers: {"Referer": "https://animepahe.com"}));
-      final script = substringAfterLast(
-          xpath(ress.body, '//script[contains(text(),"eval(function")]/text()')
-              .first,
-          "eval(function(");
-      final videoUrl = substringBefore(
-          substringAfter(
-              unpackJsAndCombine("eval(function($script"), "const source=\\'"),
-          "\\';");
-      MVideo video = MVideo();
-      video
-        ..url = videoUrl
-        ..originalUrl = videoUrl
-        ..quality = quality
-        ..headers = {"referer": "https://kwik.cx"};
-      videos.add(video);
+      final paheWinLink = downloadLinks[i].attr("href");
+      if (getPreferenceValue(source.id, "preffered_link_type")) {
+        final noRedirectClient =
+            Client(source, json.encode({"followRedirects": false}));
+        final kwikHeaders =
+            (await noRedirectClient.get(Uri.parse("${paheWinLink}/i"))).headers;
+        final kwikUrl =
+            "https://${substringAfterLast(getMapValue(json.encode(kwikHeaders), "location"), "https://")}";
+        final reskwik = (await client
+            .get(Uri.parse(kwikUrl), headers: {"Referer": "https://kwik.cx/"}));
+        final matches = RegExp(r'\("(\S+)",\d+,"(\S+)",(\d+),(\d+)')
+            .firstMatch(reskwik.body);
+        final token = decrypt(matches!.group(1)!, matches.group(2)!,
+            matches.group(3)!, int.parse(matches.group(4)!));
+        final url = RegExp(r'action="([^"]+)"').firstMatch(token)!.group(1)!;
+        final tok = RegExp(r'value="([^"]+)"').firstMatch(token)!.group(1)!;
+        var code = 419;
+        var tries = 0;
+        String location = "";
+
+        while (code != 302 && tries < 20) {
+          String cookie =
+              getMapValue(json.encode(res.request.headers), "cookie");
+          cookie +=
+              "; ${getMapValue(json.encode(reskwik.headers), "set-cookie").replaceAll("path=/;", "")}";
+          final resNo =
+              await Client(source, json.encode({"followRedirects": false}))
+                  .post(Uri.parse(url), headers: {
+            "referer": reskwik.request.url.toString(),
+            "cookie": cookie,
+            "user-agent":
+                getMapValue(json.encode(res.request.headers), "user-agent")
+          }, body: {
+            "_token": tok
+          });
+          code = resNo.statusCode;
+          tries++;
+          location = getMapValue(json.encode(resNo.headers), "location");
+        }
+        if (tries > 19) {
+          throw ("Failed to extract the stream uri from kwik.");
+        }
+        MVideo video = MVideo();
+        video
+          ..url = location
+          ..originalUrl = location
+          ..quality = quality;
+        videos.add(video);
+      } else {
+        final ress = (await client.get(Uri.parse(kwikLink),
+            headers: {"Referer": "https://animepahe.com"}));
+        final script = substringAfterLast(
+            xpath(ress.body,
+                    '//script[contains(text(),"eval(function")]/text()')
+                .first,
+            "eval(function(");
+        final videoUrl = substringBefore(
+            substringAfter(unpackJsAndCombine("eval(function($script"),
+                "const source=\\'"),
+            "\\';");
+        MVideo video = MVideo();
+        video
+          ..url = videoUrl
+          ..originalUrl = videoUrl
+          ..quality = quality
+          ..headers = {"referer": "https://kwik.cx"};
+        videos.add(video);
+      }
     }
     return sortVideos(videos);
+  }
+
+  String getString(String ctn, int sep) {
+    int b = 10;
+    String cm =
+        "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+/";
+    final n = cm.substring(0, b);
+    double mx = 0;
+    for (var index = 0; index < ctn.length; index++) {
+      mx += (int.tryParse(ctn[ctn.length - index - 1], radix: 10) ?? 0.0)
+              .toInt() *
+          (pow(sep, index));
+    }
+    var m = '';
+    while (mx > 0) {
+      m = n[(mx % b).toInt()] + m;
+      mx = (mx - (mx % b)) / b;
+    }
+    return m.isNotEmpty ? m : '0';
+  }
+
+  String decrypt(String fS, String key, String v1, int v2) {
+    var html = "";
+    var i = 0;
+    final ld = int.parse(v1);
+    while (i < fS.length) {
+      var s = "";
+      while (fS[i] != key[v2]) {
+        s += fS[i];
+        i++;
+      }
+      for (var index = 0; index < key.length; index++) {
+        s = s.replaceAll(key[index], index.toString());
+      }
+      html += String.fromCharCode(int.parse(getString(s, v2)) - ld);
+      i++;
+    }
+
+    return html;
   }
 
   List<MVideo> sortVideos(List<MVideo> videos) {
@@ -208,6 +296,12 @@ class AnimePahe extends MProvider {
             "https://animepahe.ru",
             "https://animepahe.org"
           ]),
+      SwitchPreferenceCompat(
+          key: "preffered_link_type",
+          title: "Use HLS links",
+          summary:
+              "Enable this if you are having Cloudflare issues.\n|Note that this will break the ability to seek inside of the video unless the episode is downloaded in advance.",
+          value: false),
       ListPreference(
           key: "preferred_quality",
           title: "Preferred Quality",
