@@ -299,8 +299,7 @@ class AnimePahe extends MProvider {
       SwitchPreferenceCompat(
           key: "preffered_link_type",
           title: "Use HLS links",
-          summary:
-              "Enable this if you are having Cloudflare issues.\n|Note that this will break the ability to seek inside of the video unless the episode is downloaded in advance.",
+          summary: "Enable this if you are having Cloudflare issues.",
           value: false),
       ListPreference(
           key: "preferred_quality",
