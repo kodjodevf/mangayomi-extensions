@@ -188,7 +188,7 @@ class GogoAnime extends MProvider {
 
     final id = xpath(res, '//*[@id="movie_id"]/@value').first;
     final urlEp =
-        "https://ajax.gogo-load.com/ajax/load-list-episode?ep_start=0&ep_end=4000&id=$id";
+        "https://ajax.gogocdn.net/ajax/load-list-episode?ep_start=0&ep_end=4000&id=$id";
 
     final resEp = (await client.get(Uri.parse(urlEp))).body;
 
