@@ -77,6 +77,37 @@ class Madara extends MProvider {
     return mangaFromElements(document.select("div.c-tabs-item__content"));
   }
 
+  List<MChapter> getChapters(MDocument chapDoc) {
+    List<MChapter> chapters = [];
+    for (MElement element in chapDoc.select("li.wp-manga-chapter") ?? []) {
+      var ch = element.selectFirst("a");
+      if (ch != null) {
+        var url = ch.attr("href");
+        if (url != null && url.isNotEmpty) {
+          url = substringBefore(url, "?style=paged");
+          if (url.endsWith("?style=paged")) {
+            url = url + "?style=paged";
+          }
+          var chapter = MChapter();
+          chapter.url = url;
+          chapter.name = ch.text;
+          if (source.dateFormat.isNotEmpty) {
+            var chd = element.selectFirst("span.chapter-release-date");
+            if (chd != null && chd.text.isNotEmpty) {
+              var dates = parseDates(
+                  [chd.text], source.dateFormat, source.dateFormatLocale);
+              if (dates.isNotEmpty) {
+                chapter.dateUpload = dates[0];
+              }
+            }
+          }
+          chapters.add(chapter);
+        }
+      }
+    }
+    return chapters;
+  }
+
   @override
   Future<MManga> getDetail(String url) async {
     final statusList = [
@@ -180,71 +211,17 @@ class Madara extends MProvider {
     } else {
       res = oldXhrChaptersRequest.body;
     }
+
     MDocument chapDoc = parseHtml(res);
-    List<String> chapUrls = [];
-    List<String> chaptersNames = [];
-    List<String> chapDates = [];
-    for (MElement element in chapDoc.select("li.wp-manga-chapter") ?? []) {
-      final ch = element.selectFirst("a");
-      if (ch != null) {
-        chapUrls.add(ch.attr("href"));
-      }
-    }
-    if (chapUrls.isEmpty) {
+    manga.chapters = getChapters(chapDoc);
+    if (manga.chapters.isEmpty) {
       res = (await client.post(Uri.parse("${url}ajax/chapters"),
               headers: headers))
           .body;
       chapDoc = parseHtml(res);
-      for (MElement element in chapDoc.select("li.wp-manga-chapter") ?? []) {
-        final ch = element.selectFirst("a");
-        if (ch != null) {
-          chapUrls.add(ch.attr("href"));
-        }
-      }
-    }
-    for (MElement element in chapDoc.select("li.wp-manga-chapter") ?? []) {
-      final ch = element.selectFirst("a");
-      final chd = element.selectFirst("span.chapter-release-date");
-      if (ch != null) {
-        chaptersNames.add(ch.text);
-      }
-      if (chd != null) {
-        chapDates.add(chd.text);
-      }
-    }
-    List<String> dateUploads = [];
-    if (source.dateFormat.isNotEmpty) {
-      List<String> chaptersDate = [];
-      dateUploads =
-          parseDates(chapDates, source.dateFormat, source.dateFormatLocale);
-      if (chapDates.length < chaptersNames.length) {
-        final length = chaptersNames.length - chapDates.length;
-        for (var i = 0; i < length; i++) {
-          chaptersDate.add("${DateTime.now().millisecondsSinceEpoch}");
-        }
-        final parsedDates =
-            parseDates(chapDates, source.dateFormat, source.dateFormatLocale);
-        for (var date in parsedDates) {
-          chaptersDate.add(date);
-        }
-        dateUploads = chaptersDate;
-      }
+      manga.chapters = getChapters(chapDoc);
     }
 
-    List<MChapter>? chaptersList = [];
-    for (var i = 0; i < chaptersNames.length; i++) {
-      String url = substringBefore(chapUrls[i], "?style=paged");
-      if (!chapUrls[i].endsWith("?style=paged")) {
-        url = url + "?style=paged";
-      }
-      MChapter chapter = MChapter();
-      chapter.name = chaptersNames[i];
-      chapter.url = chapUrls[i];
-      if (source.dateFormat.isNotEmpty) chapter.dateUpload = dateUploads[i];
-      chaptersList.add(chapter);
-    }
-
-    manga.chapters = chaptersList;
     return manga;
   }
 
