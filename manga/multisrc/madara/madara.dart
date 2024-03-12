@@ -96,9 +96,10 @@ class Madara extends MProvider {
             if (chd != null && chd.text.isNotEmpty) {
               var dates = parseDates(
                   [chd.text], source.dateFormat, source.dateFormatLocale);
-              if (dates.isNotEmpty) {
-                chapter.dateUpload = dates[0];
-              }
+              chapter.dateUpload = dates[0];
+            } else {
+              chapter.dateUpload =
+                  DateTime.now().millisecondsSinceEpoch.toString();
             }
           }
           chapters.add(chapter);
