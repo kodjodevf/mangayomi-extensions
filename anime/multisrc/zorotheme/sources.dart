@@ -1,8 +1,8 @@
 import '../../../model/source.dart';
-import 'src/aniwatch/aniwatch.dart';
+import 'src/hianime/hianime.dart';
 import 'src/kaido/kaido.dart';
 
-const _zorothemeVersion = "0.0.8";
+const _zorothemeVersion = "0.0.85";
 const _zorothemeSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/anime/multisrc/zorotheme/zorotheme.dart";
 

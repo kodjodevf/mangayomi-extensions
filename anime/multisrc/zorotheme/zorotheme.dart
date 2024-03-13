@@ -205,7 +205,10 @@ class ZoroTheme extends MProvider {
           a = await rapidCloudExtractor(epUrl, "Vidcloud - $subDub");
         } else if (name.contains("StreamTape")) {
           a = await streamTapeExtractor(epUrl, "StreamTape - $subDub");
+        } else if (["HD-1", "HD-2"].any((element) => name.contains(element))) {
+          a = await rapidCloudExtractor(epUrl, "$name - $subDub");
         }
+
         videos.addAll(a);
       }
     }
@@ -528,27 +531,45 @@ class ZoroTheme extends MProvider {
           valueIndex: 1,
           entries: ["1080p", "720p", "480p", "360p"],
           entryValues: ["1080", "720", "480", "360"]),
+      if (source.name == "HiAnime")
+        ListPreference(
+            key: "preferred_server1",
+            title: "Preferred server",
+            summary: "",
+            valueIndex: 0,
+            entries: ["HD-1", "HD-2", "StreamTape"],
+            entryValues: ["HD-1", "HD-2", "StreamTape"]),
+      if (source.name != "HiAnime")
+        ListPreference(
+            key: "preferred_server1",
+            title: "Preferred server",
+            summary: "",
+            valueIndex: 0,
+            entries: ["Vidstreaming", "VidCloud", "StreamTape"],
+            entryValues: ["Vidstreaming", "VidCloud", "StreamTape"]),
       ListPreference(
-          key: "preferred_server",
-          title: "Preferred server",
-          summary: "",
-          valueIndex: 0,
-          entries: ["Vidstreaming", "VidCloud", "StreamTape"],
-          entryValues: ["Vidstreaming", "VidCloud", "StreamTape"]),
-      ListPreference(
-          key: "preferred_type",
+          key: "preferred_type1",
           title: "Preferred Type",
           summary: "",
           valueIndex: 0,
           entries: ["Sub", "Dub"],
           entryValues: ["sub", "dub"]),
-      MultiSelectListPreference(
-          key: "hoster_selection",
-          title: "Enable/Disable Hosts",
-          summary: "",
-          entries: ["Vidstreaming", "VidCloud", "StreamTape"],
-          entryValues: ["Vidstreaming", "Vidcloud", "StreamTape"],
-          values: ["Vidstreaming", "Vidcloud", "StreamTape"]),
+      if (source.name != "HiAnime")
+        MultiSelectListPreference(
+            key: "hoster_selection1",
+            title: "Enable/Disable Hosts",
+            summary: "",
+            entries: ["Vidstreaming", "VidCloud", "StreamTape"],
+            entryValues: ["Vidstreaming", "VidCloud", "StreamTape"],
+            values: ["Vidstreaming", "VidCloud", "StreamTape"]),
+      if (source.name == "HiAnime")
+        MultiSelectListPreference(
+            key: "hoster_selection1",
+            title: "Enable/Disable Hosts",
+            summary: "",
+            entries: ["HD-1", "HD-2", "StreamTape"],
+            entryValues: ["HD-1", "HD-2", "StreamTape"],
+            values: ["HD-1", "HD-2", "StreamTape"]),
       MultiSelectListPreference(
           key: "type_selection",
           title: "Enable/Disable Types",
@@ -561,8 +582,8 @@ class ZoroTheme extends MProvider {
 
   List<MVideo> sortVideos(List<MVideo> videos, int sourceId) {
     String quality = getPreferenceValue(sourceId, "preferred_quality");
-    String server = getPreferenceValue(sourceId, "preferred_server");
-    String type = getPreferenceValue(sourceId, "preferred_type");
+    String server = getPreferenceValue(sourceId, "preferred_server1");
+    String type = getPreferenceValue(sourceId, "preferred_type1");
     videos.sort((MVideo a, MVideo b) {
       int qualityMatchA = 0;
 
@@ -592,7 +613,7 @@ class ZoroTheme extends MProvider {
   }
 
   List<String> preferenceHosterSelection(int sourceId) {
-    return getPreferenceValue(sourceId, "hoster_selection");
+    return getPreferenceValue(sourceId, "hoster_selection1");
   }
 
   List<String> preferenceTypeSelection(int sourceId) {
