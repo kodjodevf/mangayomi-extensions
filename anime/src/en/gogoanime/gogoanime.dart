@@ -1036,10 +1036,10 @@ class GogoAnime extends MProvider {
           title: "Override BaseUrl",
           summary:
               "For temporary uses. Updating the extension will erase this setting.",
-          value: "https://gogoanime3.net",
+          value: "https://anitaku.to",
           dialogTitle: "Override BaseUrl",
-          dialogMessage: "Default: https://gogoanime3.net",
-          text: "https://gogoanime3.net"),
+          dialogMessage: "Default: https://anitaku.to",
+          text: "https://anitaku.to"),
       ListPreference(
           key: "preferred_quality",
           title: "Preferred quality",
