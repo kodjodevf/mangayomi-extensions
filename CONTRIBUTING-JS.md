@@ -183,7 +183,7 @@ console.log(document.selectFirst("a").attr("href")); // https://github.com/kodjo
 console.log(document.selectFirst("td").text); // 1
 
 ```
-See [`dom_selector`](https://github.com/kodjodevf/mangayomi/blob/lib/eval/javascript/dom_selector.dart) to see available methods.
+See [`dom_selector`](https://github.com/kodjodevf/mangayomi/blob/main/lib/eval/javascript/dom_selector.dart) to see available methods.
 
 
 ### String utils
