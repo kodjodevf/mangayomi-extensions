@@ -60,7 +60,7 @@ List<Source> _searchJsSources(Directory dir) {
                   ..sourceCodeLanguage = 1
                   ..appMinVerReq = defaultSource.appMinVerReq
                   ..sourceCodeUrl =
-                      "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/javascript/${e["pkgPath"]}")
+                      "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/javascript/${e["pkgPath"] ?? e["pkgName"]}")
                 .toList());
           }
         }
