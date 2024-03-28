@@ -7,11 +7,10 @@ const mangayomiSources = [{
     "typeSource": "single",
     "isManga": false,
     "isNsfw": false,
-    "version": "0.0.1",
-    "apiUrl": "",
+    "version": "0.0.15",
     "dateFormat": "",
     "dateFormatLocale": "",
-    "pkgName": "anime/src/en/allanime.js"
+    "pkgPath": "anime/src/en/allanime.js"
 }];
 
 class DefaultExtension extends MProvider {
