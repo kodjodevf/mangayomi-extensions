@@ -54,11 +54,12 @@ Once extension is ready you can relocate your code into `mangayomi-extension` pr
 a.k.a. the Browse source entry point in the app (invoked by tapping on the source name).
 
 - The app calls `getPopular` which should return a  JSON
-
+    ```bash
     {
     'list': array of {'url':string,'name':string,'link':string},
      hasNextPage: Boolean
     }
+    ```
     - This method supports pagination. When user scrolls the manga  list and more results must be fetched, the app calls it again with increasing `page` values(starting with `page=1`). This continues while `hasNextPage` is passed as `true` and `list` is not empty.
 
 #### Latest manga
@@ -76,7 +77,6 @@ a.k.a. the Latest source entry point in the app (invoked by tapping on the "Late
 #### Manga Details
 
 - When user taps on an manga, `getDetail` will be called and the results will be cached.
-    - A `MManga` entry is identified by its `url`.
 - `getDetail` is called to update an manga's details from when it was initialized earlier.
     - `title` is a string containing title.
     - `description` is a string containing description.
@@ -102,10 +102,9 @@ a.k.a. the Latest source entry point in the app (invoked by tapping on the "Late
 #### Episode Videos
 
 - When user opens an episode, `getVideoList` will be called and it will return a 
-```bash
+   ```bash
    array of {'url':string,'originalUrl':string,'quality':string}
-
-```.
+   ```
 
  that are used by the player.
 
@@ -154,7 +153,7 @@ console.log(res.body);
 
 Example: 
 ```bash
-const htmlString = 
+const htmlString = ` 
 <html lang="en">
 <body>
 <div><a href='https://github.com/kodjodevf'>author</a></div>
@@ -177,13 +176,11 @@ const htmlString =
 </div>
 <div class="end">end</div>
 </body>
-</html>
+</html>`
 
-
-
-  const document = new Document(htmlString);
-  console.log(document.selectFirst("a").attr("href")); // https://github.com/kodjodevf
-  console.log(document.selectFirst("td").text); // 1
+const document = new Document(htmlString);
+console.log(document.selectFirst("a").attr("href")); // https://github.com/kodjodevf
+console.log(document.selectFirst("td").text); // 1
 
 ```
 See [`dom_selector`](https://github.com/kodjodevf/mangayomi/blob/lib/eval/javascript/dom_selector.dart) to see available methods.
