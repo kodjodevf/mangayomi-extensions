@@ -54,12 +54,11 @@ Once extension is ready you can relocate your code into `mangayomi-extension` pr
 a.k.a. the Browse source entry point in the app (invoked by tapping on the source name).
 
 - The app calls `getPopular` which should return a  JSON
-```
+
     {
     'list': array of {'url':string,'name':string,'link':string},
      hasNextPage: Boolean
     }
-```.
     - This method supports pagination. When user scrolls the manga  list and more results must be fetched, the app calls it again with increasing `page` values(starting with `page=1`). This continues while `hasNextPage` is passed as `true` and `list` is not empty.
 
 #### Latest manga
