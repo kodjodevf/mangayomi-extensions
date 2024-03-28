@@ -143,7 +143,7 @@ console.log(res.body);
 
 const client = new Client();
 
-final res = await client.post("http://example.com",{"Referer": "http://example.com"},{'name':'test'});
+const res = await client.post("http://example.com",{"Referer": "http://example.com"},{'name':'test'});
 
 console.log(res.body);
 
