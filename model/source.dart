@@ -33,6 +33,8 @@ class Source {
 
   String? additionalParams;
 
+  int? sourceCodeLanguage;
+
   Source(
       {this.id = null,
       this.name = "",
@@ -49,8 +51,33 @@ class Source {
       this.version = "",
       this.isManga = true,
       this.isFullData = false,
-      this.appMinVerReq = "0.1.7",
-      this.additionalParams = ""});
+      this.appMinVerReq = "0.2.0",
+      this.additionalParams = "",
+      this.sourceCodeLanguage = 0});
+  Source.fromJson(Map<String, dynamic> json) {
+    final sourceCodeLang = json['sourceCodeLanguage'] ?? 0;
+    apiUrl = json['apiUrl'] ?? "";
+    appMinVerReq = json['appMinVerReq'] ?? appMinVerReq;
+    baseUrl = json['baseUrl'];
+    dateFormat = json['dateFormat'] ?? "";
+    dateFormatLocale = json['dateFormatLocale'] ?? "";
+    hasCloudflare = json['hasCloudflare'] ?? false;
+    iconUrl = json['iconUrl'] ?? "";
+    id = (json['id'] ?? sourceCodeLang == 0
+            ? 'mangayomi-"${json['lang'] ?? ""}"."${json['name'] ?? ""}"'
+            : 'mangayomi-js-"${json['lang'] ?? ""}"."${json['name'] ?? ""}"')
+        .hashCode;
+    isFullData = json['isFullData'] ?? false;
+    isManga = json['isManga'] ?? false;
+    isNsfw = json['isNsfw'] ?? false;
+    lang = json['lang'] ?? "";
+    name = json['name'] ?? "";
+    sourceCodeUrl = json['sourceCodeUrl'] ?? "";
+    typeSource = json['typeSource'] ?? "";
+    version = json['version'] ?? "";
+    additionalParams = json['additionalParams'] ?? "";
+    sourceCodeLanguage = sourceCodeLang;
+  }
 
   Map<String, dynamic> toJson() {
     return {
@@ -70,7 +97,8 @@ class Source {
       "isManga": isManga,
       "isFullData": isFullData,
       "appMinVerReq": appMinVerReq,
-      "additionalParams": additionalParams
+      "additionalParams": additionalParams,
+      "sourceCodeLanguage": sourceCodeLanguage
     };
   }
 }
