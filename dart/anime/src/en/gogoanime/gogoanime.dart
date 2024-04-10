@@ -35,27 +35,18 @@ class GogoAnime extends MProvider {
 
   @override
   Future<MPages> getLatestUpdates(int page) async {
-    final res = (await client.get(Uri.parse(
-            "https://ajax.gogo-load.com/ajax/page-recent-release-ongoing.html?page=$page&type=1")))
-        .body;
-
+    final res =
+        (await client.get(Uri.parse("$baseUrl/home.html?page=$page"))).body;
+    final document = parseHtml(res);
+    final elements = document.select("div.img a");
     List<MManga> animeList = [];
-    final urls =
-        xpath(res, '//*[@class="added_series_body popular"]/ul/li/a[1]/@href');
-    final names = xpath(
-        res, '//*[//*[@class="added_series_body popular"]/ul/li/a[1]/@title');
-    List<String> images = [];
-    List<String> imagess = xpath(res,
-        '//*[//*[@class="added_series_body popular"]/ul/li/a/div[@class="thumbnail-popular"]/@style');
-    for (var url in imagess) {
-      images.add(url.replaceAll("background: url('", "").replaceAll("');", ""));
-    }
 
-    for (var i = 0; i < names.length; i++) {
-      MManga anime = MManga();
-      anime.name = names[i];
-      anime.imageUrl = images[i];
-      anime.link = urls[i];
+    for (var element in elements) {
+      var anime = MManga();
+      anime.name = element.attr("title");
+      anime.imageUrl = element.selectFirst("img")?.attr("src") ?? "";
+      final slug = substringBefore(element.attr("href"), "-episode-");
+      anime.link = "/category/$slug";
       animeList.add(anime);
     }
 
@@ -175,10 +166,10 @@ class GogoAnime extends MProvider {
             res, '//*[@class="anime_info_body_bg"]/p[@class="type"][5]/text()')
         .first
         .replaceAll("Status: ", "");
-    anime.description = xpath(
-            res, '//*[@class="anime_info_body_bg"]/p[@class="type"][2]/text()')
-        .first
-        .replaceAll("Plot Summary: ", "");
+    anime.description = parseHtml(res)
+            .selectFirst("div.anime_info_body_bg > div.description")
+            ?.text ??
+        "";
     anime.status = parseStatus(status, statusList);
     anime.genre = xpath(
             res, '//*[@class="anime_info_body_bg"]/p[@class="type"][3]/text()')
