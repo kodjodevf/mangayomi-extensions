@@ -8,7 +8,6 @@ const mangayomiSources = [{
     "isManga": true,
     "isNsfw": true,
     "version": "0.0.1",
-
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "manga/src/zh/wnacg.js"
@@ -58,7 +57,6 @@ class DefaultExtension extends MProvider {
         var year = parseInt(parts[0]);
         var month = parseInt(parts[1]) - 1;
         var day = parseInt(parts[2]);
-
         var date = new Date(year, month, day);
         var timestamp = date.getTime();
 
@@ -143,16 +141,22 @@ class DefaultExtension extends MProvider {
             for (const filter of filters) {
                 if (filter["type"] == "CateFilter") {
                     category = filter["values"][filter["state"]]["value"];
-                } else if (filter["type"] == "DJSFilter") {
-                    djs_lang = filter["values"][filter["state"]]["value"];
-                } else if (filter["type"] == "TKBFilter") {
-                    tkb_lang = filter["values"][filter["state"]]["value"];
-                } else if (filter["type"] == "MGZFilter") {
-                    mgz_lang = filter["values"][filter["state"]]["value"];
-                } else if (filter["type"] == "KRFilter") {
-                    kr_lang = filter["values"][filter["state"]]["value"];
-                } else if (filter["type"] == "PageFilter") {
-                    jump_page = parseInt(filter["values"][filter["state"]]["value"]);
+                } 
+                else if (filter["type"] == "LangFilter") {
+                    for (const lang_filter of filter["state"]) {
+                        if (lang_filter["type"] == "DJSFilter") {
+                            djs_lang = lang_filter["values"][lang_filter["state"]]["value"];
+                        } else if (lang_filter["type"] == "TKBFilter") {
+                            tkb_lang = lang_filter["values"][lang_filter["state"]]["value"];
+                        } else if (lang_filter["type"] == "MGZFilter") {
+                            mgz_lang = lang_filter["values"][lang_filter["state"]]["value"];
+                        } else if (lang_filter["type"] == "KRFilter") {
+                            kr_lang = lang_filter["values"][lang_filter["state"]]["value"];
+                        }
+                    }
+                }
+                else if (filter["type"] == "PageFilter") {
+                    jump_page = parseInt(filter["state"]);
                 }
             }
             if (jump_page != 1) {
