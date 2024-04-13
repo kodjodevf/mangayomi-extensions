@@ -7,7 +7,7 @@ const mangayomiSources = [{
   "typeSource": "single",
   "isManga": false,
   "isNsfw": true,
-  "version": "0.0.1",
+  "version": "0.0.2",
   "dateFormat": "",
   "dateFormatLocale": "",
   "pkgPath": "anime/src/zh/jable.js",
