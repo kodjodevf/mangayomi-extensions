@@ -273,37 +273,25 @@ class Aniwave extends MProvider {
   }
 
   String vrfEncrypt(String input) {
-    final rc4 = rc4Encrypt("ysJhV6U27FVIjjuk", input.codeUnits);
+    final rc4 = rc4Encrypt("tGn6kIpVXBEUmqjD", input.codeUnits);
     final vrf = base64Url.encode(rc4);
     final vrf1 = base64.encode(vrf.codeUnits);
     List<int> vrf2 = vrfShift(vrf1.codeUnits);
-    final vrf3 = base64.encode(vrf2);
-    return utf8.decode(rot13(vrf3.codeUnits));
+    final vrf3 = base64Url.encode(vrf2.reversed.toList());
+    return utf8.decode(vrf3.codeUnits);
   }
 
   String vrfDecrypt(String input) {
     final decode = base64Url.decode(input);
-    final rc4 = rc4Encrypt("hlPeNwkncH0fq9so", decode);
+    final rc4 = rc4Encrypt("LUyDrL4qIxtIxOGs", decode);
     return Uri.decodeComponent(utf8.decode(rc4));
   }
 
   List<int> vrfShift(List<int> vrf) {
-    var shifts = [-3, 3, -4, 2, -2, 5, 4, 5];
+    var shifts = [-2, -4, -5, 6, 2, -3, 3, 6];
     for (var i = 0; i < vrf.length; i++) {
       var shift = shifts[i % 8];
       vrf[i] = (vrf[i] + shift) & 0xFF;
-    }
-    return vrf;
-  }
-
-  List<int> rot13(List<int> vrf) {
-    for (var i = 0; i < vrf.length; i++) {
-      var byte = vrf[i];
-      if (byte >= 'A'.codeUnitAt(0) && byte <= 'Z'.codeUnitAt(0)) {
-        vrf[i] = (byte - 'A'.codeUnitAt(0) + 13) % 26 + 'A'.codeUnitAt(0);
-      } else if (byte >= 'a'.codeUnitAt(0) && byte <= 'z'.codeUnitAt(0)) {
-        vrf[i] = (byte - 'a'.codeUnitAt(0) + 13) % 26 + 'a'.codeUnitAt(0);
-      }
     }
     return vrf;
   }
@@ -379,7 +367,7 @@ class Aniwave extends MProvider {
         .join("&");
     var vidId = substringBefore(substringAfterLast(url, "/"), "?");
     var encodedID = encodeID(vidId, keyList);
-    final apiSlug = await callFromFuToken(host, encodedID);
+    final apiSlug = await callFromFuToken(host, encodedID, url);
     String apiUrlString = "";
     apiUrlString += "https://$host/$apiSlug";
     if (paramsToString.isNotEmpty) {
@@ -397,9 +385,10 @@ class Aniwave extends MProvider {
     return base64.encode(rc41).replaceAll("/", "_").trim();
   }
 
-  Future<String> callFromFuToken(String host, String data) async {
-    final fuTokenScript =
-        (await client.get(Uri.parse("https://$host/futoken"))).body;
+  Future<String> callFromFuToken(String host, String data, String url) async {
+    final fuTokenScript = (await client
+            .get(Uri.parse("https://$host/futoken"), headers: {"Referer": url}))
+        .body;
 
     String js = "";
     js += "(function";
