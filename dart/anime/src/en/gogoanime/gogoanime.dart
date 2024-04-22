@@ -35,8 +35,13 @@ class GogoAnime extends MProvider {
 
   @override
   Future<MPages> getLatestUpdates(int page) async {
-    final res =
-        (await client.get(Uri.parse("$baseUrl/home.html?page=$page"))).body;
+    String url = baseUrl;
+    if (baseUrl.toLowerCase().contains("gogo")) {
+      url = url + "/?page=$page";
+    } else {
+      url = url + "/home.html?page=$page";
+    }
+    final res = (await client.get(Uri.parse(url))).body;
     final document = parseHtml(res);
     final elements = document.select("div.img a");
     List<MManga> animeList = [];
