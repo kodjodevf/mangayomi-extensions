@@ -186,9 +186,10 @@ class Aniwave extends MProvider {
       final vidHtml = vidH.outerHtml;
       final type = xpath(vidHtml, '//div/@data-type').first;
       final serversIds = xpath(vidHtml, '//li/@data-link-id');
+      final serversNames = xpath(vidHtml, '//li/text()');
       for (int i = 0; i < serversIds.length; i++) {
         final serverId = serversIds[i];
-
+        final serverName = serversNames[i].toLowerCase();
         final encrypt = vrfEncrypt(serverId);
         final vrf = "vrf=${Uri.encodeComponent(encrypt)}";
         final res =
@@ -201,19 +202,19 @@ class Aniwave extends MProvider {
           final hosterSelection = preferenceHosterSelection(source.id);
           final typeSelection = preferenceTypeSelection(source.id);
           if (typeSelection.contains(type.toLowerCase())) {
-            if (url.contains("vidplay") || url.contains("mcloud")) {
+            if (serverName.contains("vidplay") || url.contains("mcloud")) {
               final hosterName =
-                  url.contains("vidplay") ? "VidPlay" : "MyCloud";
+                  serverName.contains("vidplay") ? "VidPlay" : "MyCloud";
               if (hosterSelection.contains(hosterName.toLowerCase())) {
                 a = await vidsrcExtractor(url, hosterName, type);
               }
-            } else if (url.contains("mp4upload") &&
+            } else if (serverName.contains("mp4upload") &&
                 hosterSelection.contains("mp4upload")) {
               a = await mp4UploadExtractor(url, null, "", type);
-            } else if (url.contains("streamtape") &&
+            } else if (serverName.contains("streamtape") &&
                 hosterSelection.contains("streamtape")) {
               a = await streamTapeExtractor(url, "StreamTape - $type");
-            } else if (url.contains("filemoon") &&
+            } else if (serverName.contains("filemoon") &&
                 hosterSelection.contains("filemoon")) {
               a = await filemoonExtractor(url, "", type);
             }
