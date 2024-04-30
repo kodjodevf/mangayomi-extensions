@@ -200,9 +200,6 @@ class OtakuFr extends MProvider {
       } else if (serverUrl.contains("https://ok.ru") &&
           hosterSelection.contains("Okru")) {
         a = await okruExtractor(serverUrl);
-      } else if (serverUrl.contains("vadbam") &&
-          hosterSelection.contains("Vidbm")) {
-        a = await vidbmExtractor(serverUrl);
       } else if (serverUrl.contains("upstream") &&
           hosterSelection.contains("Upstream")) {
         a = await upstreamExtractor(serverUrl);
