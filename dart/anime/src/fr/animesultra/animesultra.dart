@@ -9,8 +9,11 @@ class AnimesUltra extends MProvider {
   final Client client = Client(source);
 
   @override
+  String get baseUrl => source.baseUrl;
+
+  @override
   Future<MPages> getPopular(int page) async {
-    final res = (await client.get(Uri.parse(source.baseUrl))).body;
+    final res = (await client.get(Uri.parse(baseUrl))).body;
 
     List<MManga> animeList = [];
     final urls = xpath(res,
@@ -33,7 +36,7 @@ class AnimesUltra extends MProvider {
 
   @override
   Future<MPages> getLatestUpdates(int page) async {
-    final res = (await client.get(Uri.parse(source.baseUrl))).body;
+    final res = (await client.get(Uri.parse(baseUrl))).body;
 
     List<MManga> animeList = [];
     final urls = xpath(res,
@@ -56,7 +59,7 @@ class AnimesUltra extends MProvider {
 
   @override
   Future<MPages> search(String query, int page, FilterList filterList) async {
-    final res = (await client.get(Uri.parse(source.baseUrl))).body;
+    final res = (await client.get(Uri.parse(baseUrl))).body;
 
     List<MManga> animeList = [];
     final urls = xpath(res, '//*[@class="film-poster"]/a/@href');
@@ -81,7 +84,8 @@ class AnimesUltra extends MProvider {
     ];
 
     final res = (await client.get(Uri.parse(url))).body;
-    MManga anime = MManga();
+    var anime = MManga();
+    final doc = parseHtml(res);
     anime.description =
         xpath(res, '//*[@class="film-description m-hide"]/text()').first;
 
@@ -91,62 +95,111 @@ class AnimesUltra extends MProvider {
     anime.status = parseStatus(status, statusList);
     anime.genre = xpath(res,
         '//*[@class="item item-list" and contains(text(),"Genres:")]/a/text()');
-    anime.author = xpath(res,
-            '//*[@class="item item-title" and contains(text(),"Studio:")]/span[2]/text()')
-        .first;
-    final urlEp = url.replaceAll('.html', '/episode-1.html');
-    final resEpWebview =
-        await getHtmlViaWebview(urlEp, '//*[@class="ss-list"]/a/@href');
-    final epUrls =
-        xpath(resEpWebview, '//*[@class="ss-list"]/a/@href').reversed.toList();
-    final names = xpath(resEpWebview,
-            '//*[@class="ss-list"]/a/div[@class="ssli-detail"]/div/text()')
-        .reversed
-        .toList();
-
+    anime.author = doc.xpathFirst(
+        '//*[@class="item item-title" and contains(text(),"Studio:")]/span[2]/text()');
+    final episodesLength = int.parse(substringBefore(
+            doc.xpathFirst('//*[@class="film-stats"]/span[7]/text()'), "/")
+        .replaceAll("Ep", ""));
     List<MChapter>? episodesList = [];
-    for (var i = 0; i < names.length; i++) {
-      MChapter episode = MChapter();
-      episode.name = names[i];
-      episode.url = epUrls[i];
+
+    for (var i = 0; i < episodesLength; i++) {
+      var episode = MChapter();
+      episode.name = "Episode ${i + 1}";
+      episode.url = url.replaceAll('.html', '/episode-${i + 1}.html');
       episodesList.add(episode);
     }
-
-    anime.chapters = episodesList;
+    anime.chapters = episodesList.reversed.toList();
     return anime;
   }
 
   @override
   Future<List<MVideo>> getVideoList(String url) async {
-    final resWebview = await getHtmlViaWebview(
-        url, '//*[@class="ps__-list"]/div/@data-server-id');
+    final resHtml = (await client.get(Uri.parse(url))).body;
+    final id = url.split('/')[4].split('-')[0];
+    final resServer = (await client
+            .get(Uri.parse("$baseUrl/engine/ajax/full-story.php?newsId=$id")))
+        .body;
 
     final serverIds =
-        xpath(resWebview, '//*[@class="ps__-list"]/div/@data-server-id');
-    final serverNames =
-        xpath(resWebview, '//*[@class="ps__-list"]/div/a/text()');
+        xpath(resHtml, '//*[@class="ps__-list"]/div/@data-server-id');
+    final serverNames = xpath(resHtml, '//*[@class="ps__-list"]/div/a/text()');
     List<String> serverUrls = [];
     for (var id in serverIds) {
-      final serversUrls =
-          xpath(resWebview, '//*[@id="content_player_${id}"]/text()').first;
+      final serversUrls = xpath(jsonDecode(resServer)["html"],
+              '//*[@id="content_player_${id}"]/text()')
+          .first;
       serverUrls.add(serversUrls);
     }
     List<MVideo> videos = [];
     for (var i = 0; i < serverNames.length; i++) {
       final name = serverNames[i];
       final url = serverUrls[i];
-
       List<MVideo> a = [];
       if (name.contains("Sendvid")) {
-        a = await sendVidExtractor(url.replaceAll("https:////", "https://"),
-            json.encode({"Referer": "${source.baseUrl}/"}), "");
+        a = await sendVidExtractorr(
+            url.replaceAll("https:////", "https://"), "");
       } else if (name.contains("Sibnet")) {
         a = await sibnetExtractor(
             "https://video.sibnet.ru/shell.php?videoid=$url");
       } else if (name.contains("Mytv")) {
         a = await myTvExtractor("https://www.myvi.tv/embed/$url");
+      } else if (name.contains("Fmoon")) {
+        a = await filemoonExtractor(url, "", "");
       }
       videos.addAll(a);
+    }
+
+    return videos;
+  }
+
+  Future<List<MVideo>> sendVidExtractorr(String url, String prefix) async {
+    final res = (await client.get(Uri.parse(url))).body;
+    final document = parseHtml(res);
+    final masterUrl = document.selectFirst("source#video_source")?.attr("src");
+    if (masterUrl == null) return [];
+    final masterHeaders = {
+      "Accept": "*/*",
+      "Host": Uri.parse(masterUrl).host,
+      "Origin": "https://${Uri.parse(url).host}",
+      "Referer": "https://${Uri.parse(url).host}/",
+    };
+    List<MVideo> videos = [];
+    if (masterUrl.contains(".m3u8")) {
+      final masterPlaylistRes = (await client.get(Uri.parse(masterUrl))).body;
+
+      for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
+          .split("#EXT-X-STREAM-INF:")) {
+        final quality =
+            "${substringBefore(substringBefore(substringAfter(substringAfter(it, "RESOLUTION="), "x"), ","), "\n")}p";
+
+        String videoUrl = substringBefore(substringAfter(it, "\n"), "\n");
+
+        if (!videoUrl.startsWith("http")) {
+          videoUrl =
+              "${masterUrl.split("/").sublist(0, masterUrl.split("/").length - 1).join("/")}/$videoUrl";
+        }
+        final videoHeaders = {
+          "Accept": "*/*",
+          "Host": Uri.parse(videoUrl).host,
+          "Origin": "https://${Uri.parse(url).host}",
+          "Referer": "https://${Uri.parse(url).host}/",
+        };
+        var video = MVideo();
+        video
+          ..url = videoUrl
+          ..originalUrl = videoUrl
+          ..quality = prefix + "Sendvid:$quality"
+          ..headers = videoHeaders;
+        videos.add(video);
+      }
+    } else {
+      var video = MVideo();
+      video
+        ..url = masterUrl
+        ..originalUrl = masterUrl
+        ..quality = prefix + "Sendvid:default"
+        ..headers = masterHeaders;
+      videos.add(video);
     }
 
     return videos;
