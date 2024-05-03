@@ -59,7 +59,10 @@ class AnimesUltra extends MProvider {
 
   @override
   Future<MPages> search(String query, int page, FilterList filterList) async {
-    final res = (await client.get(Uri.parse(baseUrl))).body;
+    query = query.trim().replaceAll(" ", "+");
+    final res = (await client.get(Uri.parse(
+            "$baseUrl/index.php?do=search&subaction=search&story=$query")))
+        .body;
 
     List<MManga> animeList = [];
     final urls = xpath(res, '//*[@class="film-poster"]/a/@href');
@@ -74,7 +77,7 @@ class AnimesUltra extends MProvider {
       animeList.add(anime);
     }
 
-    return MPages(animeList, false);
+    return MPages(animeList.reversed.toList(), false);
   }
 
   @override
