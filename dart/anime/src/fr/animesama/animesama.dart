@@ -32,7 +32,7 @@ class AnimeSama extends MProvider {
     final latest = document
         .select("h2")
         .where((MElement e) =>
-            e.outerHtml.toLowerCase().contains("derniers ajouts"))
+            e.outerHtml.toLowerCase().contains("derniers épisodes ajoutés"))
         .toList();
     final seasonElements = (latest.first.nextElementSibling as MElement)
         .select(".scrollBarStyled > div")
@@ -161,14 +161,7 @@ class AnimeSama extends MProvider {
       String playerUrl = player["player"];
       List<MVideo> a = [];
       if (playerUrl.contains("sendvid")) {
-        a = await sendVidExtractor(playerUrl, null, lang);
-      } else if (playerUrl.contains("anime-sama.fr")) {
-        MVideo video = MVideo();
-        video
-          ..url = playerUrl
-          ..originalUrl = playerUrl
-          ..quality = "${lang} - AS Player";
-        a = [video];
+        a = await sendVidExtractorr(playerUrl, "$lang ");
       } else if (playerUrl.contains("sibnet.ru")) {
         a = await sibnetExtractor(playerUrl, lang);
       }
@@ -176,6 +169,59 @@ class AnimeSama extends MProvider {
     }
 
     return sortVideos(videos, source.id);
+  }
+
+  Future<List<MVideo>> sendVidExtractorr(String url, String prefix) async {
+    final res = (await client.get(Uri.parse(url))).body;
+    final document = parseHtml(res);
+    final masterUrl = document.selectFirst("source#video_source")?.attr("src");
+    if (masterUrl == null) return [];
+    final masterHeaders = {
+      "Accept": "*/*",
+      "Host": Uri.parse(masterUrl).host,
+      "Origin": "https://${Uri.parse(url).host}",
+      "Referer": "https://${Uri.parse(url).host}/",
+    };
+    List<MVideo> videos = [];
+    if (masterUrl.contains(".m3u8")) {
+      final masterPlaylistRes = (await client.get(Uri.parse(masterUrl))).body;
+
+      for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
+          .split("#EXT-X-STREAM-INF:")) {
+        final quality =
+            "${substringBefore(substringBefore(substringAfter(substringAfter(it, "RESOLUTION="), "x"), ","), "\n")}p";
+
+        String videoUrl = substringBefore(substringAfter(it, "\n"), "\n");
+
+        if (!videoUrl.startsWith("http")) {
+          videoUrl =
+              "${masterUrl.split("/").sublist(0, masterUrl.split("/").length - 1).join("/")}/$videoUrl";
+        }
+        final videoHeaders = {
+          "Accept": "*/*",
+          "Host": Uri.parse(videoUrl).host,
+          "Origin": "https://${Uri.parse(url).host}",
+          "Referer": "https://${Uri.parse(url).host}/",
+        };
+        var video = MVideo();
+        video
+          ..url = videoUrl
+          ..originalUrl = videoUrl
+          ..quality = prefix + "Sendvid:$quality"
+          ..headers = videoHeaders;
+        videos.add(video);
+      }
+    } else {
+      var video = MVideo();
+      video
+        ..url = masterUrl
+        ..originalUrl = masterUrl
+        ..quality = prefix + "Sendvid:default"
+        ..headers = masterHeaders;
+      videos.add(video);
+    }
+
+    return videos;
   }
 
   @override
@@ -240,74 +286,73 @@ class AnimeSama extends MProvider {
 
   Future<List<MManga>> fetchAnimeSeasons(String url) async {
     final res = (await client.get(Uri.parse(url))).body;
-
     var document = parseHtml(res);
     String animeName = document.getElementById("titreOeuvre")?.text ?? "";
 
-    var seasonRegex =
-        RegExp("^\\s*panneauAnime\\(\"(.*)\", \"(.*)\"\\)", multiLine: true);
+    var seasonRegex = RegExp(r'panneauAnime\("(.*?)",\s*"(.*?)"\);');
     var scripts = document
         .select("h2 + p + div > script, h2 + div > script")
         .map((MElement element) => element.text)
         .toList()
         .join("");
     List<MManga> animeList = [];
-
     List<RegExpMatch> seasonRegexReg = seasonRegex.allMatches(scripts).toList();
     for (var animeIndex = 0; animeIndex < seasonRegexReg.length; animeIndex++) {
       final seasonName = seasonRegexReg[animeIndex].group(1);
       final seasonStem = seasonRegexReg[animeIndex].group(2);
-      if (seasonStem.toLowerCase().contains("film")) {
-        var moviesUrl = "$url/$seasonStem";
-        var movies = await fetchPlayers(moviesUrl);
-        if (movies.isNotEmpty) {
-          var movieNameRegex =
-              RegExp("^\\s*newSPF\\(\"(.*)\"\\);", multiLine: true);
-          var moviesDoc = (await client.get(Uri.parse(moviesUrl))).body;
-          List<RegExpMatch> matches =
-              movieNameRegex.allMatches(moviesDoc).toList();
+      if (seasonName != "nom" && seasonStem != "url") {
+        if (seasonStem.toLowerCase().contains("film")) {
+          var moviesUrl = "$url/$seasonStem";
+          var movies = await fetchPlayers(moviesUrl);
+          if (movies.isNotEmpty) {
+            var movieNameRegex =
+                RegExp("^\\s*newSPF\\(\"(.*)\"\\);", multiLine: true);
+            var moviesDoc = (await client.get(Uri.parse(moviesUrl))).body;
+            List<RegExpMatch> matches =
+                movieNameRegex.allMatches(moviesDoc).toList();
 
-          for (var i = 0; i < movies.length; i++) {
-            var title = "";
-            if (animeIndex == 0 && movies.length == 1) {
-              title = animeName;
-            } else if (matches.length > i) {
-              title = "$animeName ${(matches[i]).group(1)}";
-            } else if (movies.length == 1) {
-              title = "$animeName Film";
-            } else {
-              title = "$animeName Film ${i + 1}";
+            for (var i = 0; i < movies.length; i++) {
+              var title = "";
+              if (animeIndex == 0 && movies.length == 1) {
+                title = animeName;
+              } else if (matches.length > i) {
+                title = "$animeName ${(matches[i]).group(1)}";
+              } else if (movies.length == 1) {
+                title = "$animeName Film";
+              } else {
+                title = "$animeName Film ${i + 1}";
+              }
+              MManga anime = MManga();
+              anime.imageUrl = document.getElementById("coverOeuvre")?.getSrc;
+              anime.genre = (document.xpathFirst(
+                          '//h2[contains(text(),"Genres")]/following-sibling::a/text()') ??
+                      "")
+                  .split(",");
+              anime.description = document.xpathFirst(
+                      '//h2[contains(text(),"Synopsis")]/following-sibling::p/text()') ??
+                  "";
+
+              anime.name = title;
+              anime.link = "$moviesUrl#$i";
+              anime.status = MStatus.completed;
+              animeList.add(anime);
             }
-            MManga anime = MManga();
-            anime.imageUrl = document.getElementById("coverOeuvre")?.getSrc;
-            anime.genre = (document.xpathFirst(
-                        '//h2[contains(text(),"Genres")]/following-sibling::a/text()') ??
-                    "")
-                .split(",");
-            anime.description = document.xpathFirst(
-                    '//h2[contains(text(),"Synopsis")]/following-sibling::p/text()') ??
-                "";
-
-            anime.name = title;
-            anime.link = "$moviesUrl#$i";
-            anime.status = MStatus.completed;
-            animeList.add(anime);
           }
+        } else {
+          MManga anime = MManga();
+          anime.imageUrl = document.getElementById("coverOeuvre")?.getSrc;
+          anime.genre = (document.xpathFirst(
+                      '//h2[contains(text(),"Genres")]/following-sibling::a/text()') ??
+                  "")
+              .split(",");
+          anime.description = document.xpathFirst(
+                  '//h2[contains(text(),"Synopsis")]/following-sibling::p/text()') ??
+              "";
+          anime.name =
+              '$animeName ${substringBefore(seasonName, ',').replaceAll('"', "")}';
+          anime.link = "$url/$seasonStem";
+          animeList.add(anime);
         }
-      } else {
-        MManga anime = MManga();
-        anime.imageUrl = document.getElementById("coverOeuvre")?.getSrc;
-        anime.genre = (document.xpathFirst(
-                    '//h2[contains(text(),"Genres")]/following-sibling::a/text()') ??
-                "")
-            .split(",");
-        anime.description = document.xpathFirst(
-                '//h2[contains(text(),"Synopsis")]/following-sibling::p/text()') ??
-            "";
-        anime.name =
-            '$animeName ${substringBefore(seasonName, ',').replaceAll('"', "")}';
-        anime.link = "$url/$seasonStem";
-        animeList.add(anime);
       }
     }
     return animeList;
