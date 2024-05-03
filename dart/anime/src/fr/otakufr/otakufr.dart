@@ -175,11 +175,12 @@ class OtakuFr extends MProvider {
   Future<List<MVideo>> getVideoList(String url) async {
     final res = (await client.get(Uri.parse(url))).body;
 
-    final servers = xpath(res, '//*[@id="nav-tabContent"]/div/iframe/@src');
+    final servers = parseHtml(res).select("div.tab-content iframe[src]");
     List<MVideo> videos = [];
     final hosterSelection = preferenceHosterSelection(source.id);
     for (var url in servers) {
-      final resServer = (await client.get(Uri.parse(fixUrl(url)),
+      final urll = url.getSrc != "about:blank" ? url.getSrc : url.getDataSrc;
+      final resServer = (await client.get(Uri.parse(fixUrl(urll)),
               headers: {"X-Requested-With": "XMLHttpRequest"}))
           .body;
       final serverUrl =
@@ -196,7 +197,7 @@ class OtakuFr extends MProvider {
         a = await doodExtractor(serverUrl);
       } else if (serverUrl.contains("https://voe.sx") &&
           hosterSelection.contains("Voe")) {
-        a = await voeExtractor(serverUrl, null);
+        // a = await voeExtractor(serverUrl, null);
       } else if (serverUrl.contains("https://ok.ru") &&
           hosterSelection.contains("Okru")) {
         a = await okruExtractor(serverUrl);
@@ -205,7 +206,7 @@ class OtakuFr extends MProvider {
         a = await upstreamExtractor(serverUrl);
       } else if (serverUrl.contains("sendvid") &&
           hosterSelection.contains("Sendvid")) {
-        a = await sendVidExtractor(serverUrl, null, "");
+        a = await sendVidExtractorr(serverUrl, "");
       }
       videos.addAll(a);
     }
@@ -349,6 +350,59 @@ class OtakuFr extends MProvider {
 
   List<String> preferenceHosterSelection(int sourceId) {
     return getPreferenceValue(sourceId, "hoster_selection");
+  }
+
+  Future<List<MVideo>> sendVidExtractorr(String url, String prefix) async {
+    final res = (await client.get(Uri.parse(url))).body;
+    final document = parseHtml(res);
+    final masterUrl = document.selectFirst("source#video_source")?.attr("src");
+    if (masterUrl == null) return [];
+    final masterHeaders = {
+      "Accept": "*/*",
+      "Host": Uri.parse(masterUrl).host,
+      "Origin": "https://${Uri.parse(url).host}",
+      "Referer": "https://${Uri.parse(url).host}/",
+    };
+    List<MVideo> videos = [];
+    if (masterUrl.contains(".m3u8")) {
+      final masterPlaylistRes = (await client.get(Uri.parse(masterUrl))).body;
+
+      for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
+          .split("#EXT-X-STREAM-INF:")) {
+        final quality =
+            "${substringBefore(substringBefore(substringAfter(substringAfter(it, "RESOLUTION="), "x"), ","), "\n")}p";
+
+        String videoUrl = substringBefore(substringAfter(it, "\n"), "\n");
+
+        if (!videoUrl.startsWith("http")) {
+          videoUrl =
+              "${masterUrl.split("/").sublist(0, masterUrl.split("/").length - 1).join("/")}/$videoUrl";
+        }
+        final videoHeaders = {
+          "Accept": "*/*",
+          "Host": Uri.parse(videoUrl).host,
+          "Origin": "https://${Uri.parse(url).host}",
+          "Referer": "https://${Uri.parse(url).host}/",
+        };
+        var video = MVideo();
+        video
+          ..url = videoUrl
+          ..originalUrl = videoUrl
+          ..quality = prefix + "Sendvid:$quality"
+          ..headers = videoHeaders;
+        videos.add(video);
+      }
+    } else {
+      var video = MVideo();
+      video
+        ..url = masterUrl
+        ..originalUrl = masterUrl
+        ..quality = prefix + "Sendvid:default"
+        ..headers = masterHeaders;
+      videos.add(video);
+    }
+
+    return videos;
   }
 
   Future<List<MVideo>> upstreamExtractor(String url) async {
