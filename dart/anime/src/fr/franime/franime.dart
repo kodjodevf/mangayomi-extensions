@@ -146,14 +146,14 @@ class FrAnime extends MProvider {
           .body;
 
       List<MVideo> a = [];
+      print(playerName);
       if (playerName.contains("vido")) {
         videos.add(video
           ..url = playerUrl
           ..originalUrl = playerUrl
           ..quality = "FRAnime (Vido)");
       } else if (playerName.contains("sendvid")) {
-        a = await sendVidExtractor(
-            playerUrl, json.encode({"Referer": "https://franime.fr/"}), "");
+        a = await sendVidExtractorr(playerUrl, "");
       } else if (playerName.contains("sibnet")) {
         a = await sibnetExtractor(playerUrl);
       }
@@ -334,6 +334,59 @@ class FrAnime extends MProvider {
       }
     }
     return "";
+  }
+
+  Future<List<MVideo>> sendVidExtractorr(String url, String prefix) async {
+    final res = (await client.get(Uri.parse(url))).body;
+    final document = parseHtml(res);
+    final masterUrl = document.selectFirst("source#video_source")?.attr("src");
+    if (masterUrl == null) return [];
+    final masterHeaders = {
+      "Accept": "*/*",
+      "Host": Uri.parse(masterUrl).host,
+      "Origin": "https://${Uri.parse(url).host}",
+      "Referer": "https://${Uri.parse(url).host}/",
+    };
+    List<MVideo> videos = [];
+    if (masterUrl.contains(".m3u8")) {
+      final masterPlaylistRes = (await client.get(Uri.parse(masterUrl))).body;
+
+      for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
+          .split("#EXT-X-STREAM-INF:")) {
+        final quality =
+            "${substringBefore(substringBefore(substringAfter(substringAfter(it, "RESOLUTION="), "x"), ","), "\n")}p";
+
+        String videoUrl = substringBefore(substringAfter(it, "\n"), "\n");
+
+        if (!videoUrl.startsWith("http")) {
+          videoUrl =
+              "${masterUrl.split("/").sublist(0, masterUrl.split("/").length - 1).join("/")}/$videoUrl";
+        }
+        final videoHeaders = {
+          "Accept": "*/*",
+          "Host": Uri.parse(videoUrl).host,
+          "Origin": "https://${Uri.parse(url).host}",
+          "Referer": "https://${Uri.parse(url).host}/",
+        };
+        var video = MVideo();
+        video
+          ..url = videoUrl
+          ..originalUrl = videoUrl
+          ..quality = prefix + "Sendvid:$quality"
+          ..headers = videoHeaders;
+        videos.add(video);
+      }
+    } else {
+      var video = MVideo();
+      video
+        ..url = masterUrl
+        ..originalUrl = masterUrl
+        ..quality = prefix + "Sendvid:default"
+        ..headers = masterHeaders;
+      videos.add(video);
+    }
+
+    return videos;
   }
 }
 
