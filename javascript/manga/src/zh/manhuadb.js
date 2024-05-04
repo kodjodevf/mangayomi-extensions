@@ -7,7 +7,7 @@ const mangayomiSources = [{
   "typeSource": "single",
   "isManga": true,
   "isNsfw": false,
-  "version": "0.0.2",
+  "version": "0.0.25",
   "dateFormat": "",
   "dateFormatLocale": "",
   "pkgPath": "manga/src/zh/manhuadb.js"
@@ -178,6 +178,7 @@ class DefaultExtension extends MProvider {
       }
       index = index + 1;
     }
+    episodes.reverse();
     return {
       name: title,
       imageUrl: cover,
