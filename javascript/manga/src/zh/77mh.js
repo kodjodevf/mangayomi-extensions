@@ -7,7 +7,7 @@ const mangayomiSources = [{
   "typeSource": "single",
   "isManga": true,
   "isNsfw": false,
-  "version": "0.0.2",
+  "version": "0.0.25",
   "apiUrl": "",
   "dateFormat": "",
   "dateFormatLocale": "",
@@ -149,7 +149,6 @@ class DefaultExtension extends MProvider {
         url: element.attr("href")
       });
     }
-    chapters.reverse();
     return {
       name: title,
       imageUrl: cover,

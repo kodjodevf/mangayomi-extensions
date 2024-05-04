@@ -7,7 +7,7 @@ const mangayomiSources = [{
   "typeSource": "single",
   "isManga": true,
   "isNsfw": false,
-  "version": "0.0.2",
+  "version": "0.0.25",
   "dateFormat": "",
   "dateFormatLocale": "",
   "pkgPath": "manga/src/zh/manhuagui.js"
@@ -227,6 +227,7 @@ class DefaultExtension extends MProvider {
       }
       index = index + 1;
     }
+    eps.reverse();
     return {
       name: title,
       imageUrl: cover,
