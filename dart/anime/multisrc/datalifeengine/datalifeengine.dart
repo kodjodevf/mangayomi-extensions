@@ -122,10 +122,8 @@ class DataLifeEngine extends MProvider {
     final sUrls = url.split(',');
     for (var sUrl in sUrls) {
       List<MVideo> a = [];
-      if (sUrl.contains("dood")) {
+      if (sUrl.contains("dood") || sUrl.contains("d000")) {
         a = await doodExtractor(sUrl, "DoodStream");
-      } else if (sUrl.contains("voe.sx")) {
-        a = await voeExtractor(sUrl, "Voe");
       } else if (sUrl.contains("streamvid") ||
           sUrl.contains("guccihide") ||
           sUrl.contains("streamhide")) {
