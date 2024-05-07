@@ -11,7 +11,7 @@ const mangayomiSources = [{
     "apiUrl": "",
     "dateFormat": "",
     "dateFormatLocale": "",
-    "pkgName": "anime/src/zh/njav.js"
+    "pkgName": "anime/src/all/njav.js"
   }];
   
   class DefaultExtension extends MProvider {
