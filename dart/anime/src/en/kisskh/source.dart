@@ -1,7 +1,7 @@
 import '../../../../../model/source.dart';
 
 Source get kisskhSource => _kisskhSource;
-const _kisskhVersion = "0.0.55";
+const _kisskhVersion = "0.0.6";
 const _kisskhSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/src/en/kisskh/kisskh.dart";
 Source _kisskhSource = Source(
