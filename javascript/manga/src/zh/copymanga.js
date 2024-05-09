@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "single",
     "isManga": true,
     "isNsfw": false,
-    "version": "0.0.15",
+    "version": "0.0.2",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "manga/src/zh/copymanga.js"
@@ -166,6 +166,7 @@ const mangayomiSources = [{
     }
   
     async getDetail(url) {
+      url = url.startsWith("/comic/") ? url.replace("/comic/", "") : url;
       const res = await new Client().get(this.source.apiUrl + `/api/v3/comic2/${url}`);
       const data = JSON.parse(res.body)["results"]["comic"];
       const title = this.stringUTF8(data["name"]);
@@ -199,7 +200,7 @@ const mangayomiSources = [{
         status: status,
         genre: genres,
         episodes: chapters,
-        link: this.source.baseUrl + "/comic/" + url
+        link: "/comic/" + url
       }
     }
   
