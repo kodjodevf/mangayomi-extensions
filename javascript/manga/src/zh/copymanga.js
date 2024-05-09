@@ -166,7 +166,7 @@ const mangayomiSources = [{
     }
   
     async getDetail(url) {
-      url = url.startsWith("/comic/") ? url.replace("/comic/", "") : url;
+      url = url.substringAfter("/comic/");
       const res = await new Client().get(this.source.apiUrl + `/api/v3/comic2/${url}`);
       const data = JSON.parse(res.body)["results"]["comic"];
       const title = this.stringUTF8(data["name"]);
