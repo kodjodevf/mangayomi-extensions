@@ -18,7 +18,7 @@ class KissKh extends MProvider {
     List<MManga> animeList = [];
 
     for (var data in datas) {
-      MManga anime = MManga();
+      var anime = MManga();
       anime.name = data["title"];
       anime.imageUrl = data["thumbnail"] ?? "";
       anime.link =
@@ -42,7 +42,7 @@ class KissKh extends MProvider {
     List<MManga> animeList = [];
 
     for (var data in datas) {
-      MManga anime = MManga();
+      var anime = MManga();
       anime.name = data["title"];
       anime.imageUrl = data["thumbnail"] ?? "";
       anime.link =
@@ -63,7 +63,7 @@ class KissKh extends MProvider {
     final jsonRes = json.decode(res);
     List<MManga> animeList = [];
     for (var data in jsonRes) {
-      MManga anime = MManga();
+      var anime = MManga();
       anime.name = data["title"];
       anime.imageUrl = data["thumbnail"] ?? "";
       anime.link =
@@ -79,7 +79,7 @@ class KissKh extends MProvider {
       {"Ongoing": 0, "Completed": 1}
     ];
     final res = (await client.get(Uri.parse(url))).body;
-    MManga anime = MManga();
+    var anime = MManga();
     final jsonRes = json.decode(res);
     final status = jsonRes["status"] ?? "";
     anime.description = jsonRes["description"];
@@ -123,22 +123,24 @@ class KissKh extends MProvider {
     final subRes =
         (await client.get(Uri.parse("${source.baseUrl}/api/Sub/$id"))).body;
     var jsonSubRes = json.decode(subRes);
-
     List<MTrack> subtitles = [];
 
     for (var sub in jsonSubRes) {
-      try {
-        final subUrl = sub["src"];
-        final label = sub["label"];
-        MTrack subtitle = MTrack();
+      final subUrl = sub["src"] as String;
+      final label = sub["label"];
+      if (subUrl.endsWith("txt")) {
+        var subtitle = await getSubtitle(subUrl, label);
+        subtitles.add(subtitle);
+      } else {
+        var subtitle = MTrack();
         subtitle
           ..label = label
           ..file = subUrl;
         subtitles.add(subtitle);
-      } catch (_) {}
+      }
     }
     final videoUrl = jsonRes["Video"];
-    MVideo video = MVideo();
+    var video = MVideo();
     video
       ..url = videoUrl
       ..originalUrl = videoUrl
@@ -149,6 +151,31 @@ class KissKh extends MProvider {
         "origin": "https://kisskh.me"
       };
     return [video];
+  }
+
+  Future<MTrack> getSubtitle(String subUrl, String subLang) async {
+    final response = await client.get(Uri.parse(subUrl), headers: {
+      "referer": "https://kisskh.me/",
+      "origin": "https://kisskh.me"
+    });
+    final subtitleData = response.body;
+    String decrypted = "\n";
+    for (String line in subtitleData.split('\n')) {
+      decrypted += "${decrypt(line.trim())}\n";
+    }
+    var subtitle = MTrack();
+    subtitle
+      ..label = subLang
+      ..file = decrypted;
+    return subtitle;
+  }
+
+  String decrypt(String data) {
+    final key = utf8.decode(
+        [56, 48, 53, 54, 52, 56, 51, 54, 52, 54, 51, 50, 56, 55, 54, 51]);
+    final iv = utf8.decode(
+        [54, 56, 53, 50, 54, 49, 50, 51, 55, 48, 49, 56, 53, 50, 55, 51]);
+    return cryptoHandler(data, iv, key, false);
   }
 }
 
