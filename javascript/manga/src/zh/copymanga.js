@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "single",
     "isManga": true,
     "isNsfw": false,
-    "version": "0.0.1",
+    "version": "0.0.15",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "manga/src/zh/copymanga.js"
@@ -190,6 +190,7 @@ const mangayomiSources = [{
           url: url + "|" + ch["id"]
         });
       }
+      chapters.reverse();
       return {
         name: title,
         imageUrl: cover,
