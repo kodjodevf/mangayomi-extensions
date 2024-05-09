@@ -5,7 +5,6 @@ import 'multisrc/zorotheme/sources.dart';
 import 'src/all/animeworldindia/sources.dart';
 import 'src/all/nyaa/source.dart';
 import 'src/ar/okanime/source.dart';
-import 'src/de/aniflix/source.dart';
 import 'src/de/animetoast/source.dart';
 import 'src/en/animepahe/source.dart';
 import 'src/en/aniwave/source.dart';
@@ -47,7 +46,6 @@ List<Source> dartAnimesourceList = [
   yomoviesSource,
   animesamaSource,
   nineanimetv,
-  aniflix,
   ...animeworldindiaSourcesList,
   nyaaSource,
   animepaheSource,
