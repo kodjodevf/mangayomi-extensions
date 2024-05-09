@@ -1,5 +1,4 @@
 import 'package:mangayomi/bridge_lib.dart';
-import 'dart:convert';
 
 class ComickFun extends MProvider {
   ComickFun({required this.source});
@@ -123,6 +122,7 @@ class ComickFun extends MProvider {
                 "${source.apiUrl}${url.replaceAll("#", '')}?tachiyomi=true"),
             headers: headers))
         .body;
+    final lang = "${source.lang != "all" ? "&lang=${source.lang}" : ""}";
     MManga manga = MManga();
     manga.author = jsonPathToString(res, r'$.authors[*].name', '');
     manga.genre = jsonPathToString(
@@ -132,13 +132,13 @@ class ComickFun extends MProvider {
     manga.status =
         parseStatus(jsonPathToString(res, r'$..comic.status', ''), statusList);
     final chapUrlReq =
-        "${source.apiUrl}${url.replaceAll("#", '')}chapters?lang=${source.lang}&tachiyomi=true&page=1";
+        "${source.apiUrl}${url.replaceAll("#", '')}chapters?${lang}&tachiyomi=true&page=1";
     final request =
         (await client.get(Uri.parse(chapUrlReq), headers: headers)).body;
     var total = jsonPathToString(request, r'$.total', '');
     final chapterLimit = int.parse(total);
     final newChapUrlReq =
-        "${source.apiUrl}${url.replaceAll("#", '')}chapters?limit=$chapterLimit&lang=${source.lang}&tachiyomi=true&page=1";
+        "${source.apiUrl}${url.replaceAll("#", '')}chapters?limit=$chapterLimit${lang}&tachiyomi=true&page=1";
 
     final newRequest =
         (await client.get(Uri.parse(newChapUrlReq), headers: headers)).body;
