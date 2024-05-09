@@ -9,8 +9,8 @@ const mangayomiSources = [{
     "isNsfw": false,
     "version": "0.0.1",
     "dateFormat": "",
-    "dateFormatLocale": "manga/src/zh/dmzj.js",
-    "pkgPath": ""
+    "dateFormatLocale": "",
+    "pkgPath": "manga/src/zh/dmzj.js"
   }];
   
   class DefaultExtension extends MProvider {
