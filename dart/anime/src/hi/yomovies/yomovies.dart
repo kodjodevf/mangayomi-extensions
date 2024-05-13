@@ -213,6 +213,8 @@ class YoMovies extends MProvider {
         SelectFilterOption("<select>", ""),
         SelectFilterOption("Bollywood", "/genre/bollywood"),
         SelectFilterOption("Trending", "/genre/top-rated"),
+        SelectFilterOption("Bollywood (2024)",
+            "/account/?ptype=post&tax_category%5B%5D=bollywood&tax_release-year=2024&wpas=1"),
         SelectFilterOption("Bollywood (2023)",
             "/account/?ptype=post&tax_category%5B%5D=bollywood&tax_release-year=2023&wpas=1"),
         SelectFilterOption("Bollywood (2022)",

@@ -1,7 +1,7 @@
 import '../../../../../model/source.dart';
 
 Source get yomoviesSource => _yomoviesSource;
-const _yomoviesVersion = "0.0.2";
+const _yomoviesVersion = "0.0.25";
 const _yomoviesSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/src/hi/yomovies/yomovies.dart";
 Source _yomoviesSource = Source(
