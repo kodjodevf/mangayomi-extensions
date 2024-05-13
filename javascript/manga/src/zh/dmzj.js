@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "single",
     "isManga": true,
     "isNsfw": false,
-    "version": "0.0.15",
+    "version": "0.0.2",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "manga/src/zh/dmzj.js"
@@ -96,7 +96,7 @@ const mangayomiSources = [{
             chapters.push({
               name: `[[${chlist["title"]}]]` + ch["chapter_title"],
               url: datas["data"]["comicInfo"]["id"].toString() + "|" + ch["chapter_id"].toString(),
-              dateUpload: ch["updatetime"].toString()
+              dateUpload: ch["updatetime"].toString() + "000"
             });
           }
         }
@@ -109,7 +109,7 @@ const mangayomiSources = [{
         description: desc,
         episodes: chapters,
         status: status,
-        link: this.source.baseUrl + "/info/" + url
+        link: "/info/" + url
       };
     }
   
