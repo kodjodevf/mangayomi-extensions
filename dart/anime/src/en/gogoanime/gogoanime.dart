@@ -585,6 +585,7 @@ class GogoAnime extends MProvider {
         CheckBoxFilter("Winter", "winter"),
       ]),
       GroupFilter("YearFilter", "Year", [
+        CheckBoxFilter("2024", "2024"),
         CheckBoxFilter("2023", "2023"),
         CheckBoxFilter("2022", "2022"),
         CheckBoxFilter("2021", "2021"),
@@ -981,6 +982,9 @@ class GogoAnime extends MProvider {
       SelectFilter("SeasonIFilter", "Season", 0, [
         SelectFilterOption("", ""),
         SelectFilterOption("Latest season", "new-season.html"),
+        SelectFilterOption("Summer 2024", "sub-category/summer-2024-anime"),
+        SelectFilterOption("Spring 2024", "sub-category/spring-2024-anime"),
+        SelectFilterOption("Winter 2024", "sub-category/winter-2024-anime"),
         SelectFilterOption("Summer 2023", "sub-category/summer-2023-anime"),
         SelectFilterOption("Spring 2023", "sub-category/spring-2023-anime"),
         SelectFilterOption("Winter 2023", "sub-category/winter-2023-anime"),

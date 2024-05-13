@@ -336,6 +336,7 @@ class DopeFlix extends MProvider {
       ]),
       SelectFilter("ReleaseYearFilter", "Released at", 0, [
         SelectFilterOption("All", "all"),
+        SelectFilterOption("2024", "2024"),
         SelectFilterOption("2023", "2023"),
         SelectFilterOption("2022", "2022"),
         SelectFilterOption("2021", "2021"),

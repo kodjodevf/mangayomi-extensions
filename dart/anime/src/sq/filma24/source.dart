@@ -1,7 +1,7 @@
 import '../../../../../model/source.dart';
 
 Source get filma24 => _filma24;
-const _filma24Version = "0.0.25";
+const _filma24Version = "0.0.3";
 const _filma24CodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/src/sq/filma24/filma24.dart";
 Source _filma24 = Source(

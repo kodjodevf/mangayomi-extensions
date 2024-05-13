@@ -475,6 +475,7 @@ class Aniwave extends MProvider {
         CheckBoxFilter("Unknown", "unknown")
       ]),
       GroupFilter("YearFilter", "Year", [
+        CheckBoxFilter("2024", "2024"),
         CheckBoxFilter("2023", "2023"),
         CheckBoxFilter("2022", "2022"),
         CheckBoxFilter("2021", "2021"),
