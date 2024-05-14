@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "single",
     "isManga": true,
     "isNsfw": false,
-    "version": "0.0.2",
+    "version": "0.0.25",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "manga/src/zh/dmzj.js"
@@ -109,7 +109,7 @@ const mangayomiSources = [{
         description: desc,
         episodes: chapters,
         status: status,
-        link: "/info/" + url
+        link: "/info/" + url + ".html"
       };
     }
   
