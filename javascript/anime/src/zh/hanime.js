@@ -7,7 +7,7 @@ const mangayomiSources = [{
   "typeSource": "single",
   "isManga": false,
   "isNsfw": true,
-  "version": "0.0.1",
+  "version": "0.0.15",
   "dateFormat": "",
   "dateFormatLocale": "",
   "pkgPath": "anime/src/zh/hanime.js",
@@ -113,7 +113,6 @@ class DefaultExtension extends MProvider {
         dateUpload: adddate.toString()
       });
     }
-    eps.reverse();
     return {
       name: title,
       imageUrl: cover,
