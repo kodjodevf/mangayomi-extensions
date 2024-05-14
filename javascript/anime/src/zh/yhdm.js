@@ -7,7 +7,7 @@ const mangayomiSources = [{
   "typeSource": "single",
   "isManga": false,
   "isNsfw": false,
-  "version": "0.0.1",
+  "version": "0.0.15",
   "dateFormat": "",
   "dateFormatLocale": "",
   "pkgPath": "anime/src/zh/yhdm.js"
@@ -105,6 +105,9 @@ class DefaultExtension extends MProvider {
         name: this.stringUTF8(element.text, true),
         url: element.attr("href")
       });
+    }
+    if (eps[0]["url"].search("-1.html") != -1) {
+      eps.reverse();
     }
     return {
       name: title,
