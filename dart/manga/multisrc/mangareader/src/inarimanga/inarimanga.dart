@@ -5,7 +5,7 @@ Source _inarimangaSource = Source(
     name: "InariManga",
     baseUrl: "https://rukavinari.org",
     lang: "es",
-    isNsfw:false,
+    isNsfw:true,
     typeSource: "mangareader",
     iconUrl: "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/manga/multisrc/mangareader/src/inarimanga/icon.png",
     dateFormat:"MMMM dd, yyyy",

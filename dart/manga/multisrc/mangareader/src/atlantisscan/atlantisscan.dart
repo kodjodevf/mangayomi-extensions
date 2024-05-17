@@ -5,7 +5,7 @@ Source _atlantisscanSource = Source(
     name: "Atlantis Scan",
     baseUrl: "https://scansatlanticos.com",
     lang: "es",
-    isNsfw:false,
+    isNsfw:true,
     typeSource: "mangareader",
     iconUrl: "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/manga/multisrc/mangareader/src/atlantisscan/icon.png",
     dateFormat:"MMMM dd, yyyy",

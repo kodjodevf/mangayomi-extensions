@@ -5,7 +5,7 @@ Source _ntrmangaSource = Source(
     name: "NTR-Manga",
     baseUrl: "https://www.ntr-manga.com",
     lang: "th",
-    isNsfw:false,
+    isNsfw:true,
     typeSource: "mangareader",
     iconUrl: "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/manga/multisrc/mangareader/src/ntrmanga/icon.png",
     dateFormat:"MMMM d, yyyy",

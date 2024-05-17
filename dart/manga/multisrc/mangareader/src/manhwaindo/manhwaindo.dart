@@ -5,7 +5,7 @@ Source _manhwaindoSource = Source(
     name: "Manhwa Indo",
     baseUrl: "https://manhwaindo.id",
     lang: "id",
-    isNsfw:false,
+    isNsfw:true,
     typeSource: "mangareader",
     iconUrl: "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/manga/multisrc/mangareader/src/manhwaindo/icon.png",
     dateFormat:"MMMM dd, yyyy",
