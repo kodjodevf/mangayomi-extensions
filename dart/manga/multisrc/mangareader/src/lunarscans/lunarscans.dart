@@ -5,7 +5,7 @@ Source _lunarscansSource = Source(
     name: "Lunar Scans",
     baseUrl: "https://lunarscan.org",
     lang: "en",
-    isNsfw:false,
+    isNsfw:true,
     typeSource: "mangareader",
     iconUrl: "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/manga/multisrc/mangareader/src/lunarscans/icon.png",
     dateFormat:"MMMM d, yyyy",
