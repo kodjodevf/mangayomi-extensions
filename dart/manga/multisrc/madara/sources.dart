@@ -163,6 +163,213 @@ import 'src/falconmanga/falconmanga.dart';
 import 'src/comicarab/comicarab.dart';
 import 'src/manga3asq/manga3asq.dart';
 import 'src/bakamh/bakamh.dart';
+import 'src/grabberzone/grabberzone.dart';
+import 'src/mangatopsite/mangatopsite.dart';
+import 'src/manhwa18cc/manhwa18cc.dart';
+import 'src/manhwadashraw/manhwadashraw.dart';
+import 'src/arabtoons/arabtoons.dart';
+import 'src/empirewebtoon/empirewebtoon.dart';
+import 'src/gatemanga/gatemanga.dart';
+import 'src/gmangasite/gmangasite.dart';
+import 'src/mangalink/mangalink.dart';
+import 'src/mangalionz/mangalionz.dart';
+import 'src/mangarose/mangarose.dart';
+import 'src/mangaspark/mangaspark.dart';
+import 'src/mangastarz/mangastarz.dart';
+import 'src/mangatime/mangatime.dart';
+import 'src/olaoe/olaoe.dart';
+import 'src/rocksmanga/rocksmanga.dart';
+import 'src/yonabar/yonabar.dart';
+import 'src/dragontea/dragontea.dart';
+import 'src/globalbloging/globalbloging.dart';
+import 'src/hentairead/hentairead.dart';
+import 'src/instamanhwa/instamanhwa.dart';
+import 'src/isekaiscaneu/isekaiscaneu.dart';
+import 'src/lilymanga/lilymanga.dart';
+import 'src/madaradex/madaradex.dart';
+import 'src/manga18fx/manga18fx.dart';
+import 'src/manga347/manga347.dart';
+import 'src/mangaeffect/mangaeffect.dart';
+import 'src/mangafastcom/mangafastcom.dart';
+import 'src/mangakitsune/mangakitsune.dart';
+import 'src/mangaleveling/mangaleveling.dart';
+import 'src/manhuamanhwa/manhuamanhwa.dart';
+import 'src/manhuatop/manhuatop.dart';
+import 'src/manhwa365/manhwa365.dart';
+import 'src/manhwahentai/manhwahentai.dart';
+import 'src/manhwuafans/manhwuafans.dart';
+import 'src/neatmanga/neatmanga.dart';
+import 'src/nvmanga/nvmanga.dart';
+import 'src/onlymanhwa/onlymanhwa.dart';
+import 'src/paragonscans/paragonscans.dart';
+import 'src/pmscans/pmscans.dart';
+import 'src/readmanhua/readmanhua.dart';
+import 'src/stonescape/stonescape.dart';
+import 'src/tappytoonnet/tappytoonnet.dart';
+import 'src/theblank/theblank.dart';
+import 'src/toongod/toongod.dart';
+import 'src/toonily/toonily.dart';
+import 'src/topmanhua/topmanhua.dart';
+import 'src/topreadmanhwa/topreadmanhwa.dart';
+import 'src/webtoonxyz/webtoonxyz.dart';
+import 'src/yaoihentai/yaoihentai.dart';
+import 'src/yaoitoon/yaoitoon.dart';
+import 'src/zinmanganet/zinmanganet.dart';
+import 'src/bokugentranslation/bokugentranslation.dart';
+import 'src/daprob/daprob.dart';
+import 'src/demanhuas/demanhuas.dart';
+import 'src/doujinhentai/doujinhentai.dart';
+import 'src/doujinshell/doujinshell.dart';
+import 'src/esmi2manga/esmi2manga.dart';
+import 'src/hadesnofansub/hadesnofansub.dart';
+import 'src/herenscan/herenscan.dart';
+import 'src/housemangas/housemangas.dart';
+import 'src/ikifeng/ikifeng.dart';
+import 'src/infrafandub/infrafandub.dart';
+import 'src/inmoralnofansub/inmoralnofansub.dart';
+import 'src/jeazscans/jeazscans.dart';
+import 'src/jobsibe/jobsibe.dart';
+import 'src/knightnoscanlation/knightnoscanlation.dart';
+import 'src/koinoboriscan/koinoboriscan.dart';
+import 'src/lectormangalat/lectormangalat.dart';
+import 'src/legendsnofansub/legendsnofansub.dart';
+import 'src/luckymanga/luckymanga.dart';
+import 'src/mangacrab/mangacrab.dart';
+import 'src/mangasnosekai/mangasnosekai.dart';
+import 'src/manhuaonline/manhuaonline.dart';
+import 'src/manhwalatino/manhwalatino.dart';
+import 'src/mhscans/mhscans.dart';
+import 'src/mundomanhwa/mundomanhwa.dart';
+import 'src/noblessetranslations/noblessetranslations.dart';
+import 'src/princediciones/princediciones.dart';
+import 'src/sapphirescan/sapphirescan.dart';
+import 'src/stickhorse/stickhorse.dart';
+import 'src/tecnoscan/tecnoscan.dart';
+import 'src/territoriolealtad/territoriolealtad.dart';
+import 'src/topcomicporno/topcomicporno.dart';
+import 'src/tresdaosscan/tresdaosscan.dart';
+import 'src/unitoon/unitoon.dart';
+import 'src/epsilonscan/epsilonscan.dart';
+import 'src/hentaiorigines/hentaiorigines.dart';
+import 'src/hentaiscantrad/hentaiscantrad.dart';
+import 'src/histoiredhentai/histoiredhentai.dart';
+import 'src/mangahubfr/mangahubfr.dart';
+import 'src/mangascantrad/mangascantrad.dart';
+import 'src/mangasoriginesfr/mangasoriginesfr.dart';
+import 'src/raijinscans/raijinscans.dart';
+import 'src/reaperscans/reaperscans.dart';
+import 'src/scanhentaifr/scanhentaifr.dart';
+import 'src/scanhentaimenu/scanhentaimenu.dart';
+import 'src/softepsilonscan/softepsilonscan.dart';
+import 'src/hwago/hwago.dart';
+import 'src/indo18h/indo18h.dart';
+import 'src/klikmanga/klikmanga.dart';
+import 'src/komikgue/komikgue.dart';
+import 'src/komikuzan/komikuzan.dart';
+import 'src/mgkomik/mgkomik.dart';
+import 'src/siimanga/siimanga.dart';
+import 'src/worldmanhwas/worldmanhwas.dart';
+import 'src/yubikiri/yubikiri.dart';
+import 'src/shavelproiection/shavelproiection.dart';
+import 'src/mangahona/mangahona.dart';
+import 'src/akimanga/akimanga.dart';
+import 'src/alonescanlator/alonescanlator.dart';
+import 'src/amuy/amuy.dart';
+import 'src/argoscomics/argoscomics.dart';
+import 'src/astrumscans/astrumscans.dart';
+import 'src/borutoexplorer/borutoexplorer.dart';
+import 'src/cafecomyaoi/cafecomyaoi.dart';
+import 'src/covenscan/covenscan.dart';
+import 'src/crystalcomics/crystalcomics.dart';
+import 'src/dianxiatraducoes/dianxiatraducoes.dart';
+import 'src/fayscans/fayscans.dart';
+import 'src/fleurblanche/fleurblanche.dart';
+import 'src/flowermanga/flowermanga.dart';
+import 'src/galinhasamuraiscan/galinhasamuraiscan.dart';
+import 'src/hikariganai/hikariganai.dart';
+import 'src/huntersscans/huntersscans.dart';
+import 'src/illusionscan/illusionscan.dart';
+import 'src/imperiodabritannia/imperiodabritannia.dart';
+import 'src/leitordemanga/leitordemanga.dart';
+import 'src/lermangas/lermangas.dart';
+import 'src/leryaoi/leryaoi.dart';
+import 'src/lichmangas/lichmangas.dart';
+import 'src/limboscan/limboscan.dart';
+import 'src/lscans/lscans.dart';
+import 'src/lunarscan/lunarscan.dart';
+import 'src/maidsecret/maidsecret.dart';
+import 'src/manhastro/manhastro.dart';
+import 'src/minitwoscan/minitwoscan.dart';
+import 'src/mryaoifansub/mryaoifansub.dart';
+import 'src/nexoscans/nexoscans.dart';
+import 'src/ninjascan/ninjascan.dart';
+import 'src/nocturnesummer/nocturnesummer.dart';
+import 'src/noindexscan/noindexscan.dart';
+import 'src/onepieceteca/onepieceteca.dart';
+import 'src/passamaoscan/passamaoscan.dart';
+import 'src/pirulitorosa/pirulitorosa.dart';
+import 'src/prismascans/prismascans.dart';
+import 'src/remangas/remangas.dart';
+import 'src/sussyscan/sussyscan.dart';
+import 'src/wintersun/wintersun.dart';
+import 'src/xxxyaoi/xxxyaoi.dart';
+import 'src/mangamammy/mangamammy.dart';
+import 'src/mangaonelove/mangaonelove.dart';
+import 'src/mangazavr/mangazavr.dart';
+import 'src/catzaa/catzaa.dart';
+import 'src/doujinlc/doujinlc.dart';
+import 'src/doujinza/doujinza.dart';
+import 'src/kingsmanga/kingsmanga.dart';
+import 'src/mangadeemak/mangadeemak.dart';
+import 'src/mangaisekaithai/mangaisekaithai.dart';
+import 'src/mangalc/mangalc.dart';
+import 'src/mangatitan/mangatitan.dart';
+import 'src/manhuabug/manhuabug.dart';
+import 'src/manhuathai/manhuathai.dart';
+import 'src/manhwabreakup/manhwabreakup.dart';
+import 'src/rh2plusmanga/rh2plusmanga.dart';
+import 'src/alliedfansub/alliedfansub.dart';
+import 'src/atikrost/atikrost.dart';
+import 'src/diamondfansub/diamondfansub.dart';
+import 'src/domalfansub/domalfansub.dart';
+import 'src/garciamanga/garciamanga.dart';
+import 'src/guncelmanga/guncelmanga.dart';
+import 'src/hoifansub/hoifansub.dart';
+import 'src/imparatormanga/imparatormanga.dart';
+import 'src/kabusmanga/kabusmanga.dart';
+import 'src/kuroimanga/kuroimanga.dart';
+import 'src/laviniafansub/laviniafansub.dart';
+import 'src/lilyumfansub/lilyumfansub.dart';
+import 'src/lowerworld/lowerworld.dart';
+import 'src/lunascans/lunascans.dart';
+import 'src/mangagezgini/mangagezgini.dart';
+import 'src/mangakeyfi/mangakeyfi.dart';
+import 'src/mangaoku/mangaoku.dart';
+import 'src/mangasehrinet/mangasehrinet.dart';
+import 'src/mangawow/mangawow.dart';
+import 'src/meowsubs/meowsubs.dart';
+import 'src/merlinscans/merlinscans.dart';
+import 'src/milasub/milasub.dart';
+import 'src/mindafansub/mindafansub.dart';
+import 'src/niverafansub/niverafansub.dart';
+import 'src/opiatoon/opiatoon.dart';
+import 'src/piedpiperfansub/piedpiperfansub.dart';
+import 'src/piedpiperfansubyy/piedpiperfansubyy.dart';
+import 'src/ruyamanga/ruyamanga.dart';
+import 'src/sarcasmscans/sarcasmscans.dart';
+import 'src/siyahmelek/siyahmelek.dart';
+import 'src/strayfansub/strayfansub.dart';
+import 'src/tonizutoon/tonizutoon.dart';
+import 'src/turkcemangaoku/turkcemangaoku.dart';
+import 'src/webtoonhatti/webtoonhatti.dart';
+import 'src/webtoontr/webtoontr.dart';
+import 'src/yaoimangaoku/yaoimangaoku.dart';
+import 'src/yaoitr/yaoitr.dart';
+import 'src/zanmanmanga/zanmanmanga.dart';
+import 'src/hentaivnplus/hentaivnplus.dart';
+import 'src/truyenvn/truyenvn.dart';
+
+
 
 const madaraVersion = "0.0.95";
 const madaraSourceCodeUrl =
@@ -497,7 +704,427 @@ List<Source> _madaraSourcesList = [
 //مانجا العاشق (AR)
   manga3asqSource,
 //巴卡漫画 (ZH)
-  bakamhSource
+  bakamhSource,
+//Grabber Zone (ALL)
+  grabberzoneSource,
+//MangaTop.site (ALL)
+  mangatopsiteSource,
+//Manhwa18.cc (ALL)
+  manhwa18ccSource,
+//Manhwa-raw (ALL)
+  manhwadashrawSource,
+//عرب تونز (AR)
+  arabtoonsSource,
+//Empire Webtoon (AR)
+  empirewebtoonSource,
+//Gatemanga (AR)
+  gatemangaSource,
+//GMANGA (unoriginal) (AR)
+  gmangasiteSource,
+//مانجا لينك (AR)
+  mangalinkSource,
+//MangaLionz (AR)
+  mangalionzSource,
+//Manga Rose (AR)
+  mangaroseSource,
+//MangaSpark (AR)
+  mangasparkSource,
+//Manga Starz (AR)
+  mangastarzSource,
+//Manga Time (AR)
+  mangatimeSource,
+//Olaoe (AR)
+  olaoeSource,
+//Rocks Manga (AR)
+  rocksmangaSource,
+//YonaBar (AR)
+  yonabarSource,
+//DragonTea (EN)
+  dragonteaSource,
+//Global Bloging (EN)
+  globalblogingSource,
+//HentaiRead (EN)
+  hentaireadSource,
+//InstaManhwa (EN)
+  instamanhwaSource,
+//IsekaiScan.to (unoriginal) (EN)
+  isekaiscaneuSource,
+//Lily Manga (EN)
+  lilymangaSource,
+//MadaraDex (EN)
+  madaradexSource,
+//Manga18fx (EN)
+  manga18fxSource,
+//Manga347 (EN)
+  manga347Source,
+//MangaEffect (EN)
+  mangaeffectSource,
+//Manga-fast.com (EN)
+  mangafastcomSource,
+//MangaKitsune (EN)
+  mangakitsuneSource,
+//Manga Leveling (EN)
+  mangalevelingSource,
+//ManhuaManhwa (EN)
+  manhuamanhwaSource,
+//ManhuaTop (EN)
+  manhuatopSource,
+//Manhwa365 (EN)
+  manhwa365Source,
+//Manhwa Hentai (EN)
+  manhwahentaiSource,
+//Manhwua.fans (EN)
+  manhwuafansSource,
+//NeatManga (EN)
+  neatmangaSource,
+//NvManga (EN)
+  nvmangaSource,
+//OnlyManhwa (EN)
+  onlymanhwaSource,
+//Paragon Scans (EN)
+  paragonscansSource,
+//PMScans (EN)
+  pmscansSource,
+//ReadManhua (EN)
+  readmanhuaSource,
+//StoneScape (EN)
+  stonescapeSource,
+//TappyToon.Net (EN)
+  tappytoonnetSource,
+//The Blank Scanlation (EN)
+  theblankSource,
+//ToonGod (EN)
+  toongodSource,
+//Toonily (EN)
+  toonilySource,
+//Top Manhua (EN)
+  topmanhuaSource,
+//TopReadManhwa (EN)
+  topreadmanhwaSource,
+//WebtoonXYZ (EN)
+  webtoonxyzSource,
+//Yaoi Hentai (EN)
+  yaoihentaiSource,
+//YaoiToon (EN)
+  yaoitoonSource,
+//Zinmanga.net (EN)
+  zinmanganetSource,
+//BokugenTranslation (ES)
+  bokugentranslationSource,
+//DapRob (ES)
+  daprobSource,
+//DeManhuas (ES)
+  demanhuasSource,
+//DoujinHentai (ES)
+  doujinhentaiSource,
+//DoujinsHell (ES)
+  doujinshellSource,
+//Es.Mi2Manga (ES)
+  esmi2mangaSource,
+//Hades no Fansub (ES)
+  hadesnofansubSource,
+//HerenScan (ES)
+  herenscanSource,
+//HouseMangas (ES)
+  housemangasSource,
+//Lector Online (ES)
+  ikifengSource,
+//InfraFandub (ES)
+  infrafandubSource,
+//Inmoral No Fansub (ES)
+  inmoralnofansubSource,
+//JeazScans (ES)
+  jeazscansSource,
+//Jobsibe (ES)
+  jobsibeSource,
+//Knight No Scanlation (ES)
+  knightnoscanlationSource,
+//Koinobori Scan (ES)
+  koinoboriscanSource,
+//LectorManga.lat (ES)
+  lectormangalatSource,
+//LegnMangas (ES)
+  legendsnofansubSource,
+//Lucky Manga (ES)
+  luckymangaSource,
+//Manga Crab (ES)
+  mangacrabSource,
+//MMFenix (ES)
+  mangafenixSource,
+//Mangas No Sekai (ES)
+  mangasnosekaiSource,
+//Manhua Online (ES)
+  manhuaonlineSource,
+//Manhwa-Latino (ES)
+  manhwalatinoSource,
+//MHScans (ES)
+  mhscansSource,
+//Visormonarca (ES)
+  monarcamangaSource,
+//Mundo Manhwa (ES)
+  mundomanhwaSource,
+//Noblesse Translations (ES)
+  noblessetranslationsSource,
+//Prince Ediciones (ES)
+  princedicionesSource,
+//SapphireScan (ES)
+  sapphirescanSource,
+//Stick Horse (ES)
+  stickhorseSource,
+//Tecno Scan (ES)
+  tecnoscanSource,
+//Territorio Lealtad (ES)
+  territoriolealtadSource,
+//TopComicPorno (ES)
+  topcomicpornoSource,
+//Tres Daos Scan (ES)
+  tresdaosscanSource,
+//Unitoon (ES)
+  unitoonSource,
+//Epsilon Scan (FR)
+  epsilonscanSource,
+//Hentai Origines (FR)
+  hentaioriginesSource,
+//Hentai-Scantrad (FR)
+  hentaiscantradSource,
+//HistoireDHentai (FR)
+  histoiredhentaiSource,
+//MangaHub.fr (FR)
+  mangahubfrSource,
+//Manga-Scantrad (FR)
+  mangascantradSource,
+//Mangas-Origines.fr (FR)
+  mangasoriginesfrSource,
+//Raijin Scans (FR)
+  raijinscansSource,
+//Reaper Scans (EN)
+  reaperscansSource,
+//Scan Hentai FR (FR)
+  scanhentaifrSource,
+//X-Manga (FR)
+  scanhentaimenuSource,
+//Soft Epsilon Scan (FR)
+  softepsilonscanSource,
+//Hwago (ID)
+  hwagoSource,
+//Indo18h (ID)
+  indo18hSource,
+//KlikManga (ID)
+  klikmangaSource,
+//Komik Gue (ID)
+  komikgueSource,
+//Komikuzan (ID)
+  komikuzanSource,
+//MG Komik (ID)
+  mgkomikSource,
+//Siimanga (ID)
+  siimangaSource,
+//WorldManhwas (ID)
+  worldmanhwasSource,
+//Yubikiri (ID)
+  yubikiriSource,
+//ShavelProiection (IT)
+  shavelproiectionSource,
+//MangaHoNa (PL)
+  mangahonaSource,
+//Akimangá (PT-BR)
+  akimangaSource,
+//Alone Scanlator (PT-BR)
+  alonescanlatorSource,
+//Amuy (PT-BR)
+  amuySource,
+//Argos Comics (PT-BR)
+  argoscomicsSource,
+//Astrum Scans (PT-BR)
+  astrumscansSource,
+//Boruto Explorer (PT-BR)
+  borutoexplorerSource,
+//Café com Yaoi (PT-BR)
+  cafecomyaoiSource,
+//Coven Scan (PT-BR)
+  covenscanSource,
+//Crystal Comics (PT-BR)
+  crystalcomicsSource,
+//Dianxia Traduções (PT-BR)
+  dianxiatraducoesSource,
+//Fay Scans (PT-BR)
+  fayscansSource,
+//Fleur Blanche (PT-BR)
+  fleurblancheSource,
+//Flower Manga (PT-BR)
+  flowermangaSource,
+//Galinha Samurai Scan (PT-BR)
+  galinhasamuraiscanSource,
+//Hikari Ga Nai (PT-BR)
+  hikariganaiSource,
+//Hunters Scan (PT-BR)
+  huntersscansSource,
+//Illusion Scan (PT-BR)
+  illusionscanSource,
+//Sagrado Império da Britannia (PT-BR)
+  imperiodabritanniaSource,
+//Neroxus (PT-BR)
+  imperioscansSource,
+//Leitor de Mangá (PT-BR)
+  leitordemangaSource,
+//Ler Mangas (PT-BR)
+  lermangasSource,
+//Ler Yaoi (PT-BR)
+  leryaoiSource,
+//Lich Mangas (PT-BR)
+  lichmangasSource,
+//Limbo Scan (PT-BR)
+  limboscanSource,
+//L Scans (PT-BR)
+  lscansSource,
+//Lunar Scan (PT-BR)
+  lunarscanSource,
+//Maid Secret (PT-BR)
+  maidsecretSource,
+//Manhastro (PT-BR)
+  manhastroSource,
+//MiniTwo Scan (PT-BR)
+  minitwoscanSource,
+//MR Yaoi Fansub (PT-BR)
+  mryaoifansubSource,
+//Nexo Scans (PT-BR)
+  nexoscansSource,
+//Ninja Scan (PT-BR)
+  ninjascanSource,
+//Nocturne Summer (PT-BR)
+  nocturnesummerSource,
+//No Index Scan (PT-BR)
+  noindexscanSource,
+//One Piece TECA (PT-BR)
+  onepiecetecaSource,
+//Passa Mão Scan (PT-BR)
+  passamaoscanSource,
+//Pirulito Rosa (PT-BR)
+  pirulitorosaSource,
+//Demon Sect (PT-BR)
+  prismascansSource,
+//Remangas (PT-BR)
+  remangasSource,
+//Sussy Scan (PT-BR)
+  sussyscanSource,
+//Winter Sun (PT-BR)
+  wintersunSource,
+//XXX Yaoi (PT-BR)
+  xxxyaoiSource,
+//Manga Mammy (RU)
+  mangamammySource,
+//Manga One Love (RU)
+  mangaoneloveSource,
+//Mangazavr (RU)
+  mangazavrSource,
+//Catzaa (TH)
+  catzaaSource,
+//Doujin-Lc (TH)
+  doujinlcSource,
+//DoujinZa (TH)
+  doujinzaSource,
+//Kings-Manga (TH)
+  kingsmangaSource,
+//MangaDeemak (TH)
+  mangadeemakSource,
+//MangaIsekaiThai (TH)
+  mangaisekaithaiSource,
+//Manga-Lc (TH)
+  mangalcSource,
+//Manga-Titan (TH)
+  mangatitanSource,
+//ManhuaBug (TH)
+  manhuabugSource,
+//ManhuaThai (TH)
+  manhuathaiSource,
+//ManhwaBreakup (TH)
+  manhwabreakupSource,
+//Rh2PlusManga (TH)
+  rh2plusmangaSource,
+//Allied Fansub (TR)
+  alliedfansubSource,
+//Atikrost (TR)
+  atikrostSource,
+//DiamondFansub (TR)
+  diamondfansubSource,
+//Domal Fansub (TR)
+  domalfansubSource,
+//ManWe (TR)
+  evascansSource,
+//Garcia Manga (TR)
+  garciamangaSource,
+//GuncelManga (TR)
+  guncelmangaSource,
+//Hoi Fansub (TR)
+  hoifansubSource,
+//İmparator Manga (TR)
+  imparatormangaSource,
+//Kabus Manga (TR)
+  kabusmangaSource,
+//Kuroi Manga (TR)
+  kuroimangaSource,
+//Lavinia Fansub (TR)
+  laviniafansubSource,
+//LilyumFansub (TR)
+  lilyumfansubSource,
+//LowerWorld (TR)
+  lowerworldSource,
+//Luna Scans (TR)
+  lunascansSource,
+//MangaGezgini (TR)
+  mangagezginiSource,
+//Manga Keyfi (TR)
+  mangakeyfiSource,
+//Manga Oku (TR)
+  mangaokuSource,
+//Manga Şehri.net (TR)
+  mangasehrinetSource,
+//MangaWOW (TR)
+  mangawowSource,
+//MeowSubs (TR)
+  meowsubsSource,
+//Merlin Scans (TR)
+  merlinscansSource,
+//MilaSub (TR)
+  milasubSource,
+//Minda Fansub (TR)
+  mindafansubSource,
+//Nivera Fansub (TR)
+  niverafansubSource,
+//Opiatoon (TR)
+  opiatoonSource,
+//Pied Piper Fansub (TR)
+  piedpiperfansubSource,
+//Pied Piper Fansubyy (TR)
+  piedpiperfansubyySource,
+//Rüya Manga (TR)
+  ruyamangaSource,
+//Sarcasm Scans (TR)
+  sarcasmscansSource,
+//Gri Melek (TR)
+  siyahmelekSource,
+//Stray Fansub (TR)
+  strayfansubSource,
+//TonizuToon (TR)
+  tonizutoonSource,
+//Türkçe Manga Oku (TR)
+  turkcemangaokuSource,
+//Webtoon Hatti (TR)
+  webtoonhattiSource,
+//Webtoon TR (TR)
+  webtoontrSource,
+//Yaoi Manga Oku (TR)
+  yaoimangaokuSource,
+//Yaoi TR (TR)
+  yaoitrSource,
+//Zanman Manga (TR)
+  zanmanmangaSource,
+//CBHentai (VI)
+  hentaicubeSource,
+//HentaiVN.plus (VI)
+  hentaivnplusSource,
+//TruyenVN (VI)
+  truyenvnSource
 ]
     .map((e) => e
       ..sourceCodeUrl = madaraSourceCodeUrl
