@@ -52,7 +52,8 @@ class AnimeWorldIndia extends MProvider {
         url += "${ll(url)}s_genre=";
         if (genre.isNotEmpty) {
           for (var st in genre) {
-            url += "${st.value}".toLowerCase().replaceAll(" ", "-");
+            String value = st.value;
+            url += value.toLowerCase().replaceAll(" ", "-");
             if (genre.length > 1) {
               url += "%2C";
             }
