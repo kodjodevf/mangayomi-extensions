@@ -126,13 +126,13 @@ class UHDMovies extends MProvider {
   List<dynamic> getSourcePreferences() {
     return [
       EditTextPreference(
-          key: "pref_domain",
+          key: "pref_domain_new",
           title: "Currently used domain",
           summary: "",
-          value: "https://uhdmovies.zip",
+          value: "https://uhdmovies.fans",
           dialogTitle: "Currently used domain",
           dialogMessage: "",
-          text: "https://uhdmovies.zip"),
+          text: "https://uhdmovies.fans"),
     ];
   }
 
