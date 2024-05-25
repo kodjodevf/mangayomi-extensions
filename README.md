@@ -7,7 +7,7 @@ This repository contains the available extension catalogues for the [Mangayomi](
 
 Contributions are welcome!
 
-To get started with development, see [CONTRIBUTING.md](./CONTRIBUTING.md) for create sources in Dart or [CONTRIBUTING-JS.md](./CONTRIBUTING-JS.md) for create sources in JavaScript.
+To get started with development, see [CONTRIBUTING-DART.md](./CONTRIBUTING-DART.md) for create sources in Dart or [CONTRIBUTING-JS.md](./CONTRIBUTING-JS.md) for create sources in JavaScript.
 
 ## License
 
