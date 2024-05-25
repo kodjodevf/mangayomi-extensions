@@ -9,9 +9,15 @@ class MangaReader extends MProvider {
   final Client client = Client(source);
 
   @override
+  String get baseUrl => getPreferenceValue(source.id, "override_baseurl");
+
+  @override
+  Map<String, dynamic> get headers => {"Referer": "$baseUrl/"};
+
+  @override
   Future<MPages> getPopular(int page) async {
     final res = (await client.get(Uri.parse(
-            "${source.baseUrl}${getMangaUrlDirectory(source.name)}/?page=$page&order=popular")))
+            "$baseUrl${getMangaUrlDirectory(source.name)}/?page=$page&order=popular")))
         .body;
     return mangaRes(res);
   }
@@ -19,7 +25,7 @@ class MangaReader extends MProvider {
   @override
   Future<MPages> getLatestUpdates(int page) async {
     final res = (await client.get(Uri.parse(
-            "${source.baseUrl}${getMangaUrlDirectory(source.name)}/?page=$page&order=update")))
+            "$baseUrl${getMangaUrlDirectory(source.name)}/?page=$page&order=update")))
         .body;
     return mangaRes(res);
   }
@@ -29,7 +35,7 @@ class MangaReader extends MProvider {
     final filters = filterList.filters;
 
     String url =
-        "${source.baseUrl}${getMangaUrlDirectory(source.name)}/?&title=$query&page=$page";
+        "$baseUrl${getMangaUrlDirectory(source.name)}/?&title=$query&page=$page";
 
     for (var filter in filters) {
       if (filter.type == "AuthorFilter") {
@@ -127,7 +133,7 @@ class MangaReader extends MProvider {
     url = getUrlWithoutDomain(url);
     MManga manga = MManga();
 
-    final res = (await client.get(Uri.parse("${source.baseUrl}$url"))).body;
+    final res = (await client.get(Uri.parse("$baseUrl$url"))).body;
     List<String> author = xpath(
         res,
         "//table[contains(@class, 'infotable')]//tr[contains(text(), 'Author')]/td[last()]/text() | //div[contains(@class, 'tsinfo')]//div[contains(@class, 'imptdt') and contains(text(), 'Author')]//i/text() | //div[contains(@class, 'fmed')]//b[contains(text(), 'Author')]/following-sibling::span[1]/text() | //span[contains(text(), 'Author')]/text()",
@@ -191,7 +197,7 @@ class MangaReader extends MProvider {
   @override
   Future<List<String>> getPageList(String url) async {
     url = getUrlWithoutDomain(url);
-    final res = (await client.get(Uri.parse('${source.baseUrl}$url'))).body;
+    final res = (await client.get(Uri.parse('$baseUrl$url'))).body;
 
     List<String> pages = [];
     List<String> pagesUrl = [];
@@ -283,6 +289,20 @@ class MangaReader extends MProvider {
       GroupFilter("GenreListFilter", "Genre", [
         TriStateFilter("Press reset to attempt to fetch genres", ""),
       ]),
+    ];
+  }
+
+  @override
+  List<dynamic> getSourcePreferences() {
+    return [
+      EditTextPreference(
+          key: "override_baseurl",
+          title: "Override BaseUrl",
+          summary: "",
+          value: baseUrl,
+          dialogTitle: "Override BaseUrl",
+          dialogMessage: "Default: $baseUrl",
+          text: baseUrl),
     ];
   }
 
