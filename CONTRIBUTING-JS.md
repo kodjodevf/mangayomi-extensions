@@ -1,6 +1,6 @@
 # Contributing
 
-This guide have some instructions and tips on how to create a new Mangayomi extension on js extension.
+This guide have some instructions and tips on how to create a new Mangayomi extension on JavaScript extension.
 
 ## Prerequisites
 
