@@ -29,7 +29,10 @@ click to open settings
     - Fecth result: where you will test the different implemented methods by having a result in the expected format
     - Console: which will show you the logs
 
-Once extension is ready you can relocate your code into `mangayomi-extension` project in a `src` or `multisrc` package and create a Pull Request.
+Once extension is ready you can relocate your code into `mangayomi-extension` project in a `src` or `multisrc` package
+Create the folder with the name of the source such as [this one](https://github.com/kodjodevf/mangayomi-extensions/blob/main/dart/anime/src/en/kisskh/kisskh.dart)
+after go either to the anime_source_list.dart file for anime or manga_source_list.dart for the manga and import the extension then
+create a Pull Request.
 
 ### Source 
 
@@ -138,7 +141,7 @@ All control filters can have a default state set. It's usually recommended if th
 
 ## Example sources that can help you understand how to create your source
 
-- [Example](https://github.com/kodjodevf/mangayomi-extensions/blob/main/anime/src/en/kisskh/kisskh.dart)
+- [Example](https://github.com/kodjodevf/mangayomi-extensions/blob/main/dart/anime/src/en/kisskh/kisskh.dart)
   of Json API usage.
 - [Example](https://github.com/kodjodevf/mangayomi-extensions/blob/main/manga/src/en/mangahere/mangahere.dart)
   of HTML parsing using xpath selector.
