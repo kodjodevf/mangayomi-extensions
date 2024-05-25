@@ -1,119 +1,34 @@
 # Contributing
 
-This guide have some instructions and tips on how to create a new Mangayomi extension.
+This guide have some instructions and tips on how to create a new Mangayomi extension on Dart extension.
 
 ## Prerequisites
 
-Before you start, please note that the ability to use following technologies is **required**.
+Before starting please have installed the recent desktop version of the mangayomi application preferably or if you want with a tablet too.
 
-- [Flutter development](https://flutter.dev/)
-- [Dart](https://dart.dev/)
-- Web scraping
-    - [HTML](https://developer.mozilla.org/en-US/docs/Web/HTML)
-    - [CSS selectors](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors)
-
-This project uses the capabilities of the [dart_eval](https://pub.dev/packages/dart_eval) package
-
-### Tools
-- [Android Studio](https://developer.android.com/studio)
-- [VS Code](https://code.visualstudio.com/)
-- Any platform emulator
 
 ### Writing your extension
-1. Clone [Mangayomi](https://github.com/kodjodevf/mangayomi) next, read the README file to learn how to run the project.
-2. Open the project then go to : 
-```console
-lib
-└── sources
-      └── source_test.dart
-```
-and you will see this : 
+1. Open the app.
+2. Go to extension tab : 
+![1](https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/screenshots/1.png)
+3. then click `+` and you will see : 
+![2](https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/screenshots/2.png)
+4. Fill in the fields with your new source that you would like to create,
+![3](https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/screenshots/dart-3.png)
+NB: only the `ApiUrl` field is optional
+then click on save
+5. you will see your new source in the extension list
+![4](https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/screenshots/dart-4.png)
+click to open settings
+6. After click on edit code
+![5](https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/screenshots/dart-5.png)
+7. Finally you can now write the extension
+![6](https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/screenshots/dart-6.png)
+- This page contains three parts: 
+    - Code editor: where you will write your code 
+    - Fecth result: where you will test the different implemented methods by having a result in the expected format
+    - Console: which will show you the logs
 
-```bash
-import 'package:mangayomi/models/source.dart';
-
-//For testing purposes, set to true
-const useTestSourceCode = true;
-
-final testSourceModelList = [
-  Source(
-      id: "Test Source".hashCode,
-      name: "Test Source",
-      // Example: https://gogoanime3.net
-      baseUrl: "",
-      // source code
-      sourceCode: testSourceCode,
-      // Example: en
-      lang: "",
-      // Example: false for anime true for manga
-      isManga: false)
-];
-
-const testSourceCode = r'''
-import 'package:mangayomi/bridge_lib.dart';
-
-class TestSource extends MProvider {
-  TestSource({required this.source});
-
-  MSource source;
-
-  final Client client = Client(source);
-
-  @override
-  bool get supportsLatest => true;
-
-  @override
-  Future<MPages> getPopular(int page) async {
-    // TODO: implement
-  }
-
-  @override
-  Future<MPages> getLatestUpdates(int page) async {
-    // TODO: implement
-  }
-
-  @override
-  Future<MPages> search(String query, int page, FilterList filterList) async {
-    // TODO: implement
-  }
-
-  @override
-  Future<MManga> getDetail(String url) async {
-    // TODO: implement
-  }
-  
-  // For anime episode video list
-  @override
-  Future<List<MVideo>> getVideoList(String url) async {
-    // TODO: implement
-  }
-
-  // For manga chapter pages
-  @override
-  Future<List<String>> getPageList(String url) {
-    // TODO: implement
-  }
-
-  @override
-  List<dynamic> getFilterList() {
-    // TODO: implement
-  }
-
-  @override
-  List<dynamic> getSourcePreferences() {
-    // TODO: implement
-  }
-}
-
-TestSource main(MSource source) {
-  return TestSource(source:source);
-}
-
-''';
-
-```
-For testing your source set `useTestSourceCode` to true.
-During the development it is recommended (but not necessary) to write it directly mangayomi application project.
 Once extension is ready you can relocate your code into `mangayomi-extension` project in a `src` or `multisrc` package and create a Pull Request.
 
 ### Source 
