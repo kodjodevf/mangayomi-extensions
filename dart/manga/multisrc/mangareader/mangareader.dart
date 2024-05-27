@@ -12,7 +12,7 @@ class MangaReader extends MProvider {
   String get baseUrl => getPreferenceValue(source.id, "override_baseurl");
 
   @override
-  Map<String, dynamic> get headers => {"Referer": "$baseUrl/"};
+  Map<String, String> get headers => {"Referer": "$baseUrl/"};
 
   @override
   Future<MPages> getPopular(int page) async {
