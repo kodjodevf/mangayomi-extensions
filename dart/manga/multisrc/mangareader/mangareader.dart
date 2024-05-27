@@ -299,10 +299,10 @@ class MangaReader extends MProvider {
           key: "override_baseurl",
           title: "Override BaseUrl",
           summary: "",
-          value: baseUrl,
+          value: source.baseUrl,
           dialogTitle: "Override BaseUrl",
-          dialogMessage: "Default: $baseUrl",
-          text: baseUrl),
+          dialogMessage: "Default: ${source.baseUrl}",
+          text: source.baseUrl),
     ];
   }
 
