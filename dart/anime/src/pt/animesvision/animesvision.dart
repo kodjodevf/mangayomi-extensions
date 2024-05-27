@@ -11,7 +11,8 @@ class AnimesVision extends MProvider {
   @override
   String get baseUrl => source.baseUrl;
 
-  Map<String, dynamic> get headers => {
+  @override
+  Map<String, String> get headers => {
         "Referer": baseUrl,
         "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7"
       };
