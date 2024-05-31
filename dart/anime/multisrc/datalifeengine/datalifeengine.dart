@@ -96,7 +96,9 @@ class DataLifeEngine extends MProvider {
           final epUrls = xpath(res,
               '//*[@class="hostsblock"]/div[@class="${eps[i]}"]/a[contains(@href,"https")]/@href');
           MChapter ep = MChapter();
-          ep.name = "Episode ${i + 1}";
+          ep.name = xpath(res,
+                  '//*[@class="eplist"]/li[contains(@rel,"${eps[i]}")]/text()')
+              .first;
           ep.url = epUrls.join(",").replaceAll("/vd.php?u=", "");
           ep.scanlator = eps[i].contains('vf') ? 'VF' : 'VOSTFR';
           episodesList.add(ep);
