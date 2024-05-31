@@ -4,7 +4,7 @@ Source get wiflixSource => _wiflixSource;
 
 Source _wiflixSource = Source(
   name: "Wiflix",
-  baseUrl: "https://wiflix.voto",
+  baseUrl: "https://wiflix.bot",
   lang: "fr",
   typeSource: "datalifeengine",
   isManga: false,
