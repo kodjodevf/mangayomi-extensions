@@ -244,7 +244,8 @@ class NineAnimeTv extends MProvider {
       }
       videoResJson = decryptAESCryptoJS(ciphertext, password);
     } else {
-      videoResJson = resServer;
+      videoResJson = json.encode(
+          (json.decode(resServer)["sources"] as List<Map<String, dynamic>>));
     }
 
     String masterUrl =
