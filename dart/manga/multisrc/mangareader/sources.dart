@@ -1,5 +1,6 @@
 import '../../../../model/source.dart';
 import 'src/beastscans/beastscans.dart';
+import 'src/funtoons/funtoons.dart';
 import 'src/lelmanga/lelmanga.dart';
 import 'src/asurascans/asurascans.dart';
 import 'src/komiklab/komiklab.dart';
@@ -127,7 +128,7 @@ import 'src/shijiescans/shijiescans.dart';
 import 'src/summertoon/summertoon.dart';
 import 'src/zenithscans/zenithscans.dart';
 
-const mangareaderVersion = "0.1.15";
+const mangareaderVersion = "0.1.2";
 const mangareaderSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/manga/multisrc/mangareader/mangareader.dart";
 
@@ -388,7 +389,9 @@ List<Source> _mangareaderSourcesList = [
 //SummerToon (TR)
   summertoonSource,
 //Zenith Scans (TR)
-  zenithscansSource
+  zenithscansSource,
+//FunToons (TH)
+  funtoonsSource
 ]
     .map((e) => e
       ..sourceCodeUrl = mangareaderSourceCodeUrl
