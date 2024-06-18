@@ -109,6 +109,12 @@ class MangaReader extends MProvider {
         "En emision": 0,
         "مستمر": 0,
         "ยังไม่จบ": 0,
+        "curso": 0,
+        "en marcha": 0,
+        "publicandose": 0,
+        "publicando": 0,
+        "devam etmekte": 0,
+        "連載中": 0,
         "Đã hoàn thành": 1,
         "مكتملة": 1,
         "Завершено": 1,
@@ -129,69 +135,85 @@ class MangaReader extends MProvider {
         "One-Shot": 1,
         "Bitti": 1,
         "จบแล้ว": 1,
+        "tamat": 1,
+        "completado": 1,
+        "concluído": 1,
+        "完結": 1,
+        "concluido": 1,
+        "bitmiş": 1,
         "hiatus": 2,
         "พักชั่วคราว": 2,
+        "on hold": 2,
+        "pausado": 2,
+        "en espera": 2,
+        "en pause": 2,
+        "en attente": 2,
+        "canceled": 3,
+        "cancelled": 3,
+        "cancelado": 3,
+        "cancellato": 3,
+        "cancelados": 3,
+        "dropped": 3,
+        "discontinued": 3,
+        "abandonné": 3
       }
     ];
     url = getUrlWithoutDomain(url);
     MManga manga = MManga();
 
     final res = (await client.get(Uri.parse("$baseUrl$url"))).body;
-    List<String> author = xpath(
-        res,
-        "//table[contains(@class, 'infotable')]//tr[contains(text(), 'Author')]/td[last()]/text() | //div[contains(@class, 'tsinfo')]//div[contains(@class, 'imptdt') and contains(text(), 'Author')]//i/text() | //div[contains(@class, 'fmed')]//b[contains(text(), 'Author')]/following-sibling::span[1]/text() | //span[contains(text(), 'Author')]/text() | //div[contains(@class, 'tsinfo')]//div[contains(@class, 'imptdt')]//span[contains(text(), 'ผู้วาด')]/following-sibling::i/text()",
-        '');
-    if (author.isEmpty) {
-      author = xpath(
-          res,
-          "//table[contains(@class, 'infotable')]//tr[contains(text(), '${authorLocalStr(source.lang)}')]/td[last()]/text() | //div[contains(@class, 'tsinfo')]//div[contains(@class, 'imptdt') and contains(text(), '${authorLocalStr(source.lang)}')]//i/text() | //div[contains(@class, 'fmed')]//b[contains(text(), '${authorLocalStr(source.lang)}')]/following-sibling::span[1]/text() | //span[contains(text(), '${authorLocalStr(source.lang)}')]/text() | //div[contains(@class, 'tsinfo')]//div[contains(@class, 'imptdt')]//span[contains(text(), 'ผู้แต่ง')]/following-sibling::i/text()",
-          '');
-    }
-    if (author.isNotEmpty) {
-      manga.author = author.first;
-    }
+    final document = parseHtml(res);
+    final seriesDetails = document.selectFirst(
+        "div.bigcontent, div.animefull, div.main-info, div.postbody");
+    manga.author = seriesDetails
+        .selectFirst(".infotable tr:contains(Author) td:last-child, .tsinfo .imptdt:contains(Author) i, .fmed b:contains(Author)+span, span:contains(Author), " +
+            ".infotable tr:contains(Auteur) td:last-child, .tsinfo .imptdt:contains(Auteur) i, .fmed b:contains(Auteur)+span, span:contains(Auteur), " +
+            ".infotable tr:contains(autor) td:last-child, .tsinfo .imptdt:contains(autor) i, .fmed b:contains(autor)+span, span:contains(autor), " +
+            ".infotable tr:contains(المؤلف) td:last-child, .tsinfo .imptdt:contains(المؤلف) i, .fmed b:contains(المؤلف)+span, span:contains(المؤلف), " +
+            ".infotable tr:contains(Mangaka) td:last-child, .tsinfo .imptdt:contains(Mangaka) i, .fmed b:contains(Mangaka)+span, span:contains(Mangaka), " +
+            ".infotable tr:contains(seniman) td:last-child, .tsinfo .imptdt:contains(seniman) i, .fmed b:contains(seniman)+span, span:contains(seniman), " +
+            ".infotable tr:contains(Pengarang) td:last-child, .tsinfo .imptdt:contains(Pengarang) i, .fmed b:contains(Pengarang)+span, span:contains(Pengarang), " +
+            ".infotable tr:contains(Yazar) td:last-child, .tsinfo .imptdt:contains(Yazar) i, .fmed b:contains(Yazar)+span, span:contains(Yazar), " +
+            ".infotable tr:contains(ผู้วาด) td:last-child, .tsinfo .imptdt:contains(ผู้วาด) i, .fmed b:contains(ผู้วาด)+span, span:contains(ผู้วาด), ")
+        .text;
 
-    final description = parseHtml(res)
-        .selectFirst(
-            ".desc, .entry-content[itemprop=description], .tsinfo > .wd-full > .entry-content[itemprop=description]")
+    manga.description = seriesDetails
+        .selectFirst(".desc, .entry-content[itemprop=description]")
         ?.text;
-
-    if (description != null) {
-      manga.description = description;
-    }
-
-    List<String> status = xpath(
-        res,
-        "//table[contains(@class, 'infotable')]//tr[contains(text(), 'Status')]/td[last()]/text() | //div[contains(@class, 'tsinfo')]//div[contains(@class, 'imptdt') and contains(text(), 'Status')]//i/text() | //div[contains(@class, 'fmed')]//b[contains(text(), 'Status')]/following-sibling::span[1]/text() | //span[contains(text(), 'Status')]/text() |  | //div[contains(@class, 'tsinfo')]//div[contains(@class, 'imptdt')]//span[contains(text(), 'สถานะ')]/following-sibling::i/text()",
-        '');
-    if (status.isEmpty) {
-      status = xpath(
-          res,
-          "//table[contains(@class, 'infotable')]//tr[contains(text(), '${statusLocalStr(source.lang)}')]/td[last()]/text() | //div[contains(@class, 'tsinfo')]//div[contains(@class, 'imptdt') and contains(text(), '${statusLocalStr(source.lang)}')]//i/text() | //div[contains(@class, 'fmed')]//b[contains(text(), '${statusLocalStr(source.lang)}')]/following-sibling::span[1]/text() | //span[contains(text(), '${statusLocalStr(source.lang)}')]/text()",
-          '');
-    }
-
-    if (status.isNotEmpty) {
-      manga.status = parseStatus(status.first, statusList);
-    }
-
-    manga.genre = xpath(res,
-        '//*[@class="gnr"  or @class="mgen"  or @class="seriestugenre" ]/a/text()');
-    var chapUrls = xpath(res,
-        '//*[@class="bxcl"  or @class="cl"  or @class="chbox" or @class="eph-num" or @id="chapterlist"]/div/a[not(contains(@href,"{{number}}"))]/@href');
-    var chaptersNames = xpath(res,
-        '//*[@class="bxcl"  or @class="cl"  or @class="chbox" or @class="eph-num" or @id="chapterlist"]/div/a/span[@class="chapternum" and not(contains(text(),"{{number}}")) or @class="lch" and not(text()="Chapter {{number}}")]/text()');
-    var chapterDates = xpath(res,
-        '//*[@class="bxcl"  or @class="cl"  or @class="chbox" or @class="eph-num" or @id="chapterlist"]/div/a/span[@class="chapterdate" and not(contains(text(),"{{date}}"))]/text()');
-    var dateUploads =
-        parseDates(chapterDates, source.dateFormat, source.dateFormatLocale);
-
+    final status = seriesDetails
+            .selectFirst(".infotable tr:contains(status) td:last-child, .tsinfo .imptdt:contains(status) i, .fmed b:contains(status)+span span:contains(status), " +
+                ".infotable tr:contains(Statut) td:last-child, .tsinfo .imptdt:contains(Statut) i, .fmed b:contains(Statut)+span span:contains(Statut), " +
+                ".infotable tr:contains(Durum) td:last-child, .tsinfo .imptdt:contains(Durum) i, .fmed b:contains(Durum)+span span:contains(Durum), " +
+                ".infotable tr:contains(連載状況) td:last-child, .tsinfo .imptdt:contains(連載状況) i, .fmed b:contains(連載状況)+span span:contains(連載状況), " +
+                ".infotable tr:contains(Estado) td:last-child, .tsinfo .imptdt:contains(Estado) i, .fmed b:contains(Estado)+span span:contains(Estado), " +
+                ".infotable tr:contains(الحالة) td:last-child, .tsinfo .imptdt:contains(الحالة) i, .fmed b:contains(الحالة)+span span:contains(الحالة), " +
+                ".infotable tr:contains(حالة العمل) td:last-child, .tsinfo .imptdt:contains(حالة العمل) i, .fmed b:contains(حالة العمل)+span span:contains(حالة العمل), " +
+                ".infotable tr:contains(สถานะ) td:last-child, .tsinfo .imptdt:contains(สถานะ) i, .fmed b:contains(สถานะ)+span span:contains(สถานะ), " +
+                ".infotable tr:contains(stato) td:last-child, .tsinfo .imptdt:contains(stato) i, .fmed b:contains(stato)+span span:contains(stato), " +
+                ".infotable tr:contains(Statüsü) td:last-child, .tsinfo .imptdt:contains(Statüsü) i, .fmed b:contains(Statüsü)+span span:contains(Statüsü), " +
+                ".infotable tr:contains(สถานะ) td:last-child, .tsinfo .imptdt:contains(สถานะ) i, .fmed b:contains(สถานะ)+span span:contains(สถานะ)")
+            ?.text ??
+        "";
+    manga.status = parseStatus(status, statusList);
+    manga.genre = seriesDetails
+        .select("div.gnr a, .mgen a, .seriestugenre a, " +
+            "span:contains(genre) , span:contains(التصنيف)")
+        .map((e) => e.text)
+        .toList();
+    final elements = document.select(
+        "div.bxcl li, div.cl li, #chapterlist li, ul li:has(div.chbox):has(div.eph-num)");
     List<MChapter>? chaptersList = [];
-    for (var i = 0; i < chaptersNames.length; i++) {
-      MChapter chapter = MChapter();
-      chapter.name = chaptersNames[i];
-      chapter.url = chapUrls[i];
-      chapter.dateUpload = dateUploads[i];
+    for (var element in elements) {
+      final urlElements = element.selectFirst("a");
+      final name =
+          element.selectFirst(".lch a, .chapternum")?.text ?? urlElements.text;
+      var chapter = MChapter();
+      chapter.name = name;
+      chapter.url = urlElements.attr("href");
+      chapter.dateUpload = parseDates([
+        element.selectFirst(".chapterdate")?.text ??
+            DateTime.now().millisecondsSinceEpoch.toString()
+      ], source.dateFormat, source.dateFormatLocale)[0];
       chaptersList.add(chapter);
     }
     manga.chapters = chaptersList;
@@ -202,32 +224,24 @@ class MangaReader extends MProvider {
   Future<List<String>> getPageList(String url) async {
     url = getUrlWithoutDomain(url);
     final res = (await client.get(Uri.parse('$baseUrl$url'))).body;
-
-    List<String> pages = [];
     List<String> pagesUrl = [];
-    bool invalidImgs = false;
-    pages = xpath(res, '//*[@id="readerarea"]/p/img/@src');
-    if (pages.isEmpty || pages.length == 1) {
-      pages = xpath(res, '//*[@id="readerarea"]/img/@src');
-    }
-    if (pages.length > 1) {
-      for (var page in pages) {
-        if (page.contains("data:image")) {
-          invalidImgs = true;
-        }
+
+    final htmlElements = parseHtml(res).select("div#readerarea img");
+    for (var htmlElement in htmlElements) {
+      String img = htmlElement.getSrc;
+      if (img.contains("data:image")) {
+        img = htmlElement.getDataSrc;
       }
-      if (invalidImgs) {
-        pages = xpath(res, '//*[@id="readerarea"]/img/@data-src');
-      }
+      pagesUrl.add(img);
     }
-    if (pages.isEmpty || pages.length == 1) {
-      final images = regExp(res, "\"images\"\\s*:\\s*(\\[.*?])", "", 1, 1);
-      final pages = json.decode(images) as List;
+    if (pagesUrl.isEmpty || pagesUrl.length == 1) {
+      RegExp exp = RegExp("\"images\"\\s*:\\s*(\\[.*?])");
+      Iterable<Match> matches = exp.allMatches(res);
+      final images = (matches.first as RegExpMatch).group(1);
+      final pages = json.decode(images!) as List;
       for (var page in pages) {
         pagesUrl.add(page);
       }
-    } else {
-      return pages;
     }
 
     return pagesUrl;
@@ -235,28 +249,18 @@ class MangaReader extends MProvider {
 
   MPages mangaRes(String res) {
     List<MManga> mangaList = [];
-    final urls = xpath(
-        res, '//*[ @class="imgu"  or @class="bsx" or @class="card"]/a/@href');
-    final names = xpath(
-        res, '//*[ @class="imgu"  or @class="bsx" or @class="card"]/a/@title');
-    List<String> images = [];
-    images = xpath(res,
-        '//*[ @class="imgu"  or @class="bsx"]/a/div[1]/img/@src | //div[@class="card"]/div[@class="card__img"]/@data-background-img');
-    bool invalidImgs = false;
-    for (var img in images) {
+    final document = parseHtml(res);
+    final elements =
+        document.select(".utao .uta .imgu, .listupd .bs .bsx, .listo .bs .bsx");
+    for (var element in elements) {
+      String img = element.getSrc;
       if (img.contains("data:image")) {
-        invalidImgs = true;
+        img = element.getDataSrc;
       }
-    }
-    if (invalidImgs) {
-      images = xpath(res,
-          '//*[ @class="imgu"  or @class="bsx"]/a/div[1]/img/@data-src | //div[@class="card"]/a/div[@class="card__img--hover"]/@data-background-img');
-    }
-    for (var i = 0; i < names.length; i++) {
-      MManga manga = MManga();
-      manga.name = names[i];
-      manga.imageUrl = images[i];
-      manga.link = urls[i];
+      var manga = MManga();
+      manga.name = element.selectFirst("a").attr("title");
+      manga.imageUrl = img;
+      manga.link = element.selectFirst("a").attr("href");
       mangaList.add(manga);
     }
 
