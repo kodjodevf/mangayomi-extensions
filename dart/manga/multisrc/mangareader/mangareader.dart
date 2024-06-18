@@ -108,6 +108,7 @@ class MangaReader extends MProvider {
         "Emision": 0,
         "En emision": 0,
         "مستمر": 0,
+        "ยังไม่จบ": 0,
         "Đã hoàn thành": 1,
         "مكتملة": 1,
         "Завершено": 1,
@@ -127,7 +128,9 @@ class MangaReader extends MProvider {
         "Completata": 1,
         "One-Shot": 1,
         "Bitti": 1,
+        "จบแล้ว": 1,
         "hiatus": 2,
+        "พักชั่วคราว": 2,
       }
     ];
     url = getUrlWithoutDomain(url);
@@ -136,12 +139,12 @@ class MangaReader extends MProvider {
     final res = (await client.get(Uri.parse("$baseUrl$url"))).body;
     List<String> author = xpath(
         res,
-        "//table[contains(@class, 'infotable')]//tr[contains(text(), 'Author')]/td[last()]/text() | //div[contains(@class, 'tsinfo')]//div[contains(@class, 'imptdt') and contains(text(), 'Author')]//i/text() | //div[contains(@class, 'fmed')]//b[contains(text(), 'Author')]/following-sibling::span[1]/text() | //span[contains(text(), 'Author')]/text()",
+        "//table[contains(@class, 'infotable')]//tr[contains(text(), 'Author')]/td[last()]/text() | //div[contains(@class, 'tsinfo')]//div[contains(@class, 'imptdt') and contains(text(), 'Author')]//i/text() | //div[contains(@class, 'fmed')]//b[contains(text(), 'Author')]/following-sibling::span[1]/text() | //span[contains(text(), 'Author')]/text() | //div[contains(@class, 'tsinfo')]//div[contains(@class, 'imptdt')]//span[contains(text(), 'ผู้วาด')]/following-sibling::i/text()",
         '');
     if (author.isEmpty) {
       author = xpath(
           res,
-          "//table[contains(@class, 'infotable')]//tr[contains(text(), '${authorLocalStr(source.lang)}')]/td[last()]/text() | //div[contains(@class, 'tsinfo')]//div[contains(@class, 'imptdt') and contains(text(), '${authorLocalStr(source.lang)}')]//i/text() | //div[contains(@class, 'fmed')]//b[contains(text(), '${authorLocalStr(source.lang)}')]/following-sibling::span[1]/text() | //span[contains(text(), '${authorLocalStr(source.lang)}')]/text()",
+          "//table[contains(@class, 'infotable')]//tr[contains(text(), '${authorLocalStr(source.lang)}')]/td[last()]/text() | //div[contains(@class, 'tsinfo')]//div[contains(@class, 'imptdt') and contains(text(), '${authorLocalStr(source.lang)}')]//i/text() | //div[contains(@class, 'fmed')]//b[contains(text(), '${authorLocalStr(source.lang)}')]/following-sibling::span[1]/text() | //span[contains(text(), '${authorLocalStr(source.lang)}')]/text() | //div[contains(@class, 'tsinfo')]//div[contains(@class, 'imptdt')]//span[contains(text(), 'ผู้แต่ง')]/following-sibling::i/text()",
           '');
     }
     if (author.isNotEmpty) {
@@ -149,7 +152,8 @@ class MangaReader extends MProvider {
     }
 
     final description = parseHtml(res)
-        .selectFirst(".desc, .entry-content[itemprop=description]")
+        .selectFirst(
+            ".desc, .entry-content[itemprop=description], .tsinfo > .wd-full > .entry-content[itemprop=description]")
         ?.text;
 
     if (description != null) {
@@ -158,7 +162,7 @@ class MangaReader extends MProvider {
 
     List<String> status = xpath(
         res,
-        "//table[contains(@class, 'infotable')]//tr[contains(text(), 'Status')]/td[last()]/text() | //div[contains(@class, 'tsinfo')]//div[contains(@class, 'imptdt') and contains(text(), 'Status')]//i/text() | //div[contains(@class, 'fmed')]//b[contains(text(), 'Status')]/following-sibling::span[1]/text() | //span[contains(text(), 'Status')]/text()",
+        "//table[contains(@class, 'infotable')]//tr[contains(text(), 'Status')]/td[last()]/text() | //div[contains(@class, 'tsinfo')]//div[contains(@class, 'imptdt') and contains(text(), 'Status')]//i/text() | //div[contains(@class, 'fmed')]//b[contains(text(), 'Status')]/following-sibling::span[1]/text() | //span[contains(text(), 'Status')]/text() |  | //div[contains(@class, 'tsinfo')]//div[contains(@class, 'imptdt')]//span[contains(text(), 'สถานะ')]/following-sibling::i/text()",
         '');
     if (status.isEmpty) {
       status = xpath(
@@ -231,11 +235,13 @@ class MangaReader extends MProvider {
 
   MPages mangaRes(String res) {
     List<MManga> mangaList = [];
-    final urls = xpath(res, '//*[ @class="imgu"  or @class="bsx"]/a/@href');
-    final names = xpath(res, '//*[ @class="imgu"  or @class="bsx"]/a/@title');
+    final urls = xpath(
+        res, '//*[ @class="imgu"  or @class="bsx" or @class="card"]/a/@href');
+    final names = xpath(
+        res, '//*[ @class="imgu"  or @class="bsx" or @class="card"]/a/@title');
     List<String> images = [];
-    images =
-        xpath(res, '//*[ @class="imgu"  or @class="bsx"]/a/div[1]/img/@src');
+    images = xpath(res,
+        '//*[ @class="imgu"  or @class="bsx"]/a/div[1]/img/@src | //div[@class="card"]/div[@class="card__img"]/@data-background-img');
     bool invalidImgs = false;
     for (var img in images) {
       if (img.contains("data:image")) {
@@ -243,8 +249,8 @@ class MangaReader extends MProvider {
       }
     }
     if (invalidImgs) {
-      images = xpath(
-          res, '//*[ @class="imgu"  or @class="bsx"]/a/div[1]/img/@data-src');
+      images = xpath(res,
+          '//*[ @class="imgu"  or @class="bsx"]/a/div[1]/img/@data-src | //div[@class="card"]/a/div[@class="card__img--hover"]/@data-background-img');
     }
     for (var i = 0; i < names.length; i++) {
       MManga manga = MManga();
