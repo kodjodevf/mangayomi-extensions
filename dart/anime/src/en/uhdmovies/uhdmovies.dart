@@ -12,7 +12,7 @@ class UHDMovies extends MProvider {
   bool get supportsLatest => false;
 
   @override
-  String get baseUrl => getPreferenceValue(source.id, "pref_domain");
+  String get baseUrl => getPreferenceValue(source.id, "pref_domain_new");
 
   @override
   Future<MPages> getPopular(int page) async {
