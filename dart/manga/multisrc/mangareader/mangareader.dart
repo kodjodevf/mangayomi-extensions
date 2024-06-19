@@ -236,8 +236,8 @@ class MangaReader extends MProvider {
     }
     if (pagesUrl.isEmpty || pagesUrl.length == 1) {
       RegExp exp = RegExp("\"images\"\\s*:\\s*(\\[.*?])");
-      Iterable<Match> matches = exp.allMatches(res);
-      final images = (matches.first as RegExpMatch).group(1);
+      var match = exp.allMatches(res).toList()[0] as RegExpMatch;
+      final images = match.group(1);
       final pages = json.decode(images!) as List;
       for (var page in pages) {
         pagesUrl.add(page);
@@ -314,22 +314,6 @@ class MangaReader extends MProvider {
           dialogMessage: "Default: ${source.baseUrl}",
           text: source.baseUrl),
     ];
-  }
-
-  String authorLocalStr(String lang) {
-    if (lang == "fr") {
-      return "Auteur";
-    }
-    return "Author";
-  }
-
-  String statusLocalStr(String lang) {
-    if (lang == "fr") {
-      return "Statut";
-    } else if (lang == "es") {
-      return "Estado";
-    }
-    return "Status";
   }
 
   String ll(String url) {
