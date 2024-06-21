@@ -233,14 +233,25 @@ class Madara extends MProvider {
     final pageElement = document.selectFirst(
         "div.page-break, li.blocks-gallery-item, .reading-content, .text-left img");
 
-    List<String> imgs = pageElement.select("img").map((e) => e.getSrc).toList();
+    List<String> imgs = pageElement
+        .select("img")
+        .map((MElement e) =>
+            e.attr("src") ??
+            e.attr("data-src") ??
+            e.attr("data-lazy-src") ??
+            e.attr("srcset"))
+        .toList();
 
     List<String> pageUrls = [];
 
     if (imgs.length == 1) {
       final pagesNumber =
           document.selectFirst("#single-pager").select("option").length;
-      final imgUrl = pageElement.selectFirst("img").getSrc;
+      MElement imgElement = pageElement.selectFirst("img");
+      final imgUrl = imgElement.attr("src") ??
+          imgElement.attr("data-src") ??
+          imgElement.attr("data-lazy-src") ??
+          imgElement.attr("srcset");
       for (var i = 0; i < pagesNumber; i++) {
         final val = i + 1;
         if (i.toString().length == 1) {
