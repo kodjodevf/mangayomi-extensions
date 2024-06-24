@@ -10,6 +10,6 @@ Source _mangairoSource = Source(
   typeSource: "mangabox",
   iconUrl:
       "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/manga/multisrc/mangabox/src/mangairo/icon.png",
-  dateFormat: "MMM-dd-yy",
+  dateFormat: "dd-MM-yyyy",
   dateFormatLocale: "en",
 );
