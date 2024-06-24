@@ -152,8 +152,7 @@ class MangaReader extends MProvider {
     }
 
     final description = parseHtml(res)
-        .selectFirst(
-            ".desc, .entry-content[itemprop=description], .tsinfo > .wd-full > .entry-content[itemprop=description]")
+        .selectFirst(".desc, .entry-content[itemprop=description]")
         ?.text;
 
     if (description != null) {
@@ -162,7 +161,7 @@ class MangaReader extends MProvider {
 
     List<String> status = xpath(
         res,
-        "//table[contains(@class, 'infotable')]//tr[contains(text(), 'Status')]/td[last()]/text() | //div[contains(@class, 'tsinfo')]//div[contains(@class, 'imptdt') and contains(text(), 'Status')]//i/text() | //div[contains(@class, 'fmed')]//b[contains(text(), 'Status')]/following-sibling::span[1]/text() | //span[contains(text(), 'Status')]/text() |  | //div[contains(@class, 'tsinfo')]//div[contains(@class, 'imptdt')]//span[contains(text(), 'สถานะ')]/following-sibling::i/text()",
+        "//table[contains(@class, 'infotable')]//tr[contains(text(), 'Status')]/td[last()]/text() | //div[contains(@class, 'tsinfo')]//div[contains(@class, 'imptdt') and contains(text(), 'Status')]//i/text() | //div[contains(@class, 'fmed')]//b[contains(text(), 'Status')]/following-sibling::span[1]/text() | //span[contains(text(), 'Status')]/text() | //div[contains(@class, 'tsinfo')]//div[contains(@class, 'imptdt')]//span[contains(text(), 'สถานะ')]/following-sibling::i/text()",
         '');
     if (status.isEmpty) {
       status = xpath(
@@ -176,7 +175,7 @@ class MangaReader extends MProvider {
     }
 
     manga.genre = xpath(res,
-        '//*[@class="gnr"  or @class="mgen"  or @class="seriestugenre" ]/a/text()');
+        '//*[@class="gnr"  or @class="mgen"  or @class="seriestugenre" ]/a/text() | //*[@class="mgen"]/li/a/text()');
     var chapUrls = xpath(res,
         '//*[@class="bxcl"  or @class="cl"  or @class="chbox" or @class="eph-num" or @id="chapterlist"]/div/a[not(contains(@href,"{{number}}"))]/@href');
     var chaptersNames = xpath(res,
