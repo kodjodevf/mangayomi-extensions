@@ -173,7 +173,7 @@ class MangaBox extends MProvider {
         dateStr = dates.last.text;
       } else {
         dateStr = element.selectFirst("ul > li > p")?.text ??
-            DateTime.now().millisecondsSinceEpoch.toString();
+            DateTime.now().toString();
       }
       chapter.url = a.getHref;
       chapter.dateUpload =
