@@ -126,6 +126,7 @@ import 'src/sereinscan/sereinscan.dart';
 import 'src/shijiescans/shijiescans.dart';
 import 'src/summertoon/summertoon.dart';
 import 'src/zenithscans/zenithscans.dart';
+import 'src/funtoons/funtoons.dart';
 
 const mangareaderVersion = "0.1.1";
 const mangareaderSourceCodeUrl =
@@ -388,7 +389,9 @@ List<Source> _mangareaderSourcesList = [
 //SummerToon (TR)
   summertoonSource,
 //Zenith Scans (TR)
-  zenithscansSource
+  zenithscansSource,
+//FunToons (TH)
+  funtoonsSource,
 ]
     .map((e) => e
       ..sourceCodeUrl = mangareaderSourceCodeUrl
