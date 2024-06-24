@@ -172,12 +172,13 @@ class MangaBox extends MProvider {
       if (dates != null && dates.isNotEmpty) {
         dateStr = dates.last.text;
       } else {
-        dateStr = element.selectFirst("ul > li > p")?.text ??
-            DateTime.now().toString();
+        dateStr = element.selectFirst("p")?.text ?? "";
       }
       chapter.url = a.getHref;
-      chapter.dateUpload =
-          parseDates([dateStr], source.dateFormat, source.dateFormatLocale)[0];
+      chapter.dateUpload = dateStr.isEmpty
+          ? DateTime.now().millisecondsSinceEpoch.toString()
+          : parseDates(
+              [dateStr], source.dateFormat, source.dateFormatLocale)[0];
       chaptersList.add(chapter);
     }
     manga.chapters = chaptersList;
