@@ -225,24 +225,32 @@ class MangaReader extends MProvider {
   Future<List<String>> getPageList(String url) async {
     url = getUrlWithoutDomain(url);
     final res = (await client.get(Uri.parse('$baseUrl$url'))).body;
-    List<String> pagesUrl = [];
 
-    final htmlElements = parseHtml(res).select("div#readerarea img");
-    for (var htmlElement in htmlElements) {
-      String img = htmlElement.getSrc;
-      if (img.contains("data:image")) {
-        img = htmlElement.getDataSrc;
-      }
-      pagesUrl.add(img);
+    List<String> pages = [];
+    List<String> pagesUrl = [];
+    bool invalidImgs = false;
+    pages = xpath(res, '//*[@id="readerarea"]/p/img/@src');
+    if (pages.isEmpty || pages.length == 1) {
+      pages = xpath(res, '//*[@id="readerarea"]/img/@src');
     }
-    if (pagesUrl.isEmpty || pagesUrl.length == 1) {
-      RegExp exp = RegExp("\"images\"\\s*:\\s*(\\[.*?])");
-      var match = exp.allMatches(res).toList()[0] as RegExpMatch;
-      final images = match.group(1);
-      final pages = json.decode(images!) as List;
+    if (pages.length > 1) {
+      for (var page in pages) {
+        if (page.contains("data:image")) {
+          invalidImgs = true;
+        }
+      }
+      if (invalidImgs) {
+        pages = xpath(res, '//*[@id="readerarea"]/img/@data-src');
+      }
+    }
+    if (pages.isEmpty || pages.length == 1) {
+      final images = regExp(res, "\"images\"\\s*:\\s*(\\[.*?])", "", 1, 1);
+      final pages = json.decode(images) as List;
       for (var page in pages) {
         pagesUrl.add(page);
       }
+    } else {
+      return pages;
     }
 
     return pagesUrl;
