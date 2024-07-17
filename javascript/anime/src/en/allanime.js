@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "single",
     "isManga": false,
     "isNsfw": false,
-    "version": "0.0.15",
+    "version": "0.0.2",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/en/allanime.js"
@@ -371,108 +371,112 @@ class AllAnimeExtractor {
         }
         const linkJson = JSON.parse(resp.body);
         for (const link of linkJson.links) {
-            const subtitles = [];
-            if (link.subtitles && link.subtitles.length > 0) {
-                subtitles.push(...link.subtitles.map(sub => {
-                    const label = sub.label ? ` - ${sub.label}` : '';
-                    return { file: sub.src, label: `${sub.lang}${label}` };
-                }));
-            }
-            if (link.mp4) {
-                videoList.push({
-                    url:
-                        link.link,
-                    quality: `Original (${name} - ${link.resolutionStr})`,
-                    originalUrl: link.link,
-                    subtitles,
-                });
-            } else if (link.hls) {
-                const headers =
-                {
-                    'Host': link.link.match(/^(?:https?:\/\/)?(?:www\.)?([^\/]+)/)[1],
-                    'Origin': endPoint,
-                    'Referer': `${endPoint}/`
-                };
-                const resp = await new Client().get(link.link, headers);
-
-                if (resp.statusCode === 200) {
-                    const masterPlaylist = resp.body;
-                    const audios = [];
-                    if (masterPlaylist.includes('#EXT-X-MEDIA:TYPE=AUDIO')) {
-                        const audioInfo = masterPlaylist.substringAfter('#EXT-X-MEDIA:TYPE=AUDIO').substringBefore('\n');
-                        const language = audioInfo.substringAfter('NAME="').substringBefore('"');
-                        const url = audioInfo.substringAfter('URI="').substringBefore('"');
-                        audios.push({ file: url, label: language });
-                    }
-                    if (!masterPlaylist.includes('#EXT-X-STREAM-INF:')) {
-                        if (audios.length === 0) {
-                            videoList.push({ url: link.link, quality: `${name} - ${link.resolutionStr}`, originalUrl: link.link, subtitles, headers });
-                        } else {
-                            videoList.push({ url: link.link, quality: `${name} - ${link.resolutionStr}`, originalUrl: link.link, subtitles, audios, headers });
-                        }
-                    } else {
-                        masterPlaylist.substringAfter('#EXT-X-STREAM-INF:').split('#EXT-X-STREAM-INF:').forEach(it => {
-                            let bandwidth = '';
-                            if (it.includes('AVERAGE-BANDWIDTH')) {
-                                bandwidth = ` ${this.bytesIntoHumanReadable(it.substringAfter('AVERAGE-BANDWIDTH=').substringBefore(','))}`;
-                            }
-                            const quality = `${it.substringAfter('RESOLUTION=').substringAfter('x').substringBefore(',')}p${bandwidth} (${name} - ${link.resolutionStr})`;
-                            let videoUrl = it.substringAfter('\n').substringBefore('\n');
-
-                            if (!videoUrl.startsWith('http')) {
-                                videoUrl = resp.request.url.substringBeforeLast('/') + `/${videoUrl}`;
-                            }
-                            const headers =
-                            {
-                                'Host': videoUrl.match(/^(?:https?:\/\/)?(?:www\.)?([^\/]+)/)[1],
-                                'Origin': endPoint,
-                                'Referer': `${endPoint}/`
-                            };
-                            if (audios.length === 0) {
-                                videoList.push({ url: videoUrl, quality, originalUrl: videoUrl, subtitles, headers });
-                            } else {
-                                videoList.push({ url: videoUrl, quality, originalUrl: videoUrl, subtitles, audios, headers });
-                            }
-
-                        });
-                    }
+            try {
+                const subtitles = [];
+                if (link.subtitles && link.subtitles.length > 0) {
+                    subtitles.push(...link.subtitles.map(sub => {
+                        const label = sub.label ? ` - ${sub.label}` : '';
+                        return { file: sub.src, label: `${sub.lang}${label}` };
+                    }));
                 }
-            } else if (link.crIframe) {
-                for (const stream of link.portData.streams) {
-                    if (stream.format === 'adaptive_dash') {
-                        videoList.push({
-                            url:
-                                stream.url,
-                            quality: `Original (AC - Dash${stream.hardsub_lang.length === 0 ? '' : ` - Hardsub: ${stream.hardsub_lang}`})`,
-                            originalUrl: stream.url,
-                            subtitles,
-                        });
-                    } else if (stream.format === 'adaptive_hls') {
-                        const resp = await new Client().get(stream.url, { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:101.0) Gecko/20100101 Firefox/101.0' })
-                        if (resp.statusCode === 200) {
-                            const masterPlaylist = resp.body;
-                            masterPlaylist.substringAfter('#EXT-X-STREAM-INF:').split('#EXT-X-STREAM-INF:').forEach(t => {
-                                const quality = `${t.substringAfter('RESOLUTION=').substringAfter('x').substringBefore(',')}p (AC - HLS${stream.hardsub_lang.length === 0 ? '' : ` - Hardsub: ${stream.hardsub_lang}`})`;
-                                const videoUrl = t.substringAfter('\n').substringBefore('\n');
-                                videoList.push({ url: videoUrl, quality, originalUrl: videoUrl, subtitles });
+                if (link.mp4) {
+                    videoList.push({
+                        url:
+                            link.link,
+                        quality: `Original (${name} - ${link.resolutionStr})`,
+                        originalUrl: link.link,
+                        subtitles,
+                    });
+                } else if (link.hls) {
+                    const headers =
+                    {
+                        'Host': link.link.match(/^(?:https?:\/\/)?(?:www\.)?([^\/]+)/)[1],
+                        'Origin': endPoint,
+                        'Referer': `${endPoint}/`
+                    };
+                    const resp = await new Client().get(link.link, headers);
+
+                    if (resp.statusCode === 200) {
+                        const masterPlaylist = resp.body;
+                        const audios = [];
+                        if (masterPlaylist.includes('#EXT-X-MEDIA:TYPE=AUDIO')) {
+                            const audioInfo = masterPlaylist.substringAfter('#EXT-X-MEDIA:TYPE=AUDIO').substringBefore('\n');
+                            const language = audioInfo.substringAfter('NAME="').substringBefore('"');
+                            const url = audioInfo.substringAfter('URI="').substringBefore('"');
+                            audios.push({ file: url, label: language });
+                        }
+                        if (!masterPlaylist.includes('#EXT-X-STREAM-INF:')) {
+                            if (audios.length === 0) {
+                                videoList.push({ url: link.link, quality: `${name} - ${link.resolutionStr}`, originalUrl: link.link, subtitles, headers });
+                            } else {
+                                videoList.push({ url: link.link, quality: `${name} - ${link.resolutionStr}`, originalUrl: link.link, subtitles, audios, headers });
+                            }
+                        } else {
+                            masterPlaylist.substringAfter('#EXT-X-STREAM-INF:').split('#EXT-X-STREAM-INF:').forEach(it => {
+                                let bandwidth = '';
+                                if (it.includes('AVERAGE-BANDWIDTH')) {
+                                    bandwidth = ` ${this.bytesIntoHumanReadable(it.substringAfter('AVERAGE-BANDWIDTH=').substringBefore(','))}`;
+                                }
+                                const quality = `${it.substringAfter('RESOLUTION=').substringAfter('x').substringBefore(',')}p${bandwidth} (${name} - ${link.resolutionStr})`;
+                                let videoUrl = it.substringAfter('\n').substringBefore('\n');
+
+                                if (!videoUrl.startsWith('http')) {
+                                    videoUrl = resp.request.url.substringBeforeLast('/') + `/${videoUrl}`;
+                                }
+                                const headers =
+                                {
+                                    'Host': videoUrl.match(/^(?:https?:\/\/)?(?:www\.)?([^\/]+)/)[1],
+                                    'Origin': endPoint,
+                                    'Referer': `${endPoint}/`
+                                };
+                                if (audios.length === 0) {
+                                    videoList.push({ url: videoUrl, quality, originalUrl: videoUrl, subtitles, headers });
+                                } else {
+                                    videoList.push({ url: videoUrl, quality, originalUrl: videoUrl, subtitles, audios, headers });
+                                }
+
                             });
                         }
                     }
-                }
-            } else if (link.dash) {
-                const audios = link.rawUrls && link.rawUrls.audios ? link.rawUrls.audios.map(it => { return { file: it.url, label: this.bytesIntoHumanReadable(it.bandwidth) }; }) : [];
-                const videos = link.rawUrls && link.rawUrls.vids ? link.rawUrls.vids.map
-                    (it => {
-                        if (!audios) {
-                            return { url: it.url, quality: `${name} - ${it.height} ${this.bytesIntoHumanReadable(it.bandwidth)}`, originalUrl: it.url, subtitles };
-                        } else {
-                            return { url: it.url, quality: `${name} - ${it.height} ${this.bytesIntoHumanReadable(it.bandwidth)}`, originalUrl: it.url, audios, subtitles };
+                } else if (link.crIframe) {
+                    for (const stream of link.portData.streams) {
+                        if (stream.format === 'adaptive_dash') {
+                            videoList.push({
+                                url:
+                                    stream.url,
+                                quality: `Original (AC - Dash${stream.hardsub_lang.length === 0 ? '' : ` - Hardsub: ${stream.hardsub_lang}`})`,
+                                originalUrl: stream.url,
+                                subtitles,
+                            });
+                        } else if (stream.format === 'adaptive_hls') {
+                            const resp = await new Client().get(stream.url, { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:101.0) Gecko/20100101 Firefox/101.0' })
+                            if (resp.statusCode === 200) {
+                                const masterPlaylist = resp.body;
+                                masterPlaylist.substringAfter('#EXT-X-STREAM-INF:').split('#EXT-X-STREAM-INF:').forEach(t => {
+                                    const quality = `${t.substringAfter('RESOLUTION=').substringAfter('x').substringBefore(',')}p (AC - HLS${stream.hardsub_lang.length === 0 ? '' : ` - Hardsub: ${stream.hardsub_lang}`})`;
+                                    const videoUrl = t.substringAfter('\n').substringBefore('\n');
+                                    videoList.push({ url: videoUrl, quality, originalUrl: videoUrl, subtitles });
+                                });
+                            }
                         }
-                    }) : [];
+                    }
+                } else if (link.dash) {
+                    const audios = link.rawUrls && link.rawUrls.audios ? link.rawUrls.audios.map(it => { return { file: it.url, label: this.bytesIntoHumanReadable(it.bandwidth) }; }) : [];
+                    const videos = link.rawUrls && link.rawUrls.vids ? link.rawUrls.vids.map
+                        (it => {
+                            if (!audios) {
+                                return { url: it.url, quality: `${name} - ${it.height} ${this.bytesIntoHumanReadable(it.bandwidth)}`, originalUrl: it.url, subtitles };
+                            } else {
+                                return { url: it.url, quality: `${name} - ${it.height} ${this.bytesIntoHumanReadable(it.bandwidth)}`, originalUrl: it.url, audios, subtitles };
+                            }
+                        }) : [];
 
-                if (videos.length > 0) {
-                    videoList.push(...videos);
+                    if (videos.length > 0) {
+                        videoList.push(...videos);
+                    }
                 }
+            } catch (_) {
+
             }
         }
         return videoList;

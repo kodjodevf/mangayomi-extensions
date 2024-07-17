@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "single",
     "isManga": false,
     "isNsfw": false,
-    "version": "0.0.1",
+    "version": "0.0.15",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/de/aniworld.js"
@@ -132,38 +132,43 @@ class DefaultExtension extends MProvider {
         const hosterSelection = preference.get("hoster_selection");
         const videos = [];
         for (const element of redirectlink) {
-            const langkey = element.attr("data-lang-key");
-            let language = "";
-            if (langkey.includes("3")) {
-                language = "Deutscher Sub";
-            } else if (langkey.includes("1")) {
-                language = "Deutscher Dub";
-            } else if (langkey.includes("2")) {
-                language = "Englischer Sub";
-            }
-            const redirectgs = baseUrl + element.selectFirst("a.watchEpisode").attr("href");
-            const hoster = element.selectFirst("a h4").text;
-            if (hoster == "Streamtape" && hosterSelection.includes("Streamtape")) {
-                const body = (await new Client().get(redirectgs)).body;
-                const quality = `Streamtape ${language}`;
-                const vids = await streamTapeExtractor(body.match(/https:\/\/streamtape\.com\/e\/[a-zA-Z0-9]+/g)[0], quality);
-                for (const vid of vids) {
-                    videos.push(vid);
+            try {
+                const langkey = element.attr("data-lang-key");
+                let language = "";
+                if (langkey.includes("3")) {
+                    language = "Deutscher Sub";
+                } else if (langkey.includes("1")) {
+                    language = "Deutscher Dub";
+                } else if (langkey.includes("2")) {
+                    language = "Englischer Sub";
                 }
-            } else if (hoster == "VOE" && hosterSelection.includes("VOE")) {
-                const body = (await new Client().get(redirectgs)).body;
-                const quality = `VOE ${language}`;
-                const vids = await voeExtractor(body.match(/https:\/\/voe\.sx\/e\/[a-zA-Z0-9]+/g)[0], quality);
-                for (const vid of vids) {
-                    videos.push(vid);
+                const redirectgs = baseUrl + element.selectFirst("a.watchEpisode").attr("href");
+                const hoster = element.selectFirst("a h4").text;
+
+                if (hoster == "Streamtape" && hosterSelection.includes("Streamtape")) {
+                    const body = (await new Client().get(redirectgs)).body;
+                    const quality = `Streamtape ${language}`;
+                    const vids = await streamTapeExtractor(body.match(/https:\/\/streamtape\.com\/e\/[a-zA-Z0-9]+/g)[0], quality);
+                    for (const vid of vids) {
+                        videos.push(vid);
+                    }
+                } else if (hoster == "VOE" && hosterSelection.includes("VOE")) {
+                    const body = (await new Client().get(redirectgs)).body;
+                    const quality = `VOE ${language}`;
+                    const vids = await voeExtractor(body.match(/https:\/\/voe\.sx\/e\/[a-zA-Z0-9]+/g)[0], quality);
+                    for (const vid of vids) {
+                        videos.push(vid);
+                    }
+                } else if (hoster == "Vidoza" && hosterSelection.includes("Vidoza")) {
+                    const body = (await new Client().get(redirectgs)).body;
+                    const quality = `Vidoza ${language}`;
+                    const match = body.match(/https:\/\/[^\s]*\.vidoza\.net\/[^\s]*\.mp4/g);
+                    if (match.length > 0) {
+                        videos.push({ url: match[0], originalUrl: match[0], quality });
+                    }
                 }
-            } else if (hoster == "Vidoza" && hosterSelection.includes("Vidoza")) {
-                const body = (await new Client().get(redirectgs)).body;
-                const quality = `Vidoza ${language}`;
-                const match = body.match(/https:\/\/[^\s]*\.vidoza\.net\/[^\s]*\.mp4/g);
-                if (match.length > 0) {
-                    videos.push({ url: match[0], originalUrl: match[0], quality });
-                }
+            } catch (_) {
+
             }
         }
         return this.sortVideos(videos);
