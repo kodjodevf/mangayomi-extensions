@@ -71,7 +71,6 @@ import 'src/lunarscans/lunarscans.dart';
 import 'src/lunarscanshentai/lunarscanshentai.dart';
 import 'src/mangasscans/mangasscans.dart';
 import 'src/rimuscans/rimuscans.dart';
-import 'src/sushiscanfr/sushiscanfr.dart';
 import 'src/vfscan/vfscan.dart';
 import 'src/comicaso/comicaso.dart';
 import 'src/kiryuu/kiryuu.dart';
@@ -278,8 +277,6 @@ List<Source> _mangareaderSourcesList = [
   mangasscansSource,
 //Rimu Scans (FR)
   rimuscansSource,
-//Sushiscan.fr (FR)
-  sushiscanfrSource,
 //VF Scan (FR)
   vfscanSource,
 //Comicaso (ID)
