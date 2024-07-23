@@ -7,10 +7,10 @@ const mangayomiSources = [{
     "typeSource": "single",
     "isManga": false,
     "isNsfw": false,
-    "version": "0.0.2",
+    "version": "0.0.1",
     "dateFormat": "",
     "dateFormatLocale": "",
-    "pkgPath": ""
+    "pkgPath": "anime/src/es/animeflv.js"
 }];
 
 class DefaultExtension extends MProvider {
@@ -96,6 +96,7 @@ class DefaultExtension extends MProvider {
 
         return this.sortVideos(videos);
     }
+
     sortVideos(videos) {
         const preferences = new SharedPreferences();
         const server = preferences.get("preferred_server");
@@ -115,6 +116,7 @@ class DefaultExtension extends MProvider {
         });
         return videos;
     }
+
     animeFromElement(body) {
         const elements = new Document(body).select("div.Container ul.ListAnimes li article");
         const list = [];
