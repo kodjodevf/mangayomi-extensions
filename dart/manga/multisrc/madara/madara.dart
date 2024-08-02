@@ -228,30 +228,30 @@ class Madara extends MProvider {
 
   @override
   Future<List<String>> getPageList(String url) async {
-    final res = (await client.get(Uri.parse(url))).body;
-    final document = parseHtml(res);
-    final pageElement = document.selectFirst(
-        "div.page-break, li.blocks-gallery-item, .reading-content, .text-left img");
+    final res = (await client.get(Uri.parse(url)));
+    final document = parseHtml(res.body);
 
-    List<String> imgs = pageElement
-        .select("img")
-        .map((MElement e) =>
-            e.attr("src") ??
-            e.attr("data-src") ??
-            e.attr("data-lazy-src") ??
-            e.attr("srcset"))
-        .toList();
+    final pageElements = document.select(
+        "div.page-break, li.blocks-gallery-item, .reading-content .text-left:not(:has(.blocks-gallery-item)) img");
+
+    List<String> imgs = [];
+    for (var element in pageElements) {
+      try {
+        final imgElement = element.selectFirst("img");
+        final img = imgElement.attr("src") ??
+            imgElement.attr("data-src") ??
+            imgElement.attr("data-lazy-src") ??
+            imgElement.attr("srcset");
+        imgs.add(img);
+      } catch (_) {}
+    }
 
     List<String> pageUrls = [];
 
     if (imgs.length == 1) {
       final pagesNumber =
           document.selectFirst("#single-pager").select("option").length;
-      MElement imgElement = pageElement.selectFirst("img");
-      final imgUrl = imgElement.attr("src") ??
-          imgElement.attr("data-src") ??
-          imgElement.attr("data-lazy-src") ??
-          imgElement.attr("srcset");
+      final imgUrl = imgs.first;
       for (var i = 0; i < pagesNumber; i++) {
         final val = i + 1;
         if (i.toString().length == 1) {
