@@ -102,7 +102,7 @@ class DiziWatch extends MProvider {
       chapter.url = a.getHref;
       chapters.add(chapter);
     } 
-    anime.chapters = chapters;
+    anime.chapters = chapters.reversed.toList();
 
     return anime;        
   }
