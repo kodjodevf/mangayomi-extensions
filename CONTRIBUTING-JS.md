@@ -97,7 +97,7 @@ a.k.a. the Latest source entry point in the app (invoked by tapping on the "Late
 
 #### Chapter pages
 
-- When user opens an chapter, `getPageList` will be called and it will return an array of map like `{ url:string,headers:map }` that are used by the reader.
+- When user opens an chapter, `getPageList` will be called and it will return an array of string or an array of map like `{ url:string,headers:map }` that are used by the reader.
 
 #### Episode Videos
 
