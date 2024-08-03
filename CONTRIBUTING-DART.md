@@ -133,7 +133,7 @@ All control filters can have a default state set. It's usually recommended if th
 
 #### Chapter pages
 
-- When user opens an chapter, `getPageList` will be called and it will return a `List<Map<String,dynamic>>` with a list of `{"url":string,"headers":Map<String,String>}` that are used by the reader.
+- When user opens an chapter, `getPageList` will be called and it will return a `List<String>` or `List<Map<String,dynamic>>` with a list of `{"url":string,"headers":Map<String,String>}` that are used by the reader.
 
 #### Episode Videos
 
