@@ -9,7 +9,7 @@ class Aniwave extends MProvider {
   final Client client = Client(source);
 
   @override
-  String get baseUrl => getPreferenceValue(source.id, "preferred_domain1");
+  String get baseUrl => getPreferenceValue(source.id, "preferred_domain2");
 
   @override
   Future<MPages> getPopular(int page) async {
@@ -174,9 +174,12 @@ class Aniwave extends MProvider {
     final ids = substringBefore(url, "&");
     final encrypt = vrfEncrypt(ids);
     final vrf = "vrf=${Uri.encodeComponent(encrypt)}";
-    final res =
-        (await client.get(Uri.parse("$baseUrl/ajax/server/list/$ids?$vrf")))
-            .body;
+    final res = (await client
+            .get(Uri.parse("$baseUrl/ajax/server/list/$ids?$vrf"), headers: {
+      "Referer": baseUrl + url,
+      "X-Requested-With": "XMLHttpRequest"
+    }))
+        .body;
     final html = json.decode(res)["result"];
 
     final vidsHtmls = parseHtml(html).select("div.servers > div");
@@ -202,21 +205,21 @@ class Aniwave extends MProvider {
           final hosterSelection = preferenceHosterSelection(source.id);
           final typeSelection = preferenceTypeSelection(source.id);
           if (typeSelection.contains(type.toLowerCase())) {
-            if (serverName.contains("vidplay") || url.contains("mcloud")) {
+            if (serverName.contains("vidstream") || url.contains("megaf")) {
               final hosterName =
-                  serverName.contains("vidplay") ? "VidPlay" : "MyCloud";
+                  serverName.contains("vidstream") ? "Vidstream" : "MegaF";
               if (hosterSelection.contains(hosterName.toLowerCase())) {
                 a = await vidsrcExtractor(url, hosterName, type);
               }
-            } else if (serverName.contains("mp4upload") &&
-                hosterSelection.contains("mp4upload")) {
+            } else if (serverName.contains("mp4u") &&
+                hosterSelection.contains("mp4u")) {
               a = await mp4UploadExtractor(url, null, "", type);
             } else if (serverName.contains("streamtape") &&
                 hosterSelection.contains("streamtape")) {
               a = await streamTapeExtractor(url, "StreamTape - $type");
-            } else if (serverName.contains("filemoon") &&
-                hosterSelection.contains("filemoon")) {
-              a = await filemoonExtractor(url, "", type);
+            } else if (serverName.contains("moonf") &&
+                hosterSelection.contains("moonf")) {
+              a = await filemoonExtractor(url, "MoonF", type);
             }
             videos.addAll(a);
           }
@@ -274,17 +277,14 @@ class Aniwave extends MProvider {
   }
 
   String vrfEncrypt(String input) {
-    final rc4 = rc4Encrypt("tGn6kIpVXBEUmqjD", input.codeUnits);
+    final rc4 = rc4Encrypt("T78s2WjTc7hSIZZR", input.codeUnits);
     final vrf = base64Url.encode(rc4);
-    final vrf1 = base64.encode(vrf.codeUnits);
-    List<int> vrf2 = vrfShift(vrf1.codeUnits);
-    final vrf3 = base64Url.encode(vrf2.reversed.toList());
-    return utf8.decode(vrf3.codeUnits);
+    return utf8.decode(vrf.codeUnits);
   }
 
-  String vrfDecrypt(String input) {
+  String vrfDecrypt(String input, {String key = "ctpAbOz5u7S6OMkx"}) {
     final decode = base64Url.decode(input);
-    final rc4 = rc4Encrypt("LUyDrL4qIxtIxOGs", decode);
+    final rc4 = rc4Encrypt(key, decode);
     return Uri.decodeComponent(utf8.decode(rc4));
   }
 
@@ -299,67 +299,62 @@ class Aniwave extends MProvider {
 
   Future<List<MVideo>> vidsrcExtractor(
       String url, String name, String type) async {
-    List<String> keys = json.decode((await client.get(Uri.parse(
-            "https://raw.githubusercontent.com/KillerDogeEmpire/vidplay-keys/keys/keys.json")))
-        .body);
     List<MVideo> videoList = [];
     final host = Uri.parse(url).host;
-    final apiUrl = await getApiUrl(url, keys);
+    final apiUrl = getApiUrl(url);
+    final res = await client.get(Uri.parse(apiUrl));
 
-    final res = await client.get(Uri.parse(apiUrl), headers: {
-      "Host": host,
-      "Referer": Uri.decodeComponent(url),
-      "X-Requested-With": "XMLHttpRequest"
-    });
-    final result = json.decode(res.body)['result'];
+    if (res.body.startsWith("{")) {
+      final result = json.decode(
+          vrfDecrypt(json.decode(res.body)['result'], key: "9jXDYBZUcTcTZveM"));
+      if (result != 404) {
+        String masterUrl =
+            ((result['sources'] as List<Map<String, dynamic>>).first)['file'];
+        final tracks = (result['tracks'] as List)
+            .where((e) => e['kind'] == 'captions' ? true : false)
+            .toList();
+        List<MTrack> subtitles = [];
 
-    if (result != 404) {
-      String masterUrl =
-          ((result['sources'] as List<Map<String, dynamic>>).first)['file'];
-      final tracks = (result['tracks'] as List)
-          .where((e) => e['kind'] == 'captions' ? true : false)
-          .toList();
-      List<MTrack> subtitles = [];
-
-      for (var sub in tracks) {
-        try {
-          MTrack subtitle = MTrack();
-          subtitle
-            ..label = sub["label"]
-            ..file = sub["file"];
-          subtitles.add(subtitle);
-        } catch (_) {}
-      }
-
-      final masterPlaylistRes = (await client.get(Uri.parse(masterUrl))).body;
-
-      for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
-          .split("#EXT-X-STREAM-INF:")) {
-        final quality =
-            "${substringBefore(substringBefore(substringAfter(substringAfter(it, "RESOLUTION="), "x"), ","), "\n")}p";
-
-        String videoUrl = substringBefore(substringAfter(it, "\n"), "\n");
-
-        if (!videoUrl.startsWith("http")) {
-          videoUrl =
-              "${masterUrl.split("/").sublist(0, masterUrl.split("/").length - 1).join("/")}/$videoUrl";
+        for (var sub in tracks) {
+          try {
+            MTrack subtitle = MTrack();
+            subtitle
+              ..label = sub["label"]
+              ..file = sub["file"];
+            subtitles.add(subtitle);
+          } catch (_) {}
         }
 
-        MVideo video = MVideo();
-        video
-          ..url = videoUrl
-          ..originalUrl = videoUrl
-          ..quality = "$name - $type - $quality"
-          ..headers = {"Referer": "https://$host/"}
-          ..subtitles = subtitles;
-        videoList.add(video);
+        final masterPlaylistRes = (await client.get(Uri.parse(masterUrl))).body;
+
+        for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
+            .split("#EXT-X-STREAM-INF:")) {
+          final quality =
+              "${substringBefore(substringBefore(substringAfter(substringAfter(it, "RESOLUTION="), "x"), ","), "\n")}p";
+
+          String videoUrl = substringBefore(substringAfter(it, "\n"), "\n");
+
+          if (!videoUrl.startsWith("http")) {
+            videoUrl =
+                "${masterUrl.split("/").sublist(0, masterUrl.split("/").length - 1).join("/")}/$videoUrl";
+          }
+
+          MVideo video = MVideo();
+          video
+            ..url = videoUrl
+            ..originalUrl = videoUrl
+            ..quality = "$name - $type - $quality"
+            ..headers = {"Referer": "https://$host/"}
+            ..subtitles = subtitles;
+          videoList.add(video);
+        }
       }
     }
 
     return videoList;
   }
 
-  Future<String> getApiUrl(String url, List<String> keyList) async {
+  String getApiUrl(String url) {
     final host = Uri.parse(url).host;
     final paramsToString = Uri.parse(url)
         .queryParameters
@@ -367,23 +362,21 @@ class Aniwave extends MProvider {
         .map((e) => "${e.key}=${e.value}")
         .join("&");
     var vidId = substringBefore(substringAfterLast(url, "/"), "?");
-    var encodedID = encodeID(vidId, keyList);
-    final apiSlug = await callFromFuToken(host, encodedID, url);
+
+    final apiSlug = encodeID(vidId, "8Qy3mlM2kod80XIK");
+    final h = encodeID(vidId, "BgKVSrzpH2Enosgm");
     String apiUrlString = "";
-    apiUrlString += "https://$host/$apiSlug";
+    apiUrlString += "https://$host/mediainfo/$apiSlug";
     if (paramsToString.isNotEmpty) {
-      apiUrlString += "?$paramsToString";
+      apiUrlString += "?$paramsToString&h=$h";
     }
 
     return apiUrlString;
   }
 
-  String encodeID(String vidId, List<String> keyList) {
-    var rc4Key1 = keyList[0];
-    var rc4Key2 = keyList[1];
-    final rc4 = rc4Encrypt(rc4Key1, vidId.codeUnits);
-    final rc41 = rc4Encrypt(rc4Key2, rc4);
-    return base64.encode(rc41).replaceAll("/", "_").trim();
+  String encodeID(String vidId, String key) {
+    final rc4 = rc4Encrypt(key, vidId.codeUnits);
+    return base64.encode(rc4).replaceAll("+", "-").replaceAll("/", "_").trim();
   }
 
   Future<String> callFromFuToken(String host, String data, String url) async {
@@ -541,22 +534,12 @@ class Aniwave extends MProvider {
   List<dynamic> getSourcePreferences() {
     return [
       ListPreference(
-          key: "preferred_domain1",
+          key: "preferred_domain2",
           title: "Preferred domain",
           summary: "",
           valueIndex: 0,
-          entries: [
-            "aniwave.to",
-            "aniwave.ws",
-            "aniwave.li",
-            "aniwave.vc"
-          ],
-          entryValues: [
-            "https://aniwave.to",
-            "https://aniwave.ws",
-            "https://aniwave.li",
-            "https://aniwave.vc"
-          ]),
+          entries: ["aniwave.to", "aniwavetv.to (unofficial)"],
+          entryValues: ["https://aniwave.to", "https://aniwavetv.to"]),
       ListPreference(
           key: "preferred_quality",
           title: "Preferred Quality",
@@ -572,49 +555,31 @@ class Aniwave extends MProvider {
           entries: ["Sub", "Softsub", "Dub"],
           entryValues: ["Sub", "Softsub", "Dub"]),
       ListPreference(
-          key: "preferred_server",
+          key: "preferred_server1",
           title: "Preferred server",
           summary: "",
           valueIndex: 0,
           entries: [
-            "VidPlay",
-            "MyCloud",
-            "Filemoon",
+            "Vidstream",
+            "Megaf",
+            "MoonF",
             "StreamTape",
-            "Mp4Upload"
+            "MP4u"
           ],
           entryValues: [
-            "vidplay",
-            "mycloud",
-            "filemoon",
+            "vidstream",
+            "megaf",
+            "moonf",
             "streamtape",
             "mp4upload"
           ]),
       MultiSelectListPreference(
-          key: "hoster_selection",
+          key: "hoster_selection1",
           title: "Enable/Disable Hosts",
           summary: "",
-          entries: [
-            "VidPlay",
-            "MyCloud",
-            "Filemoon",
-            "StreamTape",
-            "Mp4Upload"
-          ],
-          entryValues: [
-            "vidplay",
-            "mycloud",
-            "filemoon",
-            "streamtape",
-            "mp4upload"
-          ],
-          values: [
-            "vidplay",
-            "mycloud",
-            "filemoon",
-            "streamtape",
-            "mp4upload"
-          ]),
+          entries: ["Vidstream", "Megaf", "MoonF", "StreamTape", "MP4u"],
+          entryValues: ["vidstream", "megaf", "moonf", "streamtape", "mp4u"],
+          values: ["vidstream", "megaf", "moonf", "streamtape", "mp4u"]),
       MultiSelectListPreference(
           key: "type_selection",
           title: "Enable/Disable Type",
@@ -626,7 +591,7 @@ class Aniwave extends MProvider {
   }
 
   List<String> preferenceHosterSelection(int sourceId) {
-    return getPreferenceValue(sourceId, "hoster_selection");
+    return getPreferenceValue(sourceId, "hoster_selection1");
   }
 
   List<String> preferenceTypeSelection(int sourceId) {
@@ -635,7 +600,7 @@ class Aniwave extends MProvider {
 
   List<MVideo> sortVideos(List<MVideo> videos, int sourceId) {
     String quality = getPreferenceValue(sourceId, "preferred_quality");
-    String server = getPreferenceValue(sourceId, "preferred_server");
+    String server = getPreferenceValue(sourceId, "preferred_server1");
     String lang = getPreferenceValue(sourceId, "preferred_language");
     videos.sort((MVideo a, MVideo b) {
       int qualityMatchA = 0;
