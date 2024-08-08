@@ -379,23 +379,6 @@ class Aniwave extends MProvider {
     return base64.encode(rc4).replaceAll("+", "-").replaceAll("/", "_").trim();
   }
 
-  Future<String> callFromFuToken(String host, String data, String url) async {
-    final fuTokenScript = (await client
-            .get(Uri.parse("https://$host/futoken"), headers: {"Referer": url}))
-        .body;
-
-    String js = "";
-    js += "(function";
-    js += substringBefore(
-        substringAfter(substringAfter(fuTokenScript, "window"), "function")
-            .replaceAll("jQuery.ajax(", ""),
-        "+location.search");
-    js += "}(\"$data\"))";
-    final jsRes = await evalJs(js);
-    if (jsRes == "error") return "";
-    return jsRes;
-  }
-
   @override
   List<dynamic> getFilterList() {
     return [
