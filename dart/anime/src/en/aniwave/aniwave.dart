@@ -104,8 +104,28 @@ class Aniwave extends MProvider {
     final statusList = [
       {"Releasing": 0, "Completed": 1}
     ];
-    final res = (await client.get(Uri.parse("$baseUrl$url"))).body;
-    MManga anime = MManga();
+    final response =
+        await Client(source, json.encode({"followRedirects": false}))
+            .get(Uri.parse("$baseUrl$url"));
+    String res = response.body;
+    if (getMapValue(json.encode(response.headers), "location")
+        .contains("/filter?keyword=")) {
+      res = (await Client().get(Uri.parse("$baseUrl$url"))).body;
+      final animeUrls = parseHtml(res)
+          .selectFirst("div.ani.items > div.item")
+          .select("a[href]")
+          .where((MElement element) => (element.getHref as String)
+              .startsWith("${substringBefore(url, ".")}."))
+          .toList();
+      if (animeUrls.isNotEmpty) {
+        res = (await client.get(Uri.parse("$baseUrl${animeUrls[0].getHref}")))
+            .body;
+      } else {
+        throw "Anime url not found";
+      }
+    }
+
+    var anime = MManga();
     final status = xpath(res, '//div[contains(text(),"Status")]/span/text()');
     if (status.isNotEmpty) {
       anime.status = parseStatus(status.first, statusList);
