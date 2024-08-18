@@ -168,21 +168,10 @@ class Madara extends MProvider {
         "";
 
     final imageElement = document.selectFirst("div.summary_image img");
-    var image = imageElement?.attr("src") ??
-        imageElement?.attr("data-src") ??
-        imageElement?.attr("data-lazy-src") ??
-        imageElement?.attr("srcset");
-    if (image != null) {
-      if (image.contains("dflazy")) {
-        image = imageElement?.attr("data-src") ??
-            imageElement?.attr("data-src") ??
-            imageElement?.attr("data-lazy-src") ??
-            imageElement?.attr("srcset");
-      }
-      if (image != null) {
-        manga.imageUrl = image;
-      }
-    }
+    manga.imageUrl = imageElement?.attr("data-src") ??
+          imageElement?.attr("data-lazy-src") ??
+          imageElement?.attr("srcset") ??
+          imageElement?.getSrc;
 
     final id = document
             .selectFirst("div[id^=manga-chapters-holder]")
