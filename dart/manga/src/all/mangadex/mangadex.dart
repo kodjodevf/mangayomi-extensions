@@ -9,11 +9,14 @@ class MangaDex extends MProvider {
   final Client client = Client(source);
 
   @override
+  Map<String, String> get headers =>
+      {"user-agent": getPreferenceValue(source.id, "custom_user_agent")};
+  @override
   Future<MPages> getPopular(int page) async {
     page = (20 * (page - 1));
     final url =
         "https://api.mangadex.org/manga?limit=20&offset=$page&availableTranslatedLanguage[]=${source.lang}&includes[]=cover_art${preferenceContentRating(source.id)}${preferenceOriginalLanguages(source.id)}&order[followedCount]=desc";
-    final res = (await client.get(Uri.parse(url))).body;
+    final res = (await client.get(Uri.parse(url), headers: headers)).body;
     return mangaRes(res);
   }
 
@@ -22,7 +25,7 @@ class MangaDex extends MProvider {
     page = (20 * (page - 1));
     final url =
         "https://api.mangadex.org/chapter?limit=20&offset=$page&translatedLanguage[]=${source.lang}&includeFutureUpdates=0&order[publishAt]=desc&includeFuturePublishAt=0&includeEmptyPages=0";
-    final ress = (await client.get(Uri.parse(url))).body;
+    final ress = (await client.get(Uri.parse(url), headers: headers)).body;
     final mangaIds =
         jsonPathToString(ress, r'$.data[*].relationships[*].id', '.--')
             .split('.--');
@@ -32,7 +35,7 @@ class MangaDex extends MProvider {
     }
     final newUrl =
         "https://api.mangadex.org/manga?includes[]=cover_art&limit=${mangaIds.length}${preferenceContentRating(source.id)}${preferenceOriginalLanguages(source.id)}$mangaIdss";
-    final res = (await client.get(Uri.parse(newUrl))).body;
+    final res = (await client.get(Uri.parse(newUrl), headers: headers)).body;
     return mangaRes(res);
   }
 
@@ -140,7 +143,7 @@ class MangaDex extends MProvider {
       }
     }
 
-    final res = (await client.get(Uri.parse(url))).body;
+    final res = (await client.get(Uri.parse(url), headers: headers)).body;
     return mangaRes(res);
   }
 
@@ -150,8 +153,10 @@ class MangaDex extends MProvider {
       {"ongoing": 0, "completed": 1, "hiatus": 2, "cancelled": 3}
     ];
 
-    final res = (await client.get(Uri.parse(
-            "https://api.mangadex.org$url?includes[]=cover_art&includes[]=author&includes[]=artist")))
+    final res = (await client.get(
+            Uri.parse(
+                "https://api.mangadex.org$url?includes[]=cover_art&includes[]=author&includes[]=artist"),
+            headers: headers))
         .body;
     MManga manga = MManga();
     manga.author = jsonPathToString(
@@ -224,8 +229,9 @@ class MangaDex extends MProvider {
 
   @override
   Future<List<String>> getPageList(String url) async {
-    final res = (await client
-            .get(Uri.parse("https://api.mangadex.org/at-home/server/$url")))
+    final res = (await client.get(
+            Uri.parse("https://api.mangadex.org/at-home/server/$url"),
+            headers: headers))
         .body;
 
     final host = getMapValue(res, "baseUrl");
@@ -322,7 +328,7 @@ class MangaDex extends MProvider {
       String mangaId, int offset, String lang, int sourceId) async {
     final url =
         'https://api.mangadex.org/manga/$mangaId/feed?limit=500&offset=$offset&includes[]=user&includes[]=scanlation_group&order[volume]=desc&order[chapter]=desc&translatedLanguage[]=$lang&includeFuturePublishAt=0&includeEmptyPages=0${preferenceContentRating(sourceId)}';
-    final res = (await client.get(Uri.parse(url))).body;
+    final res = (await client.get(Uri.parse(url), headers: headers)).body;
     return res;
   }
 
@@ -553,6 +559,16 @@ class MangaDex extends MProvider {
             "originalLanguage[]=ko"
           ],
           values: []),
+      EditTextPreference(
+          key: "custom_user_agent",
+          title: "Set custom User-Agent",
+          summary: "",
+          value:
+              "Dalvik/2.1.0 (Linux; U; Android 14; 22081212UG Build/UKQ1.230917.001)",
+          dialogTitle: "Set custom User-Agent",
+          dialogMessage: "Specify a custom user agent",
+          text:
+              "Dalvik/2.1.0 (Linux; U; Android 14; 22081212UG Build/UKQ1.230917.001)"),
     ];
   }
 
