@@ -131,6 +131,9 @@ class AnimePahe extends MProvider {
 
   @override
   Future<List<MVideo>> getVideoList(String url) async {
+    //by default we use rhttp package but it does not support `followRedirects`
+    //so setting `useDartHttpClient` to true allows us to use a Dart http package that supports `followRedirects`
+    final client = Client(source, json.encode({"useDartHttpClient": true}));
     final res = (await client.get(Uri.parse("$baseUrl$url")));
     final document = parseHtml(res.body);
     final downloadLinks = document.select("div#pickDownload > a");
@@ -142,8 +145,8 @@ class AnimePahe extends MProvider {
       final quality = btn.text;
       final paheWinLink = downloadLinks[i].attr("href");
       if (getPreferenceValue(source.id, "preffered_link_type")) {
-        final noRedirectClient =
-            Client(source, json.encode({"followRedirects": false}));
+        final noRedirectClient = Client(source,
+            json.encode({"followRedirects": false, "useDartHttpClient": true}));
         final kwikHeaders =
             (await noRedirectClient.get(Uri.parse("${paheWinLink}/i"))).headers;
         final kwikUrl =
@@ -165,9 +168,11 @@ class AnimePahe extends MProvider {
               getMapValue(json.encode(res.request.headers), "cookie");
           cookie +=
               "; ${getMapValue(json.encode(reskwik.headers), "set-cookie").replaceAll("path=/;", "")}";
-          final resNo =
-              await Client(source, json.encode({"followRedirects": false}))
-                  .post(Uri.parse(url), headers: {
+          final resNo = await Client(
+                  source,
+                  json.encode(
+                      {"followRedirects": false, "useDartHttpClient": true}))
+              .post(Uri.parse(url), headers: {
             "referer": reskwik.request.url.toString(),
             "cookie": cookie,
             "user-agent":
