@@ -33,7 +33,7 @@ class Aniwave extends MProvider {
     String url = "$baseUrl/filter?keyword=$query";
 
     for (var filter in filters) {
-      if (filter.type == "OrderFilter") {
+      if (filter.type == "orderFilter") {
         final order = filter.values[filter.state].value;
         url += "${ll(url)}sort=$order";
       } else if (filter.type == "GenreFilter") {
@@ -104,9 +104,10 @@ class Aniwave extends MProvider {
     final statusList = [
       {"Releasing": 0, "Completed": 1}
     ];
-    final response =
-        await Client(source, json.encode({"followRedirects": false}))
-            .get(Uri.parse("$baseUrl$url"));
+    var anime = MManga();
+    final response = await Client(source,
+            json.encode({"followRedirects": false, "useDartHttpClient": true}))
+        .get(Uri.parse("$baseUrl$url"));
     String res = response.body;
     if (getMapValue(json.encode(response.headers), "location")
         .contains("/filter?keyword=")) {
@@ -120,12 +121,12 @@ class Aniwave extends MProvider {
       if (animeUrls.isNotEmpty) {
         res = (await client.get(Uri.parse("$baseUrl${animeUrls[0].getHref}")))
             .body;
+        anime.link = animeUrls[0].getHref;
       } else {
         throw "Anime url not found";
       }
     }
 
-    var anime = MManga();
     final status = xpath(res, '//div[contains(text(),"Status")]/span/text()');
     if (status.isNotEmpty) {
       anime.status = parseStatus(status.first, statusList);
@@ -143,7 +144,7 @@ class Aniwave extends MProvider {
     anime.genre = xpath(res, '//div[contains(text(),"Genre")]/span/a/text()');
     final id = parseHtml(res).selectFirst("div[data-id]").attr("data-id");
     final encrypt = vrfEncrypt(id);
-    final vrf = "vrf=${Uri.encodeComponent(encrypt)}";
+    final vrf = "vrf=$encrypt";
 
     final resEp =
         (await client.get(Uri.parse("$baseUrl/ajax/episode/list/$id?$vrf")))
@@ -193,7 +194,7 @@ class Aniwave extends MProvider {
   Future<List<MVideo>> getVideoList(String url) async {
     final ids = substringBefore(url, "&");
     final encrypt = vrfEncrypt(ids);
-    final vrf = "vrf=${Uri.encodeComponent(encrypt)}";
+    final vrf = "vrf=$encrypt";
     final res = (await client
             .get(Uri.parse("$baseUrl/ajax/server/list/$ids?$vrf"), headers: {
       "Referer": baseUrl + url,
@@ -214,7 +215,7 @@ class Aniwave extends MProvider {
         final serverId = serversIds[i];
         final serverName = serversNames[i].toLowerCase();
         final encrypt = vrfEncrypt(serverId);
-        final vrf = "vrf=${Uri.encodeComponent(encrypt)}";
+        final vrf = "vrf=$encrypt";
         final res =
             (await client.get(Uri.parse("$baseUrl/ajax/server/$serverId?$vrf")))
                 .body;
@@ -226,11 +227,11 @@ class Aniwave extends MProvider {
           final typeSelection = preferenceTypeSelection(source.id);
           if (typeSelection.contains(type.toLowerCase())) {
             if (serverName.contains("vidstream") || url.contains("megaf")) {
-              final hosterName =
-                  serverName.contains("vidstream") ? "Vidstream" : "MegaF";
-              if (hosterSelection.contains(hosterName.toLowerCase())) {
-                a = await vidsrcExtractor(url, hosterName, type);
-              }
+              // final hosterName =
+              //     serverName.contains("vidstream") ? "Vidstream" : "MegaF";
+              // if (hosterSelection.contains(hosterName.toLowerCase())) {
+              //   a = await vidsrcExtractor(url, hosterName, type);
+              // }
             } else if (serverName.contains("mp4u") &&
                 hosterSelection.contains("mp4u")) {
               a = await mp4UploadExtractor(url, null, "", type);
@@ -267,7 +268,7 @@ class Aniwave extends MProvider {
     return MPages(animeList, true);
   }
 
-  List<int> rc4Encrypt(String key, List<int> message) {
+  List<int> rc4Engine(String key, List<int> message) {
     List<int> _key = utf8.encode(key);
     int _i = 0, _j = 0;
     List<int> _box = List.generate(256, (i) => i);
@@ -296,27 +297,6 @@ class Aniwave extends MProvider {
     return out;
   }
 
-  String vrfEncrypt(String input) {
-    final rc4 = rc4Encrypt("T78s2WjTc7hSIZZR", input.codeUnits);
-    final vrf = base64Url.encode(rc4);
-    return utf8.decode(vrf.codeUnits);
-  }
-
-  String vrfDecrypt(String input, {String key = "ctpAbOz5u7S6OMkx"}) {
-    final decode = base64Url.decode(input);
-    final rc4 = rc4Encrypt(key, decode);
-    return Uri.decodeComponent(utf8.decode(rc4));
-  }
-
-  List<int> vrfShift(List<int> vrf) {
-    var shifts = [-2, -4, -5, 6, 2, -3, 3, 6];
-    for (var i = 0; i < vrf.length; i++) {
-      var shift = shifts[i % 8];
-      vrf[i] = (vrf[i] + shift) & 0xFF;
-    }
-    return vrf;
-  }
-
   Future<List<MVideo>> vidsrcExtractor(
       String url, String name, String type) async {
     List<MVideo> videoList = [];
@@ -325,8 +305,9 @@ class Aniwave extends MProvider {
     final res = await client.get(Uri.parse(apiUrl));
 
     if (res.body.startsWith("{")) {
-      final result = json.decode(
-          vrfDecrypt(json.decode(res.body)['result'], key: "9jXDYBZUcTcTZveM"));
+      final decode = base64Url.decode(json.decode(res.body)['result']);
+      final rc4 = rc4Engine("9jXDYBZUcTcTZveM", decode);
+      final result = json.decode(Uri.decodeComponent(utf8.decode(rc4)));
       if (result != 404) {
         String masterUrl =
             ((result['sources'] as List<Map<String, dynamic>>).first)['file'];
@@ -395,14 +376,14 @@ class Aniwave extends MProvider {
   }
 
   String encodeID(String vidId, String key) {
-    final rc4 = rc4Encrypt(key, vidId.codeUnits);
+    final rc4 = rc4Engine(key, vidId.codeUnits);
     return base64.encode(rc4).replaceAll("+", "-").replaceAll("/", "_").trim();
   }
 
   @override
   List<dynamic> getFilterList() {
     return [
-      SelectFilter("OrderFilter", "Sort order", 0, [
+      SelectFilter("orderFilter", "Sort order", 0, [
         SelectFilterOption("Most relevance", "most_relevance"),
         SelectFilterOption("Recently updated", "recently_updated"),
         SelectFilterOption("Recently added", "recently_added"),
@@ -639,6 +620,62 @@ class Aniwave extends MProvider {
       return "&";
     }
     return "?";
+  }
+
+  String vrfEncrypt(String input) {
+    String vrf = input;
+    vrf = exchange(vrf, ['AP6GeR8H0lwUz1', 'UAz8Gwl10P6ReH']);
+    vrf = rc4Encrypt('ItFKjuWokn4ZpB', vrf);
+    vrf = rc4Encrypt('fOyt97QWFB3', vrf);
+    vrf = exchange(vrf, ['1majSlPQd2M5', 'da1l2jSmP5QM']);
+    vrf = exchange(vrf, ['CPYvHj09Au3', '0jHA9CPYu3v']);
+    vrf = vrf.split('').reversed.join('');
+    vrf = rc4Encrypt('736y1uTJpBLUX', vrf);
+    vrf = base64Url.encode(utf8.encode(vrf));
+    return Uri.encodeComponent(vrf);
+  }
+
+  String vrfDecrypt(String input) {
+    String vrf = input;
+    vrf = utf8.decode(base64Url.decode(vrf));
+    vrf = rc4Decrypt('736y1uTJpBLUX', vrf);
+    vrf = vrf.split('').reversed.join('');
+    vrf = exchange(vrf, ['0jHA9CPYu3v', 'CPYvHj09Au3']);
+    vrf = exchange(vrf, ['da1l2jSmP5QM', '1majSlPQd2M5']);
+    vrf = rc4Decrypt('fOyt97QWFB3', vrf);
+    vrf = rc4Decrypt('ItFKjuWokn4ZpB', vrf);
+    vrf = exchange(vrf, ['UAz8Gwl10P6ReH', 'AP6GeR8H0lwUz1']);
+    return Uri.decodeComponent(vrf);
+  }
+
+  String rc4Encrypt(String key, String input) {
+    final rc4 = rc4Engine(key, input.codeUnits);
+    final vrf = base64Url.encode(rc4);
+    return utf8.decode(vrf.codeUnits);
+  }
+
+  String rc4Decrypt(String key, String input) {
+    final decode = base64Url.decode(input);
+    final rc4 = rc4Engine(key, decode);
+    return utf8.decode(rc4);
+  }
+
+  String exchange(String input, List<String> keys) {
+    final key1 = keys[0];
+    final key2 = keys[1];
+    return input.split('').map((char) {
+      final index = key1.indexOf(char);
+      return index != -1 ? key2[index] : char;
+    }).join('');
+  }
+
+  List<int> vrfShift(List<int> vrf) {
+    var shifts = [-2, -4, -5, 6, 2, -3, 3, 6];
+    for (var i = 0; i < vrf.length; i++) {
+      var shift = shifts[i % 8];
+      vrf[i] = (vrf[i] + shift) & 0xFF;
+    }
+    return vrf;
   }
 }
 
