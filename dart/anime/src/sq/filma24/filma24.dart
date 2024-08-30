@@ -6,7 +6,8 @@ class Filma24 extends MProvider {
 
   MSource source;
 
-  final Client client = Client(source);
+  final Client client =
+      Client(source, json.encode({"useDartHttpClient": true}));
 
   @override
   String get baseUrl => getPreferenceValue(source.id, "pref_domain");

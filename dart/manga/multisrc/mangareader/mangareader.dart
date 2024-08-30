@@ -34,8 +34,7 @@ class MangaReader extends MProvider {
   Future<MPages> search(String query, int page, FilterList filterList) async {
     final filters = filterList.filters;
 
-    String url =
-        "$baseUrl${getMangaUrlDirectory(source.name)}/?&title=$query&page=$page";
+    String url = "$baseUrl/?&title=$query&page=$page";
 
     for (var filter in filters) {
       if (filter.type == "AuthorFilter") {
@@ -333,7 +332,7 @@ class MangaReader extends MProvider {
   }
 
   String getMangaUrlDirectory(String sourceName) {
-    if (sourceName == "Sushi-Scan") {
+    if (["Sushi-Scan"].contains(sourceName)) {
       return "/catalogue";
     }
     return "/manga";
