@@ -7,7 +7,6 @@ import 'src/all/nyaa/source.dart';
 import 'src/ar/okanime/source.dart';
 import 'src/de/animetoast/source.dart';
 import 'src/en/animepahe/source.dart';
-import 'src/en/aniwave/source.dart';
 import 'src/en/dramacool/source.dart';
 import 'src/en/gogoanime/source.dart';
 import 'src/en/nineanimetv/source.dart';
@@ -37,7 +36,6 @@ List<Source> dartAnimesourceList = [
   otakudesu,
   nimegami,
   oploverz,
-  aniwave,
   ...dopeflixSourcesList,
   animesaturn,
   uhdmoviesSource,
