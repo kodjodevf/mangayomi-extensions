@@ -7,7 +7,7 @@ const mangayomiSources = [{
   "typeSource": "single",
   "isManga": false,
   "isNsfw": true,
-  "version": "0.0.15",
+  "version": "0.0.2",
   "dateFormat": "",
   "dateFormatLocale": "",
   "pkgPath": "anime/src/zh/hanime.js",
@@ -28,7 +28,7 @@ class DefaultExtension extends MProvider {
   }
 
   async getItems(url, type) {
-    const res = await new Client().get(this.source.baseUrl + url);
+    const res = await new Client({'useDartHttpClient': true}).get(this.source.baseUrl + url);
     const doc = new Document(res.body);
     const items = [];
     if (type == 0) {
@@ -95,7 +95,7 @@ class DefaultExtension extends MProvider {
   async getDetail(url) {
     var cover;
     [url, cover] = url.split("$");
-    const res = await new Client().get(url);
+    const res = await new Client({'useDartHttpClient': true}).get(url);
     const doc = new Document(res.body);
     const title = doc.selectFirst("div#video-playlist-wrapper h4").text;
     const desc = doc.selectFirst("div.video-details-wrapper div.video-caption-text").text;
@@ -125,7 +125,7 @@ class DefaultExtension extends MProvider {
   }
 
   async getVideoList(url) {
-    const res = await new Client().get(url);
+    const res = await new Client({'useDartHttpClient': true}).get(url);
     const doc = new Document(res.body);
     const sources = doc.select("source");
     if (sources.length==0) {
