@@ -76,8 +76,9 @@ class AnimeToast extends MProvider {
       } else {
         elements = document.select("#multi_link_tab1");
       }
+
       for (var element in elements) {
-        final episodeElement = element.selectFirst("div.tab-pane a");
+        final episodeElement = element.selectFirst("a");
         final epT = episodeElement.text;
         if (epT.contains(":") || epT.contains("-")) {
           final url = episodeElement.attr("href");
@@ -92,7 +93,7 @@ class AnimeToast extends MProvider {
             episodesList.add(ep);
           }
         } else {
-          final episodeElements = element.select("div.tab-pane a");
+          final episodeElements = element.select("a");
           for (var epElement in episodeElements) {
             MChapter ep = MChapter();
             ep.name = epElement.text;
