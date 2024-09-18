@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "single",
     "isManga": false,
     "isNsfw": false,
-    "version": "0.0.2",
+    "version": "0.0.25",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/en/allanime.js"
@@ -172,7 +172,7 @@ class DefaultExtension extends MProvider {
                 for (const vid of vids) {
                     videos.push(vid);
                 }
-            } else if (["vidstreaming", "https://gogo", "playgo1.cc", "playtaku"].some(element => videoUrl.includes(element)) && altHosterSelection.some(element => 'vidstreaming' === element)) {
+            } else if (["vidstreaming", "https://gogo", "playgo1.cc", "playtaku", "vidcloud"].some(element => videoUrl.includes(element)) && altHosterSelection.some(element => 'vidstreaming' === element)) {
                 const vids = await gogoCdnExtractor(videoUrl);
                 for (const vid of vids) {
                     videos.push(vid);
@@ -182,7 +182,7 @@ class DefaultExtension extends MProvider {
                 for (const vid of vids) {
                     videos.push(vid);
                 }
-            } else if (videoUrl.includes("ok.ru") && altHosterSelection.some(element => 'okru' === element)) {
+            } else if (["ok.ru", "okru"].some(element => videoUrl.includes(element)) && altHosterSelection.some(element => 'okru' === element)) {
                 const vids = await okruExtractor(videoUrl);
                 for (const vid of vids) {
                     videos.push(vid);
@@ -194,6 +194,16 @@ class DefaultExtension extends MProvider {
                 }
             } else if (videoUrl.includes("streamlare.com") && altHosterSelection.some(element => 'streamlare' === element)) {
                 const vids = await streamlareExtractor(videoUrl);
+                for (const vid of vids) {
+                    videos.push(vid);
+                }
+            } else if (["filemoon", "moonplayer"].some(element => videoUrl.includes(element)) && altHosterSelection.some(element => 'filemoon' === element)) {
+                const vids = await filemoonExtractor(videoUrl);
+                for (const vid of vids) {
+                    videos.push(vid);
+                }
+            } else if (videoUrl.includes("wish") && altHosterSelection.some(element => 'streamwish' === element)) {
+                const vids = await streamwishExtractor(videoUrl);
                 for (const vid of vids) {
                     videos.push(vid);
                 }
@@ -280,7 +290,7 @@ class DefaultExtension extends MProvider {
                 }
             },
             {
-                "key": "preferred_hoster",
+                "key": "preferred_hoster_",
                 "listPreference": {
                     "title": "Preferred Video Server",
                     "summary": "",
@@ -288,17 +298,21 @@ class DefaultExtension extends MProvider {
                     "entries": [
                         "Ac", "Ak", "Kir", "Rab", "Luf-mp4",
                         "Si-Hls", "S-mp4", "Ac-Hls", "Uv-mp4", "Pn-Hls",
-                        "vidstreaming", "okru", "mp4upload", "streamlare", "doodstream"
+                        "vidstreaming", "okru", "mp4upload", "streamlare", "doodstream",
+                        "filemoon",
+                        "streamwish"
                     ],
-                    "entryValues": [
+                    "entryValues_": [
                         "Ac", "Ak", "Kir", "Rab", "Luf-mp4",
                         "Si-Hls", "S-mp4", "Ac-Hls", "Uv-mp4", "Pn-Hls",
-                        "vidstreaming", "okru", "mp4upload", "streamlare", "doodstream"
+                        "vidstreaming", "okru", "mp4upload", "streamlare", "doodstream",
+                        "filemoon",
+                        "streamwish"
                     ]
                 }
             },
             {
-                "key": "alt_hoster_selection",
+                "key": "alt_hoster_selection_",
                 "multiSelectListPreference": {
                     "title": "Enable/Disable Alternative Hosts",
                     "summary": "",
@@ -308,7 +322,9 @@ class DefaultExtension extends MProvider {
                         "okru",
                         "mp4upload",
                         "streamlare",
-                        "doodstream"
+                        "doodstream",
+                        "filemoon",
+                        "streamwish"
                     ],
                     "entryValues": [
                         "player",
@@ -316,7 +332,9 @@ class DefaultExtension extends MProvider {
                         "okru",
                         "mp4upload",
                         "streamlare",
-                        "doodstream"
+                        "doodstream",
+                        "filemoon",
+                        "streamwish"
                     ],
                     "values": [
                         "player",
@@ -324,7 +342,9 @@ class DefaultExtension extends MProvider {
                         "okru",
                         "mp4upload",
                         "streamlare",
-                        "doodstream"
+                        "doodstream",
+                        "filemoon",
+                        "streamwish"
                     ]
                 }
             }
