@@ -327,7 +327,7 @@ class MangaDex extends MProvider {
   Future<String> paginatedChapterListRequest(
       String mangaId, int offset, String lang, int sourceId) async {
     final url =
-        'https://api.mangadex.org/manga/$mangaId/feed?limit=500&offset=$offset&includes[]=user&includes[]=scanlation_group&order[volume]=desc&order[chapter]=desc&translatedLanguage[]=$lang&includeFuturePublishAt=0&includeEmptyPages=0${preferenceContentRating(sourceId)}';
+        'https://api.mangadex.org/manga/$mangaId/feed?limit=500&offset=$offset&includes[]=user&includes[]=scanlation_group&order[volume]=desc&order[chapter]=desc&translatedLanguage[]=$lang&includeFuturePublishAt=0&includeEmptyPages=0&contentRating[]=safe&contentRating[]=suggestive';
     final res = (await client.get(Uri.parse(url), headers: headers)).body;
     return res;
   }
