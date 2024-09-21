@@ -15,7 +15,7 @@ class MangaDex extends MProvider {
   Future<MPages> getPopular(int page) async {
     page = (20 * (page - 1));
     final url =
-        "https://api.mangadex.org/manga?limit=20&offset=$page&availableTranslatedLanguage[]=${source.lang}&includes[]=cover_art${preferenceContentRating(source.id)}${preferenceOriginalLanguages(source.id)}&order[followedCount]=desc";
+        "https://api.mangadex.org/manga?limit=20&offset=$page&availableTranslatedLanguage[]=${source.lang}&includes[]=cover_art&contentRating[]=safe&contentRating[]=suggestive${preferenceOriginalLanguages(source.id)}&order[followedCount]=desc";
     final res = (await client.get(Uri.parse(url), headers: headers)).body;
     return mangaRes(res);
   }
@@ -34,7 +34,7 @@ class MangaDex extends MProvider {
       mangaIdss += "&ids[]=$id";
     }
     final newUrl =
-        "https://api.mangadex.org/manga?includes[]=cover_art&limit=${mangaIds.length}${preferenceContentRating(source.id)}${preferenceOriginalLanguages(source.id)}$mangaIdss";
+        "https://api.mangadex.org/manga?includes[]=cover_art&limit=${mangaIds.length}&contentRating[]=safe&contentRating[]=suggestive${preferenceOriginalLanguages(source.id)}$mangaIdss";
     final res = (await client.get(Uri.parse(newUrl), headers: headers)).body;
     return mangaRes(res);
   }
@@ -522,27 +522,6 @@ class MangaDex extends MProvider {
           entries: ["Original", "Medium", "Low"],
           entryValues: ["", ".512.jpg", ".256.jpg"]),
       MultiSelectListPreference(
-          key: "content_rating",
-          title: "Default content rating",
-          summary: "Show content with the selected rating by default",
-          valueIndex: 0,
-          entries: [
-            "safe",
-            "suggestive",
-            "erotica",
-            "pornographic"
-          ],
-          entryValues: [
-            "contentRating[]=safe",
-            "contentRating[]=suggestive",
-            "contentRating[]=erotica",
-            "contentRating[]=pornographic"
-          ],
-          values: [
-            "contentRating[]=safe",
-            "contentRating[]=suggestive"
-          ]),
-      MultiSelectListPreference(
           key: "original_languages",
           title: "Filter original languages",
           summary:
@@ -570,19 +549,6 @@ class MangaDex extends MProvider {
           text:
               "Dalvik/2.1.0 (Linux; U; Android 14; 22081212UG Build/UKQ1.230917.001)"),
     ];
-  }
-
-  String preferenceContentRating(int sourceId) {
-    final contentRating =
-        getPreferenceValue(sourceId, "content_rating") as List<String>;
-    String contentRatingStr = "";
-    if (contentRating.isNotEmpty) {
-      contentRatingStr = "&";
-      for (var ctn in contentRating) {
-        contentRatingStr += "&$ctn";
-      }
-    }
-    return contentRatingStr;
   }
 
   String preferenceOriginalLanguages(int sourceId) {

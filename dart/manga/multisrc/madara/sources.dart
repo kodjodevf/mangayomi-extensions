@@ -112,7 +112,6 @@ import 'src/manga347/manga347.dart';
 import 'src/mangaeffect/mangaeffect.dart';
 import 'src/mangafastcom/mangafastcom.dart';
 import 'src/mangaleveling/mangaleveling.dart';
-import 'src/manhwa365/manhwa365.dart';
 import 'src/neatmanga/neatmanga.dart';
 import 'src/nvmanga/nvmanga.dart';
 import 'src/pmscans/pmscans.dart';
@@ -418,8 +417,6 @@ List<Source> _madaraSourcesList = [
   mangafastcomSource,
 //Manga Leveling (EN)
   mangalevelingSource,
-//Manhwa365 (EN)
-  manhwa365Source,
 //NeatManga (EN)
   neatmangaSource,
 //NvManga (EN)
