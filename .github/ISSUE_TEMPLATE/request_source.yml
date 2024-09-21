@@ -36,7 +36,6 @@ body:
       label: Other details
       placeholder: |
         Additional details and attachments.
-        Example: "+18/NSFW = yes"
 
   - type: checkboxes
     id: acknowledgements
