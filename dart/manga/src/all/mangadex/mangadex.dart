@@ -162,7 +162,7 @@ class MangaDex extends MProvider {
     final coverUrl = jsonPathToString(
       res, r'$..data.relationships[*].attributes.fileName', '');
     if (coverUrl != null) {
-      manga.imageUrl = "https://uploads.mangadex.org/covers/${url.replaceAll("/manga/", "")}/${coverUrl}.256.jpg";
+      manga.imageUrl = "https://uploads.mangadex.org/covers/${url.replaceAll("/manga/", "")}/${coverUrl}";
     }
     manga.author = jsonPathToString(
         res, r'$..data.relationships[*].attributes.name', ', ');
