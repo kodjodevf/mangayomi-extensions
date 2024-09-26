@@ -57,7 +57,6 @@ class AniZone extends MProvider {
 
   @override
   Future<MPages> search(String query, int page, FilterList filterList) async {
-    List<MManga> animeList = [];
     String baseUrl = "${source.baseUrl}/filter?keyword=$query";
 
     Map<String, List<String>> filterMap = {
@@ -186,7 +185,8 @@ class AniZone extends MProvider {
             final playerUrl = "https://voe.sx/e/${links[j]}";
             videoList.add({"lang": lang[j], "player": playerUrl});
           } else if (name_players.isNotEmpty && name_players[j] == "Fmoon") {
-            final playerUrl = "https://filemoon.sx/e/${links[j]}&data-realid=${links[j]}&epid=${videoMatch.group(1)}";
+            final playerUrl =
+                "https://filemoon.sx/e/${links[j]}&data-realid=${links[j]}&epid=${videoMatch.group(1)}";
             videoList.add({"lang": lang[j], "player": playerUrl});
           }
         }
@@ -219,7 +219,7 @@ class AniZone extends MProvider {
       } else if (playerUrl.contains("vidcdn")) {
         a = await vidcdnExtractor(playerUrl, lang);
       } else if (playerUrl.contains("filemoon")) {
-        a = await filemoonExtractor(playerUrl, lang,"");
+        a = await filemoonExtractor(playerUrl, lang, "");
       }
       videos.addAll(a);
     }
