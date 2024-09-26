@@ -10,6 +10,7 @@ import 'src/en/animepahe/source.dart';
 import 'src/en/dramacool/source.dart';
 import 'src/en/gogoanime/source.dart';
 import 'src/en/nineanimetv/source.dart';
+import 'src/fr/anizone/source.dart';
 import 'src/fr/animesama/source.dart';
 import 'src/hi/yomovies/source.dart';
 import 'src/en/kisskh/source.dart';
@@ -50,5 +51,5 @@ List<Source> dartAnimesourceList = [
   animepaheSource,
   animetoast,
   animesvision,
-  diziwatchSource
+  diziwatchSource,aniZoneSource
 ];
