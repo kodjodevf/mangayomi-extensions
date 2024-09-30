@@ -7,12 +7,6 @@ class AniZone extends MProvider {
   final MSource source;
   final Client client = Client(source);
 
-  @override
-  bool get supportsLatest => true;
-
-  @override
-  Map<String, String> get headers => {};
-
   // Constants for the xpath
   static const String urlXpath =
       '//*[contains(@class,"flw-item item-qtip")]/div[@class="film-poster"]/a/@href';
@@ -133,64 +127,18 @@ class AniZone extends MProvider {
               "${source.baseUrl}/ajax/episode/list/${match.group(1)}")))
           .body;
 
-      final titles = xpath(res.replaceAll(r'\', ' '),
-          '//div[contains(@class,"ss-list")]//a/@title');
-      final urls = xpath(res.replaceAll(r'\', ' '),
-          '//div[contains(@class,"ss-list")]//a/@href');
-
       List<MChapter> episodesList = [];
 
+      final episodeElements =
+          parseHtml(json.decode(res)["html"]).select(".ep-item");
+
       // Associer chaque titre à son URL et récupérer les vidéos
-      for (int i = 0; i < titles.length; i++) {
+      for (var element in episodeElements) {
         MChapter episode = MChapter();
-        episode.name = titles[i];
+        episode.name = element.attr("title");
 
-        List<Map<String, String>> videoList = [];
-
-        final videoMatch = regex.firstMatch(urls[i]);
-        if (videoMatch == null) {
-          throw Exception(
-              'Numéro de l\'épisode non trouvé dans l\'URL pour les vidéos.');
-        }
-
-        final videoRes = (await client.get(
-          Uri.parse(
-              "${source.baseUrl}/ajax/episode/servers?episodeId=${videoMatch.group(1)}"),
-          headers: {'Referer': "${source.baseUrl}/${urls[i]}"},
-        ))
-            .body;
-
-        final lang = xpath(videoRes.replaceAll(r'\', ''),
-            '//div[contains(@class,"item server-item")]/@data-type');
-        final links = xpath(videoRes.replaceAll(r'\', ''),
-            '//div[contains(@class,"item server-item")]/@data-id');
-        final name_players = xpath(videoRes.replaceAll(r'\', ''),
-            '//div[contains(@class,"item server-item")]/text()');
-
-        for (int j = 0; j < links.length; j++) {
-          // schema of players https://v1.animesz.xyz/ajax/episode/servers?episodeId=(id_episode)
-          // schema or url https://v1.animesz.xyz/ajax/episode/sources?id=(player_id)&epid=(id_episode)
-          if (name_players.isNotEmpty && name_players[j] == "sibnet") {
-            final playerUrl =
-                "https://video.sibnet.ru/shell.php?videoid=${links[j]}";
-            videoList.add({"lang": lang[j], "player": playerUrl});
-          } else if (name_players.isNotEmpty && name_players[j] == "sendvid") {
-            final playerUrl = "https://sendvid.com/embed/${links[j]}";
-            videoList.add({"lang": lang[j], "player": playerUrl});
-          } else if (name_players.isNotEmpty && name_players[j] == "VidCDN") {
-            final playerUrl =
-                "https://r.vidcdn.xyz/v1/api/get_sources/${links[j].replaceFirst(RegExp(r'vidcdn$'), '')}";
-            videoList.add({"lang": lang[j], "player": playerUrl});
-          } else if (name_players.isNotEmpty && name_players[j] == "Voe") {
-            final playerUrl = "https://voe.sx/e/${links[j]}";
-            videoList.add({"lang": lang[j], "player": playerUrl});
-          } else if (name_players.isNotEmpty && name_players[j] == "Fmoon") {
-            final playerUrl =
-                "https://filemoon.sx/e/${links[j]}&data-realid=${links[j]}&epid=${videoMatch.group(1)}";
-            videoList.add({"lang": lang[j], "player": playerUrl});
-          }
-        }
-        episode.url = json.encode(videoList);
+        String id = substringAfterLast(element.attr("href"), "=");
+        episode.url = "${source.baseUrl}/ajax/episode/servers?episodeId=$id";
         episodesList.add(episode);
       }
 
@@ -204,7 +152,41 @@ class AniZone extends MProvider {
 
   @override
   Future<List<MVideo>> getVideoList(String url) async {
-    final players = json.decode(url);
+    final videoRes = (await client
+            .get(Uri.parse(url), headers: {"Referer": "${source.baseUrl}/"}))
+        .body;
+
+    final lang = xpath(videoRes.replaceAll(r'\', ''),
+        '//div[contains(@class,"item server-item")]/@data-type');
+    final links = xpath(videoRes.replaceAll(r'\', ''),
+        '//div[contains(@class,"item server-item")]/@data-id');
+    final playersNames = xpath(videoRes.replaceAll(r'\', ''),
+        '//div[contains(@class,"item server-item")]/text()');
+    List<Map<String, String>> players = [];
+    for (int j = 0; j < links.length; j++) {
+      // schema of players https://v1.animesz.xyz/ajax/episode/servers?episodeId=(id_episode)
+      // schema or url https://v1.animesz.xyz/ajax/episode/sources?id=(player_id)&epid=(id_episode)
+      if (playersNames.isNotEmpty && playersNames[j] == "sibnet") {
+        final playerUrl =
+            "https://video.sibnet.ru/shell.php?videoid=${links[j]}";
+        players.add({"lang": lang[j], "player": playerUrl});
+      } else if (playersNames.isNotEmpty && playersNames[j] == "sendvid") {
+        final playerUrl = "https://sendvid.com/embed/${links[j]}";
+        players.add({"lang": lang[j], "player": playerUrl});
+      } else if (playersNames.isNotEmpty && playersNames[j] == "VidCDN") {
+        final playerUrl =
+            "https://r.vidcdn.xyz/v1/api/get_sources/${links[j].replaceFirst(RegExp(r'vidcdn$'), '')}";
+        players.add({"lang": lang[j], "player": playerUrl});
+      } else if (playersNames.isNotEmpty && playersNames[j] == "Voe") {
+        final playerUrl = "https://voe.sx/e/${links[j]}";
+        players.add({"lang": lang[j], "player": playerUrl});
+      } else if (playersNames.isNotEmpty && playersNames[j] == "Fmoon") {
+        final playerUrl =
+            "https://filemoon.sx/e/${links[j]}&data-realid=${links[j]}&epid=${substringAfter(url, "episodeId=")}";
+        players.add({"lang": lang[j], "player": playerUrl});
+      }
+    }
+
     List<MVideo> videos = [];
     for (var player in players) {
       String lang = (player["lang"] as String).toUpperCase();
@@ -215,11 +197,13 @@ class AniZone extends MProvider {
       } else if (playerUrl.contains("sibnet.ru")) {
         a = await sibnetExtractor(playerUrl, lang);
       } else if (playerUrl.contains("voe.sx")) {
-        a = await voeExtractor(playerUrl, lang);
+        a = await voeExtractor(playerUrl, "$lang ");
       } else if (playerUrl.contains("vidcdn")) {
         a = await vidcdnExtractor(playerUrl, lang);
       } else if (playerUrl.contains("filemoon")) {
-        a = await filemoonExtractor(playerUrl, lang, "");
+        a = await filemoonExtractor(playerUrl, "$lang Filemoon - ", "");
+      } else if (playerUrl.contains("vidhide")) {
+        a = await streamHideExtractor(playerUrl, lang);
       }
       videos.addAll(a);
     }
@@ -227,9 +211,36 @@ class AniZone extends MProvider {
     return sortVideos(videos, source.id);
   }
 
-  @override
-  Future<List<String>> getPageList(String url) async {
-    // TODO: implement
+  Future<List<MVideo>> streamHideExtractor(String url, String prefix) async {
+    final res = (await client.get(Uri.parse(url))).body;
+    final masterUrl = substringBefore(
+        substringAfter(
+            substringAfter(
+                substringAfter(unpackJs(res), "sources:"), "file:\""),
+            "src:\""),
+        '"');
+    final masterPlaylistRes = (await client.get(Uri.parse(masterUrl))).body;
+    List<MVideo> videos = [];
+    for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
+        .split("#EXT-X-STREAM-INF:")) {
+      final quality =
+          "${substringBefore(substringBefore(substringAfter(substringAfter(it, "RESOLUTION="), "x"), ","), "\n")}p";
+
+      String videoUrl = substringBefore(substringAfter(it, "\n"), "\n");
+
+      if (!videoUrl.startsWith("http")) {
+        videoUrl =
+            "${masterUrl.split("/").sublist(0, masterUrl.split("/").length - 1).join("/")}/$videoUrl";
+      }
+
+      MVideo video = MVideo();
+      video
+        ..url = videoUrl
+        ..originalUrl = videoUrl
+        ..quality = "$prefix StreamHideVid - $quality";
+      videos.add(video);
+    }
+    return videos;
   }
 
   @override
