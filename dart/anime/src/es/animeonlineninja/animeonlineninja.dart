@@ -99,15 +99,15 @@ class AnimeOnlineNinja extends MProvider {
     if (url.contains("saidochesto.top") || lang == "MULTISERVER") {
       return await extractFromMulti(url);
     } else if (url.contains("filemoon")) {
-      a = await filemoonExtractor(url, "", "");
+      a = await filemoonExtractor(url, "$lang Filemoon - ", "");
     } else if (url.contains("https://dood") ||
         url.contains("https://ds2play") ||
         url.contains("https://d0")) {
-      a = await doodExtractor(url, "DoodStream");
+      a = await doodExtractor(url, "$lang DoodStream");
     } else if (url.contains("streamtape")) {
-      a = await streamTapeExtractor(url, "StreamTape");
+      a = await streamTapeExtractor(url, "$lang StreamTape");
     } else if (url.contains("uqload")) {
-      a = await uqloadExtractor(url);
+      a = await uqloadExtractor(url, lang);
     } else if (url.contains("wolfstream")) {
       final resUrl = (await client.get(Uri.parse(url))).body;
       final jsData =
@@ -128,7 +128,7 @@ class AnimeOnlineNinja extends MProvider {
     return videos;
   }
 
-  Future<List<MVideo>> uqloadExtractor(String url) async {
+  Future<List<MVideo>> uqloadExtractor(String url, String lang) async {
     final res = (await client.get(Uri.parse(url))).body;
     final js = xpath(res, '//script[contains(text(), "sources:")]/text()');
     if (js.isEmpty) {
@@ -141,7 +141,7 @@ class AnimeOnlineNinja extends MProvider {
     video
       ..url = videoUrl
       ..originalUrl = videoUrl
-      ..quality = "Uqload"
+      ..quality = "$lang Uqload"
       ..headers = {"Referer": "${Uri.parse(url).origin}/"};
     return [video];
   }
@@ -153,7 +153,7 @@ class AnimeOnlineNinja extends MProvider {
     final prefLang = getPreferenceValue(source.id, "preferred_lang");
     String langSelector = "";
     if (prefLang.isEmpty) {
-      langSelector = "div.OD_$prefLang";
+      langSelector = "div";
     } else {
       langSelector = "div.OD_$prefLang";
     }
