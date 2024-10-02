@@ -4,7 +4,7 @@ const mangayomiSources = [{
     "baseUrl": "https://www.wogg.net",
     "apiUrl": "",
     "iconUrl": "https://imgsrc.baidu.com/forum/pic/item/4b90f603738da977d5da660af651f8198618e31f.jpg",
-    "typeSource": "multi",
+    "typeSource": "single",
     "isManga": false,
     "isNsfw": false,
     "version": "0.0.1",
