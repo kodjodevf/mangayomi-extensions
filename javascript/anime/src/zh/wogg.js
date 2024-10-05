@@ -13,7 +13,6 @@ const mangayomiSources = [{
     "pkgPath": "anime/src/zh/wogg.js"
 }];
 class DefaultExtension extends MProvider {
-    patternAli = /(https:\/\/www\.aliyundrive\.com\/s\/[^"]+|https:\/\/www\.alipan\.com\/s\/[^"]+)/;
     patternQuark = /(https:\/\/pan\.quark\.cn\/s\/[^"]+)/;
     patternUc = /(https:\/\/drive\.uc\.cn\/s\/[^"]+)/;
     getHeaders(url) {
@@ -101,18 +100,25 @@ class DefaultExtension extends MProvider {
         const name = document.selectFirst("div.video-info .video-info-header h1").text;
         const description = document.selectFirst("div.video-info .video-info-content").text.replace("[收起部分]", "").replace("[展开全部]", "");
         const type_name = "电影";
-        const quark_share_url_list = document.select("div.module-row-one .module-row-info")
+        let quark_share_url_list = [],uc_share_url_list = []
+        const share_url_list = document.select("div.module-row-one .module-row-info")
             .map(e => {
                 const url = e.selectFirst(".module-row-title p").text;
                 const quarkMatches = url.match(this.patternQuark);
 
                 if (quarkMatches && quarkMatches[1]) {
-                    return quarkMatches[1];
+                    quark_share_url_list.push(quarkMatches[1]);
+                }
+                const ucMatches = url.match(this.patternUc);
+                if (ucMatches && ucMatches[1]) {
+                    uc_share_url_list.push(ucMatches[1]);
                 }
                 return null;
             })
             .filter(url => url !== null);
-        let episodes = await quarkFilesExtractor(quark_share_url_list, new SharedPreferences().get("quarkCookie"));
+        let quark_episodes = await quarkFilesExtractor(quark_share_url_list, new SharedPreferences().get("quarkCookie"));
+        let uc_episodes = await ucFilesExtractor(uc_share_url_list, new SharedPreferences().get("ucCookie"));
+        let episodes = [...quark_episodes, ...uc_episodes];
         return {
             name, imageUrl, description, episodes
         };
@@ -120,7 +126,18 @@ class DefaultExtension extends MProvider {
     // For anime episode video list
     async getVideoList(url) {
         const videos = [];
-        const vids = await quarkVideosExtractor(url, new SharedPreferences().get("quarkCookie"));
+        const parts = url.split('++');
+        const type = parts[0].toLowerCase();
+        
+        let vids;
+        if (type === 'quark') {
+            vids = await quarkVideosExtractor(url, new SharedPreferences().get("quarkCookie"));
+        } else if (type === 'uc') {
+            vids = await ucVideosExtractor(url, new SharedPreferences().get("ucCookie"));
+        } else {
+            throw new Error("不支持的链接类型");
+        }
+    
         for (const vid of vids) {
             videos.push(vid);
         }
@@ -149,6 +166,16 @@ class DefaultExtension extends MProvider {
                 "editTextPreference": {
                     "title": "夸克Cookies",
                     "summary": "填写获取到的夸克Cookies",
+                    "value": "",
+                    "dialogTitle": "Cookies",
+                    "dialogMessage": "",
+                }
+            },
+            {
+                "key": "ucCookie",
+                "editTextPreference": {
+                    "title": "UC云盘Cookies",
+                    "summary": "填写获取到的UC云盘Cookies",
                     "value": "",
                     "dialogTitle": "Cookies",
                     "dialogMessage": "",
