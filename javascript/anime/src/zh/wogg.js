@@ -100,7 +100,7 @@ class DefaultExtension extends MProvider {
         const name = document.selectFirst("div.video-info .video-info-header h1").text;
         const description = document.selectFirst("div.video-info .video-info-content").text.replace("[收起部分]", "").replace("[展开全部]", "");
         const type_name = "电影";
-        let quark_share_url_list = [],uc_share_url_list = []
+        let quark_share_url_list = [], uc_share_url_list = []
         const share_url_list = document.select("div.module-row-one .module-row-info")
             .map(e => {
                 const url = e.selectFirst(".module-row-title p").text;
@@ -128,16 +128,26 @@ class DefaultExtension extends MProvider {
         const videos = [];
         const parts = url.split('++');
         const type = parts[0].toLowerCase();
-        
+
         let vids;
         if (type === 'quark') {
-            vids = await quarkVideosExtractor(url, new SharedPreferences().get("quarkCookie"));
+            let cookie = new SharedPreferences().get("quarkCookie");
+            if (cookie == "") {
+                throw new Error("请先在本扩展设置中填写夸克Cookies, 需要夸克VIP账号 \n Please fill in the Quark Cookies in this extension settings first, you need a Quark VIP account");
+            } else {
+                vids = await quarkVideosExtractor(url, cookie);
+            }
         } else if (type === 'uc') {
-            vids = await ucVideosExtractor(url, new SharedPreferences().get("ucCookie"));
+            let cookie = new SharedPreferences().get("ucCookie");
+            if (cookie == "") {
+                throw new Error("请先在本扩展设置中填写UC云盘Cookies, 需要UC云盘VIP账号 \n Please fill in the UC Cloud Cookies in this extension settings first, you need a UC Cloud VIP account");
+            } else {
+                vids = await ucVideosExtractor(url, cookie);
+            }
         } else {
             throw new Error("不支持的链接类型");
         }
-    
+
         for (const vid of vids) {
             videos.push(vid);
         }
