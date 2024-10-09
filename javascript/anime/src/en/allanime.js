@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "single",
     "isManga": false,
     "isNsfw": false,
-    "version": "0.0.3",
+    "version": "0.0.35",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/en/allanime.js"
@@ -193,7 +193,7 @@ class DefaultExtension extends MProvider {
                     videos.push(vid);
                 }
             } else if (videoUrl.includes("streamlare.com") && altHosterSelection.some(element => 'streamlare' === element)) {
-                const vids = await streamlareExtractor(videoUrl);
+                const vids = await streamlareExtractor(videoUrl, 'Streamlare ');
                 for (const vid of vids) {
                     videos.push(vid);
                 }
@@ -203,7 +203,7 @@ class DefaultExtension extends MProvider {
                     videos.push(vid);
                 }
             } else if (videoUrl.includes("wish") && altHosterSelection.some(element => 'streamwish' === element)) {
-                const vids = await streamWishExtractor(videoUrl);
+                const vids = await streamWishExtractor(videoUrl, 'StreamWish ');
                 for (const vid of vids) {
                     videos.push(vid);
                 }
