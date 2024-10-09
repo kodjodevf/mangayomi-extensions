@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "single",
     "isManga": false,
     "isNsfw": false,
-    "version": "0.0.25",
+    "version": "0.0.3",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/en/allanime.js"
@@ -162,7 +162,7 @@ class DefaultExtension extends MProvider {
         const encodedGql = `?variables=%0A%20%20%20%20%20%20%20%20%7B%0A%20%20%20%20%20%20%20%20%20%20%22showId%22:%20%22${ep.showId}%22,%0A%20%20%20%20%20%20%20%20%20%20%22episodeString%22:%20%22${ep.episodeString}%22,%0A%20%20%20%20%20%20%20%20%20%20%22translationType%22:%20%22${translationType[0]}%22%0A%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20&query=%0A%20%20%20%20%20%20%20%20query(%0A%20%20%20%20%20%20%20%20%20%20$showId:%20String!%0A%20%20%20%20%20%20%20%20%20%20$episodeString:%20String!%0A%20%20%20%20%20%20%20%20%20%20$translationType:%20VaildTranslationTypeEnumType!%0A%20%20%20%20%20%20%20%20)%20%7B%0A%20%20%20%20%20%20%20%20%20%20episode(%0A%20%20%20%20%20%20%20%20%20%20%20%20showId:%20$showId%0A%20%20%20%20%20%20%20%20%20%20%20%20episodeString:%20$episodeString%0A%20%20%20%20%20%20%20%20%20%20%20%20translationType:%20$translationType%0A%20%20%20%20%20%20%20%20%20%20)%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20sourceUrls%0A%20%20%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20`;
         const videoJson = JSON.parse(await this.request(encodedGql));
         const videos = [];
-        const altHosterSelection = preferences.get('alt_hoster_selection');
+        const altHosterSelection = preferences.get('alt_hoster_selection1');
         for (const video of videoJson.data.episode.sourceUrls) {
             const videoUrl = this.decryptSource(video.sourceUrl);
             let quality = "";
@@ -203,7 +203,7 @@ class DefaultExtension extends MProvider {
                     videos.push(vid);
                 }
             } else if (videoUrl.includes("wish") && altHosterSelection.some(element => 'streamwish' === element)) {
-                const vids = await streamwishExtractor(videoUrl);
+                const vids = await streamWishExtractor(videoUrl);
                 for (const vid of vids) {
                     videos.push(vid);
                 }
@@ -213,7 +213,7 @@ class DefaultExtension extends MProvider {
     }
     sortVideos(videos) {
         const preferences = new SharedPreferences();
-        const hoster = preferences.get("preferred_hoster");
+        const hoster = preferences.get("preferred_hoster1");
         const quality = preferences.get("preferred_quality");
         videos.sort((a, b) => {
             let qualityMatchA = 0;
@@ -290,7 +290,7 @@ class DefaultExtension extends MProvider {
                 }
             },
             {
-                "key": "preferred_hoster_",
+                "key": "preferred_hoster1",
                 "listPreference": {
                     "title": "Preferred Video Server",
                     "summary": "",
@@ -302,7 +302,7 @@ class DefaultExtension extends MProvider {
                         "filemoon",
                         "streamwish"
                     ],
-                    "entryValues_": [
+                    "entryValues": [
                         "Ac", "Ak", "Kir", "Rab", "Luf-mp4",
                         "Si-Hls", "S-mp4", "Ac-Hls", "Uv-mp4", "Pn-Hls",
                         "vidstreaming", "okru", "mp4upload", "streamlare", "doodstream",
@@ -312,7 +312,7 @@ class DefaultExtension extends MProvider {
                 }
             },
             {
-                "key": "alt_hoster_selection_",
+                "key": "alt_hoster_selection1",
                 "multiSelectListPreference": {
                     "title": "Enable/Disable Alternative Hosts",
                     "summary": "",
