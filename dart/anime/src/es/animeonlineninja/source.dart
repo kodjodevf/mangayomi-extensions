@@ -1,7 +1,7 @@
 import '../../../../../model/source.dart';
 
 Source get animeonlineninjaSource => _animeonlineninjaSource;
-const _animeonlineninjaVersion = "0.0.15";
+const _animeonlineninjaVersion = "0.0.2";
 const _animeonlineninjaSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/src/es/animeonlineninja/animeonlineninja.dart";
 Source _animeonlineninjaSource = Source(
