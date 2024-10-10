@@ -98,13 +98,12 @@ class AnimeOnlineNinja extends MProvider {
     List<MVideo> a = [];
     if (url.contains("saidochesto.top") || lang == "MULTISERVER") {
       return await extractFromMulti(url);
-    } else if (url.contains("filemoon")) {
+    } else if (["filemoon", "moon", "filemooon"].any((a) => url.contains(a))) {
       a = await filemoonExtractor(url, "$lang Filemoon - ", "");
-    } else if (url.contains("https://dood") ||
-        url.contains("https://ds2play") ||
-        url.contains("https://d0")) {
+    } else if (["https://dood", "https://ds2play", "https://d0"]
+        .any((a) => url.contains(a))) {
       a = await doodExtractor(url, "$lang DoodStream");
-    } else if (url.contains("streamtape")) {
+    } else if (["streamtape", "stp", "stape"].any((a) => url.contains(a))) {
       a = await streamTapeExtractor(url, "$lang StreamTape");
     } else if (url.contains("uqload")) {
       a = await uqloadExtractor(url, lang);
@@ -122,9 +121,49 @@ class AnimeOnlineNinja extends MProvider {
         ..quality = "$lang WolfStream";
 
       a = [video];
+    } else if (["wishembed", "streamwish", "strwish", "wish"]
+        .any((a) => url.contains(a))) {
+      a = await streamWishExtractor(url, "$lang StreamWish");
+    } else if (url.contains("mp4upload")) {
+      a = await mp4UploadExtractor(url, null, "$lang", "");
+    } else if (["vidhide", "filelions.top", "vid."]
+        .any((a) => url.contains(a))) {
+      a = await streamHideExtractor(url, lang);
     }
     videos.addAll(a);
 
+    return videos;
+  }
+
+  Future<List<MVideo>> streamHideExtractor(String url, String prefix) async {
+    final res = (await client.get(Uri.parse(url))).body;
+    final masterUrl = substringBefore(
+        substringAfter(
+            substringAfter(
+                substringAfter(unpackJs(res), "sources:"), "file:\""),
+            "src:\""),
+        '"');
+    final masterPlaylistRes = (await client.get(Uri.parse(masterUrl))).body;
+    List<MVideo> videos = [];
+    for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
+        .split("#EXT-X-STREAM-INF:")) {
+      final quality =
+          "${substringBefore(substringBefore(substringAfter(substringAfter(it, "RESOLUTION="), "x"), ","), "\n")}p";
+
+      String videoUrl = substringBefore(substringAfter(it, "\n"), "\n");
+
+      if (!videoUrl.startsWith("http")) {
+        videoUrl =
+            "${masterUrl.split("/").sublist(0, masterUrl.split("/").length - 1).join("/")}/$videoUrl";
+      }
+
+      MVideo video = MVideo();
+      video
+        ..url = videoUrl
+        ..originalUrl = videoUrl
+        ..quality = "$prefix StreamHideVid - $quality";
+      videos.add(video);
+    }
     return videos;
   }
 
@@ -206,7 +245,7 @@ class AnimeOnlineNinja extends MProvider {
           entries: ["SUB", "All", "ES", "LAT"],
           entryValues: ["SUB", "", "ES", "LAT"]),
       ListPreference(
-          key: "preferred_server_",
+          key: "preferred_server1",
           title: "Preferred server",
           summary: "",
           valueIndex: 0,
@@ -216,7 +255,10 @@ class AnimeOnlineNinja extends MProvider {
             "StreamTape",
             "Uqload",
             "WolfStream",
-            "saidochesto.top"
+            "saidochesto.top",
+            "VidHide",
+            "StreamWish",
+            "Mp4Upload"
           ],
           entryValues: [
             "Filemoon",
@@ -224,14 +266,17 @@ class AnimeOnlineNinja extends MProvider {
             "StreamTape",
             "Uqload",
             "WolfStream",
-            "saidochesto.top"
+            "saidochesto.top",
+            "VidHide",
+            "StreamWish",
+            "Mp4Upload"
           ]),
     ];
   }
 
   List<MVideo> sortVideos(List<MVideo> videos, int sourceId) {
     String prefLang = getPreferenceValue(source.id, "preferred_lang");
-    String server = getPreferenceValue(sourceId, "preferred_server_");
+    String server = getPreferenceValue(sourceId, "preferred_server1");
     videos.sort((MVideo a, MVideo b) {
       int qualityMatchA = 0;
 
