@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "single",
     "isManga": false,
     "isNsfw": false,
-    "version": "0.0.1",
+    "version": "0.0.2",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/zh/wogg.js"
@@ -140,7 +140,7 @@ class DefaultExtension extends MProvider {
         } else if (type === 'uc') {
             let cookie = new SharedPreferences().get("ucCookie");
             if (cookie == "") {
-                throw new Error("请先在本扩展设置中填写UC云盘Cookies, 需要UC云盘VIP账号 \n Please fill in the UC Cloud Cookies in this extension settings first, you need a UC Cloud VIP account");
+                throw new Error("请先在本扩展设置中填写UC云盘Cookies \n Please fill in the UC Cloud Cookies in this extension settings first");
             } else {
                 vids = await ucVideosExtractor(url, cookie);
             }
