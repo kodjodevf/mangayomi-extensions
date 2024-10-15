@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/all.netflixmirror.png",
     "typeSource": "single",
     "isManga": false,
-    "version": "0.0.15",
+    "version": "0.0.2",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/all/netflixmirror.js"
@@ -14,12 +14,7 @@ const mangayomiSources = [{
 
 class DefaultExtension extends MProvider {
     async request(url) {
-        const baseUrl = this.source.baseUrl;
-        const body = (await new Client().get(baseUrl + url, { "hd": "on" })).body
-        if (body.includes("Just verify you're a human, Just click to below box, Without verification you can't access this app.")) {
-            throw new Error("reCAPTCHA ERROR:\nOpen webview and just verify you're a human, Without verification you can't access to contents.");
-        }
-        return body;
+        return (await new Client().get(this.source.baseUrl + url, { "hd": "on" })).body;
     }
     async getPopular(page) {
         return await this.getPages(await this.request("/home"), ".tray-container, #top10")
@@ -63,7 +58,7 @@ class DefaultExtension extends MProvider {
         const description = data.desc;
         let episodes = [];
         if (data.episodes[0] === null) {
-            episodes.push({ name, url });
+            episodes.push({ name, url: JSON.stringify({ id: url, name }) });
         } else {
             episodes = data.episodes.map(ep => ({
                 name: `${ep.s.replace('S', 'Season ')} ${ep.ep.replace('E', 'Episode ')} : ${ep.t}`,
