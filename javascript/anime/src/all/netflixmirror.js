@@ -6,15 +6,22 @@ const mangayomiSources = [{
     "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/all.netflixmirror.png",
     "typeSource": "single",
     "isManga": false,
-    "version": "0.0.2",
+    "version": "0.0.3",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/all/netflixmirror.js"
 }];
 
 class DefaultExtension extends MProvider {
-    async request(url) {
-        return (await new Client().get(this.source.baseUrl + url, { "hd": "on" })).body;
+    async getCookie() {
+        const addhash = new Document((await new Client().get(`${this.source.baseUrl}/home`, { "cookie": "" })).body).selectFirst("body").attr("data-addhash");
+        await new Client().get(`https://userverify.netmirror.app/verify?hash=${addhash}`);
+        const res = (await new Client().post(`${this.source.baseUrl}/verify2.php`, { "cookie": "" }, { "verify": addhash }));
+        return res.headers["set-cookie"];
+    }
+    async request(url, cookie) {
+        cookie = cookie ?? await this.getCookie();
+        return (await new Client().get(this.source.baseUrl + url, { "cookie": `hd=on; ${cookie}` })).body;
     }
     async getPopular(page) {
         return await this.getPages(await this.request("/home"), ".tray-container, #top10")
@@ -24,13 +31,14 @@ class DefaultExtension extends MProvider {
     }
     async getPages(body, selector) {
         const elements = new Document(body).select(selector);
+        const cookie = await this.getCookie();
         const list = [];
         for (const element of elements) {
             const linkElement = element.selectFirst("article, .top10-post");
             const id = linkElement.selectFirst("a").attr("data-post");
             if (id.length > 0) {
                 const imageUrl = linkElement.selectFirst(".card-img-container img, .top10-img img").attr("data-src");
-                list.push({ name: JSON.parse(await this.request(`/post.php?id=${id}`)).title, imageUrl, link: id });
+                list.push({ name: JSON.parse(await this.request(`/post.php?id=${id}`, cookie)).title, imageUrl, link: id });
             }
         }
         return {
@@ -52,7 +60,8 @@ class DefaultExtension extends MProvider {
         }
     }
     async getDetail(url) {
-        const data = JSON.parse(await this.request(`/post.php?id=${url}`));
+        const cookie = await this.getCookie();
+        const data = JSON.parse(await this.request(`/post.php?id=${url}`, cookie));
         const name = data.title;
         const genre = [data.ua, ...(data.genre || '').split(',').map(g => g.trim())];
         const description = data.desc;
@@ -66,7 +75,7 @@ class DefaultExtension extends MProvider {
             }));
         }
         if (data.nextPageShow === 1) {
-            const eps = await this.getEpisodes(name, url, data.nextPageSeason, 2);
+            const eps = await this.getEpisodes(name, url, data.nextPageSeason, 2, cookie);
             episodes.push(...eps);
         }
         episodes.reverse();
@@ -74,7 +83,7 @@ class DefaultExtension extends MProvider {
             let newEpisodes = [];
             const seasonsToProcess = data.season.slice(0, -1);
             await Promise.all(seasonsToProcess.map(async (season) => {
-                const eps = await this.getEpisodes(name, url, season.id, 1);
+                const eps = await this.getEpisodes(name, url, season.id, 1, cookie);
                 newEpisodes.push(...eps);
             }));
             newEpisodes.reverse();
@@ -86,12 +95,12 @@ class DefaultExtension extends MProvider {
             description, status: 1, genre, episodes
         };
     }
-    async getEpisodes(name, eid, sid, page) {
+    async getEpisodes(name, eid, sid, page, cookie) {
         const episodes = [];
         let pg = page;
         while (true) {
             try {
-                const data = JSON.parse(await this.request(`/episodes.php?s=${sid}&series=${eid}&page=${pg}`));
+                const data = JSON.parse(await this.request(`/episodes.php?s=${sid}&series=${eid}&page=${pg}`, cookie));
 
                 data.episodes?.forEach(ep => {
                     episodes.push({
@@ -123,7 +132,7 @@ class DefaultExtension extends MProvider {
                     playlist.tracks.filter(track => track.kind === 'captions').forEach(track => {
                         subtitles.push({
                             label: track.label,
-                            url: track.file
+                            file: track.file
                         });
                     });
                     const link = baseUrl + source.file;
