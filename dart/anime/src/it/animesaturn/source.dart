@@ -6,7 +6,7 @@ const _animesaturnCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/src/it/animesaturn/animesaturn.dart";
 Source _animesaturn = Source(
     name: "AnimeSaturn",
-    baseUrl: "https://www.animesaturn.tv",
+    baseUrl: "https://www.animesaturn.cx",
     lang: "it",
     typeSource: "single",
     iconUrl:
