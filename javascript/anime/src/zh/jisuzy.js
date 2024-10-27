@@ -1,13 +1,13 @@
 const mangayomiSources = [{
     "name": "极速资源",
     "lang": "zh",
-    "baseUrl": "https://wwww.jisuzy.com",
+    "baseUrl": "https://www.jisuzy.com",
     "apiUrl": "",
     "iconUrl": "https://www.jisuzy.com/template/default/images/site_logo.png",
     "typeSource": "single",
     "isManga": false,
     "isNsfw": false,
-    "version": "0.0.1",
+    "version": "0.0.2",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/zh/jisuzy.js"
@@ -95,13 +95,22 @@ class DefaultExtension extends MProvider {
         const content = this.text(anime.vod_content);
         desc = desc.length < blurb?.length ? blurb : desc;
         desc = desc.length < content.length ? content : desc;
-        const urls = anime.vod_play_url
-            .split("#")
-            .filter((e) => e)
-            .map((e) => {
-                const s = e.split("$");
-                return { name: s[0], url: s[1] };
-            });
+
+        const playLists = anime.vod_play_url.split("$$$");
+        const urls = [];
+
+        for (const playList of playLists) {
+            const episodes = playList.split("#").filter(e => e);
+
+            for (const episode of episodes) {
+                const parts = episode.split("$");
+                const name = parts[0];
+                const episodeUrl = parts[1];
+                if (episodeUrl.includes("m3u8")) {
+                    urls.push({ name, url: episodeUrl });
+                }
+            }
+        }
         return {
             name: anime.vod_name,
             imageUrl: anime.vod_pic,
@@ -111,11 +120,19 @@ class DefaultExtension extends MProvider {
     }
     // For anime episode video list
     async getVideoList(url) {
-        return [{
-            url: url,
-            originalUrl: url,
-            quality: "HLS"
-        }];
+        const proxyUrl = await getProxyUrl();
+        return [
+            {
+                url: url,
+                originalUrl: url,
+                quality: "HLS"
+            },
+            {
+                url: `${proxyUrl}/proxy?url=${encodeURIComponent(url)}`,
+                originalUrl: url,
+                quality: "去广告"
+            }
+        ];
     }
     // For manga chapter pages
     async getPageList() {
