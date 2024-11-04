@@ -1,4 +1,4 @@
-const languages = ["ja", "en", "fr", "es", "es-la", "pt", "pt-br"];
+const languages = ["en", "ja", "fr", "es", "es-la", "pt", "pt-br"];
 const mangayomiSources = languages.map(lang => {
     return {
         "name": "Mangafire",
