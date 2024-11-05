@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "single",
     "isManga": false,
     "isNsfw": false,
-    "version": "0.0.2",
+    "version": "0.0.25",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/de/aniworld.js"
@@ -129,7 +129,7 @@ class DefaultExtension extends MProvider {
         const document = new Document(res.body);
         const redirectlink = document.select("ul.row li");
         const preference = new SharedPreferences();
-        const hosterSelection = preference.get("hoster_selection");
+        const hosterSelection = preference.get("hoster_selection_new");
         const videos = [];
         for (const element of redirectlink) {
             try {
@@ -179,7 +179,7 @@ class DefaultExtension extends MProvider {
     }
     sortVideos(videos) {
         const preference = new SharedPreferences();
-        const hoster = preference.get("preferred_hoster");
+        const hoster = preference.get("preferred_hoster_new");
         const subPreference = preference.get("preferred_lang");
         videos.sort((a, b) => {
             let qualityMatchA = 0;
