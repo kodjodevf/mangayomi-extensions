@@ -1,19 +1,16 @@
-const languages = ["en", "ja", "fr", "es", "es-la", "pt", "pt-br"];
-const mangayomiSources = languages.map(lang => {
-    return {
-        "name": "Mangafire",
-        "lang": lang,
-        "baseUrl": "https://mangafire.to",
-        "apiUrl": "",
-        "iconUrl": "https://mangafire.to/assets/sites/mangafire/favicon.png?v3",
-        "typeSource": "single",
-        "isManga": true,
-        "version": "0.1.0",
-        "dateFormat": "",
-        "dateFormatLocale": "",
-        "pkgPath": "manga/src/all/mangafire.js"
-    };
-});
+const mangayomiSources = [{
+    "name": "Mangafire",
+    "langs": ["en", "ja", "fr", "es", "es-la", "pt", "pt-br"],
+    "baseUrl": "https://mangafire.to",
+    "apiUrl": "",
+    "iconUrl": "https://mangafire.to/assets/sites/mangafire/favicon.png?v3",
+    "typeSource": "single",
+    "isManga": true,
+    "version": "0.1.0",
+    "dateFormat": "",
+    "dateFormatLocale": "",
+    "pkgPath": "manga/src/all/mangafire.js"
+}];
 
 class DefaultExtension extends MProvider {
     mangaListFromPage(res) {
