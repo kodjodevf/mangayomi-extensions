@@ -63,9 +63,10 @@ class Source {
     dateFormatLocale = json['dateFormatLocale'] ?? "";
     hasCloudflare = json['hasCloudflare'] ?? false;
     iconUrl = json['iconUrl'] ?? "";
-    id = (json['id'] ?? sourceCodeLang == 0
-            ? 'mangayomi-"${json['lang'] ?? ""}"."${json['name'] ?? ""}"'
-            : 'mangayomi-js-"${json['lang'] ?? ""}"."${json['name'] ?? ""}"')
+    id = (json['id'] ??
+            (sourceCodeLang == 0
+                ? 'mangayomi-"${json['lang'] ?? ""}"."${json['name'] ?? ""}"'
+                : 'mangayomi-js-"${json['lang'] ?? ""}"."${json['name'] ?? ""}"'))
         .hashCode;
     isFullData = json['isFullData'] ?? false;
     isManga = json['isManga'] ?? false;
