@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "single",
     "isManga": false,
     "isNsfw": false,
-    "version": "0.0.15",
+    "version": "0.0.2",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/de/aniworld.js"
@@ -146,25 +146,29 @@ class DefaultExtension extends MProvider {
                 const hoster = element.selectFirst("a h4").text;
 
                 if (hoster == "Streamtape" && hosterSelection.includes("Streamtape")) {
-                    const body = (await new Client().get(redirectgs)).body;
+                    const location = (await new Client({ 'useDartHttpClient': true, "followRedirects": false }).get(redirectgs)).headers.location;
                     const quality = `Streamtape ${language}`;
-                    const vids = await streamTapeExtractor(body.match(/https:\/\/streamtape\.com\/e\/[a-zA-Z0-9]+/g)[0], quality);
+                    const vids = await streamTapeExtractor(location, quality);
                     for (const vid of vids) {
                         videos.push(vid);
                     }
                 } else if (hoster == "VOE" && hosterSelection.includes("VOE")) {
-                    const body = (await new Client().get(redirectgs)).body;
+                    const location = (await new Client({ 'useDartHttpClient': true, "followRedirects": false }).get(redirectgs)).headers.location;
                     const quality = `VOE ${language}`;
-                    const vids = await voeExtractor(body.match(/https:\/\/voe\.sx\/e\/[a-zA-Z0-9]+/g)[0], quality);
+                    const vids = await voeExtractor(location, quality);
                     for (const vid of vids) {
                         videos.push(vid);
                     }
                 } else if (hoster == "Vidoza" && hosterSelection.includes("Vidoza")) {
-                    const body = (await new Client().get(redirectgs)).body;
+                    const location = (await new Client({ 'useDartHttpClient': true, "followRedirects": false }).get(redirectgs)).headers.location;
                     const quality = `Vidoza ${language}`;
-                    const match = body.match(/https:\/\/[^\s]*\.vidoza\.net\/[^\s]*\.mp4/g);
-                    if (match.length > 0) {
-                        videos.push({ url: match[0], originalUrl: match[0], quality });
+                    videos.push({ url: location, originalUrl: location, quality });
+                } else if (hoster == "Doodstream" && hosterSelection.includes("Doodstream")) {
+                    const location = (await new Client({ 'useDartHttpClient': true, "followRedirects": false }).get(redirectgs)).headers.location;
+                    const quality = `Doodstream ${language}`;
+                    const vids = await doodExtractor(location, quality);
+                    for (const vid of vids) {
+                        videos.push(vid);
                     }
                 }
             } catch (_) {
@@ -213,7 +217,7 @@ class DefaultExtension extends MProvider {
                 }
             },
             {
-                "key": "preferred_hoster",
+                "key": "preferred_hoster_new",
                 "listPreference": {
                     "title": "Standard-Hoster",
                     "summary": "",
@@ -221,34 +225,34 @@ class DefaultExtension extends MProvider {
                     "entries": [
                         "Streamtape",
                         "VOE",
-                        "Vidoza"
+                        "Vidoza", "Doodstream"
                     ],
                     "entryValues": [
                         "Streamtape",
                         "VOE",
-                        "Vidoza"
+                        "Vidoza", "Doodstream"
                     ]
                 }
             },
             {
-                "key": "hoster_selection",
+                "key": "hoster_selection_new",
                 "multiSelectListPreference": {
                     "title": "Hoster auswählen",
                     "summary": "",
                     "entries": [
                         "Streamtape",
                         "VOE",
-                        "Vidoza"
+                        "Vidoza", "Doodstream"
                     ],
                     "entryValues": [
                         "Streamtape",
                         "VOE",
-                        "Vidoza"
+                        "Vidoza", "Doodstream"
                     ],
                     "values": [
                         "Streamtape",
                         "VOE",
-                        "Vidoza"
+                        "Vidoza", "Doodstream"
                     ]
                 }
             }
