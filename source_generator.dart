@@ -63,7 +63,9 @@ List<Source> _searchJsSources(Directory dir) {
                     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/javascript/${sourceJson["pkgPath"] ?? sourceJson["pkgName"]}";
               if (langs?.isNotEmpty ?? false) {
                 for (var lang in langs!) {
-                  sourceList.add(Source.fromJson(source.toJson())..lang = lang);
+                  sourceList.add(Source.fromJson(source.toJson())
+                    ..lang = lang
+                    ..id = 'mangayomi-js-"$lang"."${source.name}"'.hashCode);
                 }
               } else {
                 sourceList.add(source);
