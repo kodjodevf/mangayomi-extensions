@@ -49,19 +49,26 @@ List<Source> _searchJsSources(Directory dir) {
         if (entity is Directory) {
           sourceList.addAll(_searchJsSources(entity));
         } else if (entity is File && entity.path.endsWith('.js')) {
-          final RegExp regex = RegExp(
-              r'const\s+mangayomiSources\s*=\s*(\[.*?\]);',
+          final regex = RegExp(r'const\s+mangayomiSources\s*=\s*(\[.*?\]);',
               dotAll: true);
           final defaultSource = Source();
-          Match? match = regex.firstMatch(entity.readAsStringSync());
+          final match = regex.firstMatch(entity.readAsStringSync());
           if (match != null) {
-            sourceList.addAll((jsonDecode(match.group(1)!) as List)
-                .map((e) => Source.fromJson(e)
-                  ..sourceCodeLanguage = 1
-                  ..appMinVerReq = defaultSource.appMinVerReq
-                  ..sourceCodeUrl =
-                      "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/javascript/${e["pkgPath"] ?? e["pkgName"]}")
-                .toList());
+            for (var sourceJson in jsonDecode(match.group(1)!) as List) {
+              final langs = sourceJson["langs"] as List?;
+              final source = Source.fromJson(sourceJson)
+                ..sourceCodeLanguage = 1
+                ..appMinVerReq = defaultSource.appMinVerReq
+                ..sourceCodeUrl =
+                    "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/javascript/${sourceJson["pkgPath"] ?? sourceJson["pkgName"]}";
+              if (langs?.isNotEmpty ?? false) {
+                for (var lang in langs!) {
+                  sourceList.add(Source.fromJson(source.toJson())..lang = lang);
+                }
+              } else {
+                sourceList.add(source);
+              }
+            }
           }
         }
       }
