@@ -104,15 +104,15 @@ class DefaultExtension extends MProvider {
         // get urls
         const id = url.split(".").pop();
         const infoUrl = this.source.baseUrl + url;
-        const chapterUrl = `https://mangafire.to/ajax/read/${id}/chapter/${this.source.lang}`;
+        const chapterUrl = this.source.baseUrl + `/ajax/read/${id}/chapter/${this.source.lang}`;
         const detail = {};
-        
+
         // request
         const idRes = await new Client().get(chapterUrl);
         const idDoc = new Document(JSON.parse(idRes.body).result.html);
         const infoRes = await new Client().get(infoUrl);
         const infoDoc = new Document(infoRes.body);
-        
+
         // extract info
         const info = infoDoc.selectFirst("div.info");
         const sidebar = infoDoc.select("aside.sidebar div.meta div");
@@ -128,14 +128,22 @@ class DefaultExtension extends MProvider {
 
         // get chapter
         const ids = idDoc.select("a");
-        const dates = infoDoc.select("div.list-body > ul.scroll-sm > li > a > span + span");
+        const chapRes = await new Client().get(this.source.baseUrl + `/ajax/manga/${id}/chapter/${this.source.lang}`);
+        const chapDoc = new Document(JSON.parse(chapRes.body).result);
+        const chapElements = chapDoc.selectFirst(".scroll-sm").children;
         detail.chapters = [];
         for (let i = 0; i < ids.length; i++) {
             const name = ids[i].text;
             const id = ids[i].attr("data-id");
-            const url = `https://mangafire.to/ajax/read/chapter/${id}`;
-            const dateUpload = this.parseDate(dates[i].text);
-            detail.chapters.push({name, url, dateUpload});
+            const url = this.source.baseUrl + `/ajax/read/chapter/${id}`;
+            let dateUpload;
+            try {
+                dateUpload = this.parseDate(chapElements[i].selectFirst("span + span").text);
+            } catch (_) {
+                dateUpload = null
+            }
+
+            detail.chapters.push({ name, url, dateUpload });
         }
         return detail;
     }
