@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "single",
     "isManga": false,
     "isNsfw": false,
-    "version": "0.0.25",
+    "version": "0.0.26",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/de/aniworld.js"
