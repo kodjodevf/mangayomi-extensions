@@ -123,6 +123,37 @@ class DefaultExtension extends MProvider {
         }
         return {}
     }
+    getRandomString(length) {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
+        let result = "";
+        for (let i = 0; i < length; i++) {
+            const random = Math.floor(Math.random() * 61);
+            result += chars[random];
+        }
+        return result;
+    }
+    async doodExtractor(url, quality) {
+        let response = await new Client({ 'useDartHttpClient': true, "followRedirects": false }).get(url);
+        while("location" in response.headers) {
+            response = await new Client({ 'useDartHttpClient': true, "followRedirects": false }).get(response.headers.location);
+        }
+        const newUrl = response.request.url;
+        const doodhost = newUrl.match(/https:\/\/(.*?)\//, newUrl)[0].slice(8, -1);
+        const md5 = response.body.match(/'\/pass_md5\/(.*?)',/, newUrl)[0].slice(11, -2);
+        const token = md5.substring(md5.lastIndexOf("/") + 1);
+        const expiry = new Date().valueOf();
+        const randomString = this.getRandomString(10);
+    
+        response = await new Client().get(`https://${doodhost}/pass_md5/${md5}`, {"Referer": newUrl});
+        const videoUrl = `${response.body}${randomString}?token=${token}&expiry=${expiry}`;
+        const headers = { "User-Agent": "Mangayomi", "Referer": doodhost };
+        return [{ url: videoUrl, originalUrl: videoUrl, headers: headers, quality }];
+    }
+    async vidozaExtractor(url, quality) {
+        let response = await new Client({ 'useDartHttpClient': true, "followRedirects": true }).get(url);
+        const videoUrl = response.body.match(/https:\/\/\S*\.mp4/)[0];
+        return [{ url: videoUrl, originalUrl: videoUrl, quality }];
+    }
     async getVideoList(url) {
         const baseUrl = this.source.baseUrl;
         const res = await new Client().get(baseUrl + url);
@@ -147,26 +178,29 @@ class DefaultExtension extends MProvider {
 
                 if (hoster == "Streamtape" && hosterSelection.includes("Streamtape")) {
                     const location = (await new Client({ 'useDartHttpClient': true, "followRedirects": false }).get(redirectgs)).headers.location;
-                    const quality = `Streamtape ${language}`;
+                    const quality = `${language} - Streamtape`;
                     const vids = await streamTapeExtractor(location, quality);
                     for (const vid of vids) {
                         videos.push(vid);
                     }
                 } else if (hoster == "VOE" && hosterSelection.includes("VOE")) {
                     const location = (await new Client({ 'useDartHttpClient': true, "followRedirects": false }).get(redirectgs)).headers.location;
-                    const quality = `VOE ${language}`;
+                    const quality = `${language} - `;
                     const vids = await voeExtractor(location, quality);
                     for (const vid of vids) {
                         videos.push(vid);
                     }
                 } else if (hoster == "Vidoza" && hosterSelection.includes("Vidoza")) {
                     const location = (await new Client({ 'useDartHttpClient': true, "followRedirects": false }).get(redirectgs)).headers.location;
-                    const quality = `Vidoza ${language}`;
-                    videos.push({ url: location, originalUrl: location, quality });
+                    const quality = `${language} - Vidoza`;
+                    const vids = await this.vidozaExtractor(location, quality);
+                    for (const vid of vids) {
+                        videos.push(vid);
+                    }
                 } else if (hoster == "Doodstream" && hosterSelection.includes("Doodstream")) {
                     const location = (await new Client({ 'useDartHttpClient': true, "followRedirects": false }).get(redirectgs)).headers.location;
-                    const quality = `Doodstream ${language}`;
-                    const vids = await doodExtractor(location, quality);
+                    const quality = `${language} - Doodstream`;
+                    const vids = await this.doodExtractor(location, quality);
                     for (const vid of vids) {
                         videos.push(vid);
                     }
