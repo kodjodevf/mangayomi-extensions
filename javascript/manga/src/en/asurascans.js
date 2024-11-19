@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/en.asurascans.png",
     "typeSource": "single",
     "isManga": true,
-    "version": "0.1.6",
+    "version": "0.1.65",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "manga/src/en/asurascans.js"
@@ -91,7 +91,7 @@ class DefaultExtension extends MProvider {
         const chapterElements = doc.select("div.scrollbar-thumb-themecolor > div.group");
         for (const element of chapterElements) {
             const url = element.selectFirst("a").getHref;
-            const chNumber = element.selectFirst("h3 > a").text.trim();
+            const chNumber = element.selectFirst("h3 > a").text;
             const chTitle = element.select("h3 > a > span").map((span) => span.text.trim()).join(" ").trim();
             const name = chTitle == "" ? chNumber : `${chNumber} - ${chTitle}`;
 
