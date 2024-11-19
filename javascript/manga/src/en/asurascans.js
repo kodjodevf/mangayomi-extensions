@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/en.asurascans.png",
     "typeSource": "single",
     "isManga": true,
-    "version": "0.0.1",
+    "version": "0.1.6",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "manga/src/en/asurascans.js"
@@ -60,21 +60,25 @@ class DefaultExtension extends MProvider {
     }
 
     async getPopular(page) {
-        const res = await new Client().get(`${this.source.baseUrl}/series?name=&status=-1&types=-1&order=rating&page=${page}`);
+        const baseUrl = new SharedPreferences().get("overrideBaseUrl1");
+        const res = await new Client().get(`${baseUrl}/series?name=&status=-1&types=-1&order=rating&page=${page}`);
         return this.mangaListFromPage(res);
     }
 
     async getLatestUpdates(page) {
-        const res = await new Client().get(`${this.source.baseUrl}/series?genres=&status=-1&types=-1&order=update&page=${page}`);
+        const baseUrl = new SharedPreferences().get("overrideBaseUrl1");
+        const res = await new Client().get(`${baseUrl}/series?genres=&status=-1&types=-1&order=update&page=${page}`);
         return this.mangaListFromPage(res);
     }
     async search(query, page, filters) {
-        const res = await new Client().get(`${this.source.baseUrl}/series?name=${query}&page=${page}`);
+        const baseUrl = new SharedPreferences().get("overrideBaseUrl1");
+        const res = await new Client().get(`${baseUrl}/series?name=${query}&page=${page}`);
         return this.mangaListFromPage(res);
     }
 
     async getDetail(url) {
-        const res = await new Client().get(this.source.baseUrl + "/" + url);
+        const baseUrl = new SharedPreferences().get("overrideBaseUrl1");
+        const res = await new Client().get(baseUrl + "/" + url);
         const doc = new Document(res.body);
         const imageUrl = doc.selectFirst("img[alt=poster]")?.getSrc;
         const description = doc.selectFirst("span.font-medium.text-sm")?.text.trim();
@@ -114,7 +118,8 @@ class DefaultExtension extends MProvider {
 
 
     async getPageList(url) {
-        const res = await new Client().get(this.source.baseUrl + "/series/" + url);
+        const baseUrl = new SharedPreferences().get("overrideBaseUrl1");
+        const res = await new Client().get(baseUrl + "/series/" + url);
         const scriptData = new Document(res.body).select("script:contains(self.__next_f.push)").map((e) => e.text.substringAfter("\"").substringBeforeLast("\"")).join("");
         console.log(scriptData);
         const match = scriptData.match(/\\"pages\\":(\[.*?])/);
@@ -126,6 +131,19 @@ class DefaultExtension extends MProvider {
         const pageList = JSON.parse(pagesData.replace(/\\(.)/g, "$1"))
             .sort((a, b) => a.order - b.order);
         return pageList;
+    }
+
+    getSourcePreferences() {
+        return [{
+            "key": "overrideBaseUrl1",
+            "editTextPreference": {
+                "title": "Override BaseUrl",
+                "summary": "https://asuracomic.net",
+                "value": "https://asuracomic.net",
+                "dialogTitle": "Override BaseUrl",
+                "dialogMessage": "",
+            }
+        }];
     }
 
 }
