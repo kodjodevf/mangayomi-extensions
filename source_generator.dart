@@ -57,6 +57,7 @@ List<Source> _searchJsSources(Directory dir) {
             for (var sourceJson in jsonDecode(match.group(1)!) as List) {
               final langs = sourceJson["langs"] as List?;
               final source = Source.fromJson(sourceJson)
+                ..id = int.tryParse("${sourceJson["id"]}")
                 ..sourceCodeLanguage = 1
                 ..appMinVerReq = defaultSource.appMinVerReq
                 ..sourceCodeUrl =
@@ -65,7 +66,8 @@ List<Source> _searchJsSources(Directory dir) {
                 for (var lang in langs!) {
                   sourceList.add(Source.fromJson(source.toJson())
                     ..lang = lang
-                    ..id = 'mangayomi-js-"$lang"."${source.name}"'.hashCode);
+                    ..id = source.id ??
+                        'mangayomi-js-"$lang"."${source.name}"'.hashCode);
                 }
               } else {
                 sourceList.add(source);
