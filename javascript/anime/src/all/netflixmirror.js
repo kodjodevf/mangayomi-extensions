@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/all.netflixmirror.png",
     "typeSource": "single",
     "isManga": false,
-    "version": "0.0.4",
+    "version": "0.0.45",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/all/netflixmirror.js"
@@ -15,8 +15,13 @@ const mangayomiSources = [{
 class DefaultExtension extends MProvider {
     async getCookie() {
         const addhash = new Document((await new Client().get(`${this.source.baseUrl}/home`, { "cookie": "" })).body).selectFirst("body").attr("data-addhash");
-        await new Client().get(`${this.source.baseUrl}/v.php?dp1=${addhash}&a=2`);
-        const res = (await new Client().post(`${this.source.baseUrl}/verify2.php`, { "cookie": "" }, { "verify": addhash }));
+        await new Client().get(`https://userverify.netmirror.app/verify?dp1=${addhash}&a=y`);
+        let body;
+        let res;
+        do {
+            res = await new Client().post(`${this.source.baseUrl}/verify2.php`, { "cookie": "" }, { "verify": addhash });
+            body = res.body;
+        } while (!body.includes('"statusup":"All Done"'));
         return res.headers["set-cookie"];
     }
     async request(url, cookie) {
