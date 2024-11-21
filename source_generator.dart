@@ -56,18 +56,19 @@ List<Source> _searchJsSources(Directory dir) {
           if (match != null) {
             for (var sourceJson in jsonDecode(match.group(1)!) as List) {
               final langs = sourceJson["langs"] as List?;
-              final source = Source.fromJson(sourceJson)
-                ..id = int.tryParse("${sourceJson["id"]}")
+              Source source = Source.fromJson(sourceJson)
                 ..sourceCodeLanguage = 1
                 ..appMinVerReq = defaultSource.appMinVerReq
                 ..sourceCodeUrl =
                     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/javascript/${sourceJson["pkgPath"] ?? sourceJson["pkgName"]}";
+              if (sourceJson["id"] != null) {
+                source = source..id = int.tryParse("${sourceJson["id"]}");
+              }
               if (langs?.isNotEmpty ?? false) {
                 for (var lang in langs!) {
                   sourceList.add(Source.fromJson(source.toJson())
                     ..lang = lang
-                    ..id = source.id ??
-                        'mangayomi-js-"$lang"."${source.name}"'.hashCode);
+                    ..id = 'mangayomi-js-"$lang"."${source.name}"'.hashCode);
                 }
               } else {
                 sourceList.add(source);
