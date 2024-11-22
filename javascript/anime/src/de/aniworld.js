@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "single",
     "isManga": false,
     "isNsfw": false,
-    "version": "0.0.26",
+    "version": "0.0.27",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/de/aniworld.js"
@@ -67,7 +67,8 @@ class DefaultExtension extends MProvider {
     }
     async getDetail(url) {
         const baseUrl = this.source.baseUrl;
-        const res = await new Client().get(baseUrl + url);
+        const client = new Client();
+        const res = await client.get(baseUrl + url);
         const document = new Document(res.body);
         const imageUrl = baseUrl +
             document.selectFirst("div.seriesCoverBox img").attr("data-src");
@@ -81,47 +82,33 @@ class DefaultExtension extends MProvider {
             author = produzent[0].select("li").map(e => e.text).join(", ");
         }
         const seasonsElements = document.select("#stream > ul:nth-child(1) > li > a");
-        let episodes = [];
-        for (const element of seasonsElements) {
-            const eps = await this.parseEpisodesFromSeries(element);
-            for (const ep of eps) {
-                episodes.push(ep);
-            }
-        }
+        const episodes = (await Promise.all(seasonsElements.map(element => this.parseEpisodesFromSeries(element, client)))).flat();
         episodes.reverse();
-
         return {
             name, imageUrl, description, author, status: 5, genre, episodes
         };
     }
-    async parseEpisodesFromSeries(element) {
-        const seasonId = element.getHref;
-        const res = await new Client().get(this.source.baseUrl + seasonId);
-        const episodeElements = new Document(res.body).select("table.seasonEpisodesList tbody tr");
-        const list = [];
-        for (const episodeElement of episodeElements) {
-            list.push(this.episodeFromElement(episodeElement));
-        }
-        return list;
+    async parseEpisodesFromSeries(seriesElement, client) {
+        const seasonId = seriesElement.getHref;
+        const response = await client.get(`${this.source.baseUrl}${seasonId}`);
+        const episodeElements = new Document(response.body).select("table.seasonEpisodesList tbody tr");
+        const episodes = Array.from(episodeElements).map((episodeElement) => this.episodeFromElement(episodeElement));
+        return episodes.filter(ep => Object.keys(ep).length > 0);
     }
     episodeFromElement(element) {
+        const titleAnchor = element.selectFirst("td.seasonEpisodeTitle a");
+        const episodeSpan = titleAnchor.selectFirst("span");
+        const url = titleAnchor.attr("href");
+        const episodeSeasonId = element.attr("data-episode-season-id");
+        let episode = episodeSpan.text.replace(/&#039;/g, "'");
         let name = "";
-        let url = "";
-        if (element.selectFirst("td.seasonEpisodeTitle a").attr("href").includes("/film")) {
-            const num = element.attr("data-episode-season-id");
-            name = `Film ${num}` + " : " + element.selectFirst("td.seasonEpisodeTitle a span").text;
-            url = element.selectFirst("td.seasonEpisodeTitle a").attr("href");
+        if (url.includes("/film")) {
+            name = `Film ${episodeSeasonId} : ${episode}`;
         } else {
-            const season =
-                element.selectFirst("td.seasonEpisodeTitle a").attr("href").substringAfter("staffel-").substringBefore("/episode");;
-            const num = element.attr("data-episode-season-id");
-            name = `Staffel ${season} Folge ${num}` + " : " + element.selectFirst("td.seasonEpisodeTitle a span").text;
-            url = element.selectFirst("td.seasonEpisodeTitle a").attr("href");
+            const seasonMatch = url.match(/staffel-(\d+)\/episode/);
+            name = `Staffel ${seasonMatch[1]} Folge ${episodeSeasonId} : ${episode}`;
         }
-        if (name.length > 0 && url.length > 0) {
-            return { name, url }
-        }
-        return {}
+        return name && url ? { name, url } : {};
     }
     getRandomString(length) {
         const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
