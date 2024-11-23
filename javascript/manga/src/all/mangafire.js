@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://mangafire.to/assets/sites/mangafire/favicon.png?v3",
     "typeSource": "single",
     "isManga": true,
-    "version": "0.1.1",
+    "version": "0.1.2",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "manga/src/all/mangafire.js"
@@ -30,16 +30,13 @@ class DefaultExtension extends MProvider {
     }
 
     statusFromString(status){
-        if (status == "Releasing")
-            return 0;
-        else if (status == "Completed")
-            return 1;
-        else if (status == "On_Hiatus")
-            return 2;
-        else if (status == "Discontinued")
-            return 3;
-        else
-            return 5;
+        return {
+            "Releasing": 0,
+            "Completed": 1,
+            "On_Hiatus": 2,
+            "Discontinued": 3,
+            "Unrealeased": 4,
+        }[status] ?? 5;
     }
 
     parseDate(date) {
@@ -72,6 +69,12 @@ class DefaultExtension extends MProvider {
     async search(query, page, filters) {
         query = query.trim().replaceAll(/\ +/g, "+");
         let url = `${this.source.baseUrl}/filter?keyword=${query}`;
+
+        // Search sometimes failed because filters were empty. I experienced this mostly on android...
+        if (!filters || filters.length == 0) {
+            const res = await new Client().get(`${url}&language=${this.source.lang}&page=${page}`);
+            return this.mangaListFromPage(res);
+        }
 
         for (const filter of filters[0].state) {
             if (filter.state == true)
@@ -504,8 +507,8 @@ class DefaultExtension extends MProvider {
                     },
                     {
                         type_name: "SelectOption",
-                        name: "Most Relevant",
-                        value: "most_relevant"
+                        name: "Most Relevance",
+                        value: "most_relevance"
                     },
                     {
                         type_name: "SelectOption",
