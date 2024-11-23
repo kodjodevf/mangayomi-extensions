@@ -10,7 +10,7 @@ const mangayomiSources = [{
     "version": "0.0.1",
     "dateFormat": "",
     "dateFormatLocale": "",
-    "pkgPath": ""
+    "pkgPath": "anime/src/de/serienstream.js"
 }];
 
 class DefaultExtension extends MProvider {
