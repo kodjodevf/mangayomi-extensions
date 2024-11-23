@@ -173,6 +173,8 @@ class DefaultExtension extends MProvider {
         return videos;
     }
     getSourcePreferences() {
+        const hosterOptions = ["Streamtape", "VOE", "Vidoza", "Doodstream"];
+        const languageOptions = ["Deutscher Sub", "Deutscher Dub", "Englischer Sub"];
         return [
             {
                 "key": "preferred_lang",
@@ -180,16 +182,8 @@ class DefaultExtension extends MProvider {
                     "title": "Bevorzugte Sprache",
                     "summary": "",
                     "valueIndex": 0,
-                    "entries": [
-                        "Deutscher Sub",
-                        "Deutscher Dub",
-                        "Englischer Sub"
-                    ],
-                    "entryValues": [
-                        "Deutscher Sub",
-                        "Deutscher Dub",
-                        "Englischer Sub"
-                    ]
+                    "entries": languageOptions,
+                    "entryValues": languageOptions
                 }
             },
             {
@@ -198,18 +192,8 @@ class DefaultExtension extends MProvider {
                     "title": "Standard-Hoster",
                     "summary": "",
                     "valueIndex": 0,
-                    "entries": [
-                        "Streamtape",
-                        "VOE",
-                        "Vidoza",
-                        "Doodstream"
-                    ],
-                    "entryValues": [
-                        "Streamtape",
-                        "Voe",
-                        "Vidoza",
-                        "Doodstream"
-                    ]
+                    "entries": hosterOptions,
+                    "entryValues": hosterOptions
                 }
             },
             {
@@ -217,24 +201,9 @@ class DefaultExtension extends MProvider {
                 "multiSelectListPreference": {
                     "title": "Hoster auswählen",
                     "summary": "",
-                    "entries": [
-                        "Streamtape",
-                        "VOE",
-                        "Vidoza",
-                        "Doodstream"
-                    ],
-                    "entryValues": [
-                        "Streamtape",
-                        "VOE",
-                        "Vidoza",
-                        "Doodstream"
-                    ],
-                    "values": [
-                        "Streamtape",
-                        "VOE",
-                        "Vidoza",
-                        "Doodstream"
-                    ]
+                    "entries": hosterOptions,
+                    "entryValues": hosterOptions,
+                    "values": hosterOptions
                 }
             }
         ];
@@ -296,10 +265,9 @@ extractAny.methods = {
 
 function getRandomString(length) {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
-    let result = "";
+    const charArray = new Array(length);
     for (let i = 0; i < length; i++) {
-        const random = Math.floor(Math.random() * 61);
-        result += chars[random];
+        charArray[i] = chars[Math.floor(Math.random() * chars.length)];
     }
-    return result;
+    return charArray.join("");
 }
