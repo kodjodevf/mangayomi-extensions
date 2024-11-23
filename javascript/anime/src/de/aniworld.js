@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "single",
     "isManga": false,
     "isNsfw": false,
-    "version": "0.0.27",
+    "version": "0.0.28",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/de/aniworld.js"
@@ -110,23 +110,19 @@ class DefaultExtension extends MProvider {
         return list;
     }
     episodeFromElement(element) {
+        const titleAnchor = element.selectFirst("td.seasonEpisodeTitle a");
+        const episodeSpan = titleAnchor.selectFirst("span");
+        const url = titleAnchor.attr("href");
+        const episodeSeasonId = element.attr("data-episode-season-id");
+        let episode = episodeSpan.text.replace(/&#039;/g, "'");
         let name = "";
-        let url = "";
-        if (element.selectFirst("td.seasonEpisodeTitle a").attr("href").includes("/film")) {
-            const num = element.attr("data-episode-season-id");
-            name = `Film ${num}` + " : " + element.selectFirst("td.seasonEpisodeTitle a span").text;
-            url = element.selectFirst("td.seasonEpisodeTitle a").attr("href");
+        if (url.includes("/film")) {
+            name = `Film ${episodeSeasonId} : ${episode}`;
         } else {
-            const season =
-                element.selectFirst("td.seasonEpisodeTitle a").attr("href").substringAfter("staffel-").substringBefore("/episode");;
-            const num = element.attr("data-episode-season-id");
-            name = `Staffel ${season} Folge ${num}` + " : " + element.selectFirst("td.seasonEpisodeTitle a span").text;
-            url = element.selectFirst("td.seasonEpisodeTitle a").attr("href");
+            const seasonMatch = url.match(/staffel-(\d+)\/episode/);
+            name = `Staffel ${seasonMatch[1]} Folge ${episodeSeasonId} : ${episode}`;
         }
-        if (name.length > 0 && url.length > 0) {
-            return { name, url }
-        }
-        return {}
+        return name && url ? { name, url } : {};
     }
     async getVideoList(url) {
         const baseUrl = this.source.baseUrl;
