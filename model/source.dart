@@ -95,7 +95,7 @@ class Source {
       "sourceCodeUrl": sourceCodeUrl,
       "apiUrl": apiUrl,
       "version": version,
-      "itemType": itemType,
+      "itemType": itemType?.index ?? 0,
       "isFullData": isFullData,
       "appMinVerReq": appMinVerReq,
       "additionalParams": additionalParams,
