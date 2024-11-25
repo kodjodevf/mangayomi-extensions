@@ -25,7 +25,7 @@ class Source {
 
   String? version;
 
-  bool? isManga;
+  ItemType? itemType;
 
   bool? isFullData;
 
@@ -49,7 +49,7 @@ class Source {
       this.sourceCodeUrl = "",
       this.apiUrl = "",
       this.version = "",
-      this.isManga = true,
+      this.itemType = ItemType.manga,
       this.isFullData = false,
       this.appMinVerReq = "0.2.0",
       this.additionalParams = "",
@@ -68,7 +68,7 @@ class Source {
             : 'mangayomi-js-"${json['lang'] ?? ""}"."${json['name'] ?? ""}"')
         .hashCode;
     isFullData = json['isFullData'] ?? false;
-    isManga = json['isManga'] ?? false;
+    itemType = json['itemType'] ?? ItemType.manga;
     isNsfw = json['isNsfw'] ?? false;
     lang = json['lang'] ?? "";
     name = json['name'] ?? "";
@@ -94,7 +94,7 @@ class Source {
       "sourceCodeUrl": sourceCodeUrl,
       "apiUrl": apiUrl,
       "version": version,
-      "isManga": isManga,
+      "itemType": itemType,
       "isFullData": isFullData,
       "appMinVerReq": appMinVerReq,
       "additionalParams": additionalParams,
@@ -104,3 +104,9 @@ class Source {
 }
 
 const branchName = "main";
+
+enum ItemType {
+  manga,
+  anime,
+  novel
+}

@@ -7,7 +7,7 @@ Source _frenchanimeSource = Source(
   baseUrl: "https://french-anime.com",
   lang: "fr",
   typeSource: "datalifeengine",
-  isManga: false,
+  itemType: ItemType.anime,
   iconUrl:
       "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/multisrc/datalifeengine/src/frenchanime/icon.png",
 );

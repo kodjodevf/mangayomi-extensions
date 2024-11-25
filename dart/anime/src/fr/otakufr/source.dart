@@ -13,5 +13,5 @@ Source _otakufr = Source(
         "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/src/fr/otakufr/icon.png",
     sourceCodeUrl: otakufrCodeUrl,
     version: otakufrVersion,
-    isManga: false,
+    itemType: ItemType.anime,
     isFullData: false);
