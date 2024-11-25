@@ -69,7 +69,7 @@ class Source {
                 : 'mangayomi-js-"${json['lang'] ?? ""}"."${json['name'] ?? ""}"'))
         .hashCode;
     isFullData = json['isFullData'] ?? false;
-    itemType = json['itemType'] ?? ItemType.manga;
+    itemType = ItemType.values[json['itemType'] ?? 0];
     isNsfw = json['isNsfw'] ?? false;
     lang = json['lang'] ?? "";
     name = json['name'] ?? "";
