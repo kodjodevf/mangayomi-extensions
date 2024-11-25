@@ -159,6 +159,11 @@ class MangaDex extends MProvider {
             headers: headers))
         .body;
     MManga manga = MManga();
+    final coverUrl = jsonPathToString(
+      res, r'$..data.relationships[*].attributes.fileName', '');
+    if (coverUrl != null) {
+      manga.imageUrl = "https://uploads.mangadex.org/covers/${url.replaceAll("/manga/", "")}/${coverUrl}";
+    }
     manga.author = jsonPathToString(
         res, r'$..data.relationships[*].attributes.name', ', ');
 
@@ -382,8 +387,6 @@ class MangaDex extends MProvider {
       GroupFilter("ContentRatingList", "Content rating", [
         CheckBoxFilter("Safe", "contentRating[]=safe", state: true),
         CheckBoxFilter("Suggestive", "contentRating[]=suggestive", state: true),
-        CheckBoxFilter("Erotica", "contentRating[]=erotica"),
-        CheckBoxFilter("Pornographic", "contentRating[]=pornographic"),
       ]),
       GroupFilter("DemographicList", "Publication demographic", [
         CheckBoxFilter("None", "publicationDemographic[]=none"),
