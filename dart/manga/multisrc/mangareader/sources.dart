@@ -292,6 +292,7 @@ List<Source> _mangareaderSourcesList = [
   zenithscansSource
 ]
     .map((e) => e
+      ..itemType = ItemType.manga
       ..sourceCodeUrl = mangareaderSourceCodeUrl
       ..version = mangareaderVersion)
     .toList();

@@ -3,12 +3,14 @@ import 'dart:developer';
 import 'dart:io';
 import 'dart/anime/anime_source_list.dart';
 import 'dart/manga/manga_source_list.dart';
+import 'dart/novel/novel_source_list.dart';
 import 'model/source.dart';
 
 void main() {
   final jsSources = _searchJsSources(Directory("javascript"));
-  genManga(jsSources.where((element) => element.isManga!).toList());
-  genAnime(jsSources.where((element) => !element.isManga!).toList());
+  genManga(jsSources.where((element) => element.itemType == "manga").toList());
+  genAnime(jsSources.where((element) => element.itemType == "anime").toList());
+  genNovel(jsSources.where((element) => element.itemType == "novel").toList());
 }
 
 void genManga(List<Source> jsMangasourceList) {
@@ -39,6 +41,20 @@ void genAnime(List<Source> jsAnimesourceList) {
   log('JSON file created: ${file.path}');
 }
 
+void genNovel(List<Source> jsNovelSourceList) {
+  List<Source> novelSources = [];
+  novelSources.addAll(dartNovelSourceList);
+  novelSources.addAll(jsNovelSourceList);
+  final List<Map<String, dynamic>> jsonList =
+      novelSources.map((source) => source.toJson()).toList();
+  final jsonString = jsonEncode(jsonList);
+
+  final file = File('novel_index.json');
+  file.writeAsStringSync(jsonString);
+
+  log('JSON file created: ${file.path}');
+}
+
 List<Source> _searchJsSources(Directory dir) {
   List<Source> sourceList = [];
   List<FileSystemEntity> entities = dir.listSync();
@@ -60,7 +76,7 @@ List<Source> _searchJsSources(Directory dir) {
                   ..sourceCodeLanguage = 1
                   ..appMinVerReq = defaultSource.appMinVerReq
                   ..sourceCodeUrl =
-                      "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/javascript/${e["pkgPath"] ?? e["pkgName"]}")
+                      "https://raw.githubusercontent.com/Schnitzel5/mangayomi-extensions/$branchName/javascript/${e["pkgPath"] ?? e["pkgName"]}")
                 .toList());
           }
         }

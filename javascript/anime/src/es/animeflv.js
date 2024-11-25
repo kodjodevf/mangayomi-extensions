@@ -5,7 +5,7 @@ const mangayomiSources = [{
     "apiUrl": "",
     "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/es.animeflv.png",
     "typeSource": "single",
-    "isManga": false,
+    "itemType": "anime",
     "isNsfw": false,
     "version": "0.0.1",
     "dateFormat": "",

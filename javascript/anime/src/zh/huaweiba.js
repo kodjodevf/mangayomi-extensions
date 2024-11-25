@@ -5,7 +5,7 @@ const mangayomiSources = [{
     "apiUrl": "",
     "iconUrl": "https://huaweiba.live/template/ziyuan/images/logo2.png",
     "typeSource": "single",
-    "isManga": false,
+    "itemType": "anime",
     "isNsfw": false,
     "version": "0.0.1",
     "dateFormat": "",

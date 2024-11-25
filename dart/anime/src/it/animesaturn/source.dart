@@ -13,4 +13,4 @@ Source _animesaturn = Source(
         "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/src/it/animesaturn/icon.png",
     sourceCodeUrl: _animesaturnCodeUrl,
     version: _animesaturnVersion,
-    isManga: false);
+    itemType: ItemType.anime);

@@ -5,7 +5,7 @@ const mangayomiSources = [{
     "apiUrl": "",
     "iconUrl": "http://ffzy.tv/template/default/img/favicon.png",
     "typeSource": "single",
-    "isManga": false,
+    "itemType": "anime",
     "isNsfw": false,
     "version": "0.0.1",
     "dateFormat": "",

@@ -5,7 +5,7 @@ const mangayomiSources = [{
   "apiUrl": "",
   "iconUrl": "https://www.manhuagui.com/favicon.ico",
   "typeSource": "single",
-  "isManga": true,
+  "itemType": "manga",
   "isNsfw": false,
   "version": "0.0.25",
   "dateFormat": "",

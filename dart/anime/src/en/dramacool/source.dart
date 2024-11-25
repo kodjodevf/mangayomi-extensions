@@ -13,4 +13,4 @@ Source _dramacoolSource = Source(
         "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/src/en/dramacool/icon.png",
     sourceCodeUrl: _dramacoolSourceCodeUrl,
     version: _dramacoolVersion,
-    isManga: false);
+    itemType: ItemType.anime);

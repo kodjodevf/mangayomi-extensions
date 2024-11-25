@@ -14,5 +14,5 @@ Source _franimeSource = Source(
         "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/src/fr/franime/icon.png",
     sourceCodeUrl: _franimeSourceCodeUrl,
     version: _franimeVersion,
-    isManga: false,
+    itemType: ItemType.anime,
     isFullData: true);

@@ -5,7 +5,7 @@ const mangayomiSources = [{
     "apiUrl": "",
     "iconUrl": "https://360zy.com/favicon.ico",
     "typeSource": "single",
-    "isManga": false,
+    "itemType": "anime",
     "isNsfw": false,
     "version": "0.0.1",
     "dateFormat": "",

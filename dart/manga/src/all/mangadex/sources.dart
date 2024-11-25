@@ -70,5 +70,6 @@ List<Source> _mangaDexSourcesList = _languages
         isNsfw: _isNsfw,
         dateFormatLocale: 'en_Us',
         version: _mangadexVersion,
+        itemType: ItemType.manga,
         sourceCodeUrl: _mangadexSourceCodeUrl))
     .toList();
