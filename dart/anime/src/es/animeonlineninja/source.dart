@@ -13,4 +13,4 @@ Source _animeonlineninjaSource = Source(
         "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/src/es/animeonlineninja/icon.png",
     sourceCodeUrl: _animeonlineninjaSourceCodeUrl,
     version: _animeonlineninjaVersion,
-    isManga: false);
+    itemType: ItemType.anime);

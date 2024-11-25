@@ -5,7 +5,7 @@ const mangayomiSources = [{
     "apiUrl": "",
     "iconUrl": "https://tioanime.com/assets/img/tio_fb.jpg",
     "typeSource": "single",
-    "isManga": false,
+    "itemType": "anime",
     "version": "0.1.0",
     "dateFormat": "",
     "dateFormatLocale": "",

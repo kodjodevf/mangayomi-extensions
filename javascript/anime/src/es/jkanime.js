@@ -5,7 +5,7 @@ const mangayomiSources = [{
     "apiUrl": "",
     "iconUrl": "https://cdn.jkdesu.com/assets2/css/img/favicon.ico",
     "typeSource": "single",
-    "isManga": false,
+    "itemType": "anime",
     "version": "0.1.0",
     "dateFormat": "",
     "dateFormatLocale": "",
