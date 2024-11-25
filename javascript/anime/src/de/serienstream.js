@@ -1,16 +1,16 @@
 const mangayomiSources = [{
-    "name": "AniWorld",
+    "name": "SerienStream",
     "lang": "de",
-    "baseUrl": "https://aniworld.to",
+    "baseUrl": "https://s.to",
     "apiUrl": "",
-    "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/de.aniworld.png",
+    "iconUrl": "https://s.to/favicon.ico",
     "typeSource": "single",
-    "itemType": "anime",
+    "isManga": false,
     "isNsfw": false,
-    "version": "0.0.28",
+    "version": "0.0.2",
     "dateFormat": "",
     "dateFormatLocale": "",
-    "pkgPath": "anime/src/de/aniworld.js"
+    "pkgPath": "anime/src/de/serienstream.js"
 }];
 
 class DefaultExtension extends MProvider {
@@ -20,7 +20,7 @@ class DefaultExtension extends MProvider {
     }
     async getPopular(page) {
         const baseUrl = this.source.baseUrl;
-        const res = await this.client.get(`${baseUrl}/beliebte-animes`);
+        const res = await this.client.get(`${baseUrl}/beliebte-serien`);
         const elements = new Document(res.body).select("div.seriesListContainer div");
         const list = [];
         for (const element of elements) {
@@ -54,7 +54,7 @@ class DefaultExtension extends MProvider {
     }
     async search(query, page, filters) {
         const baseUrl = this.source.baseUrl;
-        const res = await this.client.get(`${baseUrl}/animes`);
+        const res = await this.client.get(`${baseUrl}/serien`);
         const elements = new Document(res.body).select("#seriesContainer > div > ul > li > a").filter(e => e.attr("title").toLowerCase().includes(query.toLowerCase()));
         const list = [];
         for (const element of elements) {
