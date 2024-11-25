@@ -5,7 +5,7 @@ const mangayomiSources = [{
     "apiUrl": "",
     "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/all.netflixmirror.png",
     "typeSource": "single",
-    "isManga": false,
+    "itemType": "anime",
     "version": "0.0.45",
     "dateFormat": "",
     "dateFormatLocale": "",
