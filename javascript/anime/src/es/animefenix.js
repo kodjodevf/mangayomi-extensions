@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www3.animefenix.tv/themes/fenix-neo/images/AveFenix.png",
     "typeSource": "single",
     "isManga": false,
-    "version": "0.1.0",
+    "version": "0.1.1",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/es/animefenix.js"
@@ -37,10 +37,11 @@ class DefaultExtension extends MProvider {
     }
     statusFromString(status) {
         return {
-            "En emision": 0, // releasing
-            "Finalizado": 1, // finished
-            "Proximamente": 4, // unreleased
-        }[status] ?? 5;
+            "en emision": 0, // releasing
+            "emisión": 0, // releasing
+            "finalizado": 1, // finished
+            "proximamente": 4, // unreleased
+        }[status.toLowerCase()] ?? 5;
     }
     async getPopular(page) {
         return this.parseAnimeList(`${this.source.baseUrl}/animes?order=visits&page=${page}`);
@@ -80,7 +81,7 @@ class DefaultExtension extends MProvider {
         const info = doc.selectFirst('main div.flex');
 
         detail.name = info.selectFirst("h1").text;
-        detail.status = this.statusFromString(info.selectFirst("a").text);
+        detail.status = this.statusFromString(info.selectFirst("a").text.trim());
         detail.imageUrl = info.selectFirst("img").getSrc;
         detail.description = info.selectFirst("h2 + p").text.trim();
         detail.genre = info.select("h2 + div a").map(e => e.text.trim());
@@ -114,13 +115,8 @@ class DefaultExtension extends MProvider {
         };
         
         // extract remote video links
-        const renameLUT = {
-            'amazones': 'amazon',
-            'burst': 'burstcloud',
-            'hide': 'vidhide',
-            'ru': 'okru',
-            'stream2': 'vidhide',
-        };
+        const renameLUT = { 'amazones': 'amazon', 'burst': 'burstcloud', 'hide': 'vidhide',
+            'ru': 'okru', 'stream2': 'vidhide', };
         for (let i = 0; i < hosts.length; i++) {
             const host = hosts[i].trim();
             const lhost = host.toLowerCase();
@@ -509,6 +505,11 @@ class DefaultExtension extends MProvider {
         ];
     }
     getSourcePreferences() {
+        const languages = ['Español'];
+        const types = ['Sub'];
+        const resolutions = ['1080p', '720p', '480p'];
+        const hosts = ['Amazon', 'AmazonEs', 'Burst', 'Mp4Upload', 'RU', 'Sendvid', 'STREAM2', 'HIDE', 'YourUpload'];
+
         return [
             {
                 key: 'lang',
@@ -516,12 +517,8 @@ class DefaultExtension extends MProvider {
                     title: 'Preferred Language',
                     summary: 'If available, this language will be chosen by default. Priority = 0 (lower is better)',
                     valueIndex: 0,
-                    entries: [
-                        'Español'
-                    ],
-                    entryValues: [
-                        'Español'
-                    ]
+                    entries: languages,
+                    entryValues: languages
                 }
             },
             {
@@ -530,12 +527,8 @@ class DefaultExtension extends MProvider {
                     title: 'Preferred Type',
                     summary: 'If available, this type will be chosen by default. Priority = 1 (lower is better)',
                     valueIndex: 0,
-                    entries: [
-                        'Sub'
-                    ],
-                    entryValues: [
-                        'Sub'
-                    ]
+                    entries: types,
+                    entryValues: types
                 }
             },
             {
@@ -544,44 +537,18 @@ class DefaultExtension extends MProvider {
                     title: 'Preferred Resolution',
                     summary: 'If available, this resolution will be chosen by default. Priority = 2 (lower is better)',
                     valueIndex: 0,
-                    entries: [
-                        '1080p',
-                        '720p',
-                        '480p'
-                    ],
-                    entryValues: [
-                        '1080p',
-                        '720p',
-                        '480p'
-                    ]
+                    entries: resolutions,
+                    entryValues: resolutions
                 }
             },
             {
                 key: 'host',
                 listPreference: {
-                    title: 'Preferred Hoster',
+                    title: 'Preferred Host',
                     summary: 'If available, this hoster will be chosen by default. Priority = 3 (lower is better)',
                     valueIndex: 0,
-                    entries: [
-                        'Amazon',
-                        'Burst',
-                        'Mp4Upload',
-                        'RU',
-                        'Sendvid',
-                        'STREAM2',
-                        'HIDE',
-                        'YourUpload',
-                    ],
-                    entryValues: [
-                        'Amazon',
-                        'Burst',
-                        'Mp4Upload',
-                        'RU',
-                        'Sendvid',
-                        'STREAM2',
-                        'HIDE',
-                        'YourUpload',
-                    ]
+                    entries: hosts,
+                    entryValues: hosts
                 }
             }
         ];
@@ -590,7 +557,7 @@ class DefaultExtension extends MProvider {
 
 /***************************************************************************************************
 * 
-*   mangayomi-js-helpers v1.0
+*   mangayomi-js-helpers v1.1
 *       
 *   # Video Extractors
 *       - vidGuardExtractor
@@ -601,9 +568,10 @@ class DefaultExtension extends MProvider {
 *       - vidHideExtractor
 *       - filemoonExtractor
 *       - mixdropExtractor
+*       - speedfilesExtractor
 *       - burstcloudExtractor (not working, see description)
 *   
-*   # Video Extractor Format Wrappers
+*   # Video Extractor Wrappers
 *       - streamWishExtractor
 *       - voeExtractor
 *       - mp4UploadExtractor
@@ -618,23 +586,33 @@ class DefaultExtension extends MProvider {
 *       - m3u8Extractor
 *       - jwplayerExtractor
 *   
-*   # Extension
+*   # Extension Helpers
 *       - sortVideos()
 *   
-*   # Encoding/Decoding
-*       - Uint8Array.fromBase64() 
-*       - Uint8Array.prototype.toBase64() 
-*       - Uint8Array.prototype.decode() 
+*   # Uint8Array
+*       - Uint8Array.fromBase64()
+*       - Uint8Array.prototype.toBase64()
+*       - Uint8Array.prototype.decode()
+*   
+*   # String
 *       - String.prototype.encode()
-*       - String.prototype.decode()
-*   
-*   # Random string
+*       - String.decode()
+*       - String.prototype.reverse()
+*       - String.prototype.swapcase()
 *       - getRandomString()
+*
+*   # Encode/Decode Functions
+*       - decodeUTF8
+*       - encodeUTF8
 *   
-*   # URL
+*   # Url
 *       - absUrl()
 *
 ***************************************************************************************************/
+
+//--------------------------------------------------------------------------------------------------
+//  Video Extractors
+//--------------------------------------------------------------------------------------------------
 
 async function vidGuardExtractor(url) {
     // get html
@@ -716,8 +694,8 @@ async function vidHideExtractor(url) {
     return await jwplayerExtractor(res.body);
 }
 
-async function filemoonExtractor(url) {
-    let res = await new Client().get(url);
+async function filemoonExtractor(url, headers) {
+    let res = await new Client().get(url, headers);
     const src = res.body.match(/iframe src="(.*?)"/)?.[1];
     if (src) {
         res = await new Client().get(src, {
@@ -749,6 +727,37 @@ async function mixdropExtractor(url) {
     return [{url: videoUrl, originalUrl: videoUrl, quality: '', headers: headers}];
 }
 
+async function speedfilesExtractor(url) {
+    let res = await new Client().get(url);
+    let doc = new Document(res.body);
+    
+    const code = doc.selectFirst('script:contains(var)').text;
+    let b64;
+
+    // Get b64
+    for (const match of code.matchAll(/(?:var|let|const)\s*\w+\s*=\s*["']([^"']+)/g)) {
+        if (match[1].match(/[g-zG-Z]/)) {
+            b64 = match[1];
+            break;
+        }
+    }
+
+    // decode b64 => b64
+    const step1 = Uint8Array.fromBase64(b64).reverse().decode().swapcase();
+    // decode b64 => hex
+    const step2 = Uint8Array.fromBase64(step1).reverse().decode();
+    // decode hex => b64
+    let step3 = [];
+    for (let i = 0; i < step2.length; i += 2) {
+        step3.push(parseInt(step2.slice(i, i + 2), 16) - 3);
+    }
+    step3 = String.fromCharCode(...step3.reverse()).swapcase();
+    // decode b64 => url
+    const videoUrl = Uint8Array.fromBase64(step3).decode();
+    
+    return [{url: videoUrl, originalUrl: videoUrl, quality: '', headers: null}];
+}
+
 /** Does not work: Client always sets 'charset=utf-8' in Content-Type. */
 async function burstcloudExtractor(url) {
     let client = new Client();
@@ -772,6 +781,10 @@ async function burstcloudExtractor(url) {
         quality: ''
     }];
 }
+
+//--------------------------------------------------------------------------------------------------
+//  Video Extractor Wrappers
+//--------------------------------------------------------------------------------------------------
 
 _streamWishExtractor = streamWishExtractor;
 streamWishExtractor = async (url) => {
@@ -829,9 +842,13 @@ sendVidExtractor = async (url) => {
     return [{url: videoUrl, originalUrl: videoUrl, quality: quality, headers: null}];
 }
 
-async function extractAny(url, method, lang, type, host) {
+//--------------------------------------------------------------------------------------------------
+//  Video Extractor Helpers
+//--------------------------------------------------------------------------------------------------
+
+async function extractAny(url, method, lang, type, host, headers = null) {
     const m = extractAny.methods[method];
-    return (!m) ? [] : (await m(url)).map(v => {
+    return (!m) ? [] : (await m(url, headers)).map(v => {
         v.quality = v.quality ? `${lang} ${type} ${v.quality} ${host}` : `${lang} ${type} ${host}`;
         return v;
     });
@@ -846,6 +863,7 @@ extractAny.methods = {
     'mp4upload': mp4UploadExtractor,
     'okru': okruExtractor,
     'sendvid': sendVidExtractor,
+    'speedfiles': speedfilesExtractor,
     'streamtape': streamTapeExtractor,
     'streamwish': vidHideExtractor,
     'vidguard': vidGuardExtractor,
@@ -854,6 +872,10 @@ extractAny.methods = {
     'voe': voeExtractor,
     'yourupload': yourUploadExtractor
 };
+
+//--------------------------------------------------------------------------------------------------
+//  Playlist Extractors
+//--------------------------------------------------------------------------------------------------
 
 async function m3u8Extractor(url, headers = null) {
     // https://developer.apple.com/documentation/http-live-streaming/creating-a-multivariant-playlist
@@ -992,6 +1014,10 @@ async function jwplayerExtractor(text, headers) {
     });
 }
 
+//--------------------------------------------------------------------------------------------------
+//  Extension Helpers
+//--------------------------------------------------------------------------------------------------
+
 function sortVideos(videos) {
     const pref = new SharedPreferences();
     const getres = RegExp('(\\d+)p?', 'i');
@@ -1022,6 +1048,10 @@ function sortVideos(videos) {
         return qA.localeCompare(qB);
     });
 }
+
+//--------------------------------------------------------------------------------------------------
+//  Uint8Array
+//--------------------------------------------------------------------------------------------------
 
 Uint8Array.fromBase64 = function (b64) {
     //        [00,01,02,03,04,05,06,07,08,\t,\n,0b,0c,\r,0e,0f,10,11,12,13,14,15,16,17,18,19,1a,1b,1c,1d,1e,1f,' ', !, ", #, $, %, &, ', (, ), *, +,',', -, ., /, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, :, ;, <,'=', >, ?, @,A,B,C,D,E,F,G,H,I,J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, [, \, ], ^, _, `, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, {, |, }, ~,7f]
@@ -1062,6 +1092,10 @@ Uint8Array.prototype.decode = function (encoding = 'utf-8') {
     return null;
 }
 
+//--------------------------------------------------------------------------------------------------
+//  String
+//--------------------------------------------------------------------------------------------------
+
 String.prototype.encode = function (encoding = 'utf-8') {
     encoding = encoding.toLowerCase();
     if (encoding == 'utf-8') {
@@ -1077,6 +1111,32 @@ String.decode = function (data, encoding = 'utf-8') {
     }
     return null;
 }
+
+String.prototype.reverse = function () {
+    return this.split('').reverse().join('');
+}
+
+String.prototype.swapcase = function () {
+    const isAsciiLetter = /[A-z]/;
+    const result = [];
+    for (const l of this)
+        result.push(isAsciiLetter.test(l) ? String.fromCharCode(l.charCodeAt() ^ 32) : l);
+    return result.join('');
+}
+
+function getRandomString(length) {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
+    let result = "";
+    for (let i = 0; i < length; i++) {
+        const random = Math.floor(Math.random() * 61);
+        result += chars[random];
+    }
+    return result;
+}
+
+//--------------------------------------------------------------------------------------------------
+//  Encode/Decode Functions
+//--------------------------------------------------------------------------------------------------
 
 function decodeUTF8(data) {
     const codes = [];
@@ -1107,15 +1167,9 @@ function encodeUTF8(string) {
     return new Uint8Array(data);
 }
 
-function getRandomString(length) {
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
-    let result = "";
-    for (let i = 0; i < length; i++) {
-        const random = Math.floor(Math.random() * 61);
-        result += chars[random];
-    }
-    return result;
-}
+//--------------------------------------------------------------------------------------------------
+//  Url
+//--------------------------------------------------------------------------------------------------
 
 function absUrl(url, base) {
     if (url.search(/^\w+:\/\//) == 0) {
