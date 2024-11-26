@@ -3,7 +3,7 @@ const mangayomiSources = [{
     "lang": "es",
     "baseUrl": "https://jkanime.net",
     "apiUrl": "",
-    "iconUrl": "https://cdn.jkdesu.com/assets2/css/img/favicon.ico",
+    "iconUrl": "https://cdn.jkanime.net/logo_jk.png",
     "typeSource": "single",
     "isManga": false,
     "version": "0.1.1",
