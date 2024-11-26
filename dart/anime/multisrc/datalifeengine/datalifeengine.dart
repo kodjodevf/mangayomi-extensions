@@ -1,5 +1,4 @@
 import 'package:mangayomi/bridge_lib.dart';
-import 'dart:convert';
 
 class DataLifeEngine extends MProvider {
   DataLifeEngine({required this.source});
@@ -12,10 +11,13 @@ class DataLifeEngine extends MProvider {
   bool get supportsLatest => false;
 
   @override
+  String get baseUrl => getPreferenceValue(source.id, "overrideBaseUrl");
+
+  @override
   Future<MPages> getPopular(int page) async {
-    final res = (await client
-            .get(Uri.parse("${source.baseUrl}${getPath(source)}page/$page")))
-        .body;
+    final res =
+        (await client.get(Uri.parse("$baseUrl${getPath(source)}page/$page")))
+            .body;
     return animeFromElement(res);
   }
 
@@ -27,10 +29,11 @@ class DataLifeEngine extends MProvider {
   @override
   Future<MPages> search(String query, int page, FilterList filterList) async {
     final filters = filterList.filters;
-    final baseUrl = source.baseUrl;
     String res = "";
     if (query.isNotEmpty) {
-      if (query.length < 4) return MPages([], false);
+      if (query.length < 4)
+        throw Exception(
+            "La recherche est suspendue! La chaîne de recherche est vide ou contient moins de 4 caractères.");
       final headers = {
         "Host": Uri.parse(baseUrl).host,
         "Origin": baseUrl,
@@ -71,7 +74,9 @@ class DataLifeEngine extends MProvider {
 
   @override
   Future<MManga> getDetail(String url) async {
-    String res = (await client.get(Uri.parse(url))).body;
+    String res =
+        (await client.get(Uri.parse("$baseUrl${getUrlWithoutDomain(url)}")))
+            .body;
     MManga anime = MManga();
     final description = xpath(res, '//span[@itemprop="description"]/text()');
     anime.description = description.isNotEmpty ? description.first : "";
@@ -89,27 +94,40 @@ class DataLifeEngine extends MProvider {
         episodesList.add(ep);
       }
     } else {
-      final eps = xpath(res,
-          '//*[@class="hostsblock"]/div/a[contains(@href,"https")]/parent::div/@class');
-      if (eps.isNotEmpty) {
-        for (var i = 0; i < eps.length; i++) {
-          final epUrls = xpath(res,
-              '//*[@class="hostsblock"]/div[@class="${eps[i]}"]/a[contains(@href,"https")]/@href');
+      final doc = parseHtml(res);
+      final elements = doc
+          .select(".hostsblock div:has(a)")
+          .where((MElement e) => e.outerHtml.contains("loadVideo('https://"))
+          .toList();
+      if (elements.isNotEmpty) {
+        for (var element in elements) {
+          element = element as MElement;
           MChapter ep = MChapter();
-          ep.name = xpath(res,
-                  '//*[@class="eplist"]/li[contains(@rel,"${eps[i]}")]/text()')
-              .first;
-          ep.url = epUrls.join(",").replaceAll("/vd.php?u=", "");
-          ep.scanlator = eps[i].contains('vf') ? 'VF' : 'VOSTFR';
+          ep.name = element.className
+              .replaceAll("ep", "Episode ")
+              .replaceAll("vs", " VOSTFR")
+              .replaceAll("vf", " VF");
+          ep.url = element
+              .select("a")
+              .map((MElement e) => substringBefore(
+                  substringAfter(e.attr('onclick'), "loadVideo('"), "')"))
+              .toList()
+              .join(",")
+              .replaceAll("/vd.php?u=", "");
+          ep.scanlator = element.className.contains('vf') ? 'VF' : 'VOSTFR';
           episodesList.add(ep);
         }
       } else {
-        anime.status = MStatus.completed;
-        final epUrls = xpath(res,
-            '//*[contains(@class,"filmlinks")]/div/a[contains(@href,"https")]/@href');
         MChapter ep = MChapter();
         ep.name = "Film";
-        ep.url = epUrls.join(",").replaceAll("/vd.php?u=", "");
+        ep.url = doc
+            .select("a")
+            .where((MElement e) => e.outerHtml.contains("loadVideo('https://"))
+            .map((MElement e) => substringBefore(
+                substringAfter(e.attr('onclick'), "loadVideo('"), "')"))
+            .toList()
+            .join(",")
+            .replaceAll("/vd.php?u=", "");
         episodesList.add(ep);
       }
     }
@@ -126,9 +144,8 @@ class DataLifeEngine extends MProvider {
       List<MVideo> a = [];
       if (sUrl.contains("dood") || sUrl.contains("d000")) {
         a = await doodExtractor(sUrl, "DoodStream");
-      } else if (sUrl.contains("streamvid") ||
-          sUrl.contains("guccihide") ||
-          sUrl.contains("streamhide")) {
+      } else if (["streamhide", "guccihide", "streamvid", "dhtpre"]
+          .any((a) => sUrl.contains(a))) {
         a = await streamHideExtractor(sUrl);
       } else if (sUrl.contains("uqload")) {
         a = await uqloadExtractor(sUrl);
@@ -138,6 +155,12 @@ class DataLifeEngine extends MProvider {
         a = await sibnetExtractor(sUrl);
       } else if (sUrl.contains("ok.ru")) {
         a = await okruExtractor(sUrl);
+      } else if (sUrl.contains("vidmoly")) {
+        a = await vidmolyExtractor(sUrl);
+      } else if (sUrl.contains("streamtape")) {
+        a = await streamTapeExtractor(sUrl, "");
+      } else if (sUrl.contains("voe.sx")) {
+        a = await voeExtractor(sUrl, "");
       }
       videos.addAll(a);
     }
@@ -156,7 +179,7 @@ class DataLifeEngine extends MProvider {
       MManga anime = MManga();
       anime.name =
           "$name ${season.isNotEmpty ? season.first.replaceAll("\n", " ") : ""}";
-      anime.imageUrl = "${source.baseUrl}$image";
+      anime.imageUrl = "$baseUrl$image";
       anime.link = url;
       animeList.add(anime);
     }
@@ -246,9 +269,68 @@ class DataLifeEngine extends MProvider {
     return [video];
   }
 
+  Future<List<MVideo>> vidmolyExtractor(String url) async {
+    final headers = {
+      'Referer': 'https://vidmoly.to',
+    };
+    List<MVideo> videos = [];
+    final playListUrlResponse = (await client.get(Uri.parse(url))).body;
+    final playlistUrl =
+        RegExp(r'file:"(\S+?)"').firstMatch(playListUrlResponse)?.group(1) ??
+            "";
+    if (playlistUrl.isEmpty) return [];
+    final masterPlaylistRes =
+        await client.get(Uri.parse(playlistUrl), headers: headers);
+
+    if (masterPlaylistRes.statusCode == 200) {
+      for (var it
+          in substringAfter(masterPlaylistRes.body, "#EXT-X-STREAM-INF:")
+              .split("#EXT-X-STREAM-INF:")) {
+        final quality =
+            "${substringBefore(substringBefore(substringAfter(substringAfter(it, "RESOLUTION="), "x"), ","), "\n")}p";
+
+        String videoUrl = substringBefore(substringAfter(it, "\n"), "\n");
+
+        MVideo video = MVideo();
+        video
+          ..url = videoUrl
+          ..originalUrl = videoUrl
+          ..quality = "Vidmoly $quality"
+          ..headers = headers;
+        videos.add(video);
+      }
+    }
+
+    return videos;
+  }
+
   String getPath() {
     if (source.name == "French Anime") return "/animes-vostfr/";
     return "/serie-en-streaming/";
+  }
+
+  @override
+  List<dynamic> getSourcePreferences() {
+    return [
+      if (source.name == "Wiflix")
+        EditTextPreference(
+            key: "overrideBaseUrl",
+            title: "Changer l'url de base",
+            summary: "",
+            value: "https://wiflix-hd.vip",
+            dialogTitle: "Changer l'url de base",
+            dialogMessage: "",
+            text: "https://wiflix-hd.vip"),
+      if (source.name == "French Anime")
+        EditTextPreference(
+            key: "overrideBaseUrl",
+            title: "Changer l'url de base",
+            summary: "",
+            value: "https://french-anime.com",
+            dialogTitle: "Changer l'url de base",
+            dialogMessage: "",
+            text: "https://french-anime.com"),
+    ];
   }
 
   @override
