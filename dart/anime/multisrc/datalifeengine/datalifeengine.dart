@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:mangayomi/bridge_lib.dart';
 
 class DataLifeEngine extends MProvider {
@@ -5,7 +6,8 @@ class DataLifeEngine extends MProvider {
 
   MSource source;
 
-  final Client client = Client(source);
+  final Client client =
+      Client(source, json.encode({"useDartHttpClient": true}));
 
   @override
   bool get supportsLatest => false;

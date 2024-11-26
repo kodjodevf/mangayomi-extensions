@@ -168,6 +168,8 @@ class AnimeOnlineNinja extends MProvider {
   }
 
   Future<List<MVideo>> uqloadExtractor(String url, String lang) async {
+    final Client client =
+        Client(source, json.encode({"useDartHttpClient": true}));
     final res = (await client.get(Uri.parse(url))).body;
     final js = xpath(res, '//script[contains(text(), "sources:")]/text()');
     if (js.isEmpty) {
