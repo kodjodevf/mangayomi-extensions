@@ -32,8 +32,7 @@ class DataLifeEngine extends MProvider {
     String res = "";
     if (query.isNotEmpty) {
       if (query.length < 4)
-        throw Exception(
-            "La recherche est suspendue! La chaîne de recherche est vide ou contient moins de 4 caractères.");
+        throw "La recherche est suspendue! La chaîne de recherche est vide ou contient moins de 4 caractères.";
       final headers = {
         "Host": Uri.parse(baseUrl).host,
         "Origin": baseUrl,
