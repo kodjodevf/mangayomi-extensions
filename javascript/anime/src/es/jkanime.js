@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://cdn.jkanime.net/logo_jk.png",
     "typeSource": "single",
     "isManga": false,
-    "version": "0.1.1",
+    "version": "0.1.11",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/es/jkanime.js"
@@ -164,17 +164,9 @@ class DefaultExtension extends MProvider {
                 name: "Filtro",
                 state: 0,
                 values: [
-                    {
-                        type_name: "SelectOption",
-                        name: "Por fecha",
-                        value: ""
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Por nombre",
-                        value: "nombre"
-                    }
-                ]
+                    ["Por fecha", ""],
+                    ["Por nombre", "nombre"]
+                ].map(x => ({ type_name: 'SelectOption', name: x[0], value: x[1] }))
             },
             {
                 type_name: "SelectFilter",
@@ -182,212 +174,48 @@ class DefaultExtension extends MProvider {
                 name: "Género",
                 state: 0,
                 values: [
-                    {
-                        type_name: "SelectOption",
-                        name: "Género",
-                        value: ""
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Accion",
-                        value: "accion"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Aventura",
-                        value: "aventura"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Autos",
-                        value: "autos"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Comedia",
-                        value: "comedia"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Dementia",
-                        value: "dementia"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Demonios",
-                        value: "demonios"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Misterio",
-                        value: "misterio"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Drama",
-                        value: "drama"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Ecchi",
-                        value: "ecchi"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Fantasia",
-                        value: "fantasia"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Juegos",
-                        value: "juegos"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Hentai",
-                        value: "hentai"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Historico",
-                        value: "historico"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Terror",
-                        value: "terror"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Magia",
-                        value: "magia"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Artes Marciales",
-                        value: "artes-marciales"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Mecha",
-                        value: "mecha"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Musica",
-                        value: "musica"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Parodia",
-                        value: "parodia"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Samurai",
-                        value: "samurai"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Romance",
-                        value: "romance"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Colegial",
-                        value: "colegial"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Sci-Fi",
-                        value: "sci-fi"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Shoujo Ai",
-                        value: "shoujo-ai"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Shounen Ai",
-                        value: "shounen-ai"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Space",
-                        value: "space"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Deportes",
-                        value: "deportes"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Super Poderes",
-                        value: "super-poderes"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Vampiros",
-                        value: "vampiros"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Yaoi",
-                        value: "yaoi"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Yuri",
-                        value: "yuri"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Harem",
-                        value: "harem"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Cosas de la vida",
-                        value: "cosas-de-la-vida"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Sobrenatural",
-                        value: "sobrenatural"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Militar",
-                        value: "militar"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Policial",
-                        value: "policial"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Psicologico",
-                        value: "psicologico"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Thriller",
-                        value: "thriller"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Español Latino",
-                        value: "latino"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Isekai",
-                        value: "isekai"
-                    }
-                ]
+                    ["Género", ""],
+                    ["Accion", "accion"],
+                    ["Aventura", "aventura"],
+                    ["Autos", "autos"],
+                    ["Comedia", "comedia"],
+                    ["Dementia", "dementia"],
+                    ["Demonios", "demonios"],
+                    ["Misterio", "misterio"],
+                    ["Drama", "drama"],
+                    ["Ecchi", "ecchi"],
+                    ["Fantasia", "fantasia"],
+                    ["Juegos", "juegos"],
+                    ["Hentai", "hentai"],
+                    ["Historico", "historico"],
+                    ["Terror", "terror"],
+                    ["Magia", "magia"],
+                    ["Artes Marciales", "artes-marciales"],
+                    ["Mecha", "mecha"],
+                    ["Musica", "musica"],
+                    ["Parodia", "parodia"],
+                    ["Samurai", "samurai"],
+                    ["Romance", "romance"],
+                    ["Colegial", "colegial"],
+                    ["Sci-Fi", "sci-fi"],
+                    ["Shoujo Ai", "shoujo-ai"],
+                    ["Shounen Ai", "shounen-ai"],
+                    ["Space", "space"],
+                    ["Deportes", "deportes"],
+                    ["Super Poderes", "super-poderes"],
+                    ["Vampiros", "vampiros"],
+                    ["Yaoi", "yaoi"],
+                    ["Yuri", "yuri"],
+                    ["Harem", "harem"],
+                    ["Cosas de la vida", "cosas-de-la-vida"],
+                    ["Sobrenatural", "sobrenatural"],
+                    ["Militar", "militar"],
+                    ["Policial", "policial"],
+                    ["Psicologico", "psicologico"],
+                    ["Thriller", "thriller"],
+                    ["Español Latino", "latino"],
+                    ["Isekai", "isekai"]
+                ].map(x => ({ type_name: 'SelectOption', name: x[0], value: x[1] }))
             },
             {
                 type_name: "SelectFilter",
@@ -395,37 +223,13 @@ class DefaultExtension extends MProvider {
                 name: "Demografía",
                 state: 0,
                 values: [
-                    {
-                        type_name: "SelectOption",
-                        name: "Demografía",
-                        value: ""
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Niños",
-                        value: "nios"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Shoujo",
-                        value: "shoujo"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Shounen",
-                        value: "shounen"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Seinen",
-                        value: "seinen"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Josei",
-                        value: "josei"
-                    }
-                ]
+                    ["Demografía", ""],
+                    ["Niños", "nios"],
+                    ["Shoujo", "shoujo"],
+                    ["Shounen", "shounen"],
+                    ["Seinen", "seinen"],
+                    ["Josei", "josei"]
+                ].map(x => ({ type_name: 'SelectOption', name: x[0], value: x[1] }))
             },
             {
                 type_name: "SelectFilter",
@@ -433,17 +237,9 @@ class DefaultExtension extends MProvider {
                 name: "Categoría",
                 state: 0,
                 values: [
-                    {
-                        type_name: "SelectOption",
-                        name: "Categoría",
-                        value: ""
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Donghua",
-                        value: "donghua"
-                    }
-                ]
+                    ["Categoría", ""],
+                    ["Donghua", "donghua"]
+                ].map(x => ({ type_name: 'SelectOption', name: x[0], value: x[1] }))
             },
             {
                 type_name: "SelectFilter",
@@ -451,37 +247,13 @@ class DefaultExtension extends MProvider {
                 name: "Tipo",
                 state: 0,
                 values: [
-                    {
-                        type_name: "SelectOption",
-                        name: "Tipo",
-                        value: ""
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Animes",
-                        value: "animes"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Peliculas",
-                        value: "peliculas"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Especiales",
-                        value: "especiales"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Ovas",
-                        value: "ovas"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Onas",
-                        value: "onas"
-                    }
-                ]
+                    ["Tipo", ""],
+                    ["Animes", "animes"],
+                    ["Peliculas", "peliculas"],
+                    ["Especiales", "especiales"],
+                    ["Ovas", "ovas"],
+                    ["Onas", "onas"]
+                ].map(x => ({ type_name: 'SelectOption', name: x[0], value: x[1] }))
             },
             {
                 type_name: "SelectFilter",
@@ -489,27 +261,11 @@ class DefaultExtension extends MProvider {
                 name: "Estado",
                 state: 0,
                 values: [
-                    {
-                        type_name: "SelectOption",
-                        name: "Estado",
-                        value: ""
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "En emisión",
-                        value: "emision"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Finalizado",
-                        value: "finalizados"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Por Estrenar",
-                        value: "estrenos"
-                    }
-                ]
+                    ["Estado", ""],
+                    ["En emisión", "emision"],
+                    ["Finalizado", "finalizados"],
+                    ["Por Estrenar", "estrenos"]
+                ].map(x => ({ type_name: 'SelectOption', name: x[0], value: x[1] }))
             },
             {
                 type_name: "SelectFilter",
@@ -517,232 +273,52 @@ class DefaultExtension extends MProvider {
                 name: "Año",
                 state: 0,
                 values: [
-                    {
-                        type_name: "SelectOption",
-                        name: "Año",
-                        value: "Año"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "2024",
-                        value: "2024"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "2023",
-                        value: "2023"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "2022",
-                        value: "2022"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "2021",
-                        value: "2021"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "2020",
-                        value: "2020"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "2019",
-                        value: "2019"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "2018",
-                        value: "2018"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "2017",
-                        value: "2017"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "2016",
-                        value: "2016"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "2015",
-                        value: "2015"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "2014",
-                        value: "2014"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "2013",
-                        value: "2013"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "2012",
-                        value: "2012"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "2011",
-                        value: "2011"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "2010",
-                        value: "2010"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "2009",
-                        value: "2009"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "2008",
-                        value: "2008"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "2007",
-                        value: "2007"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "2006",
-                        value: "2006"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "2005",
-                        value: "2005"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "2004",
-                        value: "2004"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "2003",
-                        value: "2003"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "2002",
-                        value: "2002"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "2001",
-                        value: "2001"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "2000",
-                        value: "2000"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "1999",
-                        value: "1999"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "1998",
-                        value: "1998"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "1997",
-                        value: "1997"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "1996",
-                        value: "1996"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "1995",
-                        value: "1995"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "1994",
-                        value: "1994"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "1993",
-                        value: "1993"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "1992",
-                        value: "1992"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "1991",
-                        value: "1991"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "1990",
-                        value: "1990"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "1989",
-                        value: "1989"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "1988",
-                        value: "1988"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "1987",
-                        value: "1987"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "1986",
-                        value: "1986"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "1985",
-                        value: "1985"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "1984",
-                        value: "1984"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "1983",
-                        value: "1983"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "1982",
-                        value: "1982"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "1981",
-                        value: "1981"
-                    }
-                ]
+                    ["Año", "Año"],
+                    ["2024", "2024"],
+                    ["2023", "2023"],
+                    ["2022", "2022"],
+                    ["2021", "2021"],
+                    ["2020", "2020"],
+                    ["2019", "2019"],
+                    ["2018", "2018"],
+                    ["2017", "2017"],
+                    ["2016", "2016"],
+                    ["2015", "2015"],
+                    ["2014", "2014"],
+                    ["2013", "2013"],
+                    ["2012", "2012"],
+                    ["2011", "2011"],
+                    ["2010", "2010"],
+                    ["2009", "2009"],
+                    ["2008", "2008"],
+                    ["2007", "2007"],
+                    ["2006", "2006"],
+                    ["2005", "2005"],
+                    ["2004", "2004"],
+                    ["2003", "2003"],
+                    ["2002", "2002"],
+                    ["2001", "2001"],
+                    ["2000", "2000"],
+                    ["1999", "1999"],
+                    ["1998", "1998"],
+                    ["1997", "1997"],
+                    ["1996", "1996"],
+                    ["1995", "1995"],
+                    ["1994", "1994"],
+                    ["1993", "1993"],
+                    ["1992", "1992"],
+                    ["1991", "1991"],
+                    ["1990", "1990"],
+                    ["1989", "1989"],
+                    ["1988", "1988"],
+                    ["1987", "1987"],
+                    ["1986", "1986"],
+                    ["1985", "1985"],
+                    ["1984", "1984"],
+                    ["1983", "1983"],
+                    ["1982", "1982"],
+                    ["1981", "1981"]
+                ].map(x => ({ type_name: 'SelectOption', name: x[0], value: x[1] }))
             },
             {
                 type_name: "SelectFilter",
@@ -750,32 +326,12 @@ class DefaultExtension extends MProvider {
                 name: "Temporada",
                 state: 0,
                 values: [
-                    {
-                        type_name: "SelectOption",
-                        name: "Temporada",
-                        value: ""
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Invierno",
-                        value: "invierno"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Primavera",
-                        value: "primavera"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Verano",
-                        value: "verano"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Otoño",
-                        value: "otoño"
-                    }
-                ]
+                    ["Temporada", ""],
+                    ["Invierno", "invierno"],
+                    ["Primavera", "primavera"],
+                    ["Verano", "verano"],
+                    ["Otoño", "otoño"]
+                ].map(x => ({ type_name: 'SelectOption', name: x[0], value: x[1] }))
             }
         ];
     }
