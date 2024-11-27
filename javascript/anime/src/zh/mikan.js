@@ -5,7 +5,7 @@ const mangayomiSources = [{
   "apiUrl": "",
   "iconUrl": "https://mikanime.tv/images/mikan-pic.png",
   "typeSource": "torrent",
-  "itemType": "anime",
+  "itemType": 1,
   "isNsfw": false,
   "version": "0.0.15",
   "dateFormat": "",

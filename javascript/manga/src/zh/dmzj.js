@@ -5,7 +5,7 @@ const mangayomiSources = [{
     "apiUrl": "",
     "iconUrl": "https://www.dmzj.com/_nuxt/logo_dmzj.1c94014a.png",
     "typeSource": "single",
-    "itemType": "manga",
+    "itemType": 0,
     "isNsfw": false,
     "version": "0.0.25",
     "dateFormat": "",
