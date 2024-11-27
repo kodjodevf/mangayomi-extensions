@@ -13,4 +13,4 @@ Source _nimegami = Source(
         "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/src/id/nimegami/icon.png",
     sourceCodeUrl: _nimegamiCodeUrl,
     version: _nimegamiVersion,
-    isManga: false);
+    itemType: ItemType.anime);

@@ -13,4 +13,4 @@ Source _animesvision = Source(
         "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/src/pt/animesvision/icon.png",
     sourceCodeUrl: _animesvisionCodeUrl,
     version: _animesvisionVersion,
-    isManga: false);
+    itemType: ItemType.anime);

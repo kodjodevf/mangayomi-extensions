@@ -5,7 +5,7 @@ const mangayomiSources = [{
   "apiUrl": "",
   "iconUrl": "https://www.77mh.nl/favicon.ico",
   "typeSource": "single",
-  "isManga": true,
+  "itemType": 0,
   "isNsfw": false,
   "version": "0.0.25",
   "apiUrl": "",

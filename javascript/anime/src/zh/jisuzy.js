@@ -5,7 +5,7 @@ const mangayomiSources = [{
     "apiUrl": "",
     "iconUrl": "https://www.jisuzy.com/template/default/images/site_logo.png",
     "typeSource": "single",
-    "isManga": false,
+    "itemType": 1,
     "isNsfw": false,
     "version": "0.0.1",
     "dateFormat": "",

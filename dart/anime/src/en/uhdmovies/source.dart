@@ -13,4 +13,4 @@ Source _uhdmoviesSource = Source(
         "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/src/en/uhdmovies/icon.png",
     sourceCodeUrl: _uhdmoviesSourceCodeUrl,
     version: _uhdmoviesVersion,
-    isManga: false);
+    itemType: ItemType.anime);

@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "apiUrl": "",
     "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/en.asurascans.png",
     "typeSource": "single",
-    "isManga": true,
+    "itemType": 0,
     "version": "0.1.65",
     "dateFormat": "",
     "dateFormatLocale": "",
