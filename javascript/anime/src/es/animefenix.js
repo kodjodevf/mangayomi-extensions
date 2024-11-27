@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www3.animefenix.tv/themes/fenix-neo/images/AveFenix.png",
     "typeSource": "single",
     "isManga": false,
-    "version": "0.1.1",
+    "version": "0.1.11",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/es/animefenix.js"
