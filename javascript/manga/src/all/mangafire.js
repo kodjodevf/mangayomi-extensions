@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://mangafire.to/assets/sites/mangafire/favicon.png?v3",
     "typeSource": "single",
     "isManga": true,
-    "version": "0.1.2",
+    "version": "0.1.21",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "manga/src/all/mangafire.js"
@@ -168,321 +168,85 @@ class DefaultExtension extends MProvider {
                 type_name: "GroupFilter",
                 name: "Type",
                 state: [
-                    {
-                        type_name: "CheckBox",
-                        name: "Manga",
-                        value: "manga"
-                    },
-                    {
-                        type_name: "CheckBox",
-                        name: "One-Shot",
-                        value: "one_shot"
-                    },
-                    {
-                        type_name: "CheckBox",
-                        name: "Doujinshi",
-                        value: "doujinshi"
-                    },
-                    {
-                        type_name: "CheckBox",
-                        name: "Novel",
-                        value: "novel"
-                    },
-                    {
-                        type_name: "CheckBox",
-                        name: "Manhwa",
-                        value: "manhwa"
-                    },
-                    {
-                        type_name: "CheckBox",
-                        name: "Manhua",
-                        value: "manhua"
-                    }
-                ]
+                    ["Manga", "manga"],
+                    ["One-Shot", "one_shot"],
+                    ["Doujinshi", "doujinshi"],
+                    ["Novel", "novel"],
+                    ["Manhwa", "manhwa"],
+                    ["Manhua", "manhua"]
+                ].map(x => ({ type_name: 'CheckBox', name: x[0], value: x[1] }))
             },
             {
                 type_name: "GroupFilter",
                 name: "Genre",
                 state: [
-                    {
-                    	type_name: "TriState",
-                    	name: "Action",
-                    	value: "1"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Adventure",
-                    	value: "78"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Avant Garde",
-                    	value: "3"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Boys Love",
-                    	value: "4"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Comedy",
-                    	value: "5"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Demons",
-                    	value: "77"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Drama",
-                    	value: "6"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Ecchi",
-                    	value: "7"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Fantasy",
-                    	value: "79"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Girls Love",
-                    	value: "9"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Gourmet",
-                    	value: "10"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Harem",
-                    	value: "11"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Horror",
-                    	value: "530"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Isekai",
-                    	value: "13"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Iyashikei",
-                    	value: "531"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Josei",
-                    	value: "15"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Kids",
-                    	value: "532"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Magic",
-                    	value: "539"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Mahou Shoujo",
-                    	value: "533"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Martial Arts",
-                    	value: "534"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Mecha",
-                    	value: "19"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Military",
-                    	value: "535"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Music",
-                    	value: "21"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Mystery",
-                    	value: "22"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Parody",
-                    	value: "23"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Psychological",
-                    	value: "536"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Reverse Harem",
-                    	value: "25"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Romance",
-                    	value: "26"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "School",
-                    	value: "73"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Sci-Fi",
-                    	value: "28"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Seinen",
-                    	value: "537"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Shoujo",
-                    	value: "30"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Shounen",
-                    	value: "31"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Slice of Life",
-                    	value: "538"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Space",
-                    	value: "33"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Sports",
-                    	value: "34"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "SuperPower",
-                    	value: "75"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Supernatural",
-                    	value: "76"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Suspense",
-                    	value: "37"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Thriller",
-                    	value: "38"
-                    },
-                    {
-                    	type_name: "TriState",
-                    	name: "Vampire",
-                    	value: "39"
-                    }
-                ]
+                    ["Action", "1"],
+                    ["Adventure", "78"],
+                    ["Avant Garde", "3"],
+                    ["Boys Love", "4"],
+                    ["Comedy", "5"],
+                    ["Demons", "77"],
+                    ["Drama", "6"],
+                    ["Ecchi", "7"],
+                    ["Fantasy", "79"],
+                    ["Girls Love", "9"],
+                    ["Gourmet", "10"],
+                    ["Harem", "11"],
+                    ["Horror", "530"],
+                    ["Isekai", "13"],
+                    ["Iyashikei", "531"],
+                    ["Josei", "15"],
+                    ["Kids", "532"],
+                    ["Magic", "539"],
+                    ["Mahou Shoujo", "533"],
+                    ["Martial Arts", "534"],
+                    ["Mecha", "19"],
+                    ["Military", "535"],
+                    ["Music", "21"],
+                    ["Mystery", "22"],
+                    ["Parody", "23"],
+                    ["Psychological", "536"],
+                    ["Reverse Harem", "25"],
+                    ["Romance", "26"],
+                    ["School", "73"],
+                    ["Sci-Fi", "28"],
+                    ["Seinen", "537"],
+                    ["Shoujo", "30"],
+                    ["Shounen", "31"],
+                    ["Slice of Life", "538"],
+                    ["Space", "33"],
+                    ["Sports", "34"],
+                    ["SuperPower", "75"],
+                    ["Supernatural", "76"],
+                    ["Suspense", "37"],
+                    ["Thriller", "38"],
+                    ["Vampire", "39"]
+                ].map(x => ({ type_name: 'TriState', name: x[0], value: x[1] }))
             },
             {
                 type_name: "GroupFilter",
                 name: "Status",
                 state: [
-                    {
-                        type_name: "CheckBox",
-                        name: "Releasing",
-                        value: "releasing"
-                    },
-                    {
-                        type_name: "CheckBox",
-                        name: "Completed",
-                        value: "completed"
-                    },
-                    {
-                        type_name: "CheckBox",
-                        name: "Hiatus",
-                        value: "on_hiatus"
-                    },
-                    {
-                        type_name: "CheckBox",
-                        name: "Discontinued",
-                        value: "discontinued"
-                    },
-                    {
-                        type_name: "CheckBox",
-                        name: "Not Yet Published",
-                        value: "info"
-                    }
-                ]
+                    ["Releasing", "releasing"],
+                    ["Completed", "completed"],
+                    ["Hiatus", "on_hiatus"],
+                    ["Discontinued", "discontinued"],
+                    ["Not Yet Published", "info"]
+                ].map(x => ({ type_name: 'CheckBox', name: x[0], value: x[1] }))
             },
             {
                 type_name: "SelectFilter",
                 type: "length",
                 name: "Length",
                 values: [
-                    {
-                        type_name: "SelectOption",
-                        name: ">= 1 chapters",
-                        value: "1"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: ">= 3 chapters",
-                        value: "3"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: ">= 5 chapters",
-                        value: "5"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: ">= 10 chapters",
-                        value: "10"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: ">= 20 chapters",
-                        value: "20"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: ">= 30 chapters",
-                        value: "30"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: ">= 50 chapters",
-                        value: "50"
-                    }
-                ],
+                    [">= 1 chapters", "1"],
+                    [">= 3 chapters", "3"],
+                    [">= 5 chapters", "5"],
+                    [">= 10 chapters", "10"],
+                    [">= 20 chapters", "20"],
+                    [">= 30 chapters", "30"],
+                    [">= 50 chapters", "50"]
+                ].map(x => ({ type_name: 'SelectOption', name: x[0], value: x[1] }))
             },
             {
                 type_name: "SelectFilter",
@@ -490,32 +254,12 @@ class DefaultExtension extends MProvider {
                 name: "Sort",
                 state: 3,
                 values: [
-                    {
-                        type_name: "SelectOption",
-                        name: "Added",
-                        value: "recently_added"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Updated",
-                        value: "recently_updated"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Trending",
-                        value: "trending"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Most Relevance",
-                        value: "most_relevance"
-                    },
-                    {
-                        type_name: "SelectOption",
-                        name: "Name",
-                        value: "title_az"
-                    }
-                ],
+                    ["Added", "recently_added"],
+                    ["Updated", "recently_updated"],
+                    ["Trending", "trending"],
+                    ["Most Relevance", "most_relevance"],
+                    ["Name", "title_az"]
+                ].map(x => ({ type_name: 'SelectOption', name: x[0], value: x[1] }))
             }
         ];
     }
