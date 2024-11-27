@@ -5,7 +5,7 @@ const mangayomiSources = [{
     "apiUrl": "",
     "iconUrl": "https://api.tiankongapi.com/template/v10012/images/logo.jpg",
     "typeSource": "single",
-    "itemType": "anime",
+    "itemType": 1,
     "isNsfw": false,
     "version": "0.0.1",
     "dateFormat": "",

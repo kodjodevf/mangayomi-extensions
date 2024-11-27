@@ -5,7 +5,7 @@ const mangayomiSources = [{
     "apiUrl": "https://api.mangacopy.com",
     "iconUrl": "https://hi77-overseas.mangafuna.xyz/static/free.ico",
     "typeSource": "single",
-    "itemType": "manga",
+    "itemType": 0,
     "isNsfw": false,
     "version": "0.0.2",
     "dateFormat": "",

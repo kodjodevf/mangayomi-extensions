@@ -5,7 +5,7 @@ const mangayomiSources = [{
     "apiUrl": "",
     "iconUrl": "https://mangafire.to/assets/sites/mangafire/favicon.png?v3",
     "typeSource": "single",
-    "itemType": "anime",
+    "itemType": 0,
     "version": "0.1.2",
     "dateFormat": "",
     "dateFormatLocale": "",
