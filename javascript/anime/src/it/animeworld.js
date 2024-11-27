@@ -1,15 +1,15 @@
 const mangayomiSources = [{
-    "name": "AnimeFénix",
-    "lang": "es",
-    "baseUrl": "https://www3.animefenix.tv",
+    "name": "AnimeWorld",
+    "lang": "it",
+    "baseUrl": "https://www.animeworld.so",
     "apiUrl": "",
-    "iconUrl": "https://www3.animefenix.tv/themes/fenix-neo/images/AveFenix.png",
+    "iconUrl": "https://i.postimg.cc/RFRGfBvP/FVLyB1I.png",
     "typeSource": "single",
     "isManga": false,
-    "version": "0.1.1",
+    "version": "0.0.1",
     "dateFormat": "",
     "dateFormatLocale": "",
-    "pkgPath": "anime/src/es/animefenix.js"
+    "pkgPath": "anime/src/it/animeworld.js"
 }];
 
 class DefaultExtension extends MProvider {
@@ -23,117 +23,126 @@ class DefaultExtension extends MProvider {
     async parseAnimeList(url) {
         const res = await this.client.get(url);
         const doc = new Document(res.body);
-        const elements = doc.select("main div.grid a");
+        const elements = doc.select("div.film-list div.item");
         const list = [];
 
         for (const element of elements) {
-            const name = element.selectFirst("h3").text;
-            const imageUrl = element.selectFirst("img").getSrc;
-            const link = element.getHref;
+            let name = element.selectFirst('a + a').text;
+            const imageUrl = element.selectFirst('img').getSrc;
+            const link = element.selectFirst('a').getHref;
+            const type = element.selectFirst('div.dub').text == 'DUB';
+            if (type && !name.includes('ITA')) {
+                name += ' (ITA)';
+            }
             list.push({ name, imageUrl, link });
         }
-        const hasNextPage = doc.selectFirst("main nav a:last-child").text.trim() == "Next";
+        const hasNextPage = parseInt(doc.selectFirst('span.total').text) > parseInt(url.match(/page=(\d+)/)[1]);
         return { "list": list, "hasNextPage": hasNextPage };
     }
-    statusFromString(status) {
+    parseStatus(status) {
         return {
-            "en emision": 0, // releasing
-            "emisión": 0, // releasing
-            "finalizado": 1, // finished
-            "proximamente": 4, // unreleased
+            "in corso": 0,
+            "finito": 1,
+            "droppato": 3,
+            "non rilasciato": 4,
         }[status.toLowerCase()] ?? 5;
     }
     async getPopular(page) {
-        return this.parseAnimeList(`${this.source.baseUrl}/animes?order=visits&page=${page}`);
+        const res = await this.client.get(this.source.baseUrl + '/tops/ongoing');
+        const doc = new Document(res.body);
+        const elements = doc.select('div.content div.item');
+        const list = [];
+
+        for (const element of elements) {
+            const name = element.selectFirst('div.name').text;
+            const imageUrl = element.selectFirst('img').getSrc;
+            const link = element.selectFirst('a').getHref;
+            list.push({ name, imageUrl, link });
+        }
+        return { "list": list, "hasNextPage": false };
     }
     async getLatestUpdates(page) {
-        return this.parseAnimeList(`${this.source.baseUrl}/animes?order=updated&page=${page}`);
+        return this.parseAnimeList(`${this.source.baseUrl}/filter?sort=1&page=${page}`);
     }
     async search(query, page, filters) {
         query = query.trim().replaceAll(/\ +/g, "+");
-        let url = `${this.source.baseUrl}/animes?q=${query}`;
 
         // Search sometimes failed because filters were empty. I experienced this mostly on android...
         if (!filters || filters.length == 0) {
-            return this.parseAnimeList(url + `&page=${page}`);
+            return this.parseAnimeList(`${this.source.baseUrl}/search?keyword=${query}&page=${page}`);
         }
+
+        let url = `${this.source.baseUrl}/filter?sort=${filters[5].values[filters[5].state].value}&keyword=${query}`;
 
         for (const filter of filters[0].state) {
             if (filter.state == true)
-                url += `&type[]=${filter.value}`;
+                url += `&type=${filter.value}`;
         }
-
-        url += `&genero[]=${filters[1].values[filters[1].state].value}`;
-
+        for (const filter of filters[1].state) {
+            if (filter.state == true)
+                url += `&genre=${filter.value}`;
+        }
         for (const filter of filters[2].state) {
             if (filter.state == true)
-                url += `&estado[]=${filter.value}`;
+                url += `&status=${filter.value}`;
         }
-
-        url += `&order=${filters[3].values[filters[3].state].value}`;
-        url += `&page=${page}`;
-        return this.parseAnimeList(url);
+        for (const filter of filters[3].state) {
+            if (filter.state == true)
+                url += `&dub=${filter.value}`;
+        }
+        for (const filter of filters[4].state) {
+            if (filter.state == true)
+                url += `&language=${filter.value}`;
+        }
+        return this.parseAnimeList(url + `&page=${page}`);
     }
     async getDetail(url) {
-        const detail = {};
-        const res = await this.client.get(url);
+        const res = await this.client.get(this.source.baseUrl + url);
         const doc = new Document(res.body);
-        const info = doc.selectFirst('main div.flex');
+        const detail = {};
 
-        detail.name = info.selectFirst("h1").text;
-        detail.status = this.statusFromString(info.selectFirst("a").text.trim());
-        detail.imageUrl = info.selectFirst("img").getSrc;
-        detail.description = info.selectFirst("h2 + p").text.trim();
-        detail.genre = info.select("h2 + div a").map(e => e.text.trim());
-        detail.episodes = [];
-        for (const e of doc.select('main + div ul a').reverse()) {
-            const name = `Episodio ${detail.episodes.length + 1}`;
-            const url = e.getHref;
-            detail.episodes.push({ name, url });
+        const info = doc.selectFirst('div.info div.info');
+        detail.name = info.selectFirst('h2').text;
+        detail.imageUrl = info.selectFirst('img').getSrc;
+        detail.description = info.selectFirst('div.desc').text;
+        detail.author = info.selectFirst('dt:contains(Studio) + dd').text.trim();
+        detail.status = this.parseStatus(info.selectFirst('dt:contains(Stato) + dd').text.trim());
+        detail.genre = info.select('dt:contains(Genere) + dd a').map(e => e.text);
+        detail.episodes = doc.select('div.server.active li.episode > a').map(e => ({
+            name: 'Ep. ' + e.text,
+            url: this.source.baseUrl + e.getHref
+        })).reverse();
+        const type = doc.selectFirst('div.info div.info dt:contains(Audio) + dd').text.trim() == 'Italiano' ?
+            'Doppiato' : 'Subbato';
+        if (type == 'Doppiato' && !detail.name.includes('ITA')) {
+            detail.name += ' (ITA)';
         }
-        detail.episodes.reverse();
         return detail;
     }
     // For anime episode video list
     async getVideoList(url) {
-        let res = await this.client.get(url);
-        let doc = new Document(res.body);
-        let promises = [];
+        const res = await this.client.get(url);
+        const doc = new Document(res.body);
+        const promises = [];
         const videos = [];
 
-        // get type
-        const type = /\blatino\b/i.test(url) ? 'Dub' : 'Sub';
+        const type = doc.selectFirst('div.info div.info dt:contains(Audio) + dd').text.trim() == 'Italiano' ?
+            'Doppiato' : 'Subbato';
 
-        // get names
-        const hosts = doc.select('main ul a').map(e => e.text);
-        
-        // get links
-        const redirects = [];
-        let script = doc.selectFirst("script:contains(tabsArray)");
-        for (const e of script.text.matchAll(/tabsArray.*? = "(.*?)"/g)) {
-            redirects.push(e[1]);
-        };
-        
-        // extract remote video links
-        const renameLUT = { 'amazones': 'amazon', 'burst': 'burstcloud', 'hide': 'vidhide',
-            'ru': 'okru', 'stream2': 'vidhide', };
-        for (let i = 0; i < hosts.length; i++) {
-            const host = hosts[i].trim();
-            const lhost = host.toLowerCase();
-            const method = renameLUT[lhost] ?? lhost;
-            if (method in extractAny.methods) {
-                promises.push((async (redirect) => {
-                    const res = await this.client.get(redirect);
-                    const doc = new Document(res.body);
-                    const script = doc.selectFirst('script:contains(play)');
-                    let link = script.text.match(/src="(.*?)"/)[1];
+        for (const element of doc.select('div#download a')) {
+            const host = /Download (.*?) -/.exec(element.text)?.[1];
+            let url = element.getHref;
 
-                    if (method == 'amazon')
-                        link = this.source.baseUrl + link.slice(link.search('/'));
-
-                    return await extractAny(link, method, 'Español', type, host);
-                })(redirects[i]));
+            if (!host || host == 'Diretto') {
+                // ignore
+                continue;
+            } else if (host == 'Alternativo') {
+                videos.push({url: url, originalUrl: url, quality: `Italiano ${type} Alternativo`, headers: null});
+                continue;
+            } else {
+                url = url.replace('/d/', '/e/');
             }
+            promises.push(extractAny(url, host.toLowerCase(), 'Italiano', type, host));
         }
         for (const p of (await Promise.allSettled(promises))) {
             if (p.status == 'fulfilled') {
@@ -148,103 +157,115 @@ class DefaultExtension extends MProvider {
                 type_name: "GroupFilter",
                 name: "Tipo",
                 state: [
-                    ["TV", "tv"],
-                    ["Película", "movie"],
-                    ["Especial", "special"],
-                    ["OVA", "ova"],
-                    ["DONGHUA", "donghua"]
+                    ['Anime', '0'],
+                    ['Movie', '4'],
+                    ['OVA', '1'],
+                    ['ONA', '2'],
+                    ['Special', '3'],
+                    ['Music', '5']
                 ].map(x => ({ type_name: 'CheckBox', name: x[0], value: x[1] }))
             },
             {
-                type_name: "SelectFilter",
-                type: "genero",
-                name: "Género",
-                state: 0,
-                values: [
-                    ["Todos", ""],
-                    ["Acción", "accion"],
-                    ["Ángeles", "angeles"],
-                    ["Artes Marciales", "artes-marciales"],
-                    ["Aventura", "aventura"],
-                    ["Ciencia Ficción", "Ciencia Ficción"],
-                    ["Comedia", "comedia"],
-                    ["Cyberpunk", "cyberpunk"],
-                    ["Demonios", "demonios"],
-                    ["Deportes", "deportes"],
-                    ["Dragones", "dragones"],
-                    ["Drama", "drama"],
-                    ["Ecchi", "ecchi"],
-                    ["Escolares", "escolares"],
-                    ["Fantasía", "fantasia"],
-                    ["Gore", "gore"],
-                    ["Harem", "harem"],
-                    ["Histórico", "historico"],
-                    ["Horror", "horror"],
-                    ["Infantil", "infantil"],
-                    ["Isekai", "isekai"],
-                    ["Josei", "josei"],
-                    ["Juegos", "juegos"],
-                    ["Magia", "magia"],
-                    ["Mecha", "mecha"],
-                    ["Militar", "militar"],
-                    ["Misterio", "misterio"],
-                    ["Música", "Musica"],
-                    ["Ninjas", "ninjas"],
-                    ["Parodia", "parodia"],
-                    ["Policía", "policia"],
-                    ["Psicológico", "psicologico"],
-                    ["Recuerdos de la vida", "Recuerdos de la vida"],
-                    ["Romance", "romance"],
-                    ["Samurai", "samurai"],
-                    ["Sci-Fi", "sci-fi"],
-                    ["Seinen", "seinen"],
-                    ["Shoujo", "shoujo"],
-                    ["Shoujo Ai", "shoujo-ai"],
-                    ["Shounen", "shounen"],
-                    ["Slice of life", "slice-of-life"],
-                    ["Sobrenatural", "sobrenatural"],
-                    ["Space", "space"],
-                    ["Spokon", "spokon"],
-                    ["Steampunk", "steampunk"],
-                    ["Superpoder", "superpoder"],
-                    ["Thriller", "thriller"],
-                    ["Vampiro", "vampiro"],
-                    ["Yaoi", "yaoi"],
-                    ["Yuri", "yuri"],
-                    ["Zombies", "zombies"]
-                ].map(x => ({ type_name: 'SelectOption', name: x[0], value: x[1] }))
+                type_name: "GroupFilter",
+                name: "Generi",
+                state: [
+                    ["Arti Marziali", "3"],
+                    ["Avanguardia", "5"],
+                    ["Avventura", "2"],
+                    ["Azione", "1"],
+                    ["Bambini", "47"],
+                    ["Commedia", "4"],
+                    ["Demoni", "6"],
+                    ["Drammatico", "7"],
+                    ["Ecchi", "8"],
+                    ["Fantasy", "9"],
+                    ["Gioco", "10"],
+                    ["Harem", "11"],
+                    ["Hentai", "43"],
+                    ["Horror", "13"],
+                    ["Josei", "14"],
+                    ["Magia", "16"],
+                    ["Mecha", "18"],
+                    ["Militari", "19"],
+                    ["Mistero", "21"],
+                    ["Musicale", "20"],
+                    ["Parodia", "22"],
+                    ["Polizia", "23"],
+                    ["Psicologico", "24"],
+                    ["Romantico", "46"],
+                    ["Samurai", "26"],
+                    ["Sci-Fi", "28"],
+                    ["Scolastico", "27"],
+                    ["Seinen", "29"],
+                    ["Sentimentale", "25"],
+                    ["Shoujo", "30"],
+                    ["Shoujo Ai", "31"],
+                    ["Shounen", "32"],
+                    ["Shounen Ai", "33"],
+                    ["Slice of Life", "34"],
+                    ["Spazio", "35"],
+                    ["Soprannaturale", "37"],
+                    ["Sport", "36"],
+                    ["Storico", "12"],
+                    ["Superpoteri", "38"],
+                    ["Thriller", "39"],
+                    ["Vampiri", "40"],
+                    ["Veicoli", "48"],
+                    ["Yaoi", "41"],
+                    ["Yuri", "42"]
+                ].map(x => ({ type_name: 'CheckBox', name: x[0], value: x[1] }))
             },
             {
                 type_name: "GroupFilter",
-                name: "Estado",
+                name: "Stato",
                 state: [
-                    ["Emisión", "1"],
-                    ["Finalizado", "2"],
-                    ["Proximamente", "3"],
-                    ["En Cuarentena", "4"]
+                    ["In corso", "0"],
+                    ["Finito", "1"],
+                    ["Non rilasciato", "2"],
+                    ["Droppato", "3"]
+                ].map(x => ({ type_name: 'CheckBox', name: x[0], value: x[1] }))
+            },
+            {
+                type_name: "GroupFilter",
+                name: "Sottotitoli",
+                state: [
+                    ["Subbato", "0"],
+                    ["Doppiato", "1"]
+                ].map(x => ({ type_name: 'CheckBox', name: x[0], value: x[1] }))
+            },
+            {
+                type_name: "GroupFilter",
+                name: "Audio",
+                state: [
+                    ["Giapponese", "jp"],
+                    ["Italiano", "it"],
+                    ["Cinese", "ch"],
+                    ["Coreano", "kr"],
+                    ["Inglese", "en"]
                 ].map(x => ({ type_name: 'CheckBox', name: x[0], value: x[1] }))
             },
             {
                 type_name: "SelectFilter",
                 type: "sort",
-                name: "Orden",
+                name: "Ordine",
                 state: 0,
                 values: [
-                    ["Por Defecto", "default"],
-                    ["Recientemente Actualizados", "updated"],
-                    ["Recientemente Agregados", "added"],
-                    ["Nombre A-Z", "title"],
-                    ["Calificación", "likes"],
-                    ["Más Vistos", "visits"]
-                ].map(x => ({ type_name: 'SelectOption', name: x[0], value: x[1] }))
-            }
+                    ["Standard", "0"],
+                    ["Ultime aggiunte", "1"],
+                    ["Lista A-Z", "2"],
+                    ["Lista Z-A", "3"],
+                    ["Più vecchi", "4"],
+                    ["Più recenti", "5"],
+                    ["Più visti", "6"]
+                ].map(x => ({type_name: 'SelectOption', name: x[0], value: x[1] }))
+            },
         ];
     }
     getSourcePreferences() {
-        const languages = ['Español'];
-        const types = ['Sub'];
+        const languages = ['Italiano'];
+        const types = ['Doppiato', 'Subbato'];
         const resolutions = ['1080p', '720p', '480p'];
-        const hosts = ['Amazon', 'AmazonEs', 'Burst', 'Mp4Upload', 'RU', 'Sendvid', 'STREAM2', 'HIDE', 'YourUpload'];
+        const hosts = ['Alternativo', 'VidGuard'];
 
         return [
             {
