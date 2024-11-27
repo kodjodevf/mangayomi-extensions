@@ -13,4 +13,4 @@ Source _oploverz = Source(
         "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/src/id/oploverz/icon.png",
     sourceCodeUrl: _oploverzCodeUrl,
     version: _oploverzVersion,
-    isManga: false);
+    itemType: ItemType.anime);

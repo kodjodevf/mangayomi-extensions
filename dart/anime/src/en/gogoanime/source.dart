@@ -13,4 +13,4 @@ Source _gogoanimeSource = Source(
         "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/src/en/gogoanime/icon.png",
     sourceCodeUrl: _gogoanimeSourceCodeUrl,
     version: _gogoanimeVersion,
-    isManga: false);
+    itemType: ItemType.anime);
