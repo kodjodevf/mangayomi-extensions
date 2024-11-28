@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://tioanime.com/assets/img/tio_fb.jpg",
     "typeSource": "single",
     "isManga": false,
-    "version": "0.1.1",
+    "version": "0.1.11",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/es/tioanime.js"
@@ -42,15 +42,15 @@ class DefaultExtension extends MProvider {
         }[status] ?? 5;
     }
     async getPopular(page) {
-        return this.parseAnimeList(`${this.source.baseUrl}/directorio?p=${page}`);
+        return await this.parseAnimeList(`${this.source.baseUrl}/directorio?p=${page}`);
     }
     async getLatestUpdates(page) {
-        return this.parseAnimeList(`${this.source.baseUrl}/directorio?p=${page}`);
+        return await this.parseAnimeList(`${this.source.baseUrl}/directorio?p=${page}`);
     }
     async search(query, page, filters) {
         query = query.trim().replaceAll(/\ +/g, "+");
         let url = `${this.source.baseUrl}/directorio?q=${query}&p=${page}`;
-        return this.parseAnimeList(url);
+        return await this.parseAnimeList(url);
     }
     async getDetail(url) {
         const res = await this.client.get(this.source.baseUrl + url);

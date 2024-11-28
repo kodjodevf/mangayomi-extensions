@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www3.animefenix.tv/themes/fenix-neo/images/AveFenix.png",
     "typeSource": "single",
     "isManga": false,
-    "version": "0.1.11",
+    "version": "0.1.12",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/es/animefenix.js"
@@ -44,10 +44,10 @@ class DefaultExtension extends MProvider {
         }[status.toLowerCase()] ?? 5;
     }
     async getPopular(page) {
-        return this.parseAnimeList(`${this.source.baseUrl}/animes?order=visits&page=${page}`);
+        return await this.parseAnimeList(`${this.source.baseUrl}/animes?order=visits&page=${page}`);
     }
     async getLatestUpdates(page) {
-        return this.parseAnimeList(`${this.source.baseUrl}/animes?order=updated&page=${page}`);
+        return await this.parseAnimeList(`${this.source.baseUrl}/animes?order=updated&page=${page}`);
     }
     async search(query, page, filters) {
         query = query.trim().replaceAll(/\ +/g, "+");
@@ -72,7 +72,7 @@ class DefaultExtension extends MProvider {
 
         url += `&order=${filters[3].values[filters[3].state].value}`;
         url += `&page=${page}`;
-        return this.parseAnimeList(url);
+        return await this.parseAnimeList(url);
     }
     async getDetail(url) {
         const detail = {};

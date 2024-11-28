@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://i.postimg.cc/RFRGfBvP/FVLyB1I.png",
     "typeSource": "single",
     "isManga": false,
-    "version": "0.0.1",
+    "version": "0.0.11",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/it/animeworld.js"
@@ -23,7 +23,7 @@ class DefaultExtension extends MProvider {
     async parseAnimeList(url) {
         const res = await this.client.get(url);
         const doc = new Document(res.body);
-        const elements = doc.select("div.film-list div.item");
+        const elements = doc.select("div#main div.film-list div.item");
         const list = [];
 
         for (const element of elements) {
@@ -62,14 +62,14 @@ class DefaultExtension extends MProvider {
         return { "list": list, "hasNextPage": false };
     }
     async getLatestUpdates(page) {
-        return this.parseAnimeList(`${this.source.baseUrl}/filter?sort=1&page=${page}`);
+        return await this.parseAnimeList(`${this.source.baseUrl}/filter?sort=1&page=${page}`);
     }
     async search(query, page, filters) {
         query = query.trim().replaceAll(/\ +/g, "+");
 
         // Search sometimes failed because filters were empty. I experienced this mostly on android...
         if (!filters || filters.length == 0) {
-            return this.parseAnimeList(`${this.source.baseUrl}/search?keyword=${query}&page=${page}`);
+            return await this.parseAnimeList(`${this.source.baseUrl}/search?keyword=${query}&page=${page}`);
         }
 
         let url = `${this.source.baseUrl}/filter?sort=${filters[5].values[filters[5].state].value}&keyword=${query}`;
@@ -94,7 +94,7 @@ class DefaultExtension extends MProvider {
             if (filter.state == true)
                 url += `&language=${filter.value}`;
         }
-        return this.parseAnimeList(url + `&page=${page}`);
+        return await this.parseAnimeList(url + `&page=${page}`);
     }
     async getDetail(url) {
         const res = await this.client.get(this.source.baseUrl + url);
@@ -258,7 +258,7 @@ class DefaultExtension extends MProvider {
                     ["Più recenti", "5"],
                     ["Più visti", "6"]
                 ].map(x => ({type_name: 'SelectOption', name: x[0], value: x[1] }))
-            },
+            }
         ];
     }
     getSourcePreferences() {
