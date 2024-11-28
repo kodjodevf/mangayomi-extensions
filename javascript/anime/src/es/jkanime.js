@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://cdn.jkanime.net/logo_jk.png",
     "typeSource": "single",
     "isManga": false,
-    "version": "0.1.11",
+    "version": "0.1.12",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/es/jkanime.js"
@@ -61,7 +61,7 @@ class DefaultExtension extends MProvider {
         return { "list": list, "hasNextPage": false };
     }
     async getLatestUpdates(page) {
-        return this.parseAnimeList(`${this.source.baseUrl}/directorio/${page}/`);
+        return await this.parseAnimeList(`${this.source.baseUrl}/directorio/${page}/`);
     }
     async search(query, page, filters) {
         query = query.trim().replaceAll(/\ +/g, "_");
@@ -85,7 +85,7 @@ class DefaultExtension extends MProvider {
             url += `/${filters[7].values[filters[7].state].value}`;
             url += `/${filters[8].values[filters[8].state].value}`;
         }        
-        return this.parseAnimeList(url);
+        return await this.parseAnimeList(url);
     }
     async getDetail(url) {
         let res = await this.client.get(url);
