@@ -136,17 +136,20 @@ class DefaultExtension extends MProvider {
         let promises = [];
         const videos = [];
 
+        const preferences = new SharedPreferences();
+        const hostFilter = preferences.get("host_filter");
+        const langFilter = preferences.get("lang_filter");
+
         const redirectsElements = document.select("ul.row li");
-        const hostFilter = new SharedPreferences().get("host_filter");
         const dartClient = new Client({ 'useDartHttpClient': true, "followRedirects": false });
 
         for (const element of redirectsElements) {
+            const langkey = element.attr("data-lang-key");
+            const lang = (langkey == 1 || langkey == 3) ? 'Deutscher' : 'Englischer';
+            const type = (langkey == 1) ? 'Dub' : 'Sub';
             const host = element.selectFirst("a h4").text;
 
-            if (hostFilter.includes(host)) {
-                const langkey = element.attr("data-lang-key");
-                const lang = (langkey == 1 || langkey == 3) ? 'Deutscher' : 'Englischer';
-                const type = (langkey == 1) ? 'Dub' : 'Sub';
+            if (/*hostFilter.includes(host) && */langFilter.includes(`${lang} ${type}`)) {
                 const redirect = baseUrl + element.selectFirst("a.watchEpisode").attr("href");
                 promises.push((async (redirect, lang, type, host) => {
                     const location = (await dartClient.get(redirect)).headers.location;
@@ -166,7 +169,14 @@ class DefaultExtension extends MProvider {
         const languageValues = ['Deutscher', 'Englischer'];
         const types = ['Dub', 'Sub'];
         const resolutions = ['1080p', '720p', '480p'];
-        const hosts = ['Doodstream', 'Filemoon', 'SpeedFiles', 'Streamtape', 'Vidoza', 'VOE'];
+        const hosts = ['Doodstream', 'Filemoon', 'Luluvdo', 'SpeedFiles', 'Streamtape', 'Vidoza', 'VOE'];
+        const languageFilters = [];
+
+        for (const lang of languageValues) {
+            for (const type of types) {
+                languageFilters.push(`${lang} ${type}`);
+            }
+        }
 
         return [
             {
@@ -210,10 +220,20 @@ class DefaultExtension extends MProvider {
                 }
             },
             {
+                key: "lang_filter",
+                multiSelectListPreference: {
+                    title: "Sprachen auswählen",
+                    summary: "Wähle aus welche Sprachen dir angezeigt werden sollen. Weniger streams zu laden beschleunigt den Start der Videos.",
+                    entries: languageFilters,
+                    entryValues: languageFilters,
+                    values: languageFilters
+                }
+            },
+            {
                 key: "host_filter",
                 multiSelectListPreference: {
                     title: "Hoster auswählen",
-                    summary: "Wähle aus welche Hoster dir angezeigt werden sollen. Weniger hoster zu laden beschleunigt den Start der Videos.",
+                    summary: "Wähle aus welche Hoster dir angezeigt werden sollen. Weniger streams zu laden beschleunigt den Start der Videos.",
                     entries: hosts,
                     entryValues: hosts,
                     values: hosts
@@ -225,7 +245,7 @@ class DefaultExtension extends MProvider {
 
 /***************************************************************************************************
 * 
-*   mangayomi-js-helpers v1.1
+*   mangayomi-js-helpers v1.2
 *       
 *   # Video Extractors
 *       - vidGuardExtractor
@@ -237,6 +257,7 @@ class DefaultExtension extends MProvider {
 *       - filemoonExtractor
 *       - mixdropExtractor
 *       - speedfilesExtractor
+*       - luluvdoExtractor
 *       - burstcloudExtractor (not working, see description)
 *   
 *   # Video Extractor Wrappers
@@ -426,6 +447,14 @@ async function speedfilesExtractor(url) {
     return [{url: videoUrl, originalUrl: videoUrl, quality: '', headers: null}];
 }
 
+async function luluvdoExtractor(url) {
+    const client = new Client();    
+    const match = url.match(/(.*?:\/\/.*?)\/.*\/(.*)/);
+    const headers = {'user-agent': 'Mangayomi'};
+    const res = await client.get(`${match[1]}/dl?op=embed&file_code=${match[2]}`, headers);    
+    return await jwplayerExtractor(res.body, headers);
+}
+
 /** Does not work: Client always sets 'charset=utf-8' in Content-Type. */
 async function burstcloudExtractor(url) {
     let client = new Client();
@@ -527,6 +556,7 @@ extractAny.methods = {
     'burstcloud': burstcloudExtractor,
     'doodstream': doodExtractor,
     'filemoon': filemoonExtractor,
+    'luluvdo': luluvdoExtractor,
     'mixdrop': mixdropExtractor,
     'mp4upload': mp4UploadExtractor,
     'okru': okruExtractor,
@@ -577,6 +607,10 @@ async function m3u8Extractor(url, headers = null) {
 
     const res = await new Client().get(url, headers);
     const text = res.body;
+
+    if (res.statusCode != 200) {
+        return [];
+    }
 
     // collect media
     for (const match of text.matchAll(/#EXT-X-MEDIA:(.*)/g)) {

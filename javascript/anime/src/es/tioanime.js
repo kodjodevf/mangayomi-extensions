@@ -158,7 +158,7 @@ class DefaultExtension extends MProvider {
 
 /***************************************************************************************************
 * 
-*   mangayomi-js-helpers v1.1
+*   mangayomi-js-helpers v1.2
 *       
 *   # Video Extractors
 *       - vidGuardExtractor
@@ -170,6 +170,7 @@ class DefaultExtension extends MProvider {
 *       - filemoonExtractor
 *       - mixdropExtractor
 *       - speedfilesExtractor
+*       - luluvdoExtractor
 *       - burstcloudExtractor (not working, see description)
 *   
 *   # Video Extractor Wrappers
@@ -359,6 +360,14 @@ async function speedfilesExtractor(url) {
     return [{url: videoUrl, originalUrl: videoUrl, quality: '', headers: null}];
 }
 
+async function luluvdoExtractor(url) {
+    const client = new Client();    
+    const match = url.match(/(.*?:\/\/.*?)\/.*\/(.*)/);
+    const headers = {'user-agent': 'Mangayomi'};
+    const res = await client.get(`${match[1]}/dl?op=embed&file_code=${match[2]}`, headers);    
+    return await jwplayerExtractor(res.body, headers);
+}
+
 /** Does not work: Client always sets 'charset=utf-8' in Content-Type. */
 async function burstcloudExtractor(url) {
     let client = new Client();
@@ -460,6 +469,7 @@ extractAny.methods = {
     'burstcloud': burstcloudExtractor,
     'doodstream': doodExtractor,
     'filemoon': filemoonExtractor,
+    'luluvdo': luluvdoExtractor,
     'mixdrop': mixdropExtractor,
     'mp4upload': mp4UploadExtractor,
     'okru': okruExtractor,
@@ -510,6 +520,10 @@ async function m3u8Extractor(url, headers = null) {
 
     const res = await new Client().get(url, headers);
     const text = res.body;
+
+    if (res.statusCode != 200) {
+        return [];
+    }
 
     // collect media
     for (const match of text.matchAll(/#EXT-X-MEDIA:(.*)/g)) {
