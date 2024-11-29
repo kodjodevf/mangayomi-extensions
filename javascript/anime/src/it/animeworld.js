@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://i.postimg.cc/RFRGfBvP/FVLyB1I.png",
     "typeSource": "single",
     "isManga": false,
-    "version": "0.0.11",
+    "version": "0.0.12",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/it/animeworld.js"
