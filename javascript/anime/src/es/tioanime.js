@@ -297,15 +297,19 @@ async function vidHideExtractor(url) {
 }
 
 async function filemoonExtractor(url, headers) {
+    headers['User-Agent'] = headers['User-Agent'] ?? 'Mangayomi';
+    delete headers['user-agent'];
+    
     let res = await new Client().get(url, headers);
     const src = res.body.match(/iframe src="(.*?)"/)?.[1];
     if (src) {
         res = await new Client().get(src, {
             'Referer': url,
-            'Accept-Language': 'de,en-US;q=0.7,en;q=0.3'
+            'Accept-Language': 'de,en-US;q=0.7,en;q=0.3',
+            'User-Agent': headers['User-Agent']
         });
     }
-    return await jwplayerExtractor(res.body);
+    return await jwplayerExtractor(res.body, headers);
 }
 
 async function mixdropExtractor(url) {
