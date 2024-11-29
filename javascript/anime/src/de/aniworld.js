@@ -384,6 +384,7 @@ async function vidHideExtractor(url) {
 }
 
 async function filemoonExtractor(url, headers) {
+    headers = headers ?? {};
     headers['User-Agent'] = headers['User-Agent'] ?? 'Mangayomi';
     delete headers['user-agent'];
     
