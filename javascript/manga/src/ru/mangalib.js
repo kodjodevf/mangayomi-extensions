@@ -346,7 +346,7 @@ class DefaultExtension extends MProvider {
                 listPreference: {
                     title: 'Image Server',
                     summary: '',
-                    valueIndex: 2,
+                    valueIndex: 0,
                     entries: imageServers,
                     entryValues: imageServerValuess
                 }
