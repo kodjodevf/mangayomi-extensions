@@ -8,9 +8,9 @@ import 'model/source.dart';
 
 void main() {
   final jsSources = _searchJsSources(Directory("javascript"));
-  genManga(jsSources.where((element) => element.itemType == "manga").toList());
-  genAnime(jsSources.where((element) => element.itemType == "anime").toList());
-  genNovel(jsSources.where((element) => element.itemType == "novel").toList());
+  genManga(jsSources.where((element) => element.itemType!.name == "manga").toList());
+  genAnime(jsSources.where((element) => element.itemType!.name == "anime").toList());
+  genNovel(jsSources.where((element) => element.itemType!.name == "novel").toList());
 }
 
 void genManga(List<Source> jsMangasourceList) {
