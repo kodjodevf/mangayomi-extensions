@@ -9,7 +9,8 @@ const mangayomiSources = [{
     "version": "0.0.1",
     "dateFormat": "",
     "dateFormatLocale": "",
-    "pkgPath": "novel/src/en/novelupdates.js"
+    "pkgPath": "novel/src/en/novelupdates.js",
+    "appMinVerReq": "0.3.75"
 }];
 
 class DefaultExtension extends MProvider {
