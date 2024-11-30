@@ -30,11 +30,11 @@ class DefaultExtension extends MProvider {
     }
     parseStatus(status) {
         return {
-            'In corso': 0,
-            'Finito': 1,
-            'In pausa': 2,
-            'Droppato': 3,
-            'Cancellato': 3
+            "Онгоинг": 0,
+            "Завершён": 1,
+            "Приостановлен": 2,
+            "Выпуск прекращён": 3,
+            "Анонс": 4
         }[status] ?? 5;
     }
     async parseMangaList(url) {
