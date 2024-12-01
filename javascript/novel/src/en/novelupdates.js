@@ -3,7 +3,7 @@ const mangayomiSources = [{
     "lang": "en",
     "baseUrl": "https://novelupdates.com",
     "apiUrl": "",
-    "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/en.novelupdates.png",
+    "iconUrl": "https://raw.githubusercontent.com/Schnitzel5/mangayomi-extensions/main/javascript/icon/en.novelupdates.png",
     "typeSource": "single",
     "itemType": 2,
     "version": "0.0.1",
@@ -21,25 +21,25 @@ class DefaultExtension extends MProvider {
     }
     mangaListFromPage(res) {
         const doc = new Document(res.body);
-        const mangaElements = doc.select("div.grid > a[href]");
+        const mangaElements = doc.select("div.grid > div.search_main_box_nu");
         const list = [];
         for (const element of mangaElements) {
-            const name = element.selectFirst("span.block").text;
+            const name = element.selectFirst(".search_title > a").text;
             const imageUrl = element.selectFirst("img").getSrc;
-            const link = element.getHref;
+            const link = element.selectFirst(".search_title > a").getHref.replace("https://novelupdates.com/", "");
             list.push({ name, imageUrl, link });
         }
-        const hasNextPage = doc.selectFirst("a.flex.bg-themecolor:contains(Next)").text != "";
+        const hasNextPage = doc.selectFirst("div.digg_pagination > a.next_page").text == " →";
         return { "list": list, hasNextPage };
     }
     toStatus(status) {
-        if (status == "Ongoing")
+        if (status.includes("Ongoing"))
             return 0;
-        else if (status == "Completed")
+        else if (status.includes("Completed"))
             return 1;
-        else if (status == "Hiatus")
+        else if (status.includes("Hiatus"))
             return 2;
-        else if (status == "Dropped")
+        else if (status.includes("Dropped"))
             return 3;
         else
             return 5;
@@ -61,18 +61,18 @@ class DefaultExtension extends MProvider {
 
     async getPopular(page) {
         const baseUrl = new SharedPreferences().get("overrideBaseUrl1");
-        const res = await new Client().get(`${baseUrl}/series?name=&status=-1&types=-1&order=rating&page=${page}`);
+        const res = await new Client().get(`${baseUrl}/series-ranking/?rank=popmonth&pg=${page}`);
         return this.mangaListFromPage(res);
     }
 
     async getLatestUpdates(page) {
         const baseUrl = new SharedPreferences().get("overrideBaseUrl1");
-        const res = await new Client().get(`${baseUrl}/series?genres=&status=-1&types=-1&order=update&page=${page}`);
+        const res = await new Client().get(`${baseUrl}/series-finder/?sf=1&sh=&sort=sdate&order=desc&pg=${page}`);
         return this.mangaListFromPage(res);
     }
     async search(query, page, filters) {
         const baseUrl = new SharedPreferences().get("overrideBaseUrl1");
-        const res = await new Client().get(`${baseUrl}/series?name=${query}&page=${page}`);
+        const res = await new Client().get(`${baseUrl}/series-finder/?sf=1&sh=${query}&sort=sdate&order=desc&pg=${page}`);
         return this.mangaListFromPage(res);
     }
 
@@ -80,31 +80,50 @@ class DefaultExtension extends MProvider {
         const baseUrl = new SharedPreferences().get("overrideBaseUrl1");
         const res = await new Client().get(baseUrl + "/" + url);
         const doc = new Document(res.body);
-        const imageUrl = doc.selectFirst("img[alt=poster]")?.getSrc;
-        const description = doc.selectFirst("span.font-medium.text-sm")?.text.trim();
-        const author = doc.selectFirst("h3:contains('Author')").nextElementSibling.text.trim();
-        const artist = doc.selectFirst("h3:contains('Artist')").nextElementSibling.text.trim();
-        const status = this.toStatus(doc.selectFirst("h3:contains('Status')").nextElementSibling.text.trim());
-        const genre = doc.select("div[class^=space] > div.flex > button.text-white")
-            .map((el) => el.text.trim());
-        const chapters = [];
-        const chapterElements = doc.select("div.scrollbar-thumb-themecolor > div.group");
-        for (const element of chapterElements) {
-            const url = element.selectFirst("a").getHref;
-            const chNumber = element.selectFirst("h3 > a").text;
-            const chTitle = element.select("h3 > a > span").map((span) => span.text.trim()).join(" ").trim();
-            const name = chTitle == "" ? chNumber : `${chNumber} - ${chTitle}`;
+        const imageUrl = doc.selectFirst(".wpb_wrapper img")?.getSrc;
+        const type = doc.selectFirst("#showtype")?.text.trim();
+        const description = doc.selectFirst("#editdescription")?.text.trim() + `\n\nType: ${type}`;
+        const author = doc.select("#authtag").map((el) => el.text.trim()).join(", ");
+        const artist = doc.select("#artiststag").map((el) => el.text.trim()).join(", ");
+        const status = this.toStatus(doc.selectFirst("#editstatus").text.trim());
+        const genre = doc.select("#seriesgenre > a")
+        .map((el) => el.text.trim());
 
-            let dateUpload;
-            try {
-                const dateText = element.selectFirst("h3 + h3").text.trim();
-                const cleanDateText = dateText.replace(/(\d+)(st|nd|rd|th)/, "$1");
-                dateUpload = this.parseDate(cleanDateText);
-            } catch (_) {
-                dateUpload = null
+        const novelId = doc.selectFirst("input#mypostid")?.attr("value");
+        const formData = new FormData();
+        formData.append('action', 'nd_getchapters');
+        formData.append('mygrr', '0');
+        formData.append('mypostid', novelId);
+    
+        const link = `${baseUrl}/wp-admin/admin-ajax.php`;
+
+        const headers = {
+            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+            'Referer': baseUrl + "/" + url,
+        };
+    
+        const chapters = [];
+        const chapterRes = await client.post(link, headers, formData);
+        const chapterDoc = new Document(chapterRes.body);
+
+        const nameReplacements = {
+            'v': 'volume ',
+            'c': ' chapter ',
+            'part': 'part ',
+            'ss': 'SS',
+          };
+
+        chapterDoc.select("li.sp_li_chp").forEach((el) => {
+            let chapterName = el.text;
+            for (const name in nameReplacements) {
+                chapterName = chapterName.replace(name, nameReplacements[name]);
             }
-            chapters.push({ name, url, dateUpload });
-        }
+            chapterName = chapterName.replace(/\b\w/g, l => l.toUpperCase()).trim();
+            const chapterUrl = `https:${el.select("a")[1].attr("href")}`;
+            const dateUpload = String(Date.now());
+            chapters.push({ chapterName, chapterUrl, dateUpload });
+        });
+
         return {
             imageUrl,
             description,
@@ -115,7 +134,6 @@ class DefaultExtension extends MProvider {
             chapters
         };
     }
-
 
     async getPageList(url) {
         const baseUrl = new SharedPreferences().get("overrideBaseUrl1");
