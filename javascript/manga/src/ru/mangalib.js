@@ -1,6 +1,6 @@
 const mangayomiSources = [{
     "name": "Mangalib",
-    "lang": 'ru',
+    "lang": "ru",
     "baseUrl": "https://mangalib.org/ru",
     "apiUrl": "https://api.mangalib.me/api",
     "iconUrl": "https://mangalib.org/static/images/logo/ml/icon-180.png",
