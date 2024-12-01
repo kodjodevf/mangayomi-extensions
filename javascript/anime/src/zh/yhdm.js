@@ -1,13 +1,13 @@
 const mangayomiSources = [{
   "name": "樱花动漫",
   "lang": "zh",
-  "baseUrl": "http://www.iyinghua.io",
+  "baseUrl": "http://www.iyinghua.com",
   "apiUrl": "",
-  "iconUrl": "http://www.iyinghua.io/js/20180601/favicon.ico",
+  "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/zh.yhdm.png",
   "typeSource": "single",
   "isManga": false,
   "isNsfw": false,
-  "version": "0.0.15",
+  "version": "0.0.2",
   "dateFormat": "",
   "dateFormatLocale": "",
   "pkgPath": "anime/src/zh/yhdm.js"
@@ -51,12 +51,21 @@ class DefaultExtension extends MProvider {
     return String.fromCharCode.apply(null, charCodes);
   }
 
+  getBaseUrl() {
+    const preference = new SharedPreferences();
+    var base_url = preference.get("domain_url");
+    if (base_url.endsWith("/")) {
+      return base_url.slice(0, -1);
+    }
+    return base_url;
+  }
+
   getHeaders(url) {
     throw new Error("getHeaders not implemented");
   }
 
   async getItems(url, p, d) {
-    const res = await new Client().get(this.source.baseUrl + url);
+    const res = await new Client().get(this.getBaseUrl() + url);
     const doc = new Document(res.body);
     const items = [];
     const elements = doc.select(p);
@@ -91,7 +100,7 @@ class DefaultExtension extends MProvider {
   }
 
   async getDetail(url) {
-    const res = await new Client().get(this.source.baseUrl + url);
+    const res = await new Client().get(this.getBaseUrl() + url);
     const doc = new Document(res.body);
     const cover = doc.selectFirst("div.thumb img").attr("src");
     const title = this.stringUTF8(doc.selectFirst("div.rate h1").text, true);
@@ -119,7 +128,7 @@ class DefaultExtension extends MProvider {
   }
 
   async getVideoList(url) {
-    const res = await new Client().get(this.source.baseUrl + url);
+    const res = await new Client().get(this.getBaseUrl() + url);
     const doc = new Document(res.body);
     const video_url = this.stringUTF8(doc.selectFirst("div#playbox").attr("data-vid").split("$")[0], true);
     return [{
@@ -354,6 +363,16 @@ class DefaultExtension extends MProvider {
   }
 
   getSourcePreferences() {
-    throw new Error("getSourcePreferences not implemented");
+    return [{
+        "key": "domain_url",
+        "editTextPreference": {
+          "title": "Url",
+          "summary": "樱花动漫网址",
+          "value": "http://www.iyinghua.com",
+          "dialogTitle": "URL",
+          "dialogMessage": "",
+        }
+      }
+    ];
   }
 }
