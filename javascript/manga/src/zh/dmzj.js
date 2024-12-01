@@ -3,11 +3,11 @@ const mangayomiSources = [{
     "lang": "zh",
     "baseUrl": "https://www.dmzj.com",
     "apiUrl": "",
-    "iconUrl": "https://www.dmzj.com/_nuxt/logo_dmzj.1c94014a.png",
+    "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/zh.dmzj.png",
     "typeSource": "single",
     "isManga": true,
     "isNsfw": false,
-    "version": "0.0.25",
+    "version": "0.0.3",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "manga/src/zh/dmzj.js"

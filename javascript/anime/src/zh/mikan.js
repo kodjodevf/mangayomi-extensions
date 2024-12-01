@@ -3,11 +3,11 @@ const mangayomiSources = [{
   "lang": "zh",
   "baseUrl": "https://mikanime.tv",
   "apiUrl": "",
-  "iconUrl": "https://mikanime.tv/images/mikan-pic.png",
+  "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/zh.mikan.png",
   "typeSource": "torrent",
   "isManga": false,
   "isNsfw": false,
-  "version": "0.0.15",
+  "version": "0.0.2",
   "dateFormat": "",
   "dateFormatLocale": "",
   "pkgPath": "anime/src/zh/mikan.js"
@@ -30,9 +30,10 @@ class DefaultExtension extends MProvider {
 
   async getItems(url, cookies) {
     var res;
-    if (cookies) {
+    const identity = new SharedPreferences().get("cookies");
+    if ((cookies) && (identity.length > 0)) {
       res = await new Client().get(this.source.baseUrl + url, {
-        Cookie: `.AspNetCore.Identity.Application=${new SharedPreferences().get("cookies")}`
+        Cookie: `.AspNetCore.Identity.Application=${identity}`
       });
     } else {
       res = await new Client().get(this.source.baseUrl + url);
@@ -127,7 +128,7 @@ class DefaultExtension extends MProvider {
     return [{
       "key": "cookies",
       "editTextPreference": {
-        "title": "用户Cookies",
+        "title": "用户Cookies（在webview中登陆则可不设）",
         "summary": "用于读取用户订阅的Cookies（.AspNetCore.Identity.Application）",
         "value": "",
         "dialogTitle": "Cookies",

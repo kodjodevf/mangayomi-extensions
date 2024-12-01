@@ -3,11 +3,11 @@ const mangayomiSources = [{
     "lang": "zh",
     "baseUrl": "https://www.mangacopy.com",
     "apiUrl": "https://api.mangacopy.com",
-    "iconUrl": "https://hi77-overseas.mangafuna.xyz/static/free.ico",
+    "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/zh.copymanga.png",
     "typeSource": "single",
     "isManga": true,
     "isNsfw": false,
-    "version": "0.0.2",
+    "version": "0.0.25",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "manga/src/zh/copymanga.js"
@@ -100,6 +100,21 @@ const mangayomiSources = [{
         Referer: this.source.baseUrl
       };
     }
+
+    reqHeaders() {
+      const date = new Date();
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return {
+        'User-Agent': 'duoTuoCartoon/3.2.4 (iPhone; iOS 18.0.1; Scale/3.00) iDOKit/1.0.0 RSSX/1.0.0',
+        'version': `${year}.${month}.${day}`,
+        'region': '0',
+        'webp': '0',
+        "platform": "1",
+        "Referer": "https://www.copymanga.com/"
+      }
+    }
   
     async getManga(url) {
       const res = await new Client().get(this.source.apiUrl + url);
@@ -128,14 +143,8 @@ const mangayomiSources = [{
   
     async search(query, page, filters) {
       if (query != "") {
-        const res = await new Client().get(this.source.apiUrl + `/api/v3/search/comic?platform=1&q=${query}&limit=16&offset=${(page -1)*16}&q_type=&_update=true`, {
-          "webp": '1',
-          "region": '1',
-          "platform": '1',
-          "version": '2022.10.20',
-          "accept": 'application/json',
-          'content-encoding': 'gzip, compress, br'
-        });
+        const res = await new Client().get(this.source.apiUrl + `/api/v3/search/comic?platform=1&q=${query}&limit=16&offset=${(page -1)*16}&q_type=&_update=true`, 
+        this.reqHeaders());
         const datas = JSON.parse(res.body)["results"]["list"];
         const manga = [];
         for (const data of datas) {
@@ -167,7 +176,7 @@ const mangayomiSources = [{
   
     async getDetail(url) {
       url = url.substringAfter("/comic/");
-      const res = await new Client().get(this.source.apiUrl + `/api/v3/comic2/${url}`);
+      const res = await new Client().get(this.source.apiUrl + `/api/v3/comic2/${url}`, this.reqHeaders());
       const data = JSON.parse(res.body)["results"]["comic"];
       const title = this.stringUTF8(data["name"]);
       const cover = data["cover"];
