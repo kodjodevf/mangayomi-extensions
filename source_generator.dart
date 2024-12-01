@@ -77,6 +77,9 @@ List<Source> _searchJsSources(Directory dir) {
                 ..appMinVerReq = defaultSource.appMinVerReq
                 ..sourceCodeUrl =
                     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/javascript/${sourceJson["pkgPath"] ?? sourceJson["pkgName"]}";
+              if (source.itemType == ItemType.novel) {
+                source.sourceCodeUrl = source.sourceCodeUrl?.replaceAll("kodjodevf", "Schnitzel5");
+              }
               if (sourceJson["id"] != null) {
                 source = source..id = int.tryParse("${sourceJson["id"]}");
               }
