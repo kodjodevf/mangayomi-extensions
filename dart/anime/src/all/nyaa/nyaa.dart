@@ -60,6 +60,16 @@ class Nyaa extends MProvider {
   }
 
   @override
+  Future<List<MVideo>> getVideoList(String url) async {
+    var video = MVideo();
+    video
+      ..url = url
+      ..originalUrl = url
+      ..quality = "";
+    return [video];
+  }
+
+  @override
   List<dynamic> getFilterList() {
     return [
       SortFilter("SortFilter", "Sort by", SortState(0, true), [
