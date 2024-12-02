@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "torrent",
     "isManga": false,
     "version": "0.0.1",
-    "appMinVerReq": "0.3.75",
+    "appMinVerReq": "0.3.8",
     "pkgPath": "anime/src/all/torrentioanime.js"
 }];
 
