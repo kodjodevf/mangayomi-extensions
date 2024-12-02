@@ -20,12 +20,16 @@ class AnimeToast extends MProvider {
     final elements = document.select("div.row div.col-md-4 div.video-item");
     List<MManga> animeList = [];
     for (var element in elements) {
-      MManga anime = MManga();
-      anime.name = element.selectFirst("div.item-thumbnail a").attr("title");
-      anime.link = getUrlWithoutDomain(
-          element.selectFirst("div.item-thumbnail a").attr("href"));
-      anime.imageUrl =
-          element.selectFirst("div.item-thumbnail a img").attr("src");
+      MManga anime = await (() async {
+        MManga anime = MManga();
+        anime.name = element.selectFirst("div.item-thumbnail a").attr("title");
+        anime.link = getUrlWithoutDomain(
+            element.selectFirst("div.item-thumbnail a").attr("href"));
+        final detailsRes = (await client.get(Uri.parse("$baseUrl${anime.link}"))).body;
+        final detailsDoc = parseHtml(detailsRes);
+        anime.imageUrl = detailsDoc.selectFirst(".item-content p img").attr("src");
+        return anime;
+      })();
       animeList.add(anime);
     }
     return MPages(animeList, false);
@@ -33,20 +37,23 @@ class AnimeToast extends MProvider {
 
   @override
   Future<MPages> search(String query, int page, FilterList filterList) async {
-    final res =
-        (await client.get(Uri.parse("$baseUrl/page/$page/?s=$query"))).body;
-    final document = parseHtml(res);
-    final elements = document.select("div.item-thumbnail a[href]");
-    List<MManga> animeList = [];
-    for (var element in elements) {
-      MManga anime = MManga();
-      anime.name = element.attr("title");
-      anime.link = getUrlWithoutDomain(element.attr("href"));
-      anime.imageUrl = element.selectFirst("a img").attr("src");
-      animeList.add(anime);
-    }
-    return MPages(
-        animeList, document.selectFirst("li.next a")?.attr("href") != null);
+    final res = (await client.get(Uri.parse("$baseUrl/page/$page/?s=$query"))).body;
+	final document = parseHtml(res);
+	final elements = document.select("div.item-thumbnail a[href]");
+	List<MManga> animeList = [];
+	for (var element in elements) {
+		MManga anime = await (() async {
+			MManga anime = MManga();
+			anime.name = element.attr("title");
+			anime.link = getUrlWithoutDomain(element.attr("href"));
+			final detailsRes = (await client.get(Uri.parse("$baseUrl${anime.link}"))).body;
+			final detailsDoc = parseHtml(detailsRes);
+			anime.imageUrl = detailsDoc.selectFirst(".item-content p img").attr("src");
+			return anime;
+		})();
+		animeList.add(anime);
+	}
+	return MPages(animeList, document.selectFirst("li.next a")?.attr("href") != null);
   }
 
   @override
