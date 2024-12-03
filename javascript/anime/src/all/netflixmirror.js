@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/all.netflixmirror.png",
     "typeSource": "single",
     "isManga": false,
-    "version": "0.0.45",
+    "version": "0.0.5",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/all/netflixmirror.js"
@@ -14,19 +14,29 @@ const mangayomiSources = [{
 
 class DefaultExtension extends MProvider {
     async getCookie() {
+        const preferences = new SharedPreferences();
+        let cookie;
+        cookie = preferences.getString("cookie", "");
+        const check = await new Client().get(`${this.source.baseUrl}/home`, { "cookie": cookie });
+        const elements = new Document(check.body).select(".tray-container, #top10");
+        if (elements) {
+            return cookie;
+        }
         const addhash = new Document((await new Client().get(`${this.source.baseUrl}/home`, { "cookie": "" })).body).selectFirst("body").attr("data-addhash");
-        await new Client().get(`https://userverify.netmirror.app/verify?dp1=${addhash}&a=y`);
+        await new Client().get(`https://userverify.netmirror.app/verify?vhfd=${addhash}&a=y`);
         let body;
         let res;
         do {
             res = await new Client().post(`${this.source.baseUrl}/verify2.php`, { "cookie": "" }, { "verify": addhash });
             body = res.body;
         } while (!body.includes('"statusup":"All Done"'));
-        return res.headers["set-cookie"];
+        cookie = `ott=nf; hd=on; ${res.headers["set-cookie"]}`;
+        preferences.setString("cookie", cookie);
+        return cookie;
     }
     async request(url, cookie) {
         cookie = cookie ?? await this.getCookie();
-        return (await new Client().get(this.source.baseUrl + url, { "cookie": `ott=nf; hd=on; ${cookie}` })).body;
+        return (await new Client().get(this.source.baseUrl + url, { "cookie": cookie })).body;
     }
     async getPopular(page) {
         return await this.getPages(await this.request("/home"), ".tray-container, #top10")
