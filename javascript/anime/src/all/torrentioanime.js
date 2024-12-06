@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/all.torrentio.png",
     "typeSource": "torrent",
     "isManga": false,
-    "version": "0.0.1",
+    "version": "0.0.15",
     "appMinVerReq": "0.3.8",
     "pkgPath": "anime/src/all/torrentioanime.js"
 }];
@@ -284,29 +284,26 @@ class DefaultExtension extends MProvider {
         return anime;
     }
 
+    appendQueryParam(key, values) {
+        let url = "";
+        if (values && values.length > 0) {
+            const filteredValues = Array.from(values).filter(value => value.trim() !== "").join(",");
+            url += `${key}=${filteredValues}|`;
+        }
+        return url;
+    };
     async getVideoList(url) {
         const preferences = new SharedPreferences();
 
         let mainURL = `${this.source.baseUrl}/`;
-
-        const appendQueryParam = (key, values) => {
-            if (values && values.size > 0) {
-                const filteredValues = Array.from(values).filter(value => value.trim() !== "").join(",");
-                mainURL += `${key}=${filteredValues}|`;
-            }
-        };
-
-        appendQueryParam("providers", preferences.get("provider_selection"));
-        appendQueryParam("language", preferences.get("lang_selection"));
-        appendQueryParam("qualityfilter", preferences.get("quality_selection"));
-        appendQueryParam("sort", new Set([preferences.get("sorting_link")]));
-
-
+        mainURL += this.appendQueryParam("providers", preferences.get("provider_selection"));
+        mainURL += this.appendQueryParam("language", preferences.get("lang_selection"));
+        mainURL += this.appendQueryParam("qualityfilter", preferences.get("quality_selection"));
+        mainURL += this.appendQueryParam("sort", new Set([preferences.get("sorting_link")]));
         mainURL += url;
         mainURL = mainURL.replace(/\|$/, "");
         const responseEpisodes = await this.client.get(mainURL);
         const streamList = JSON.parse(responseEpisodes.body);
-
         const animeTrackers = `
         http://nyaa.tracker.wf:7777/announce,
         http://anidex.moe:6969/announce,http://tracker.anirena.com:80/announce,
