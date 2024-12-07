@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/all.torrentio.png",
     "typeSource": "torrent",
     "isManga": false,
-    "version": "0.0.15",
+    "version": "0.0.2",
     "appMinVerReq": "0.3.8",
     "pkgPath": "anime/src/all/torrentio.js"
 }];
@@ -84,7 +84,7 @@ class DefaultExtension extends MProvider {
     }
     async searchAnimeRequest(page, query) {
         const preferences = new SharedPreferences();
-        const country = preferences.get("jw_region");
+        const country = preferences.get("jw_region1");
         const language = preferences.get("jw_lang");
         const perPage = 40;
         const year = 0;
@@ -209,7 +209,7 @@ class DefaultExtension extends MProvider {
         const preferences = new SharedPreferences();
 
         let mainURL = `${this.source.baseUrl}/`;
-        mainURL += this.appendQueryParam("providers", preferences.get("provider_selection"));
+        mainURL += this.appendQueryParam("providers", preferences.get("provider_selection1"));
         mainURL += this.appendQueryParam("language", preferences.get("lang_selection"));
         mainURL += this.appendQueryParam("qualityfilter", preferences.get("quality_selection"));
         mainURL += this.appendQueryParam("sort", new Set([preferences.get("sorting_link")]));
@@ -313,7 +313,7 @@ class DefaultExtension extends MProvider {
                 }
             },
             {
-                "key": "provider_selection",
+                "key": "provider_selection1",
                 "multiSelectListPreference": {
                     "title": "Enable/Disable Providers",
                     "summary": "",
@@ -358,7 +358,25 @@ class DefaultExtension extends MProvider {
                         "mejortorrent",
                         "cinecalidad"],
                     "values": [
-                        "nyaasi",]
+                        "yts",
+                        "eztv",
+                        "rarbg",
+                        "1337x",
+                        "thepiratebay",
+                        "kickasstorrents",
+                        "torrentgalaxy",
+                        "magnetdl",
+                        "horriblesubs",
+                        "nyaasi",
+                        "tokyotosho",
+                        "anidex",
+                        "rutor",
+                        "rutracker",
+                        "comando",
+                        "bludv",
+                        "torrent9",
+                        "mejortorrent",
+                        "cinecalidad"]
                 }
             },
             {
@@ -526,11 +544,11 @@ class DefaultExtension extends MProvider {
                 }
             },
             {
-                "key": "jw_region",
+                "key": "jw_region1",
                 "listPreference": {
                     "title": "Catalogue Region",
                     "summary": "Region based catalogue recommendation.",
-                    "valueIndex": 133,
+                    "valueIndex": 132,
                     "entries": [
                         "Albania", "Algeria", "Androrra", "Angola", "Antigua and Barbuda", "Argentina", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Barbados", "Belarus", "Belgium", "Belize", "Bermuda", "Bolivia", "Bosnia and Herzegovina", "Brazil", "Bulgaria", "Burkina Faso", "Cameroon", "Canada", "Cape Verde", "Chad", "Chile", "Colombia", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czech Republic", "DR Congo", "Denmark", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Estonia", "Fiji", "Finland", "France", "French Guiana", "French Polynesia", "Germany", "Ghana", "Gibraltar", "Greece", "Guatemala", "Guernsey", "Guyana", "Honduras", "Hong Kong", "Hungary", "Iceland", "India", "Indonesia", "Iraq", "Ireland", "Israel", "Italy", "Ivory Coast", "Jamaica", "Japan", "Jordan", "Kenya", "Kosovo", "Kuwait", "Latvia", "Lebanon", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Macedonia", "Madagascar", "Malawi", "Malaysia", "Mali", "Malta", "Mauritius", "Mexico", "Moldova", "Monaco", "Montenegro", "Morocco", "Mozambique", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "Norway", "Oman", "Pakistan", "Palestine", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania", "Russia", "Saint Lucia", "San Marino", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Singapore", "Slovakia", "Slovenia", "South Africa", "South Korea", "Spain", "Sweden", "Switzerland", "Taiwan", "Tanzania", "Thailand", "Trinidad and Tobago", "Tunisia", "Turkey", "Turks and Caicos Islands", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Vatican City", "Venezuela", "Yemen", "Zambia", "Zimbabwe"],
                     "entryValues": [
