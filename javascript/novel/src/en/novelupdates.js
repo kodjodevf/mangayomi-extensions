@@ -1,7 +1,7 @@
 const mangayomiSources = [{
     "name": "Novel Updates",
     "lang": "en",
-    "baseUrl": "https://novelupdates.com",
+    "baseUrl": "https://www.novelupdates.com",
     "apiUrl": "",
     "iconUrl": "https://raw.githubusercontent.com/Schnitzel5/mangayomi-extensions/main/javascript/icon/en.novelupdates.png",
     "typeSource": "single",
@@ -14,19 +14,29 @@ const mangayomiSources = [{
 }];
 
 class DefaultExtension extends MProvider {
+    headers = {
+        "Referer": this.source.baseUrl,
+        "Origin": this.source.baseUrl,
+        "Connection": "keep-alive",
+        "Accept": "*/*",
+        "Accept-Language": "*",
+        "Sec-Fetch-Mode": "cors",
+        "Accept-Encoding": "gzip, deflate",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
+        "Cookie": ``
+    }
+
     getHeaders(url) {
-        return {
-            Referer: this.source.baseUrl
-        };
+        throw new Error("getHeaders not implemented");
     }
     mangaListFromPage(res) {
         const doc = new Document(res.body);
-        const mangaElements = doc.select("div.grid > div.search_main_box_nu");
+        const mangaElements = doc.select("div.search_main_box_nu");
         const list = [];
         for (const element of mangaElements) {
             const name = element.selectFirst(".search_title > a").text;
             const imageUrl = element.selectFirst("img").getSrc;
-            const link = element.selectFirst(".search_title > a").getHref.replace("https://novelupdates.com/", "");
+            const link = element.selectFirst(".search_title > a").getHref;
             list.push({ name, imageUrl, link });
         }
         const hasNextPage = doc.selectFirst("div.digg_pagination > a.next_page").text == " →";
@@ -61,24 +71,24 @@ class DefaultExtension extends MProvider {
 
     async getPopular(page) {
         const baseUrl = new SharedPreferences().get("overrideBaseUrl1");
-        const res = await new Client().get(`${baseUrl}/series-ranking/?rank=popmonth&pg=${page}`);
+        const res = await new Client().get(`${baseUrl}/series-ranking/?rank=popmonth&pg=${page}`, this.headers);
         return this.mangaListFromPage(res);
     }
 
     async getLatestUpdates(page) {
         const baseUrl = new SharedPreferences().get("overrideBaseUrl1");
-        const res = await new Client().get(`${baseUrl}/series-finder/?sf=1&sh=&sort=sdate&order=desc&pg=${page}`);
+        const res = await new Client().get(`${baseUrl}/series-finder/?sf=1&sh=&sort=sdate&order=desc&pg=${page}`, this.headers);
         return this.mangaListFromPage(res);
     }
     async search(query, page, filters) {
         const baseUrl = new SharedPreferences().get("overrideBaseUrl1");
-        const res = await new Client().get(`${baseUrl}/series-finder/?sf=1&sh=${query}&sort=sdate&order=desc&pg=${page}`);
+        const res = await new Client().get(`${baseUrl}/series-finder/?sf=1&sh=${query}&sort=sdate&order=desc&pg=${page}`, this.headers);
         return this.mangaListFromPage(res);
     }
 
     async getDetail(url) {
         const baseUrl = new SharedPreferences().get("overrideBaseUrl1");
-        const res = await new Client().get(baseUrl + "/" + url);
+        const res = await new Client().get(url, this.headers);
         const doc = new Document(res.body);
         const imageUrl = doc.selectFirst(".wpb_wrapper img")?.getSrc;
         const type = doc.selectFirst("#showtype")?.text.trim();
@@ -90,39 +100,47 @@ class DefaultExtension extends MProvider {
         .map((el) => el.text.trim());
 
         const novelId = doc.selectFirst("input#mypostid")?.attr("value");
-        const formData = new FormData();
-        formData.append('action', 'nd_getchapters');
-        formData.append('mygrr', '0');
-        formData.append('mypostid', novelId);
     
         const link = `${baseUrl}/wp-admin/admin-ajax.php`;
 
         const headers = {
             "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-            'Referer': baseUrl + "/" + url,
+            ...this.headers
         };
     
         const chapters = [];
-        const chapterRes = await client.post(link, headers, formData);
+        const chapterRes = await new Client().post(link, headers, {
+            "action": "nd_getchapters",
+            "mygrr": "0",
+            "mypostid": novelId
+        });
         const chapterDoc = new Document(chapterRes.body);
 
         const nameReplacements = {
-            'v': 'volume ',
-            'c': ' chapter ',
-            'part': 'part ',
+            'v': 'Volume ',
+            'c': ' Chapter ',
+            'part': 'Part ',
             'ss': 'SS',
-          };
+        };
 
-        chapterDoc.select("li.sp_li_chp").forEach((el) => {
-            let chapterName = el.text;
+        const chapterElements = chapterDoc.select("li.sp_li_chp");
+        for (const el of chapterElements) {
+            let chapterName = el.selectFirst("span").text;
             for (const name in nameReplacements) {
                 chapterName = chapterName.replace(name, nameReplacements[name]);
             }
             chapterName = chapterName.replace(/\b\w/g, l => l.toUpperCase()).trim();
-            const chapterUrl = `https:${el.select("a")[1].attr("href")}`;
+            const chapterUrl = `https:${el.select("a")[1].getHref}`;
             const dateUpload = String(Date.now());
-            chapters.push({ chapterName, chapterUrl, dateUpload });
-        });
+            chapters.push({
+                name: chapterName,
+                url: chapterUrl,
+                dateUpload: dateUpload,
+                scanlator: null
+            });
+        }
+
+        chapters.reverse();
 
         return {
             imageUrl,
@@ -137,7 +155,7 @@ class DefaultExtension extends MProvider {
 
     async getPageList(url) {
         const baseUrl = new SharedPreferences().get("overrideBaseUrl1");
-        const res = await new Client().get(baseUrl + "/series/" + url);
+        const res = await new Client().get(baseUrl + "/series/" + url, this.headers);
         const scriptData = new Document(res.body).select("script:contains(self.__next_f.push)").map((e) => e.text.substringAfter("\"").substringBeforeLast("\"")).join("");
         console.log(scriptData);
         const match = scriptData.match(/\\"pages\\":(\[.*?])/);
@@ -156,8 +174,8 @@ class DefaultExtension extends MProvider {
             "key": "overrideBaseUrl1",
             "editTextPreference": {
                 "title": "Override BaseUrl",
-                "summary": "https://novelupdates.com",
-                "value": "https://novelupdates.com",
+                "summary": "https://www.novelupdates.com",
+                "value": "https://www.novelupdates.com",
                 "dialogTitle": "Override BaseUrl",
                 "dialogMessage": "",
             }
