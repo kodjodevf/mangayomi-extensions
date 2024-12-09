@@ -10,7 +10,9 @@ const mangayomiSources = [{
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "novel/src/en/novelupdates.js",
-    "appMinVerReq": "0.3.75"
+    "appMinVerReq": "0.3.75",
+    "isNsfw": false,
+    "hasCloudflare": true
 }];
 
 class DefaultExtension extends MProvider {
@@ -23,7 +25,6 @@ class DefaultExtension extends MProvider {
         "Sec-Fetch-Mode": "cors",
         "Accept-Encoding": "gzip, deflate",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
-        "Cookie": ``
     }
 
     getHeaders(url) {
@@ -70,25 +71,22 @@ class DefaultExtension extends MProvider {
     }
 
     async getPopular(page) {
-        const baseUrl = new SharedPreferences().get("overrideBaseUrl1");
-        const res = await new Client().get(`${baseUrl}/series-ranking/?rank=popmonth&pg=${page}`, this.headers);
+        const res = await new Client().get(`${this.source.baseUrl}/series-ranking/?rank=popmonth&pg=${page}`, this.headers);
         return this.mangaListFromPage(res);
     }
 
     async getLatestUpdates(page) {
-        const baseUrl = new SharedPreferences().get("overrideBaseUrl1");
-        const res = await new Client().get(`${baseUrl}/series-finder/?sf=1&sh=&sort=sdate&order=desc&pg=${page}`, this.headers);
+        const res = await new Client().get(`${this.source.baseUrl}/series-finder/?sf=1&sh=&sort=sdate&order=desc&pg=${page}`, this.headers);
         return this.mangaListFromPage(res);
     }
     async search(query, page, filters) {
-        const baseUrl = new SharedPreferences().get("overrideBaseUrl1");
-        const res = await new Client().get(`${baseUrl}/series-finder/?sf=1&sh=${query}&sort=sdate&order=desc&pg=${page}`, this.headers);
+        const res = await new Client().get(`${this.source.baseUrl}/series-finder/?sf=1&sh=${query}&sort=sdate&order=desc&pg=${page}`, this.headers);
         return this.mangaListFromPage(res);
     }
 
     async getDetail(url) {
-        const baseUrl = new SharedPreferences().get("overrideBaseUrl1");
-        const res = await new Client().get(url, this.headers);
+        const client = new Client();
+        const res = await client.get(url, this.headers);
         const doc = new Document(res.body);
         const imageUrl = doc.selectFirst(".wpb_wrapper img")?.getSrc;
         const type = doc.selectFirst("#showtype")?.text.trim();
@@ -101,15 +99,14 @@ class DefaultExtension extends MProvider {
 
         const novelId = doc.selectFirst("input#mypostid")?.attr("value");
     
-        const link = `${baseUrl}/wp-admin/admin-ajax.php`;
-
+        const link = `https://www.novelupdates.com/wp-admin/admin-ajax.php`;
         const headers = {
             "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
             ...this.headers
         };
     
         const chapters = [];
-        const chapterRes = await new Client().post(link, headers, {
+        const chapterRes = await client.post(link, headers, {
             "action": "nd_getchapters",
             "mygrr": "0",
             "mypostid": novelId
@@ -154,8 +151,7 @@ class DefaultExtension extends MProvider {
     }
 
     async getPageList(url) {
-        const baseUrl = new SharedPreferences().get("overrideBaseUrl1");
-        const res = await new Client().get(baseUrl + "/series/" + url, this.headers);
+        const res = await new Client().get(this.source.baseUrl + "/series/" + url, this.headers);
         const scriptData = new Document(res.body).select("script:contains(self.__next_f.push)").map((e) => e.text.substringAfter("\"").substringBeforeLast("\"")).join("");
         console.log(scriptData);
         const match = scriptData.match(/\\"pages\\":(\[.*?])/);
@@ -170,16 +166,7 @@ class DefaultExtension extends MProvider {
     }
 
     getSourcePreferences() {
-        return [{
-            "key": "overrideBaseUrl1",
-            "editTextPreference": {
-                "title": "Override BaseUrl",
-                "summary": "https://www.novelupdates.com",
-                "value": "https://www.novelupdates.com",
-                "dialogTitle": "Override BaseUrl",
-                "dialogMessage": "",
-            }
-        }];
+        throw new Error("getSourcePreferences not implemented");
     }
 
 }
