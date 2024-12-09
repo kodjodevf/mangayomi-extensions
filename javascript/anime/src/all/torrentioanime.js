@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/all.torrentio.png",
     "typeSource": "torrent",
     "isManga": false,
-    "version": "0.0.15",
+    "version": "0.0.2",
     "appMinVerReq": "0.3.8",
     "pkgPath": "anime/src/all/torrentioanime.js"
 }];
@@ -247,10 +247,9 @@ class DefaultExtension extends MProvider {
                 case "series": {
                     const videos = episodeList.meta.videos;
                     return videos
-                        .filter(video => video.thumbnail !== null)
+                        .filter(video => video.thumbnail !== null && ((video.released ? new Date(video.released) : Date.now()) < Date.now()))
                         .map(video => {
                             const releaseDate = video.released ? new Date(video.released) : Date.now();
-                            const upcoming = releaseDate > Date.now() ? "Upcoming" : "";
                             return {
                                 url: `/stream/series/${video.id}.json`,
                                 dateUpload: releaseDate.valueOf().toString(),
@@ -258,7 +257,6 @@ class DefaultExtension extends MProvider {
                                     ?.replace(/^Episode /, "")
                                     ?.replace(/^\d+\s*/, "")
                                     ?.trim()}`,
-                                scanlator: upcoming,
                             };
                         })
                         .reverse();
