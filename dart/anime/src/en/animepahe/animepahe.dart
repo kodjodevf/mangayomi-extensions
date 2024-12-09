@@ -13,14 +13,18 @@ class AnimePahe extends MProvider {
   String get baseUrl => getPreferenceValue(source.id, "preferred_domain");
 
   @override
+  Map<String, String> get headers => {'cookie': '__ddg1_=;__ddg2_=;'};
+
+  @override
   Future<MPages> getPopular(int page) async {
     return await getLatestUpdates(page);
   }
 
   @override
   Future<MPages> getLatestUpdates(int page) async {
-    final res =
-        (await client.get(Uri.parse("$baseUrl/api?m=airing&page=$page"))).body;
+    final res = (await client.get(Uri.parse("$baseUrl/api?m=airing&page=$page"),
+            headers: headers))
+        .body;
     final jsonResult = json.decode(res);
     final hasNextPage = jsonResult["current_page"] < jsonResult["last_page"];
     List<MManga> animeList = [];
@@ -37,9 +41,10 @@ class AnimePahe extends MProvider {
 
   @override
   Future<MPages> search(String query, int page, FilterList filterList) async {
-    final res =
-        (await client.get(Uri.parse("$baseUrl/api?m=search&l=8&q=$query")))
-            .body;
+    final res = (await client.get(
+            Uri.parse("$baseUrl/api?m=search&l=8&q=$query"),
+            headers: headers))
+        .body;
     final jsonResult = json.decode(res);
     List<MManga> animeList = [];
     for (var item in jsonResult["data"]) {
@@ -61,9 +66,10 @@ class AnimePahe extends MProvider {
     final id = substringBefore(substringAfterLast(url, "?anime_id="), "&name=");
     final name = substringAfterLast(url, "&name=");
     final session = await getSession(name, id);
-    final res =
-        (await client.get(Uri.parse("$baseUrl/anime/$session?anime_id=$id")))
-            .body;
+    final res = (await client.get(
+            Uri.parse("$baseUrl/anime/$session?anime_id=$id"),
+            headers: headers))
+        .body;
     final document = parseHtml(res);
     final status =
         (document.xpathFirst('//div/p[contains(text(),"Status:")]/text()') ??
@@ -91,7 +97,7 @@ class AnimePahe extends MProvider {
       anime.description += "\n\n$synonyms";
     }
     final epUrl = "$baseUrl/api?m=release&id=$session&sort=episode_desc&page=1";
-    final resEp = (await client.get(Uri.parse(epUrl))).body;
+    final resEp = (await client.get(Uri.parse(epUrl), headers: headers)).body;
     final episodes = await recursivePages(epUrl, resEp, session);
 
     anime.chapters = episodes;
@@ -114,15 +120,17 @@ class AnimePahe extends MProvider {
     }
     if (hasNextPage) {
       final newUrl = "${substringBeforeLast(url, "&page=")}&page=${page + 1}";
-      final newRes = (await client.get(Uri.parse(newUrl))).body;
+      final newRes =
+          (await client.get(Uri.parse(newUrl), headers: headers)).body;
       animeList.addAll(await recursivePages(newUrl, newRes, session));
     }
     return animeList;
   }
 
   Future<String> getSession(String title, String animeId) async {
-    final res =
-        (await client.get(Uri.parse("$baseUrl/api?m=search&q=$title"))).body;
+    final res = (await client.get(Uri.parse("$baseUrl/api?m=search&q=$title"),
+            headers: headers))
+        .body;
     return substringBefore(
         substringAfter(
             substringAfter(res, "\"id\":$animeId"), "\"session\":\""),
@@ -134,7 +142,7 @@ class AnimePahe extends MProvider {
     //by default we use rhttp package but it does not support `followRedirects`
     //so setting `useDartHttpClient` to true allows us to use a Dart http package that supports `followRedirects`
     final client = Client(source, json.encode({"useDartHttpClient": true}));
-    final res = (await client.get(Uri.parse("$baseUrl$url")));
+    final res = (await client.get(Uri.parse("$baseUrl$url"), headers: headers));
     final document = parseHtml(res.body);
     final downloadLinks = document.select("div#pickDownload > a");
     final buttons = document.select("div#resolutionMenu > button");
