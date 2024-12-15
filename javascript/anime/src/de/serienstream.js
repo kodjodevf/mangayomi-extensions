@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "single",
     "isManga": false,
     "isNsfw": false,
-    "version": "0.0.3",
+    "version": "0.0.4",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/de/serienstream.js"
@@ -85,17 +85,10 @@ class DefaultExtension extends MProvider {
             author = produzent[0].select("li").map(e => e.text).join(", ");
         }
         const seasonsElements = document.select("#stream > ul:nth-child(1) > li > a");
-
-        const promises = [];
-        const episodes = [];
-        for (const element of seasonsElements) {
-            promises.push(this.parseEpisodesFromSeries(element));
-        }
-        for (const p of (await Promise.allSettled(promises))) {
-            if (p.status == 'fulfilled') {
-                episodes.push(...p.value);
-            }
-        }
+        const promises = seasonsElements.map(element => this.parseEpisodesFromSeries(element));
+        const episodes = (await Promise.allSettled(promises))
+            .filter(p => p.status === 'fulfilled')
+            .flatMap(p => p.value);
         episodes.reverse();
         return { name, imageUrl, description, author, status: 5, genre, episodes };
     }
@@ -103,16 +96,13 @@ class DefaultExtension extends MProvider {
         const seasonId = element.getHref;
         const res = await this.client.get(this.source.baseUrl + seasonId);
         const episodeElements = new Document(res.body).select("table.seasonEpisodesList tbody tr");
-        const list = [];
-        for (const episodeElement of episodeElements) {
-            list.push(this.episodeFromElement(episodeElement));
-        }
-        return list;
+        return Promise.all(episodeElements.map(e => this.episodeFromElement(e)));
     }
-    episodeFromElement(element) {
+    async episodeFromElement(element) {
         const titleAnchor = element.selectFirst("td.seasonEpisodeTitle a");
         const episodeSpan = titleAnchor.selectFirst("span");
         const url = titleAnchor.attr("href");
+        const dateUpload = await this.getUploadDateFromEpisode(url);
         const episodeSeasonId = element.attr("data-episode-season-id");
         let episode = episodeSpan.text.replace(/&#039;/g, "'");
         let name = "";
@@ -122,7 +112,36 @@ class DefaultExtension extends MProvider {
             const seasonMatch = url.match(/staffel-(\d+)\/episode/);
             name = `Staffel ${seasonMatch[1]} Folge ${episodeSeasonId} : ${episode}`;
         }
-        return name && url ? { name, url } : {};
+        return name && url ? { name, url, dateUpload } : {};
+    }
+    async getUploadDateFromEpisode(url) {
+        const baseUrl = this.source.baseUrl;
+        const res = await this.client.get(baseUrl + url);
+        const getLastSundayOfMonth = (year, month) => {
+            const lastDay = new Date(year, month, 0);
+            const lastSunday = lastDay.getDate() - lastDay.getDay();
+            return new Date(year, month - 1, lastSunday);
+        };
+        const document = new Document(res.body);
+        const dateString = document.selectFirst('strong[style="color: white;"]').text;
+        const dateTimePart = dateString.split(", ")[1];
+        const [date, time] = dateTimePart.split(" ");
+        const [day, month, year] = date.split(".");
+        const [hours, minutes] = time.split(":");
+        const dayInt = parseInt(day);
+        const monthInt = parseInt(month);
+        const yearInt = parseInt(year);
+        const hoursInt = parseInt(hours);
+        const minutesInt = parseInt(minutes);
+        const lastSundayOfMarch = getLastSundayOfMonth(yearInt, 3);
+        const lastSundayOfOctober = getLastSundayOfMonth(yearInt, 10);
+        const jsDate = new Date(yearInt, monthInt - 1, dayInt, hoursInt, minutesInt);
+        // If Date between lastSundayOfMarch & lastSundayOfOctober -> CEST (MESZ)
+        const isInDST = jsDate >= lastSundayOfMarch && jsDate < lastSundayOfOctober;
+        let timeZoneOffset = isInDST ? 0 : 1;
+        // If it's in CEST, subtract 1 hour from UTC (to get local time in CEST)
+        const correctedTime = new Date(jsDate.getTime() + (timeZoneOffset - 1) * 60 * 60 * 1000);
+        return String(correctedTime.valueOf()); // dateUpload is a string containing date expressed in millisecondsSinceEpoch.
     }
     async getVideoList(url) {
         const baseUrl = this.source.baseUrl;
