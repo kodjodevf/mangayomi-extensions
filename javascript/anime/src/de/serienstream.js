@@ -141,9 +141,7 @@ class DefaultExtension extends MProvider {
         let timeZoneOffset = isInDST ? 0 : 1;
         // If it's in CEST, subtract 1 hour from UTC (to get local time in CEST)
         const correctedTime = new Date(jsDate.getTime() + (timeZoneOffset - 1) * 60 * 60 * 1000);
-        // Convert to epoch time
-        const epochTime = Math.floor(correctedTime.getTime() / 1000);
-        return epochTime.toString(); // dateUpload is a string containing date expressed in millisecondsSinceEpoch.
+        return String(correctedTime.valueOf()); // dateUpload is a string containing date expressed in millisecondsSinceEpoch.
     }
     async getVideoList(url) {
         const baseUrl = this.source.baseUrl;
