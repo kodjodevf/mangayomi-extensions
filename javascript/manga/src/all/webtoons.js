@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "single",
     "isManga": true,
     "isNsfw": false,
-    "version": "0.0.25",
+    "version": "0.0.3",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "manga/src/all/webtoons.js"
@@ -200,7 +200,6 @@ class DefaultExtension extends MProvider {
     }
 
     formatDateString(dateStr, lang) {
-        console.log(dateStr);
         // Month translations for supported languages
         const monthTranslations = {
             en: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
