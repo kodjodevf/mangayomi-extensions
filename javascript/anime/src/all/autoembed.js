@@ -6,14 +6,14 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=64&domain=https://autoembed.cc/",
     "typeSource": "multi",
     "isManga": false,
-    "version": "0.0.3",
+    "version": "0.0.4",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": ""
 }];
 
 class DefaultExtension extends MProvider {
-    tmdb_api = "https://94c8cb9f702d-tmdb-addon.baby-beamup.club";
+
     getHeaders(url) {
         return {
             Referer: this.source.apiUrl
@@ -26,7 +26,7 @@ class DefaultExtension extends MProvider {
     }
 
     async tmdbRequest(slug) {
-        var api = `${this.tmdb_api}/${slug}`
+        var api = `https://94c8cb9f702d-tmdb-addon.baby-beamup.club/${slug}`
         var response = await new Client().get(api);
         var body = JSON.parse(response.body);
         return body;
@@ -76,7 +76,9 @@ class DefaultExtension extends MProvider {
         throw new Error("supportsLatest not implemented");
     }
     async getLatestUpdates(page) {
-        throw new Error("getLatestUpdates not implemented");
+        var trend_window = await this.getPreference("pref_latest_time_window");
+        var skip = (page - 1) * 20;
+        return await this.getSearchInfo(`tmdb.trending/genre=${trend_window}&skip=${skip}.json`);
     }
     async search(query, page, filters) {
         throw new Error("search not implemented");
@@ -87,7 +89,7 @@ class DefaultExtension extends MProvider {
         var id = parts[1];
         var body = await this.tmdbRequest(`meta/${media_type}/${id}.json`)
         var result = body.meta;
-      
+
         var tmdb_id = id.substring(5, )
         var imdb_id = result.imdb_id
         var dateNow = Date.now().valueOf();
@@ -111,14 +113,13 @@ class DefaultExtension extends MProvider {
 
                 if (!seasonNum) continue;
 
-                var episodeNum = video.episode
-
-                var eplink = `tv||${tmdb_id}/${seasonNum}/${episodeNum}`
                 release = video.released ? new Date(video.released).valueOf() : dateNow
 
-
                 if (release < dateNow) {
-                    var name = video.name
+                    var episodeNum = video.episode
+                    var name = `S${seasonNum}:E${episodeNum} - ${video.name}`
+                    var eplink = `tv||${tmdb_id}/${seasonNum}/${episodeNum}`
+
                     chaps.push({
                         name: name,
                         url: eplink,
@@ -196,6 +197,18 @@ class DefaultExtension extends MProvider {
     }
 
     getSourcePreferences() {
+        return [{
+                key: 'pref_latest_time_window',
+                listPreference: {
+                    title: 'Preferred latest trend time window',
+                    summary: '',
+                    valueIndex: 0,
+                    entries: ["Day", "Week"],
+                    entryValues: ["day", "week"]
+                }
+            },
+
+        ];
 
     }
 }
