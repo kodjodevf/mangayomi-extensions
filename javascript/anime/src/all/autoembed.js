@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=64&domain=https://autoembed.cc/",
     "typeSource": "multi",
     "isManga": false,
-    "version": "0.0.4",
+    "version": "0.0.5",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": ""
@@ -162,6 +162,25 @@ class DefaultExtension extends MProvider {
         return streams;
     }
 
+    async sortStreams(streams) {
+        var sortedStreams = [];
+
+        var copyStreams = streams.slice()
+        var pref = await this.getPreference("pref_video_resolution");
+        for (var i in streams) {
+            var stream = streams[i];
+            if (stream.quality.indexOf(pref) > -1) {
+                sortedStreams.push(stream);
+                var index = copyStreams.indexOf(stream);
+                if (index > -1) {
+                    copyStreams.splice(index, 1);
+                }
+                break;
+            }
+        }
+        return [...sortedStreams, ...copyStreams]
+    }
+  
     // For anime episode video list
     async getVideoList(url) {
         var parts = url.split("||");
@@ -182,11 +201,11 @@ class DefaultExtension extends MProvider {
         streams.push({
             url: link,
             originalUrl: link,
-            quality: "Auto",
+            quality: "auto",
             subtitles: subtitles,
         });
 
-        return streams;
+        return await this.sortStreams(streams);
     }
     // For manga chapter pages
     async getPageList() {
@@ -206,7 +225,17 @@ class DefaultExtension extends MProvider {
                     entries: ["Day", "Week"],
                     entryValues: ["day", "week"]
                 }
+            }, {
+                key: 'pref_video_resolution',
+                listPreference: {
+                    title: 'Preferred video resolution',
+                    summary: '',
+                    valueIndex: 0,
+                    entries: ["Auto", "1080p", "720p", "360p"],
+                    entryValues: ["auto", "1080", "720", "360"]
+                }
             },
+
 
         ];
 
