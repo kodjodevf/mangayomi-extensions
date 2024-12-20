@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=64&domain=https://autoembed.cc/",
     "typeSource": "multi",
     "isManga": false,
-    "version": "0.0.6",
+    "version": "1.0.0",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": ""
@@ -42,7 +42,7 @@ class DefaultExtension extends MProvider {
             items.push({
                 name: result.name,
                 imageUrl: result.poster,
-                link: `${media_type}/${id}`,
+                link: `${media_type}||${id}`,
                 description: result.description,
                 genre: result.genre
             });
@@ -84,7 +84,7 @@ class DefaultExtension extends MProvider {
         return await this.getSearchInfo(`tmdb.popular/search=${query}.json`);
     }
     async getDetail(url) {
-        var parts = url.split("/");
+        var parts = url.split("||");
         var media_type = parts[0];
         var id = parts[1];
         var body = await this.tmdbRequest(`meta/${media_type}/${id}.json`)
@@ -212,7 +212,7 @@ class DefaultExtension extends MProvider {
         throw new Error("getPageList not implemented");
     }
     getFilterList() {
-        throw new Error("getSourcePreferences not implemented");
+        throw new Error("getFilterList not implemented");
     }
 
     getSourcePreferences() {
