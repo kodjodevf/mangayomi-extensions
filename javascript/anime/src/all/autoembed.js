@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=64&domain=https://autoembed.cc/",
     "typeSource": "multi",
     "isManga": false,
-    "version": "0.0.5",
+    "version": "0.0.6",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": ""
@@ -59,7 +59,7 @@ class DefaultExtension extends MProvider {
         body = await this.tmdbRequest(`catalog/series/${slug}`);
         var popSeries = await this.getSearchItems(body);
 
-        var hasNextPage = true;
+        var hasNextPage = slug.indexOf("search=") > -1 ? false : true;
         return {
             list: [...popMovie, ...popSeries],
             hasNextPage
@@ -81,7 +81,7 @@ class DefaultExtension extends MProvider {
         return await this.getSearchInfo(`tmdb.trending/genre=${trend_window}&skip=${skip}.json`);
     }
     async search(query, page, filters) {
-        throw new Error("search not implemented");
+        return await this.getSearchInfo(`tmdb.popular/search=${query}.json`);
     }
     async getDetail(url) {
         var parts = url.split("/");
@@ -180,7 +180,7 @@ class DefaultExtension extends MProvider {
         }
         return [...sortedStreams, ...copyStreams]
     }
-  
+
     // For anime episode video list
     async getVideoList(url) {
         var parts = url.split("||");
