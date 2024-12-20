@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=64&domain=https://autoembed.cc/",
     "typeSource": "multi",
     "isManga": false,
-    "version": "0.0.2",
+    "version": "0.0.3",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": ""
@@ -20,11 +20,15 @@ class DefaultExtension extends MProvider {
         }
     }
 
-    async tmdbSearchRequest(slug, page = 1) {
-        var skip = (page - 1) * 20;
-        const api = `${this.tmdb_api}/${slug}skip=${skip}.json`
-        const response = await new Client().get(api);
-        const body = JSON.parse(response.body);
+    async getPreference(key) {
+        const preferences = new SharedPreferences();
+        return preferences.get(key);
+    }
+
+    async tmdbRequest(slug) {
+        var api = `${this.tmdb_api}/${slug}`
+        var response = await new Client().get(api);
+        var body = JSON.parse(response.body);
         return body;
     }
 
@@ -43,18 +47,30 @@ class DefaultExtension extends MProvider {
                 genre: result.genre
             });
         }
+        return items;
+
+    }
+    async getSearchInfo(slug) {
+
+        var body = await this.tmdbRequest(`catalog/movie/${slug}`);
+        var popMovie = await this.getSearchItems(body);
+
+
+        body = await this.tmdbRequest(`catalog/series/${slug}`);
+        var popSeries = await this.getSearchItems(body);
+
         var hasNextPage = true;
         return {
-            "list": items,
+            list: [...popMovie, ...popSeries],
             hasNextPage
         };
+
     }
 
+
     async getPopular(page) {
-        const preferences = new SharedPreferences();
-        var media_type = preferences.get("pref_popular_page");
-        var body = await this.tmdbSearchRequest(`catalog/${media_type}/tmdb.popular/`, page);
-        return this.getSearchItems(body);
+        var skip = (page - 1) * 20;
+        return await this.getSearchInfo(`tmdb.popular/skip=${skip}.json`);
     }
     get supportsLatest() {
         throw new Error("supportsLatest not implemented");
@@ -69,11 +85,9 @@ class DefaultExtension extends MProvider {
         var parts = url.split("/");
         var media_type = parts[0];
         var id = parts[1];
-        var api = `${this.tmdb_api}/meta/${media_type}/${id}.json`
-        const response = await new Client().get(api);
-        const body = JSON.parse(response.body);
+        var body = await this.tmdbRequest(`meta/${media_type}/${id}.json`)
         var result = body.meta;
-
+      
         var tmdb_id = id.substring(5, )
         var imdb_id = result.imdb_id
         var dateNow = Date.now().valueOf();
@@ -182,17 +196,6 @@ class DefaultExtension extends MProvider {
     }
 
     getSourcePreferences() {
-        return [{
-                key: 'pref_popular_page',
-                listPreference: {
-                    title: 'Preferred popular page',
-                    summary: '',
-                    valueIndex: 0,
-                    entries: ["Movies", "TV Shows"],
-                    entryValues: ["movie", "series"]
-                }
-            },
 
-        ];
     }
 }
