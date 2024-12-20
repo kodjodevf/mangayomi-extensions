@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=64&domain=https://autoembed.cc/",
     "typeSource": "multi",
     "isManga": false,
-    "version": "0.0.1",
+    "version": "0.0.2",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": ""
@@ -68,34 +68,64 @@ class DefaultExtension extends MProvider {
     async getDetail(url) {
         var parts = url.split("/");
         var media_type = parts[0];
-        var tmdbId = parts[1];
-        var api = `${this.tmdb_api}/meta/${media_type}/${tmdbId}.json`
+        var id = parts[1];
+        var api = `${this.tmdb_api}/meta/${media_type}/${id}.json`
         const response = await new Client().get(api);
         const body = JSON.parse(response.body);
         var result = body.meta;
-      
-        var release = result.released ? new Date(result.released) : Date.now();
+
+        var tmdb_id = id.substring(5, )
+        var imdb_id = result.imdb_id
+        var dateNow = Date.now().valueOf();
+        var release = result.released ? new Date(result.released).valueOf() : dateNow
+        var chaps = [];
 
         var item = {
             name: result.name,
             imageUrl: result.poster,
-            link: `${media_type}/${tmdbId}`,
+            link: `https://imdb.com/title/${imdb_id}`,
             description: result.description,
             genre: result.genre,
         };
-        var chaps = [];
 
-        chaps.push({
-            name: "Movie",
-            url: `${media_type}/${result.imdb_id}`,
-            dateUpload: release.valueOf().toString(),
-        })
+        if (media_type == "series") {
+
+            var videos = result.videos
+            for (var i in videos) {
+                var video = videos[i];
+                var seasonNum = video.season;
+
+                if (!seasonNum) continue;
+
+                var episodeNum = video.episode
+
+                var eplink = `tv||${tmdb_id}/${seasonNum}/${episodeNum}`
+                release = video.released ? new Date(video.released).valueOf() : dateNow
+
+
+                if (release < dateNow) {
+                    var name = video.name
+                    chaps.push({
+                        name: name,
+                        url: eplink,
+                        dateUpload: release.toString(),
+                    })
+                }
+            }
+        } else {
+            if (release < dateNow) {
+                chaps.push({
+                    name: "Movie",
+                    url: `${media_type}||${tmdb_id}`,
+                    dateUpload: release.toString(),
+                })
+            }
+        }
 
         item.chapters = chaps;
 
         return item;
     }
-
     async extractStreams(url) {
         const response = await new Client().get(url);
         const body = response.body;
@@ -113,21 +143,27 @@ class DefaultExtension extends MProvider {
                     quality: resolution,
                 });
             }
-        }     
+        }
         return streams;
     }
 
     // For anime episode video list
     async getVideoList(url) {
-        var parts = url.split("/");
+        var parts = url.split("||");
         var media_type = parts[0];
-        var imdbId = parts[1];
-        var api = `${this.source.apiUrl}/api/getVideoSource?type=${media_type}&id=${imdbId}`
+        var id = parts[1];
+        var api = `${this.source.apiUrl}/api/getVideoSource?type=${media_type}&id=${id}`
         const response = await new Client().get(api, this.getHeaders());
         const body = JSON.parse(response.body);
+
+        if (response.statusCode == 404) {
+            throw new Error("Video unavailable");
+
+        }
         var link = body.videoSource
+
         var subtitles = body.subtitles
-        var streams = await this.extractStreams(link);          
+        var streams = await this.extractStreams(link);
         streams.push({
             url: link,
             originalUrl: link,
@@ -153,7 +189,7 @@ class DefaultExtension extends MProvider {
                     summary: '',
                     valueIndex: 0,
                     entries: ["Movies", "TV Shows"],
-                    entryValues: ["movie", "tv"]
+                    entryValues: ["movie", "series"]
                 }
             },
 
