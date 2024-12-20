@@ -7,7 +7,7 @@ Source _lscansSource = Source(
     lang: "pt-br",
     isNsfw:false,
     typeSource: "madara",
-    iconUrl: "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/bbranchNamee/dart/manga/multisrc/madara/src/lscans/icon.png",
+    iconUrl: "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/dart/manga/multisrc/madara/src/lscans/icon.png",
     dateFormat:"dd/MM/yyyy",
     dateFormatLocale:"en"
   );

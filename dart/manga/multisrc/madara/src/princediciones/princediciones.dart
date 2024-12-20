@@ -7,7 +7,7 @@ Source _princedicionesSource = Source(
     lang: "es",
     isNsfw:false,
     typeSource: "madara",
-    iconUrl: "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/bbranchNamee/dart/manga/multisrc/madara/src/princediciones/icon.png",
+    iconUrl: "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/dart/manga/multisrc/madara/src/princediciones/icon.png",
     dateFormat:"MMMM dd, yyyy",
     dateFormatLocale:"es"
   );

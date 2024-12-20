@@ -7,7 +7,7 @@ Source _manhwabreakupSource = Source(
     lang: "th",
     isNsfw:false,
     typeSource: "madara",
-    iconUrl: "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/bbranchNamee/dart/manga/multisrc/madara/src/manhwabreakup/icon.png",
+    iconUrl: "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/dart/manga/multisrc/madara/src/manhwabreakup/icon.png",
     dateFormat:"MMMM dd, yyyy",
     dateFormatLocale:"th"
   );

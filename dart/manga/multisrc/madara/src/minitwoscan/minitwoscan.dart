@@ -7,7 +7,7 @@ Source _minitwoscanSource = Source(
     lang: "pt-br",
     isNsfw:false,
     typeSource: "madara",
-    iconUrl: "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/bbranchNamee/dart/manga/multisrc/madara/src/minitwoscan/icon.png",
+    iconUrl: "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/dart/manga/multisrc/madara/src/minitwoscan/icon.png",
     dateFormat:"dd/MM/yyyy",
     dateFormatLocale:"pt-br"
   );

@@ -7,7 +7,7 @@ Source _jeazscansSource = Source(
     lang: "es",
     isNsfw:false,
     typeSource: "madara",
-    iconUrl: "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/bbranchNamee/dart/manga/multisrc/madara/src/jeazscans/icon.png",
+    iconUrl: "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/dart/manga/multisrc/madara/src/jeazscans/icon.png",
     dateFormat:"d MMMM, yyyy",
     dateFormatLocale:"es"
   );
