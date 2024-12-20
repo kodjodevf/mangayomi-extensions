@@ -7,7 +7,7 @@ Source _globalblogingSource = Source(
     lang: "en",
     isNsfw:false,
     typeSource: "madara",
-    iconUrl: "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/bbranchNamee/dart/manga/multisrc/madara/src/globalbloging/icon.png",
+    iconUrl: "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/dart/manga/multisrc/madara/src/globalbloging/icon.png",
     dateFormat:"dd MMMM yyyy",
     dateFormatLocale:"en_us"
   );

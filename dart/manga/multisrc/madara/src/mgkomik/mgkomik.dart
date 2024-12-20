@@ -7,7 +7,7 @@ Source _mgkomikSource = Source(
     lang: "id",
     isNsfw:false,
     typeSource: "madara",
-    iconUrl: "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/bbranchNamee/dart/manga/multisrc/madara/src/mgkomik/icon.png",
+    iconUrl: "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/dart/manga/multisrc/madara/src/mgkomik/icon.png",
     dateFormat:"dd MMM yy",
     dateFormatLocale:"en_us"
   );

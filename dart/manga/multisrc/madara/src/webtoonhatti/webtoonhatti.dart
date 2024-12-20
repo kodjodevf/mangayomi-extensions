@@ -7,7 +7,7 @@ Source _webtoonhattiSource = Source(
     lang: "tr",
     isNsfw:false,
     typeSource: "madara",
-    iconUrl: "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/bbranchNamee/dart/manga/multisrc/madara/src/webtoonhatti/icon.png",
+    iconUrl: "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/dart/manga/multisrc/madara/src/webtoonhatti/icon.png",
     dateFormat:"dd MMMM",
     dateFormatLocale:"tr"
   );

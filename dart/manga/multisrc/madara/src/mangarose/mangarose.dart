@@ -7,7 +7,7 @@ Source _mangaroseSource = Source(
     lang: "ar",
     isNsfw:false,
     typeSource: "madara",
-    iconUrl: "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/bbranchNamee/dart/manga/multisrc/madara/src/mangarose/icon.png",
+    iconUrl: "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/dart/manga/multisrc/madara/src/mangarose/icon.png",
     dateFormat:"MMMM dd, yyyy",
     dateFormatLocale:"ar"
   );

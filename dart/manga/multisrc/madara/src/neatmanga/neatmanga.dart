@@ -7,7 +7,7 @@ Source _neatmangaSource = Source(
     lang: "en",
     isNsfw:false,
     typeSource: "madara",
-    iconUrl: "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/bbranchNamee/dart/manga/multisrc/madara/src/neatmanga/icon.png",
+    iconUrl: "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/dart/manga/multisrc/madara/src/neatmanga/icon.png",
     dateFormat:"dd MMM yyyy",
     dateFormatLocale:"en_us"
   );

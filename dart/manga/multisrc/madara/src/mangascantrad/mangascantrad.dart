@@ -7,7 +7,7 @@ Source _mangascantradSource = Source(
     lang: "fr",
     isNsfw:false,
     typeSource: "madara",
-    iconUrl: "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/bbranchNamee/dart/manga/multisrc/madara/src/mangascantrad/icon.png",
+    iconUrl: "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/dart/manga/multisrc/madara/src/mangascantrad/icon.png",
     dateFormat:"d MMM yyyy",
     dateFormatLocale:"fr"
   );

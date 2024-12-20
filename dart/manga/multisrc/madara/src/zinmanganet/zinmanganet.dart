@@ -7,7 +7,7 @@ Source _zinmanganetSource = Source(
     lang: "en",
     isNsfw:false,
     typeSource: "madara",
-    iconUrl: "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/bbranchNamee/dart/manga/multisrc/madara/src/zinmanganet/icon.png",
+    iconUrl: "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/dart/manga/multisrc/madara/src/zinmanganet/icon.png",
     dateFormat:"MM/dd/yyyy",
     dateFormatLocale:"en"
   );

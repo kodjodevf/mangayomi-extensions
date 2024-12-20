@@ -7,7 +7,7 @@ Source _ninjascanSource = Source(
     lang: "pt-br",
     isNsfw:false,
     typeSource: "madara",
-    iconUrl: "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/bbranchNamee/dart/manga/multisrc/madara/src/ninjascan/icon.png",
+    iconUrl: "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/dart/manga/multisrc/madara/src/ninjascan/icon.png",
     dateFormat:"dd 'de' MMMMM 'de' yyyy",
     dateFormatLocale:"pt-br"
   );

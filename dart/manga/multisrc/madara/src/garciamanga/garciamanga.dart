@@ -7,7 +7,7 @@ Source _garciamangaSource = Source(
     lang: "tr",
     isNsfw:false,
     typeSource: "madara",
-    iconUrl: "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/bbranchNamee/dart/manga/multisrc/madara/src/garciamanga/icon.png",
+    iconUrl: "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/dart/manga/multisrc/madara/src/garciamanga/icon.png",
     dateFormat:"MMMM d, yyyy",
     dateFormatLocale:"tr"
   );

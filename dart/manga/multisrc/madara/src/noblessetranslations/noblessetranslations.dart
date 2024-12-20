@@ -7,7 +7,7 @@ Source _noblessetranslationsSource = Source(
     lang: "es",
     isNsfw:false,
     typeSource: "madara",
-    iconUrl: "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/bbranchNamee/dart/manga/multisrc/madara/src/noblessetranslations/icon.png",
+    iconUrl: "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/dart/manga/multisrc/madara/src/noblessetranslations/icon.png",
     dateFormat:"MMMM d, yyyy",
     dateFormatLocale:"es"
   );
