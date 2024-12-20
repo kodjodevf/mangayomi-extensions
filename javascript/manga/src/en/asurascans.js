@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/en.asurascans.png",
     "typeSource": "single",
     "isManga": true,
-    "version": "0.1.65",
+    "version": "0.1.7",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "manga/src/en/asurascans.js"
@@ -85,16 +85,13 @@ class DefaultExtension extends MProvider {
         const author = doc.selectFirst("h3:contains('Author')").nextElementSibling.text.trim();
         const artist = doc.selectFirst("h3:contains('Artist')").nextElementSibling.text.trim();
         const status = this.toStatus(doc.selectFirst("h3:contains('Status')").nextElementSibling.text.trim());
-        const genre = doc.select("div[class^=space] > div.flex > button.text-white")
-            .map((el) => el.text.trim());
+        const genre = doc.selectFirst("h3:contains('Genres')").nextElementSibling.select("button.text-white")
+            .map((e) => e.text.trim());
         const chapters = [];
         const chapterElements = doc.select("div.scrollbar-thumb-themecolor > div.group");
         for (const element of chapterElements) {
             const url = element.selectFirst("a").getHref;
-            const chNumber = element.selectFirst("h3 > a").text;
-            const chTitle = element.select("h3 > a > span").map((span) => span.text.trim()).join(" ").trim();
-            const name = chTitle == "" ? chNumber : `${chNumber} - ${chTitle}`;
-
+            const name = element.selectFirst("h3").text;
             let dateUpload;
             try {
                 const dateText = element.selectFirst("h3 + h3").text.trim();
@@ -121,7 +118,6 @@ class DefaultExtension extends MProvider {
         const baseUrl = new SharedPreferences().get("overrideBaseUrl1");
         const res = await new Client().get(baseUrl + "/series/" + url);
         const scriptData = new Document(res.body).select("script:contains(self.__next_f.push)").map((e) => e.text.substringAfter("\"").substringBeforeLast("\"")).join("");
-        console.log(scriptData);
         const match = scriptData.match(/\\"pages\\":(\[.*?])/);
         if (!match) {
             throw new Error("Failed to find chapter pages");
