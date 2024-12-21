@@ -9,7 +9,7 @@ const mangayomiSources = [{
     "version": "1.0.0",
     "dateFormat": "",
     "dateFormatLocale": "",
-    "pkgPath": ""
+    "pkgPath": "anime/src/all/autoembed.js"
 }];
 
 class DefaultExtension extends MProvider {
