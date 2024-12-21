@@ -3,12 +3,14 @@ import 'dart:developer';
 import 'dart:io';
 import 'dart/anime/anime_source_list.dart';
 import 'dart/manga/manga_source_list.dart';
+import 'dart/novel/novel_source_list.dart';
 import 'model/source.dart';
 
 void main() {
   final jsSources = _searchJsSources(Directory("javascript"));
-  genManga(jsSources.where((element) => element.isManga!).toList());
-  genAnime(jsSources.where((element) => !element.isManga!).toList());
+  genManga(jsSources.where((element) => element.itemType!.name == "manga").toList());
+  genAnime(jsSources.where((element) => element.itemType!.name == "anime").toList());
+  genNovel(jsSources.where((element) => element.itemType!.name == "novel").toList());
 }
 
 void genManga(List<Source> jsMangasourceList) {
@@ -39,6 +41,20 @@ void genAnime(List<Source> jsAnimesourceList) {
   log('JSON file created: ${file.path}');
 }
 
+void genNovel(List<Source> jsNovelSourceList) {
+  List<Source> novelSources = [];
+  novelSources.addAll(dartNovelSourceList);
+  novelSources.addAll(jsNovelSourceList);
+  final List<Map<String, dynamic>> jsonList =
+      novelSources.map((source) => source.toJson()).toList();
+  final jsonString = jsonEncode(jsonList);
+
+  final file = File('novel_index.json');
+  file.writeAsStringSync(jsonString);
+
+  log('JSON file created: ${file.path}');
+}
+
 List<Source> _searchJsSources(Directory dir) {
   List<Source> sourceList = [];
   List<FileSystemEntity> entities = dir.listSync();
@@ -62,6 +78,9 @@ List<Source> _searchJsSources(Directory dir) {
                     sourceJson["appMinVerReq"] ?? defaultSource.appMinVerReq
                 ..sourceCodeUrl =
                     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/javascript/${sourceJson["pkgPath"] ?? sourceJson["pkgName"]}";
+              if (source.itemType == ItemType.novel) {
+                source.sourceCodeUrl = source.sourceCodeUrl?.replaceAll("kodjodevf", "Schnitzel5");
+              }
               if (sourceJson["id"] != null) {
                 source = source..id = int.tryParse("${sourceJson["id"]}");
               }

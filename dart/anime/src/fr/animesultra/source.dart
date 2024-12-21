@@ -13,5 +13,5 @@ Source _animesultraSource = Source(
         "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/src/fr/animesultra/icon.png",
     sourceCodeUrl: _animesultraSourceCodeUrl,
     version: _animesultraVersion,
-    isManga: false,
+    itemType: ItemType.anime,
     isFullData: false);
