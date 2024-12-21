@@ -13,4 +13,4 @@ Source _otakudesu = Source(
         "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/src/id/otakudesu/icon.png",
     sourceCodeUrl: _otakudesuCodeUrl,
     version: _otakudesuVersion,
-    isManga: false);
+    itemType: ItemType.anime);

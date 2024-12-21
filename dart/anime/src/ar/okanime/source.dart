@@ -13,4 +13,4 @@ Source _okanimeSource = Source(
         "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/src/ar/okanime/icon.png",
     sourceCodeUrl: _okanimeSourceCodeUrl,
     version: _okanimeVersion,
-    isManga: false);
+    itemType: ItemType.anime);
