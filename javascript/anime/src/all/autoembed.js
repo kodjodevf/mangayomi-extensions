@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=64&domain=https://autoembed.cc/",
     "typeSource": "multi",
     "isManga": false,
-    "version": "1.0.0",
+    "version": "1.0.1",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/all/autoembed.js"
@@ -138,7 +138,7 @@ class DefaultExtension extends MProvider {
         }
 
         item.chapters = chaps;
-
+        chaps.reverse();
         return item;
     }
     async extractStreams(url) {
