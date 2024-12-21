@@ -1,22 +1,20 @@
-const mangayomiSources = [
-  {
-    name: "Novel Updates",
-    lang: "en",
-    baseUrl: "https://www.novelupdates.com",
-    apiUrl: "",
-    iconUrl:
-      "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/en.novelupdates.png",
-    typeSource: "single",
-    itemType: 2,
-    version: "0.0.1",
-    dateFormat: "",
-    dateFormatLocale: "",
-    pkgPath: "novel/src/en/novelupdates.js",
-    appMinVerReq: "0.3.75",
-    isNsfw: false,
-    hasCloudflare: true,
-  },
-];
+const mangayomiSources = [{
+  "name": "Novel Updates",
+  "lang": "en",
+  "baseUrl": "https://www.novelupdates.com",
+  "apiUrl": "",
+  "iconUrl":
+    "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/en.novelupdates.png",
+  "typeSource": "single",
+  "itemType": 2,
+  "version": "0.0.1",
+  "dateFormat": "",
+  "dateFormatLocale": "",
+  "pkgPath": "novel/src/en/novelupdates.js",
+  "appMinVerReq": "0.4.0",
+  "isNsfw": false,
+  "hasCloudflare": true
+}];
 
 class DefaultExtension extends MProvider {
   headers = {
