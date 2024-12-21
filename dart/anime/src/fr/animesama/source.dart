@@ -13,4 +13,4 @@ Source _animesama = Source(
         "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/src/fr/animesama/icon.png",
     sourceCodeUrl: animesamaCodeUrl,
     version: animesamaVersion,
-    isManga: false);
+    itemType: ItemType.anime);

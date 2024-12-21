@@ -7,7 +7,7 @@ Source _dopeboxSource = Source(
   baseUrl: "https://dopebox.to",
   lang: "en",
   typeSource: "dopeflix",
-  isManga: false,
+  itemType: ItemType.anime,
   iconUrl:
       "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/multisrc/dopeflix/src/dopebox/icon.png",
 );

@@ -15,6 +15,7 @@ List<Source> _nepnepSourcesList = [
   mangalifeSource,
 ]
     .map((e) => e
+      ..itemType = ItemType.manga
       ..sourceCodeUrl = nepnepSourceCodeUrl
       ..version = nepnepVersion)
     .toList();

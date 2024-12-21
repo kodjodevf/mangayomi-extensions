@@ -5,7 +5,7 @@ const mangayomiSources = [{
   "apiUrl": "",
   "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/zh.mikan.png",
   "typeSource": "torrent",
-  "isManga": false,
+  "itemType": 1,
   "isNsfw": false,
   "version": "0.0.2",
   "dateFormat": "",

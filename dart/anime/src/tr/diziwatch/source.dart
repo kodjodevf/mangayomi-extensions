@@ -13,4 +13,4 @@ Source _diziwatchSource = Source(
         "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/src/tr/diziwatch/icon.png",
     sourceCodeUrl: _diziwatchSourceCodeUrl,
     version: _diziwatchVersion,
-    isManga: false); 
+    itemType: ItemType.anime); 

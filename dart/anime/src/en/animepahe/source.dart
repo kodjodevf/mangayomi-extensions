@@ -13,4 +13,4 @@ Source _animepaheSource = Source(
         "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/src/en/animepahe/icon.png",
     sourceCodeUrl: _animepaheSourceCodeUrl,
     version: _animepaheVersion,
-    isManga: false);
+    itemType: ItemType.anime);
