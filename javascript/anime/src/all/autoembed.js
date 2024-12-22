@@ -59,11 +59,13 @@ class DefaultExtension extends MProvider {
         body = await this.tmdbRequest(`catalog/series/${slug}`);
         var popSeries = await this.getSearchItems(body);
 
-        var fullList = [...popMovie, ...popSeries];
+        var fullList = [];
 
         var priority = await this.getPreference("pref_content_priority");
         if (priority === "series") {
             fullList = [...popSeries, ...popMovie];
+        } else {
+            fullList = [...popMovie, ...popSeries]
         }
         var hasNextPage = slug.indexOf("search=") > -1 ? false : true;
         return {
@@ -96,7 +98,7 @@ class DefaultExtension extends MProvider {
         var body = await this.tmdbRequest(`meta/${media_type}/${id}.json`)
         var result = body.meta;
 
-        var tmdb_id = id.substring(5, )
+        var tmdb_id = id.substring(5,)
         media_type = media_type == "series" ? "tv" : media_type;
 
         var dateNow = Date.now().valueOf();
@@ -226,33 +228,33 @@ class DefaultExtension extends MProvider {
 
     getSourcePreferences() {
         return [{
-                key: 'pref_latest_time_window',
-                listPreference: {
-                    title: 'Preferred latest trend time window',
-                    summary: '',
-                    valueIndex: 0,
-                    entries: ["Day", "Week"],
-                    entryValues: ["day", "week"]
-                }
-            }, {
-                key: 'pref_video_resolution',
-                listPreference: {
-                    title: 'Preferred video resolution',
-                    summary: '',
-                    valueIndex: 0,
-                    entries: ["Auto", "1080p", "720p", "360p"],
-                    entryValues: ["auto", "1080", "720", "360"]
-                }
-            }, {
-                key: 'pref_content_priority',
-                listPreference: {
-                    title: 'Preferred content priority',
-                    summary: 'Choose which type of content to show first',
-                    valueIndex: 0,
-                    entries: ["Movies", "Series"],
-                    entryValues: ["movies", "series"]
-                }
-            },
+            key: 'pref_latest_time_window',
+            listPreference: {
+                title: 'Preferred latest trend time window',
+                summary: '',
+                valueIndex: 0,
+                entries: ["Day", "Week"],
+                entryValues: ["day", "week"]
+            }
+        }, {
+            key: 'pref_video_resolution',
+            listPreference: {
+                title: 'Preferred video resolution',
+                summary: '',
+                valueIndex: 0,
+                entries: ["Auto", "1080p", "720p", "360p"],
+                entryValues: ["auto", "1080", "720", "360"]
+            }
+        }, {
+            key: 'pref_content_priority',
+            listPreference: {
+                title: 'Preferred content priority',
+                summary: 'Choose which type of content to show first',
+                valueIndex: 0,
+                entries: ["Movies", "Series"],
+                entryValues: ["movies", "series"]
+            }
+        },
 
 
         ];
