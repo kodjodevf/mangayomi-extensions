@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=64&domain=https://autoembed.cc/",
     "typeSource": "multi",
     "isManga": false,
-    "version": "1.0.1",
+    "version": "1.0.2",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/all/autoembed.js"
@@ -59,9 +59,15 @@ class DefaultExtension extends MProvider {
         body = await this.tmdbRequest(`catalog/series/${slug}`);
         var popSeries = await this.getSearchItems(body);
 
+        var fullList = [...popMovie, ...popSeries];
+
+        var priority = await this.getPreference("pref_content_priority");
+        if(priority === "series"){
+            fullList = [...popSeries, ...popMovie];
+        }
         var hasNextPage = slug.indexOf("search=") > -1 ? false : true;
         return {
-            list: [...popMovie, ...popSeries],
+            list: fullList,
             hasNextPage
         };
 
@@ -234,7 +240,16 @@ class DefaultExtension extends MProvider {
                     entries: ["Auto", "1080p", "720p", "360p"],
                     entryValues: ["auto", "1080", "720", "360"]
                 }
-            },
+            },{
+                key: 'pref_content_priority',
+                listPreference: {
+                    title: 'Preferred content priority',
+                    summary: 'Choose which type of content to show first',
+                    valueIndex: 0,
+                    entries: ["Movies", "Series"],
+                    entryValues: ["movies", "series"]
+                }
+            }, 
 
 
         ];
