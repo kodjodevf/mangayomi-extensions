@@ -1,12 +1,12 @@
 const mangayomiSources = [{
     "name": "Autoembed",
     "lang": "all",
-    "baseUrl": "https://autoembed.cc",
+    "baseUrl": "https://watch.autoembed.cc",
     "apiUrl": "https://tom.autoembed.cc",
     "iconUrl": "https://www.google.com/s2/favicons?sz=64&domain=https://autoembed.cc/",
     "typeSource": "multi",
     "isManga": false,
-    "version": "1.0.1",
+    "version": "1.0.3",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/all/autoembed.js"
@@ -14,7 +14,7 @@ const mangayomiSources = [{
 
 class DefaultExtension extends MProvider {
 
-    getHeaders(url) {
+    getHeaders() {
         return {
             Referer: this.source.apiUrl
         }
@@ -59,9 +59,17 @@ class DefaultExtension extends MProvider {
         body = await this.tmdbRequest(`catalog/series/${slug}`);
         var popSeries = await this.getSearchItems(body);
 
+        var fullList = [];
+
+        var priority = await this.getPreference("pref_content_priority");
+        if (priority === "series") {
+            fullList = [...popSeries, ...popMovie];
+        } else {
+            fullList = [...popMovie, ...popSeries]
+        }
         var hasNextPage = slug.indexOf("search=") > -1 ? false : true;
         return {
-            list: [...popMovie, ...popSeries],
+            list: fullList,
             hasNextPage
         };
 
@@ -90,8 +98,9 @@ class DefaultExtension extends MProvider {
         var body = await this.tmdbRequest(`meta/${media_type}/${id}.json`)
         var result = body.meta;
 
-        var tmdb_id = id.substring(5, )
-        var imdb_id = result.imdb_id
+        var tmdb_id = id.substring(5,)
+        media_type = media_type == "series" ? "tv" : media_type;
+
         var dateNow = Date.now().valueOf();
         var release = result.released ? new Date(result.released).valueOf() : dateNow
         var chaps = [];
@@ -99,12 +108,14 @@ class DefaultExtension extends MProvider {
         var item = {
             name: result.name,
             imageUrl: result.poster,
-            link: `https://imdb.com/title/${imdb_id}`,
+            link: `${this.source.baseUrl}/${media_type}/${tmdb_id}`,
             description: result.description,
             genre: result.genre,
         };
 
-        if (media_type == "series") {
+        var link = `${media_type}||${tmdb_id}`
+
+        if (media_type == "tv") {
 
             var videos = result.videos
             for (var i in videos) {
@@ -118,7 +129,7 @@ class DefaultExtension extends MProvider {
                 if (release < dateNow) {
                     var episodeNum = video.episode
                     var name = `S${seasonNum}:E${episodeNum} - ${video.name}`
-                    var eplink = `tv||${tmdb_id}/${seasonNum}/${episodeNum}`
+                    var eplink = `${link}/${seasonNum}/${episodeNum}`
 
                     chaps.push({
                         name: name,
@@ -131,7 +142,7 @@ class DefaultExtension extends MProvider {
             if (release < dateNow) {
                 chaps.push({
                     name: "Movie",
-                    url: `${media_type}||${tmdb_id}`,
+                    url: link,
                     dateUpload: release.toString(),
                 })
             }
@@ -217,24 +228,33 @@ class DefaultExtension extends MProvider {
 
     getSourcePreferences() {
         return [{
-                key: 'pref_latest_time_window',
-                listPreference: {
-                    title: 'Preferred latest trend time window',
-                    summary: '',
-                    valueIndex: 0,
-                    entries: ["Day", "Week"],
-                    entryValues: ["day", "week"]
-                }
-            }, {
-                key: 'pref_video_resolution',
-                listPreference: {
-                    title: 'Preferred video resolution',
-                    summary: '',
-                    valueIndex: 0,
-                    entries: ["Auto", "1080p", "720p", "360p"],
-                    entryValues: ["auto", "1080", "720", "360"]
-                }
-            },
+            key: 'pref_latest_time_window',
+            listPreference: {
+                title: 'Preferred latest trend time window',
+                summary: '',
+                valueIndex: 0,
+                entries: ["Day", "Week"],
+                entryValues: ["day", "week"]
+            }
+        }, {
+            key: 'pref_video_resolution',
+            listPreference: {
+                title: 'Preferred video resolution',
+                summary: '',
+                valueIndex: 0,
+                entries: ["Auto", "1080p", "720p", "360p"],
+                entryValues: ["auto", "1080", "720", "360"]
+            }
+        }, {
+            key: 'pref_content_priority',
+            listPreference: {
+                title: 'Preferred content priority',
+                summary: 'Choose which type of content to show first',
+                valueIndex: 0,
+                entries: ["Movies", "Series"],
+                entryValues: ["movies", "series"]
+            }
+        },
 
 
         ];
