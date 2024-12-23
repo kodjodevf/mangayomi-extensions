@@ -7,7 +7,7 @@ Source _sflixSource = Source(
   baseUrl: "https://sflix.to",
   lang: "en",
   typeSource: "dopeflix",
-  isManga: false,
+  itemType: ItemType.anime,
   iconUrl:
       "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/multisrc/dopeflix/src/sflix/icon.png",
 );

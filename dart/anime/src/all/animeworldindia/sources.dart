@@ -28,6 +28,6 @@ List<Source> _animeworldindiaSourcesList = _languages
         typeSource: "multiple",
         iconUrl: _iconUrl,
         version: _animeworldindiaVersion,
-        isManga: false,
+        itemType: ItemType.anime,
         sourceCodeUrl: _animeworldindiaSourceCodeUrl))
     .toList();

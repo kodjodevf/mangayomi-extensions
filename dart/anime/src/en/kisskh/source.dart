@@ -13,4 +13,4 @@ Source _kisskhSource = Source(
         "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/src/en/kisskh/icon.png",
     sourceCodeUrl: _kisskhSourceCodeUrl,
     version: _kisskhVersion,
-    isManga: false);
+    itemType: ItemType.anime);

@@ -32,6 +32,7 @@ List<Source> _mmrcmsSourcesList = [
   mangafrSource,
 ]
     .map((e) => e
+      ..itemType = ItemType.manga
       ..sourceCodeUrl = mmrcmsSourceCodeUrl
       ..version = mmrcmsVersion)
     .toList();

@@ -13,4 +13,4 @@ Source _yomoviesSource = Source(
         "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/src/hi/yomovies/icon.png",
     sourceCodeUrl: _yomoviesSourceCodeUrl,
     version: _yomoviesVersion,
-    isManga: false);
+    itemType: ItemType.anime);

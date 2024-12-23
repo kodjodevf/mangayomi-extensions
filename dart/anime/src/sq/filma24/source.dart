@@ -13,4 +13,4 @@ Source _filma24 = Source(
         "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/src/sq/filma24/icon.png",
     sourceCodeUrl: _filma24CodeUrl,
     version: _filma24Version,
-    isManga: false);
+    itemType: ItemType.anime);

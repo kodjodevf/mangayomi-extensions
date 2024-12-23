@@ -20,6 +20,7 @@ List<Source> _mangaboxSourcesList = [
   manganatoSource
 ]
     .map((e) => e
+      ..itemType = ItemType.manga
       ..sourceCodeUrl = mangaboxSourceCodeUrl
       ..version = mangaboxVersion)
     .toList();

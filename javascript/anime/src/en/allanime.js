@@ -5,7 +5,7 @@ const mangayomiSources = [{
     "apiUrl": "https://api.allanime.day/api",
     "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/en.allanime.png",
     "typeSource": "single",
-    "isManga": false,
+    "itemType": 1,
     "isNsfw": false,
     "version": "0.0.35",
     "dateFormat": "",

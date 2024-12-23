@@ -13,4 +13,4 @@ Source _animetoast = Source(
         "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/src/de/animetoast/icon.png",
     sourceCodeUrl: _animetoastCodeUrl,
     version: _animetoastVersion,
-    isManga: false);
+    itemType: ItemType.anime);

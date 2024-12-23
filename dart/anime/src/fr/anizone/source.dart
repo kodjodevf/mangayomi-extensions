@@ -13,4 +13,4 @@ Source _aniZoneSource = Source(
         "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/src/fr/anizone/icon.png",
     sourceCodeUrl: _aniZoneSourceCodeUrl,
     version: _aniZoneVersion,
-    isManga: false);
+    itemType: ItemType.anime);

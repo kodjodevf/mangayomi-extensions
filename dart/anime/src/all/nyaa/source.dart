@@ -15,5 +15,5 @@ Source _nyaaSource = Source(
     typeSource: "torrent",
     iconUrl: _iconUrl,
     version: _nyaaVersion,
-    isManga: false,
+    itemType: ItemType.anime,
     sourceCodeUrl: _nyaaSourceCodeUrl);

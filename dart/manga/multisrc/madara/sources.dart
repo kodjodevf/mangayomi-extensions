@@ -571,6 +571,7 @@ List<Source> _madaraSourcesList = [
   webtoonhattiSource,
 ]
     .map((e) => e
+      ..itemType = ItemType.manga
       ..sourceCodeUrl = madaraSourceCodeUrl
       ..version = madaraVersion)
     .toList();

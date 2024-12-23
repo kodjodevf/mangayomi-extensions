@@ -13,4 +13,4 @@ Source _nineanimetv = Source(
         "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/src/en/nineanimetv/icon.png",
     sourceCodeUrl: _nineanimetvCodeUrl,
     version: _nineanimetvVersion,
-    isManga: false);
+    itemType: ItemType.anime);
