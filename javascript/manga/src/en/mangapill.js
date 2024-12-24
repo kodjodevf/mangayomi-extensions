@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=64&domain=https://mangapill.com/",
     "typeSource": "single",
     "isManga": true,
-    "version": "0.0.2",
+    "version": "0.0.3",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "manga/src/en/mangapill.js"
@@ -18,7 +18,17 @@ class DefaultExtension extends MProvider {
             "Referer": this.source.baseUrl
         }
     }
-    async print(msg) { console.log(msg) }
+    print(msg) { console.log(msg) }
+
+    statusCode(status) {
+        return {
+            "publishing": 0,
+            "finished": 1,
+            "on hiatus": 2,
+            "discontinued": 3,
+            "not yet published": 4,
+        }[status] ?? 5;
+    }
 
     async getPreference(key) {
         const preferences = new SharedPreferences();
@@ -81,8 +91,35 @@ class DefaultExtension extends MProvider {
     async search(query, page, filters) {
         return await this.searchManga(query, "", "", page);
     }
+
+    async getMangaDetail(slug) {
+        var link = `${this.source.baseUrl}${slug}`
+        var res = await new Client().get(link, this.getHeaders());
+        var doc = new Document(res.body);
+
+        var mangaName = doc.selectFirst(".mb-3 .font-bold.text-lg").text
+        var description = doc.selectFirst("meta[name='description']").attr("content")
+        var imageUrl = doc.selectFirst(".w-full.h-full").getSrc
+        var statusText = doc.select(".grid.grid-cols-1 > div")[1].selectFirst("div").text
+        var status = this.statusCode(statusText)
+     
+        var genre = []
+        var genreList = doc.select("a.mr-1")
+        for (var gen of genreList) { genre.push(gen.text) }
+
+        var chapters = []
+        var chapList = doc.select("div.my-3.grid > a")
+        for (var chap of chapList) {
+            var name = chap.text
+            var url = chap.getHref
+            chapters.push({ name, url })
+        }
+        return { name: mangaName, description, link, imageUrl, status, genre, chapters }
+    }
+
     async getDetail(url) {
-        throw new Error("getDetail not implemented");
+        return await this.getMangaDetail(url.substring(1,));
+
     }
     // For anime episode video list
     async getVideoList(url) {
