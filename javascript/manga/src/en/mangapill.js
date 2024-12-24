@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=64&domain=https://mangapill.com/",
     "typeSource": "single",
     "isManga": true,
-    "version": "0.0.3",
+    "version": "0.0.4",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "manga/src/en/mangapill.js"
@@ -36,6 +36,8 @@ class DefaultExtension extends MProvider {
     }
 
     async getMangaList(slug) {
+        var lang = await this.getPreference("pref_title_lang");
+
         var url = `${this.source.baseUrl}${slug}`
         var res = await new Client().get(url, this.getHeaders());
         var doc = new Document(res.body);
@@ -48,7 +50,10 @@ class DefaultExtension extends MProvider {
 
             var imageUrl = manga.selectFirst("img").getSrc;
             var link = details.getHref;
-            var name = details.selectFirst('div').text;
+            var nameSection = details.select('div');
+
+            var name = (nameSection[1] && lang == 2) ? nameSection[1].text : nameSection[0].text
+
             list.push({ name, imageUrl, link });
         }
         var hasNextPage = false;
@@ -93,16 +98,19 @@ class DefaultExtension extends MProvider {
     }
 
     async getMangaDetail(slug) {
+        var lang = await this.getPreference("pref_title_lang");
+
         var link = `${this.source.baseUrl}${slug}`
         var res = await new Client().get(link, this.getHeaders());
         var doc = new Document(res.body);
 
         var mangaName = doc.selectFirst(".mb-3 .font-bold.text-lg").text
+        if (doc.selectFirst(".mb-3 .text-sm.text-secondary") && lang == 2) mangaName = doc.selectFirst(".mb-3 .text-sm.text-secondary").text
         var description = doc.selectFirst("meta[name='description']").attr("content")
         var imageUrl = doc.selectFirst(".w-full.h-full").getSrc
         var statusText = doc.select(".grid.grid-cols-1 > div")[1].selectFirst("div").text
         var status = this.statusCode(statusText)
-     
+
         var genre = []
         var genreList = doc.select("a.mr-1")
         for (var gen of genreList) { genre.push(gen.text) }
@@ -151,7 +159,16 @@ class DefaultExtension extends MProvider {
                 entries: ["New Mangas", "Recent Chapters"],
                 entryValues: ["1", "2"]
             }
-        },
+        }, {
+            key: 'pref_title_lang',
+            listPreference: {
+                title: 'Preferred title language',
+                summary: '',
+                valueIndex: 0,
+                entries: ["Romaji", "English"],
+                entryValues: ["1", "2"]
+            }
+        }
         ];
     }
 }
