@@ -6,10 +6,10 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=64&domain=https://mangapill.com/",
     "typeSource": "single",
     "isManga": true,
-    "version": "0.0.1",
+    "version": "0.0.2",
     "dateFormat": "",
     "dateFormatLocale": "",
-    "pkgPath": ""
+    "pkgPath": "manga/src/en/mangapill.js"
 }];
 
 class DefaultExtension extends MProvider {
@@ -42,6 +42,9 @@ class DefaultExtension extends MProvider {
             list.push({ name, imageUrl, link });
         }
         var hasNextPage = false;
+        if (slug.includes("search?q")) {
+            hasNextPage = doc.selectFirst(".container.py-3 a.btn.btn-sm").className ? true : false
+        }
         return { list, hasNextPage }
     }
 
@@ -70,8 +73,13 @@ class DefaultExtension extends MProvider {
     async getLatestUpdates(page) {
         return await this.getNavPage("pref_latest_content");
     }
+
+    async searchManga(query, status, type, page) {
+        var slug = `search?q=${query}&status=${status}&type=${type}&page=${page}`
+        return await this.getMangaList(slug)
+    }
     async search(query, page, filters) {
-        throw new Error("search not implemented");
+        return await this.searchManga(query, "", "", page);
     }
     async getDetail(url) {
         throw new Error("getDetail not implemented");
