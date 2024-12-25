@@ -89,12 +89,20 @@ class DefaultExtension extends MProvider {
         return await this.getNavPage("pref_latest_content");
     }
 
-    async searchManga(query, status, type, page) {
-        var slug = `search?q=${query}&status=${status}&type=${type}&page=${page}`
+    async searchManga(query, status, type, genre, page) {
+        var slug = `search?q=${query}&status=${status}&type=${type}${genre}&page=${page}`
         return await this.getMangaList(slug)
     }
     async search(query, page, filters) {
-        return await this.searchManga(query, "", "", page);
+        var type = filters[0].values[filters[0].state].value
+        var status = filters[1].values[filters[1].state].value
+
+        var genre = ""
+        for (var filter of filters[2].state) {
+            if (filter.state == true)
+                genre += `&genre=${filter.value}`
+        }
+        return await this.searchManga(query, status, type, genre, page);
     }
 
     async getMangaDetail(slug) {
@@ -138,7 +146,89 @@ class DefaultExtension extends MProvider {
         throw new Error("getPageList not implemented");
     }
     getFilterList() {
-        throw new Error("getFilterList not implemented");
+        return [
+            {
+                type_name: "SelectFilter",
+                name: "Type",
+                state: 0,
+                values: [
+                    ["All", ""],
+                    ["Manga", "manga"],
+                    ["Novel", "novel"],
+                    ["One-Shot", "one-shot"],
+                    ["Doujinshi", "doujinshi"],
+                    ["Manhwa", "manhwa"],
+                    ["Manhua", "manhua"],
+                    ["Oel", "oel"]
+                ].map(x => ({ type_name: 'SelectOption', name: x[0], value: x[1] }))
+            },
+            {
+                type_name: "SelectFilter",
+                name: "Status",
+                state: 0,
+                values: [
+                    ["All", ""],
+                    ["Publishing", "publishing"],
+                    ["Finished", "finished"],
+                    ["On hiatus", "on hiatus"],
+                    ["Discontinued", "discontinued"],
+                    ["Not yet published", "not yet published"]
+                ].map(x => ({ type_name: 'SelectOption', name: x[0], value: x[1] }))
+            }, {
+                type_name: "GroupFilter",
+                name: "Genre",
+                state: [
+                    ["Action", "Action"],
+                    ["Adventure", "Adventure"],
+                    ["Cars", "Cars"],
+                    ["Comedy", "Comedy"],
+                    ["Dementia", "Dementia"],
+                    ["Demons", "Demons"],
+                    ["Doujinshi", "Doujinshi"],
+                    ["Drama", "Drama"],
+                    ["Ecchi", "Ecchi"],
+                    ["Fantasy", "Fantasy"],
+                    ["Game", "Game"],
+                    ["Gender Bender", "Gender Bender"],
+                    ["Harem", "Harem"],
+                    ["Historical", "Historical"],
+                    ["Horror", "Horror"],
+                    ["Isekai", "Isekai"],
+                    ["Josei", "Josei"],
+                    ["Kids", "Kids"],
+                    ["Magic", "Magic"],
+                    ["Martial Arts", "Martial Arts"],
+                    ["Mecha", "Mecha"],
+                    ["Military", "Military"],
+                    ["Music", "Music"],
+                    ["Mystery", "Mystery"],
+                    ["Parody", "Parody"],
+                    ["Police", "Police"],
+                    ["Psychological", "Psychological"],
+                    ["Romance", "Romance"],
+                    ["Samurai", "Samurai"],
+                    ["School", "School"],
+                    ["Sci-Fi", "Sci-Fi"],
+                    ["Seinen", "Seinen"],
+                    ["Shoujo", "Shoujo"],
+                    ["Shoujo Ai", "Shoujo Ai"],
+                    ["Shounen", "Shounen"],
+                    ["Shounen Ai", "Shounen Ai"],
+                    ["Slice of Life", "Slice of Life"],
+                    ["Space", "Space"],
+                    ["Sports", "Sports"],
+                    ["Super Power", "Super Power"],
+                    ["Supernatural", "Supernatural"],
+                    ["Thriller", "Thriller"],
+                    ["Tragedy", "Tragedy"],
+                    ["Vampire", "Vampire"],
+                    ["Yaoi", "Yaoi"],
+                    ["Yuri", "Yuri"]
+                ].map(x => ({ type_name: 'CheckBox', name: x[0], value: x[1] }))
+            }
+
+        ];
+
     }
     getSourcePreferences() {
         return [{
