@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=64&domain=https://mangapill.com/",
     "typeSource": "single",
     "isManga": true,
-    "version": "0.0.4",
+    "version": "0.0.5",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "manga/src/en/mangapill.js"
@@ -142,9 +142,24 @@ class DefaultExtension extends MProvider {
         throw new Error("getVideoList not implemented");
     }
     // For manga chapter pages
-    async getPageList() {
-        throw new Error("getPageList not implemented");
+    async getPageList(url) {
+        var link = `${this.source.baseUrl}${url.substring(1,)}`
+
+        var res = await new Client().get(link, this.getHeaders());
+        var doc = new Document(res.body);
+
+        var urls = [];
+
+        var pages = doc.select("chapter-page")
+        for (var page of pages) {
+            var img = page.selectFirst("img").getSrc
+            if (img != null) urls.push(img);
+        }
+
+        return urls
     }
+
+
     getFilterList() {
         return [
             {
