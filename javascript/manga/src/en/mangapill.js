@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=64&domain=https://mangapill.com/",
     "typeSource": "single",
     "isManga": true,
-    "version": "0.0.5",
+    "version": "1.0.0",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "manga/src/en/mangapill.js"
@@ -18,7 +18,6 @@ class DefaultExtension extends MProvider {
             "Referer": this.source.baseUrl
         }
     }
-    print(msg) { console.log(msg) }
 
     statusCode(status) {
         return {
@@ -85,6 +84,7 @@ class DefaultExtension extends MProvider {
     get supportsLatest() {
         throw new Error("supportsLatest not implemented");
     }
+
     async getLatestUpdates(page) {
         return await this.getNavPage("pref_latest_content");
     }
@@ -93,6 +93,7 @@ class DefaultExtension extends MProvider {
         var slug = `search?q=${query}&status=${status}&type=${type}${genre}&page=${page}`
         return await this.getMangaList(slug)
     }
+
     async search(query, page, filters) {
         var type = filters[0].values[filters[0].state].value
         var status = filters[1].values[filters[1].state].value
@@ -141,6 +142,7 @@ class DefaultExtension extends MProvider {
     async getVideoList(url) {
         throw new Error("getVideoList not implemented");
     }
+
     // For manga chapter pages
     async getPageList(url) {
         var link = `${this.source.baseUrl}${url.substring(1,)}`
@@ -158,7 +160,6 @@ class DefaultExtension extends MProvider {
 
         return urls
     }
-
 
     getFilterList() {
         return [
@@ -243,8 +244,8 @@ class DefaultExtension extends MProvider {
             }
 
         ];
-
     }
+
     getSourcePreferences() {
         return [{
             key: 'pref_popular_content',
