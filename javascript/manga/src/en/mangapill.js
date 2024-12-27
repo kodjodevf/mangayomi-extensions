@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=64&domain=https://mangapill.com/",
     "typeSource": "single",
     "isManga": true,
-    "version": "1.0.0",
+    "version": "1.0.1",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "manga/src/en/mangapill.js"
@@ -37,7 +37,7 @@ class DefaultExtension extends MProvider {
     async getMangaList(slug) {
         var lang = await this.getPreference("pref_title_lang");
 
-        var url = `${this.source.baseUrl}${slug}`
+        var url = `${this.source.baseUrl}/${slug}`
         var res = await new Client().get(url, this.getHeaders());
         var doc = new Document(res.body);
         var list = [];
@@ -67,11 +67,11 @@ class DefaultExtension extends MProvider {
         var slug = ''
         switch (val) {
             case 1: {
-                slug = 'mangas/new'
+                slug = '/mangas/new'
                 break;
             }
             case 2: {
-                slug = 'chapters'
+                slug = '/chapters'
                 break;
             }
         }
@@ -109,7 +109,7 @@ class DefaultExtension extends MProvider {
     async getMangaDetail(slug) {
         var lang = await this.getPreference("pref_title_lang");
 
-        var link = `${this.source.baseUrl}${slug}`
+        var link = `${this.source.baseUrl}/${slug}`
         var res = await new Client().get(link, this.getHeaders());
         var doc = new Document(res.body);
 
@@ -145,7 +145,7 @@ class DefaultExtension extends MProvider {
 
     // For manga chapter pages
     async getPageList(url) {
-        var link = `${this.source.baseUrl}${url.substring(1,)}`
+        var link = `${this.source.baseUrl}/${url.substring(1,)}`
 
         var res = await new Client().get(link, this.getHeaders());
         var doc = new Document(res.body);
