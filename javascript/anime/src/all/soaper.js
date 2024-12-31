@@ -6,10 +6,10 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://soaper.cc/",
     "typeSource": "multi",
     "isManga": false,
-    "version": "0.0.1",
+    "version": "0.0.2",
     "dateFormat": "",
     "dateFormatLocale": "",
-    "pkgPath": ""
+    "pkgPath": "anime/src/all/soaper.js"
 }];
 
 class DefaultExtension extends MProvider {
@@ -35,7 +35,8 @@ class DefaultExtension extends MProvider {
 
     async formatList(slug, page) {
         const baseUrl = await this.getPreference("pref_override_base_url")
-        var doc = await this.request(`${slug}?page=${page}`);
+        slug = parseInt(page) > 1 ? `${slug}?page=${page}` : slug
+        var doc = await this.request(slug);
         var list = [];
         var movies = doc.select(".thumbnail.text-center")
 
@@ -49,14 +50,17 @@ class DefaultExtension extends MProvider {
             list.push({ name, imageUrl, link });
         }
 
-        var pagination = doc.select("ul.pagination > li")
-        var last_page_num = parseInt(pagination[pagination.length - 2].text);
-        var hasNextPage = page < last_page_num ? true : false;
+
+        var hasNextPage = false
+        if (slug.indexOf("search.html?") == -1) {
+            var pagination = doc.select("ul.pagination > li")
+            var last_page_num = parseInt(pagination[pagination.length - 2].text);
+            hasNextPage = page < last_page_num ? true : false;
+        }
         return { list, hasNextPage }
     }
 
     async filterList(year = "all", genre = "all", sort = "new", page = 1) {
-
         year = year == "all" ? "" : `/year/${year}`
         genre = genre == "all" ? "" : `/cat/${genre}`
         sort = sort == "new" ? "" : `/sort/${sort}`
@@ -87,9 +91,35 @@ class DefaultExtension extends MProvider {
     async getLatestUpdates(page) {
         return await this.filterList("all", "all", "new", page);
     }
+
+
     async search(query, page, filters) {
-        throw new Error("search not implemented");
+        var seriesList = []
+        var movieList = []
+        var list = [];
+
+        var res = await this.formatList(`search.html?keyword=${query}`, 1)
+        var movies = res["list"]
+
+        for (var movie of movies) {
+            var link = movie.link
+            if (link.indexOf("/tv_") != -1) {
+                seriesList.push(movie);
+            } else {
+                movieList.push(movie);
+            }
+        }
+
+        var priority = await this.getPreference("pref_content_priority");
+        if (priority === "series") {
+            list = [...seriesList, ...movieList];
+        } else {
+            list = [...movieList, ...seriesList];
+        }
+
+        return { list, hasNextPage: false }
     }
+
     async getDetail(url) {
         throw new Error("getDetail not implemented");
     }
