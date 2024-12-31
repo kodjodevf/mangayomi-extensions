@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://soaper.cc/",
     "typeSource": "multi",
     "isManga": false,
-    "version": "0.0.2",
+    "version": "0.0.3",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/all/soaper.js"
@@ -42,14 +42,13 @@ class DefaultExtension extends MProvider {
 
         for (var movie of movies) {
             var linkSection = movie.selectFirst("div.img-group > a")
-            var link = linkSection.getHref;
+            var link = linkSection.getHref.substring(1,);
             var poster = linkSection.selectFirst("img").getSrc
             var imageUrl = `${baseUrl}${poster}`
             var name = movie.selectFirst("h5").text;
 
             list.push({ name, imageUrl, link });
         }
-
 
         var hasNextPage = false
         if (slug.indexOf("search.html?") == -1) {
@@ -92,7 +91,6 @@ class DefaultExtension extends MProvider {
         return await this.filterList("all", "all", "new", page);
     }
 
-
     async search(query, page, filters) {
         var seriesList = []
         var movieList = []
@@ -103,7 +101,7 @@ class DefaultExtension extends MProvider {
 
         for (var movie of movies) {
             var link = movie.link
-            if (link.indexOf("/tv_") != -1) {
+            if (link.indexOf("tv_") != -1) {
                 seriesList.push(movie);
             } else {
                 movieList.push(movie);
@@ -121,7 +119,43 @@ class DefaultExtension extends MProvider {
     }
 
     async getDetail(url) {
-        throw new Error("getDetail not implemented");
+        var doc = await this.request(url);
+
+        const baseUrl = await this.getPreference("pref_override_base_url")
+        var name = doc.selectFirst(".col-sm-12.col-lg-12.text-center").selectFirst("h4").text.trim()
+        var poster = doc.selectFirst(".thumbnail.text-center").selectFirst("img").getSrc
+        var imageUrl = `${baseUrl}${poster}`
+
+        var description = doc.selectFirst("p#wrap").text.trim()
+        var link = `${baseUrl}/${url}`
+
+        var chapters = []
+        if (url.indexOf("tv_") != -1) {
+            var seasonList = doc.select(".alert.alert-info-ex.col-sm-12")
+            var seasonCount = seasonList.length
+            for (var season of seasonList) {
+                var eps = season.select(".col-sm-12.col-md-6.col-lg-4.myp1")
+                for (var ep of eps) {
+                    var epLinkSection = ep.selectFirst("a")
+                    var epLink = epLinkSection.getHref
+                    var epName = epLinkSection.text
+
+                    chapters.push({
+                        name: `S${seasonCount}E${epName}`,
+                        url: epLink,
+                    })
+                }
+                seasonCount--;
+            }
+
+        } else {
+            chapters.push({
+                name: "Movie",
+                url: url,
+            })
+        }
+
+        return { name, imageUrl, description, link, chapters }
     }
     // For anime episode video list
     async getVideoList(url) {
