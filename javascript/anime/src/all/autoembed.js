@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=64&domain=https://autoembed.cc/",
     "typeSource": "multi",
     "isManga": false,
-    "version": "1.1.2",
+    "version": "1.1.3",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/all/autoembed.js"
@@ -176,7 +176,7 @@ class DefaultExtension extends MProvider {
                 });
             }
         }
-        return await this.sortStreams(streams);
+        return streams
 
     }
 
@@ -184,13 +184,14 @@ class DefaultExtension extends MProvider {
         var streams = [];
         var quality = ["auto", "360", "480", "720", "1080"]
         for (var q of quality) {
+            var link = url
             if (q != "auto") {
-                url = url.replace("index.m3u8", `${q}/index.m3u8`)
+                link = link.replace("index.m3u8", `${q}/index.m3u8`)
                 q = `${q}p`
             }
             streams.push({
-                url: url,
-                originalUrl: url,
+                url: link,
+                originalUrl: link,
                 quality: `${lang} - ${q}`,
                 headers: hdr
             });
@@ -263,7 +264,6 @@ class DefaultExtension extends MProvider {
 
                 var body = JSON.parse(response.body);
                 var link = body.playlist[0].file
-                subtitles = await this.getSubtitleList(tmdb, s, e)
                 streams.push({
                     url: link,
                     originalUrl: link,
@@ -282,6 +282,7 @@ class DefaultExtension extends MProvider {
                     id = `${id}&s=${s}&e=${e}`
                 }
                 var api = `https://autoembed.cc/embed/player.php?id=${id}`
+
                 var response = await new Client().get(api);
 
                 if (response.statusCode != 200) {
@@ -290,10 +291,12 @@ class DefaultExtension extends MProvider {
                 var body = response.body
                 var sKey = '"file": '
                 var eKey = "]});"
-                var start = body.indexOf(sKey) + sKey.length
+                var start = body.indexOf(sKey)
                 if (start < 0) {
                     throw new Error("Video unavailable");
                 }
+                start += sKey.length
+
                 var end = body.substring(start,).indexOf(eKey) + start - 1
                 var strms = JSON.parse(body.substring(start, end) + "]")
                 for (var strm of strms) {
@@ -302,7 +305,41 @@ class DefaultExtension extends MProvider {
                     var streamSplit = await this.splitStreams(link, lang);
                     streams = [...streams, ...streamSplit]
                 }
-                subtitles = await this.getSubtitleList(tmdb, s, e)
+
+                break;
+            }
+            case 4: {
+                var s = "0"
+                var e = "0"
+                if (media_type == "tv") {
+                    s = parts[2]
+                    e = parts[3]
+                    id = `${id}&season=${s}&episode=${e}`
+                }
+                var api = `https://player.flicky.host/Server-main.php?id=${id}`
+                var response = await new Client().get(api, { "Referer": "https://flicky.host/" });
+
+                if (response.statusCode != 200) {
+                    throw new Error("Video unavailable");
+                }
+                var body = response.body
+                var sKey = 'streams = '
+                var eKey = "];"
+                var start = body.indexOf(sKey)
+                if (start < 0) {
+                    throw new Error("Video unavailable");
+                }
+                start += sKey.length
+
+                var end = body.substring(start,).indexOf(eKey) + start + 1
+                var strms = JSON.parse(body.substring(start, end))
+
+                for (var strm of strms) {
+                    var link = strm.url
+                    var lang = strm.language
+                    var streamSplit = await this.splitStreams(link, lang);
+                    streams = [...streams, ...streamSplit]
+                }
 
                 break;
             }
@@ -326,8 +363,15 @@ class DefaultExtension extends MProvider {
             }
 
         }
-        streams[0].subtitles = subtitles
-        return streams
+        if (streams.length < 1) {
+            throw new Error("Video unavailable");
+        }
+
+        if (subtitles.length < 1) {
+            streams[0].subtitles = await this.getSubtitleList(tmdb, s, e)
+        }
+
+        return await this.sortStreams(streams)
     }
     // For manga chapter pages
     async getPageList() {
@@ -372,8 +416,8 @@ class DefaultExtension extends MProvider {
                 title: 'Preferred stream source',
                 summary: '',
                 valueIndex: 0,
-                entries: ["tom.autoembed.cc", "123embed.net", "autoembed.cc - Indian languages"],
-                entryValues: ["1", "2", "3"]
+                entries: ["tom.autoembed.cc", "123embed.net", "autoembed.cc - Indian languages", "flicky.host - Indian languages"],
+                entryValues: ["1", "2", "3", "4"]
             }
         },
         ];
