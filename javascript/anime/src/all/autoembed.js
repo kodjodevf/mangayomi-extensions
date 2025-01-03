@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=64&domain=https://autoembed.cc/",
     "typeSource": "multi",
     "isManga": false,
-    "version": "1.1.1",
+    "version": "1.1.2",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/all/autoembed.js"
@@ -272,6 +272,41 @@ class DefaultExtension extends MProvider {
                 });
                 break;
             }
+
+            case 3: {
+                var s = "0"
+                var e = "0"
+                if (media_type == "tv") {
+                    s = parts[2]
+                    e = parts[3]
+                    id = `${id}&s=${s}&e=${e}`
+                }
+                var api = `https://autoembed.cc/embed/player.php?id=${id}`
+                var response = await new Client().get(api);
+
+                if (response.statusCode != 200) {
+                    throw new Error("Video unavailable");
+                }
+                var body = response.body
+                var sKey = '"file": '
+                var eKey = "]});"
+                var start = body.indexOf(sKey) + sKey.length
+                if (start < 0) {
+                    throw new Error("Video unavailable");
+                }
+                var end = body.substring(start,).indexOf(eKey) + start - 1
+                var strms = JSON.parse(body.substring(start, end) + "]")
+                for (var strm of strms) {
+                    var link = strm.file
+                    var lang = strm.title
+                    var streamSplit = await this.splitStreams(link, lang);
+                    streams = [...streams, ...streamSplit]
+                }
+                subtitles = await this.getSubtitleList(tmdb, s, e)
+
+                break;
+            }
+
             default: {
                 if (media_type == "tv") {
                     id = `${id}/${parts[2]}/${parts[3]}`
@@ -337,8 +372,8 @@ class DefaultExtension extends MProvider {
                 title: 'Preferred stream source',
                 summary: '',
                 valueIndex: 0,
-                entries: ["tom.autoembed.cc", "123embed.net"],
-                entryValues: ["1", "2"]
+                entries: ["tom.autoembed.cc", "123embed.net", "autoembed.cc - Indian languages"],
+                entryValues: ["1", "2", "3"]
             }
         },
         ];
