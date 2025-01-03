@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=64&domain=https://autoembed.cc/",
     "typeSource": "multi",
     "isManga": false,
-    "version": "1.1.0",
+    "version": "1.1.1",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/all/autoembed.js"
@@ -152,18 +152,22 @@ class DefaultExtension extends MProvider {
         chaps.reverse();
         return item;
     }
-    async extractStreams(url, hdr = {}) {
+    async extractStreams(url, lang = "", hdr = {}) {
         const response = await new Client().get(url);
         const body = response.body;
         const lines = body.split('\n');
-        var streams = [];
+        var streams = [{
+            url: url,
+            originalUrl: url,
+            quality: "auto",
+        }];
 
         for (let i = 0; i < lines.length; i++) {
             if (lines[i].startsWith('#EXT-X-STREAM-INF:')) {
-                const resolution = lines[i].match(/RESOLUTION=(\d+x\d+)/)[1];
+                var resolution = lines[i].match(/RESOLUTION=(\d+x\d+)/)[1];
+                resolution = `${lang} ${resolution}`
                 var m3u8Url = lines[i + 1].trim();
-                m3u8Url =
-                    m3u8Url.replace("./", `${url}/`)
+                m3u8Url = m3u8Url.replace("./", `${url}/`)
                 streams.push({
                     url: m3u8Url,
                     originalUrl: m3u8Url,
@@ -172,8 +176,28 @@ class DefaultExtension extends MProvider {
                 });
             }
         }
+        return await this.sortStreams(streams);
+
+    }
+
+    async splitStreams(url, lang = "", hdr = {}) {
+        var streams = [];
+        var quality = ["auto", "360", "480", "720", "1080"]
+        for (var q of quality) {
+            if (q != "auto") {
+                url = url.replace("index.m3u8", `${q}/index.m3u8`)
+                q = `${q}p`
+            }
+            streams.push({
+                url: url,
+                originalUrl: url,
+                quality: `${lang} - ${q}`,
+                headers: hdr
+            });
+        }
         return streams;
     }
+
 
     async sortStreams(streams) {
         var sortedStreams = [];
@@ -203,8 +227,7 @@ class DefaultExtension extends MProvider {
         var subs = []
         for (var sub of body) {
             subs.push({
-                file: sub.url
-                ,
+                file: sub.url,
                 label: sub.display
             })
         }
@@ -215,7 +238,7 @@ class DefaultExtension extends MProvider {
     // For anime episode video list
     async getVideoList(url) {
         var streamAPI = parseInt(await this.getPreference("pref_stream_source"))
-        
+
         var parts = url.split("||");
         var media_type = parts[0];
         var id = parts[1];
@@ -233,22 +256,20 @@ class DefaultExtension extends MProvider {
                 }
                 var api = `https://play2.123embed.net/server/3?path=/${media_type}/${id}`
                 var response = await new Client().get(api);
-                var body = JSON.parse(response.body);
 
                 if (response.statusCode != 200) {
                     throw new Error("Video unavailable");
                 }
+
+                var body = JSON.parse(response.body);
                 var link = body.playlist[0].file
                 subtitles = await this.getSubtitleList(tmdb, s, e)
                 streams.push({
                     url: link,
                     originalUrl: link,
                     quality: "auto",
-                    headers: { "Origin": "https://play2.123embed.net" }
-                    ,
-                    subtitles: subtitles
+                    headers: { "Origin": "https://play2.123embed.net" },
                 });
-
                 break;
             }
             default: {
@@ -257,26 +278,20 @@ class DefaultExtension extends MProvider {
                 }
                 var api = `${this.source.apiUrl}/api/getVideoSource?type=${media_type}&id=${id}`
                 var response = await new Client().get(api, this.getHeaders());
-                var body = JSON.parse(response.body);
 
                 if (response.statusCode != 200) {
                     throw new Error("Video unavailable");
                 }
+
+                var body = JSON.parse(response.body);
                 var link = body.videoSource
-                subtitles =
-                    body.subtitles
+                subtitles = body.subtitles
                 streams = await this.extractStreams(link);
-                streams.push({
-                    url: link,
-                    originalUrl: link,
-                    quality: "auto",
-                    subtitles: subtitles,
-                });
-                streams = await this.sortStreams(streams);
                 break;
             }
 
         }
+        streams[0].subtitles = subtitles
         return streams
     }
     // For manga chapter pages
