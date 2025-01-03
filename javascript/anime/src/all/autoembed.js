@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=64&domain=https://autoembed.cc/",
     "typeSource": "multi",
     "isManga": false,
-    "version": "1.1.3",
+    "version": "1.1.4",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/all/autoembed.js"
@@ -152,6 +152,8 @@ class DefaultExtension extends MProvider {
         chaps.reverse();
         return item;
     }
+
+    // Extracts the streams url for different resolutions from a hls stream.
     async extractStreams(url, lang = "", hdr = {}) {
         const response = await new Client().get(url);
         const body = response.body;
@@ -180,6 +182,7 @@ class DefaultExtension extends MProvider {
 
     }
 
+    // For some streams, we can form stream url using a default template.
     async splitStreams(url, lang = "", hdr = {}) {
         var streams = [];
         var quality = ["auto", "360", "480", "720", "1080"]
@@ -199,7 +202,7 @@ class DefaultExtension extends MProvider {
         return streams;
     }
 
-
+    // Sorts streams based on user preference.
     async sortStreams(streams) {
         var sortedStreams = [];
 
@@ -219,6 +222,7 @@ class DefaultExtension extends MProvider {
         return [...sortedStreams, ...copyStreams]
     }
 
+    // Gets subtitles based on TMDB id.
     async getSubtitleList(id, s, e) {
         var api = `https://sub.wyzie.ru/search?id=${id}`
         if (s != "0") api = `${api}&season=${s}&episode=${e}`
@@ -272,7 +276,6 @@ class DefaultExtension extends MProvider {
                 });
                 break;
             }
-
             case 3: {
                 var s = "0"
                 var e = "0"
@@ -343,6 +346,23 @@ class DefaultExtension extends MProvider {
 
                 break;
             }
+            case 5: {
+                if (media_type == "tv") {
+                    id = `${id}/${parts[2]}/${parts[3]}`
+                }
+                var api = `https://vidapi.click/api/video/${media_type}/${id}`
+                var response = await new Client().get(api);
+
+                if (response.statusCode != 200) {
+                    throw new Error("Video unavailable");
+                }
+
+                var body = JSON.parse(response.body);
+                var link = body.sources[0].file
+                subtitles = body.tracks
+                streams = await this.extractStreams(link);
+                break;
+            }
 
             default: {
                 if (media_type == "tv") {
@@ -368,8 +388,9 @@ class DefaultExtension extends MProvider {
         }
 
         if (subtitles.length < 1) {
-            streams[0].subtitles = await this.getSubtitleList(tmdb, s, e)
+            subtitles = await this.getSubtitleList(tmdb, s, e)
         }
+        streams[0].subtitles = subtitles
 
         return await this.sortStreams(streams)
     }
@@ -416,8 +437,8 @@ class DefaultExtension extends MProvider {
                 title: 'Preferred stream source',
                 summary: '',
                 valueIndex: 0,
-                entries: ["tom.autoembed.cc", "123embed.net", "autoembed.cc - Indian languages", "flicky.host - Indian languages"],
-                entryValues: ["1", "2", "3", "4"]
+                entries: ["tom.autoembed.cc", "123embed.net", "autoembed.cc - Indian languages", "flicky.host - Indian languages", "vidapi.click"],
+                entryValues: ["1", "2", "3", "4", "5"]
             }
         },
         ];
