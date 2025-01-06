@@ -6,6 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=64&domain=https://autoembed.cc/",
     "typeSource": "multi",
     "isManga": false,
+    "itemType": 1,
     "version": "1.1.4",
     "dateFormat": "",
     "dateFormatLocale": "",
