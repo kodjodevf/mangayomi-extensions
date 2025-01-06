@@ -5,7 +5,7 @@ const mangayomiSources = [{
   "apiUrl": "",
   "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/zh.yhdm.png",
   "typeSource": "single",
-  "isManga": false,
+  "itemType": 1,
   "isNsfw": false,
   "version": "0.0.2",
   "dateFormat": "",
