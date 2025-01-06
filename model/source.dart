@@ -25,6 +25,8 @@ class Source {
 
   String? version;
 
+  bool? isManga;
+
   ItemType? itemType;
 
   bool? isFullData;
@@ -49,6 +51,7 @@ class Source {
       this.sourceCodeUrl = "",
       this.apiUrl = "",
       this.version = "",
+      this.isManga,
       this.itemType = ItemType.manga,
       this.isFullData = false,
       this.appMinVerReq = "0.2.0",
@@ -73,6 +76,7 @@ class Source {
     isNsfw = json['isNsfw'] ?? false;
     lang = json['lang'] ?? "";
     name = json['name'] ?? "";
+    isManga = json['isManga'] ?? ((json['itemType'] as int?) ?? 0) == 0;
     sourceCodeUrl = json['sourceCodeUrl'] ?? "";
     typeSource = json['typeSource'] ?? "";
     version = json['version'] ?? "";
@@ -95,6 +99,7 @@ class Source {
       "sourceCodeUrl": sourceCodeUrl,
       "apiUrl": apiUrl,
       "version": version,
+      "isManga": isManga ?? (itemType?.index ?? 0) == 0,
       "itemType": itemType?.index ?? 0,
       "isFullData": isFullData,
       "appMinVerReq": appMinVerReq,
@@ -106,8 +111,4 @@ class Source {
 
 const branchName = "main";
 
-enum ItemType {
-  manga,
-  anime,
-  novel
-}
+enum ItemType { manga, anime, novel }
