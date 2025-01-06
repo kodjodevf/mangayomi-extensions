@@ -125,7 +125,7 @@ class DefaultExtension extends MProvider {
       .select("#artiststag")
       .map((el) => el.text.trim())
       .join(", ");
-    const status = this.toStatus(doc.selectFirst("#editstatus").text.trim());
+    const status = this.toStatus(doc.selectFirst("#editstatus")?.text.trim());
     const genre = doc.select("#seriesgenre > a").map((el) => el.text.trim());
 
     const novelId = doc.selectFirst("input#mypostid")?.attr("value");
