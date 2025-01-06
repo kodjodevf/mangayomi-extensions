@@ -67,5 +67,6 @@ List<Source> _comickSourcesList = _languages
         isNsfw: _isNsfw,
         dateFormatLocale: "en",
         version: _comickVersion,
+        itemType: ItemType.manga,
         sourceCodeUrl: _comickSourceCodeUrl))
     .toList();

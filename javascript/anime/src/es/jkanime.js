@@ -5,7 +5,7 @@ const mangayomiSources = [{
     "apiUrl": "",
     "iconUrl": "https://cdn.jkanime.net/logo_jk.png",
     "typeSource": "single",
-    "isManga": false,
+    "itemType": 1,
     "version": "0.1.13",
     "dateFormat": "",
     "dateFormatLocale": "",
