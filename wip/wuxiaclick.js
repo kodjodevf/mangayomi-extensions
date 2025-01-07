@@ -111,7 +111,11 @@ class DefaultExtension extends MProvider {
   async getHtmlContent(url) {
     const client = await new Client();
     const res = await client.get(url);
-    const doc = new Document(res.body);
+    return await this.cleanHtmlContent(res.body);
+  }
+
+  async cleanHtmlContent(html) {
+    const doc = new Document(html);
     const title =
         doc.selectFirst("div.mantine-Center-root > h1.mantine-Title-root")?.text.trim() ||
         "";
