@@ -6,6 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/all.torrentio.png",
     "typeSource": "torrent",
     "isManga": false,
+    "itemType": 1,
     "version": "0.0.25",
     "appMinVerReq": "0.3.8",
     "pkgPath": "anime/src/all/torrentio.js"
