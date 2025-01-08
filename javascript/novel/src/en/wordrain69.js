@@ -7,7 +7,7 @@ const mangayomiSources = [{
       "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/en.wordrain69.png",
     "typeSource": "single",
     "itemType": 2,
-    "version": "0.0.2",
+    "version": "0.0.1",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "novel/src/en/wordrain69.js",
@@ -117,15 +117,11 @@ const mangayomiSources = [{
         chapters,
       };
     }
-
+  
     async getHtmlContent(url) {
       const client = await new Client();
       const res = await client.get(url);
-      return await this.cleanHtmlContent(res.body);
-    }
-  
-    async cleanHtmlContent(html) {
-      const doc = new Document(html);
+      const doc = new Document(res.body);
       const title =
           doc.selectFirst("#chapter-heading")?.text.trim() ||
           "";
