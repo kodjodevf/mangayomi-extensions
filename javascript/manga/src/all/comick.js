@@ -50,7 +50,7 @@ const mangayomiSources = [
         "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/all.comick.png",
         "typeSource": "single",
         "itemType": 0,
-        "version": "0.0.85",
+        "version": "0.0.9",
         "pkgPath": "manga/src/all/comick.js"
     }];
 
@@ -385,7 +385,7 @@ class DefaultExtension extends MProvider {
                 imageUrl: manga.cover_url,
                 link: `/comic/${manga.hid}/#`
             })),
-            hasNextPage: body.hasNextPage || false
+            hasNextPage: true
         };
     }
     beautifyChapterName(vol, chap, title) {
