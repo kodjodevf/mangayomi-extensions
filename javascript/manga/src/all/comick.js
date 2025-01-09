@@ -1,6 +1,6 @@
 const mangayomiSources = [
     {
-        "name": "Comick test",
+        "name": "Comick",
         "langs": ["all", "en", "pt-br", "ru", "fr", "es-419", "pl", "tr", "it", "es", "id", "hu", "vi", "zh-hk", "ar", "de", "zh", "ca", "bg", "th", "fa", "uk", "mn", "ro", "he", "ms", "tl", "ja", "hi", "my", "ko", "cs", "pt", "nl", "sv", "bn", "no", "lt", "el", "sr", "da"],
         "ids": {
             "all": 370890607,
@@ -50,7 +50,7 @@ const mangayomiSources = [
         "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/all.comick.png",
         "typeSource": "single",
         "itemType": 0,
-        "version": "0.0.8",
+        "version": "0.0.85",
         "pkgPath": "manga/src/all/comick.js"
     }];
 
