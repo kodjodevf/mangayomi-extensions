@@ -8,9 +8,12 @@ import 'model/source.dart';
 
 void main() {
   final jsSources = _searchJsSources(Directory("javascript"));
-  genManga(jsSources.where((element) => element.itemType!.name == "manga").toList());
-  genAnime(jsSources.where((element) => element.itemType!.name == "anime").toList());
-  genNovel(jsSources.where((element) => element.itemType!.name == "novel").toList());
+  genManga(
+      jsSources.where((element) => element.itemType!.name == "manga").toList());
+  genAnime(
+      jsSources.where((element) => element.itemType!.name == "anime").toList());
+  genNovel(
+      jsSources.where((element) => element.itemType!.name == "novel").toList());
 }
 
 void genManga(List<Source> jsMangasourceList) {
@@ -83,9 +86,11 @@ List<Source> _searchJsSources(Directory dir) {
               }
               if (langs?.isNotEmpty ?? false) {
                 for (var lang in langs!) {
+                  final id = sourceJson["ids"]?[lang] as int?;
                   sourceList.add(Source.fromJson(source.toJson())
                     ..lang = lang
-                    ..id = 'mangayomi-js-"$lang"."${source.name}"'.hashCode);
+                    ..id =
+                        id ?? 'mangayomi-js-"$lang"."${source.name}"'.hashCode);
                 }
               } else {
                 sourceList.add(source);
