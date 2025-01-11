@@ -32,7 +32,7 @@ class DefaultExtension extends MProvider {
         var res = await new Client().get(url, this.getHeaders());
         var doc = new Document(res.body);
         var jsonData = doc.selectFirst("#__NEXT_DATA__").text
-        return JSON.parse(jsonData);
+        return JSON.parse(jsonData).props.pageProps;
     }
 
 
@@ -65,8 +65,8 @@ class DefaultExtension extends MProvider {
     }
 
     async getPopular(page) {
-        var extract = await this.extractFromUrl(this.source.baseUrl)
-        var pageProps = extract.props.pageProps
+        var pageProps = await this.extractFromUrl(this.source.baseUrl)
+        //  var  = extract
         var latestEpisodes = await this.formListFromHome(pageProps.latestEpisodes)
         var latestAnimes = await this.formListFromHome(pageProps.latestAnimes)
         var newAnimes = await this.formListFromHome(pageProps.newAnimes)
@@ -112,8 +112,55 @@ class DefaultExtension extends MProvider {
             hasNextPage
         };
     }
+
+    statusCode(status) {
+        return {
+            "Currently Airing": 0,
+            "Finished Airing": 1,
+            "Hiatus": 2,
+            "Discontinued": 3,
+            "Not Yet Released": 4,
+        }[status] ?? 5;
+    }
+
     async getDetail(url) {
-        throw new Error("getDetail not implemented");
+        var link = `https://sudatchi.com/anime/${url}`
+        var jsonData = await this.extractFromUrl(link);
+        var details = jsonData.animeData
+        var name = details.titleRomanji
+        var lang = this.getPreference("sudatchi_pref_lang")
+        switch (lang) {
+            case "e": {
+                name = "titleEnglish" in details ? details.titleEnglish : name;
+                break;
+            }
+            case "j": {
+                name = "titleJapanese" in details ? details.titleJapanese : name;
+                break;
+            }
+        }
+        var description = details.synopsis
+        var status = this.statusCode(details.Status.name)
+        var imageUrl = this.getImgUrl(details.imgUrl)
+        var genre = []
+        var animeGenres = details.AnimeGenres
+        for (var gObj of animeGenres) {
+            genre.push(gObj.Genre.name)
+        }
+
+        var chapters = []
+        var episodes = details.Episodes
+
+        for (var eObj of episodes) {
+            var name = eObj.title
+            var number = eObj.number
+            var epUrl = `${url}/${number}`
+            chapters.push({ name, url: epUrl })
+        }
+
+
+        return { name, description, status, imageUrl, genre, chapters }
+
     }
     // For novel html content
     async getHtmlContent(url) {
