@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://sudatchi.com",
     "typeSource": "single",
     "isManga": null,
-    "version": "0.0.1",
+    "version": "0.0.2",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/en/sudatchi.js"
@@ -35,11 +35,12 @@ class DefaultExtension extends MProvider {
         return JSON.parse(jsonData);
     }
 
-    async formList(latestEpisodes) {
+
+    async formListFromHome(animes) {
         var list = []
-        for (var item of latestEpisodes) {
+        var lang = this.getPreference("sudatchi_pref_lang")
+        for (var item of animes) {
             var details = "Anime" in item ? item.Anime : item
-            var lang = this.getPreference("sudatchi_pref_lang")
             var name = details.titleRomanji
             switch (lang) {
                 case "e": {
@@ -66,11 +67,11 @@ class DefaultExtension extends MProvider {
     async getPopular(page) {
         var extract = await this.extractFromUrl(this.source.baseUrl)
         var pageProps = extract.props.pageProps
-        var latestEpisodes = await this.formList(pageProps.latestEpisodes)
-        var latestAnimes = await this.formList(pageProps.latestAnimes)
-        var newAnimes = await this.formList(pageProps.newAnimes)
-        var animeSpotlight = await this.formList(pageProps.AnimeSpotlight)
-        var list = [...animeSpotlight, ...newAnimes, ...latestAnimes, ...latestEpisodes]
+        var latestEpisodes = await this.formListFromHome(pageProps.latestEpisodes)
+        var latestAnimes = await this.formListFromHome(pageProps.latestAnimes)
+        var newAnimes = await this.formListFromHome(pageProps.newAnimes)
+        var animeSpotlight = await this.formListFromHome(pageProps.AnimeSpotlight)
+        var list = [...animeSpotlight, ...latestAnimes, ...latestEpisodes, ...newAnimes]
         return {
             list,
             hasNextPage: false
@@ -82,7 +83,7 @@ class DefaultExtension extends MProvider {
     async getLatestUpdates(page) {
         var extract = await this.extractFromUrl(this.source.baseUrl)
         var latest = extract.props.pageProps.latestEpisodes
-        var list = await this.formList(latest)
+        var list = await this.formListFromHome(latest)
 
         return {
             list,
@@ -90,7 +91,26 @@ class DefaultExtension extends MProvider {
         };
     }
     async search(query, page, filters) {
-        throw new Error("search not implemented");
+        var type = '';
+        for (var filter of filters[0].state) if (filter.state) type += `,${filter.value}`;
+        var status = '';
+        for (var filter of filters[1].state) if (filter.state) status += `,${filter.value}`;
+        var genre = '';
+        for (var filter of filters[2].state) if (filter.state) genre += `,${filter.value}`;
+        var year = '';
+        for (var filter of filters[3].state) if (filter.state) year += `,${filter.value}`;
+
+        var api = `https://sudatchi.com/api/directory?page=${page}&genres=${genre}&years=${year}&types=${type}&status=${status}&title=${query}&category=`
+        var response = await new Client().get(api);
+        var body = JSON.parse(response.body);
+
+        var list = await this.formListFromHome(body.animes)
+        var hasNextPage = body.pages > page ? true : false;
+
+        return {
+            list,
+            hasNextPage
+        };
     }
     async getDetail(url) {
         throw new Error("getDetail not implemented");
@@ -112,7 +132,84 @@ class DefaultExtension extends MProvider {
         throw new Error("getPageList not implemented");
     }
     getFilterList() {
-        throw new Error("getFilterList not implemented");
+        var currentYear = new Date().getFullYear();
+        var formattedYears = Array.from({ length: currentYear - 2003 }, (_, i) => (i + 2004).toString()).map(year => ({ type_name: 'CheckBox', name: year, value: year }));
+
+        return [
+            {
+                type_name: "GroupFilter",
+                name: "Type",
+                state: [
+                    ["All", ""],
+                    ["BD", "BD"],
+                    ["Movie", "Movie"],
+                    ["ONA", "ONA"],
+                    ["OVA", "OVA"],
+                    ["Special", "Special"],
+                    ["TV", "TV"]
+                ].map(x => ({ type_name: 'CheckBox', name: x[0], value: x[1] }))
+            },
+            {
+                type_name: "GroupFilter",
+                name: "Status",
+                state: [
+                    ["All", ""],
+                    ["Currently Airing", "Currently Airing"],
+                    ["Finished Airing", "Finished Airing"],
+                    ["Hiatus", "Hiatus"],
+                    ["Not Yet Released", "Not Yet Released"]
+                ].map(x => ({ type_name: 'CheckBox', name: x[0], value: x[1] }))
+            }, {
+                type_name: "GroupFilter",
+                name: "Genre",
+                state: [
+                    ["Action", "Action"],
+                    ["Adventure", "Adventure"],
+                    ["Comedy", "Comedy"],
+                    ["Cyberpunk", "Cyberpunk"],
+                    ["Demons", "Demons"],
+                    ["Drama", "Drama"],
+                    ["Ecchi", "Ecchi"],
+                    ["Fantasy", "Fantasy"],
+                    ["Harem", "Harem"],
+                    ["Hentai", "Hentai"],
+                    ["Historical", "Historical"],
+                    ["Horror", "Horror"],
+                    ["Isekai", "Isekai"],
+                    ["Josei", "Josei"],
+                    ["Magic", "Magic"],
+                    ["Martial Arts", "Martial Arts"],
+                    ["Mecha", "Mecha"],
+                    ["Military", "Military"],
+                    ["Music", "Music"],
+                    ["Mystery", "Mystery"],
+                    ["Police", "Police"],
+                    ["Post-Apocalyptic", "Post-Apocalyptic"],
+                    ["Psychological", "Psychological"],
+                    ["Romance", "Romance"],
+                    ["School", "School"],
+                    ["Sci-Fi ", "Sci-Fi "],
+                    ["Seinen", "Seinen"],
+                    ["Shoujo", "Shoujo"],
+                    ["Shounen", "Shounen"],
+                    ["Slice of Life", "Slice of Life"],
+                    ["Space", "Space"],
+                    ["Sports", "Sports"],
+                    ["Super Power", "Super Power"],
+                    ["Supernatural", "Supernatural"],
+                    ["Thriller", "Thriller"],
+                    ["Tragedy", "Tragedy"],
+                    ["Vampire", "Vampire"],
+                    ["Yaoi", "Yaoi"],
+                    ["Yuri", "Yuri"]
+                ].map(x => ({ type_name: 'CheckBox', name: x[0], value: x[1] }))
+            }, {
+                type_name: "GroupFilter",
+                name: "Year",
+                state: formattedYears
+            },
+
+        ];
     }
     getSourcePreferences() {
         return [{
