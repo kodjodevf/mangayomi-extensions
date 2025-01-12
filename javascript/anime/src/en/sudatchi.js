@@ -8,7 +8,7 @@ const mangayomiSources = [{
     "version": "1.0.2",
     "dateFormat": "",
     "dateFormatLocale": "",
-    "itemType: 1,
+    "itemType: "1",
     "pkgPath": "anime/src/en/sudatchi.js"
 }];
 
