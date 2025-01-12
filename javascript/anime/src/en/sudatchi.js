@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://sudatchi.com",
     "typeSource": "single",
     "isManga": null,
-    "version": "0.0.2",
+    "version": "1.0.0",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/en/sudatchi.js"
@@ -24,7 +24,7 @@ class DefaultExtension extends MProvider {
         return preferences.get(key);
     }
 
-    getImgUrl(slug) {
+    getUrl(slug) {
         return `https://ipfs.sudatchi.com/ipfs/${slug}`
     }
 
@@ -54,7 +54,7 @@ class DefaultExtension extends MProvider {
 
             }
             var link = details.slug
-            var imageUrl = this.getImgUrl(details.imgUrl)
+            var imageUrl = this.getUrl(details.imgUrl)
             list.push({
                 name,
                 imageUrl,
@@ -123,6 +123,7 @@ class DefaultExtension extends MProvider {
         }[status] ?? 5;
     }
 
+
     async getDetail(url) {
         var link = `https://sudatchi.com/anime/${url}`
         var jsonData = await this.extractFromUrl(link);
@@ -141,7 +142,7 @@ class DefaultExtension extends MProvider {
         }
         var description = details.synopsis
         var status = this.statusCode(details.Status.name)
-        var imageUrl = this.getImgUrl(details.imgUrl)
+        var imageUrl = this.getUrl(details.imgUrl)
         var genre = []
         var animeGenres = details.AnimeGenres
         for (var gObj of animeGenres) {
@@ -150,12 +151,18 @@ class DefaultExtension extends MProvider {
 
         var chapters = []
         var episodes = details.Episodes
-
-        for (var eObj of episodes) {
-            var name = eObj.title
-            var number = eObj.number
+        var typeId = details.typeId
+        if (typeId == 6) {
+            var number = episodes[0].number
             var epUrl = `${url}/${number}`
-            chapters.push({ name, url: epUrl })
+            chapters.push({ name: "Movie", url: epUrl })
+        } else {
+            for (var eObj of episodes) {
+                var name = eObj.title
+                var number = eObj.number
+                var epUrl = `${url}/${number}`
+                chapters.push({ name, url: epUrl })
+            }
         }
 
 
@@ -170,9 +177,72 @@ class DefaultExtension extends MProvider {
     async cleanHtmlContent(html) {
         throw new Error("cleanHtmlContent not implemented");
     }
+
+    async extractStreams(url) {
+        const response = await new Client().get(url);
+        const body = response.body;
+        const lines = body.split('\n');
+        var audios = []
+
+        var streams = [{
+            url: url,
+            originalUrl: url,
+            quality: "auto",
+        }];
+
+        for (let i = 0; i < lines.length; i++) {
+            var currentLine = lines[i]
+            if (currentLine.startsWith('#EXT-X-STREAM-INF:')) {
+                var resolution = currentLine.match(/RESOLUTION=(\d+x\d+)/)[1];
+                var m3u8Url = lines[i + 1].trim();
+                m3u8Url = m3u8Url.replace("./", `${url}/`)
+                streams.push({
+                    url: m3u8Url,
+                    originalUrl: m3u8Url,
+                    quality: resolution,
+                });
+            } else if (currentLine.startsWith('#EXT-X-MEDIA:TYPE=AUDIO')) {
+                var attributesString = currentLine.split(",")
+                var attributeRegex = /([A-Z-]+)=("([^"]*)"|[^,]*)/g;
+                let match;
+                var trackInfo = {};
+                while ((match = attributeRegex.exec(attributesString)) !== null) {
+                    var key = match[1];
+                    var value = match[3] || match[2];
+                    if (key === "NAME") {
+                        trackInfo.label = value
+                    } else if (key === "URI") {
+                        trackInfo.file = value
+                    }
+                }
+                audios.push(trackInfo);
+            }
+        }
+        streams[0].audios = audios
+        return streams
+    }
+
     // For anime episode video list
     async getVideoList(url) {
-        throw new Error("getVideoList not implemented");
+        var link = `https://sudatchi.com/watch/${url}`
+        var jsonData = await this.extractFromUrl(link);
+        var episodeData = jsonData.episodeData.episode;
+        var epId = episodeData.id;
+
+        var epLink = `https://sudatchi.com/videos/m3u8/episode-${epId}.m3u8`
+        var streams = await this.extractStreams(epLink);
+
+        var subs = JSON.parse(jsonData.episodeData.subtitlesJson)
+        var subtitles = [];
+        for (var sub of subs) {
+            var file = this.getUrl(sub.url)
+            var label = sub.SubtitlesName.name;
+            subtitles.push({ file: file, label: label });
+        }
+        streams[0].subtitles = subtitles
+
+        return streams;
+
     }
     // For manga chapter pages
     async getPageList() {
