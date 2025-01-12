@@ -165,6 +165,7 @@ class DefaultExtension extends MProvider {
             }
         }
 
+        chapters.reverse()
 
         return { name, description, status, imageUrl, genre, chapters }
 
