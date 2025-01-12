@@ -5,10 +5,10 @@ const mangayomiSources = [{
     "apiUrl": "",
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://sudatchi.com",
     "typeSource": "single",
-    "isManga": null,
-    "version": "1.0.1",
+    "version": "1.0.2",
     "dateFormat": "",
     "dateFormatLocale": "",
+    "itemType: 1,
     "pkgPath": "anime/src/en/sudatchi.js"
 }];
 
