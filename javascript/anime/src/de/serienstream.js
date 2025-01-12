@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "single",
     "itemType": 1,
     "isNsfw": false,
-    "version": "0.0.4",
+    "version": "0.0.5",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/de/serienstream.js"
