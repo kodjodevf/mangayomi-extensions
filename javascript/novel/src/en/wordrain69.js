@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/en.wordrain69.png",
   "typeSource": "single",
   "itemType": 2,
-  "version": "0.0.2",
+  "version": "0.0.3",
   "dateFormat": "",
   "dateFormatLocale": "",
   "pkgPath": "novel/src/en/wordrain69.js",
@@ -91,7 +91,7 @@ class DefaultExtension extends MProvider {
     for (const el of chapterElements) {
       let chapterName = el.selectFirst("a")?.text.trim();
       const chapterUrl = el.selectFirst("a").getHref;
-      let dateUpload; 
+      let dateUpload;
       try {
         dateUpload = this.parseDate(el.selectFirst("span.chapter-release-date > i")?.text.trim());
       } catch (_) {
@@ -104,8 +104,6 @@ class DefaultExtension extends MProvider {
         scanlator: null,
       });
     }
-
-    chapters.reverse();
 
     return {
       imageUrl,
@@ -127,8 +125,8 @@ class DefaultExtension extends MProvider {
   async cleanHtmlContent(html) {
     const doc = new Document(html);
     const title =
-        doc.selectFirst("#chapter-heading")?.text.trim() ||
-        "";
+      doc.selectFirst("#chapter-heading")?.text.trim() ||
+      "";
     const content = doc.selectFirst(".entry-content")?.innerHtml;
     return `<h2>${title}</h2><hr><br>${content}`;
   }
@@ -142,19 +140,19 @@ class DefaultExtension extends MProvider {
   }
 
   parseDate(date) {
-      const months = {
-        "January": "01", "February": "02", "March": "03", "April": "04", "May": "05", "June": "06", 
-        "July": "07", "August": "08", "September": "09", "October": "10", "November": "11", "December": "12"
-      };
-      date = date.toLowerCase().replace(",", "").split(" ");
+    const months = {
+      "January": "01", "February": "02", "March": "03", "April": "04", "May": "05", "June": "06",
+      "July": "07", "August": "08", "September": "09", "October": "10", "November": "11", "December": "12"
+    };
+    date = date.toLowerCase().replace(",", "").split(" ");
 
-      if (!(date[0] in months)) {
-          return String(new Date().valueOf())
-      }
-      
-      date[0] = months[date[0]];
-      date = [date[2], date[0], date[1]];
-      date = date.join("-");
-      return String(new Date(date).valueOf());
+    if (!(date[0] in months)) {
+      return String(new Date().valueOf())
+    }
+
+    date[0] = months[date[0]];
+    date = [date[2], date[0], date[1]];
+    date = date.join("-");
+    return String(new Date(date).valueOf());
   }
 }
