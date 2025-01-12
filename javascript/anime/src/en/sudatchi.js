@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://sudatchi.com",
     "typeSource": "single",
     "isManga": null,
-    "version": "1.0.0",
+    "version": "1.0.1",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/en/sudatchi.js"
@@ -158,16 +158,16 @@ class DefaultExtension extends MProvider {
             chapters.push({ name: "Movie", url: epUrl })
         } else {
             for (var eObj of episodes) {
-                var name = eObj.title
+                var epName = eObj.title
                 var number = eObj.number
                 var epUrl = `${url}/${number}`
-                chapters.push({ name, url: epUrl })
+                chapters.push({ name:epName, url: epUrl })
             }
         }
 
         chapters.reverse()
 
-        return { name, description, status, imageUrl, genre, chapters }
+        return { name, description, status, imageUrl, genre, chapters ,link}
 
     }
     // For novel html content
