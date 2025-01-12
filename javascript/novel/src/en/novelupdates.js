@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/en.novelupdates.png",
   "typeSource": "single",
   "itemType": 2,
-  "version": "0.0.2",
+  "version": "0.0.3",
   "dateFormat": "",
   "dateFormatLocale": "",
   "pkgPath": "novel/src/en/novelupdates.js",
@@ -188,8 +188,13 @@ class DefaultExtension extends MProvider {
       "User-Agent":
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
     });
-    const doc = new Document(res.body);
-    const domain = res.body;
+    return await this.cleanHtmlContent(res.body);
+  }
+
+  async cleanHtmlContent(html) {
+    const client = await new Client();
+    const doc = new Document(html);
+    const domain = html;
     
     if (domain.includes("anotivereads")) {
       const title =
@@ -424,50 +429,49 @@ class DefaultExtension extends MProvider {
       return e?.toLowerCase().includes("wordpress") || e?.toLowerCase().includes("site kit by google")
     });
 
-    
     let title =
-    doc.selectFirst(".entry-title")?.text.trim() ||
-    doc.selectFirst(".entry-title-main")?.text.trim() ||
-    doc.selectFirst(".chapter__title")?.text.trim() ||
-    doc.selectFirst(".sp-title")?.text.trim() ||
-    doc.selectFirst(".title-content")?.text.trim() ||
-    doc.selectFirst(".wp-block-post-title")?.text.trim() ||
-    doc.selectFirst(".title_story")?.text.trim() ||
-    doc.selectFirst(".active")?.text.trim() ||
-    doc.selectFirst("head title")?.text.trim() ||
-    doc.selectFirst("h1.leading-none ~ h2")?.text.trim() ||
-    "";
-  const subtitle =
-    doc.selectFirst(".cat-series")?.text.trim() ||
-    doc.selectFirst("h1.leading-none ~ span")?.text.trim() ||
-    "";
-  if (subtitle && subtitle != "") {
-    title = subtitle;
-  }
-  const content =
-    doc.selectFirst(".rdminimal")?.innerHtml ||
-    doc.selectFirst(".entry-content")?.innerHtml ||
-    doc.selectFirst(".chapter__content")?.innerHtml ||
-    doc.selectFirst(".prevent-select")?.innerHtml ||
-    doc.selectFirst(".text_story")?.innerHtml ||
-    doc.selectFirst(".contenta")?.innerHtml ||
-    doc.selectFirst(".single_post")?.innerHtml ||
-    doc.selectFirst(".post-entry")?.innerHtml ||
-    doc.selectFirst(".main-content")?.innerHtml ||
-    doc.selectFirst(".post-content")?.innerHtml ||
-    doc.selectFirst(".content")?.innerHtml ||
-    doc.selectFirst(".page-body")?.innerHtml ||
-    doc.selectFirst(".td-page-content")?.innerHtml ||
-    doc.selectFirst(".reader-content")?.innerHtml ||
-    doc.selectFirst("#content")?.innerHtml ||
-    doc.selectFirst("#the-content")?.innerHtml ||
-    doc.selectFirst("article.post")?.innerHtml;
-    
-    if (isWordpress || domain.includes("etherreads") || domain.includes("soafp")) {
-      return `<h2>${title}</h2><hr><br>${content}`;
+      doc.selectFirst(".entry-title")?.text.trim() ||
+      doc.selectFirst(".entry-title-main")?.text.trim() ||
+      doc.selectFirst(".chapter__title")?.text.trim() ||
+      doc.selectFirst(".sp-title")?.text.trim() ||
+      doc.selectFirst(".title-content")?.text.trim() ||
+      doc.selectFirst(".wp-block-post-title")?.text.trim() ||
+      doc.selectFirst(".title_story")?.text.trim() ||
+      doc.selectFirst(".active")?.text.trim() ||
+      doc.selectFirst("head title")?.text.trim() ||
+      doc.selectFirst("h1.leading-none ~ h2")?.text.trim() ||
+      "";
+    const subtitle =
+      doc.selectFirst(".cat-series")?.text.trim() ||
+      doc.selectFirst("h1.leading-none ~ span")?.text.trim() ||
+      "";
+    if (subtitle && subtitle != "") {
+      title = subtitle;
     }
+    const content =
+      doc.selectFirst(".rdminimal")?.innerHtml ||
+      doc.selectFirst(".entry-content")?.innerHtml ||
+      doc.selectFirst(".chapter__content")?.innerHtml ||
+      doc.selectFirst(".prevent-select")?.innerHtml ||
+      doc.selectFirst(".text_story")?.innerHtml ||
+      doc.selectFirst(".contenta")?.innerHtml ||
+      doc.selectFirst(".single_post")?.innerHtml ||
+      doc.selectFirst(".post-entry")?.innerHtml ||
+      doc.selectFirst(".main-content")?.innerHtml ||
+      doc.selectFirst(".post-content")?.innerHtml ||
+      doc.selectFirst(".content")?.innerHtml ||
+      doc.selectFirst(".page-body")?.innerHtml ||
+      doc.selectFirst(".td-page-content")?.innerHtml ||
+      doc.selectFirst(".reader-content")?.innerHtml ||
+      doc.selectFirst("#content")?.innerHtml ||
+      doc.selectFirst("#the-content")?.innerHtml ||
+      doc.selectFirst("article.post")?.innerHtml;
     
-    return `<p>Domain not supported yet. Content might not load properly!</p>
+      if (isWordpress || domain.includes("etherreads") || domain.includes("soafp")) {
+        return `<h2>${title}</h2><hr><br>${content}`;
+      }
+    
+      return `<p>Domain not supported yet. Content might not load properly!</p>
             <br><h2>${title}</h2><hr><br>${content}`;
   }
 
