@@ -69,6 +69,16 @@ class DefaultExtension extends MProvider {
             hasNextPage: false
         }
     }
+    cleanHtmlString(input) {
+      if (!input) return "";
+      return input
+          .replace(/&lt;/g, '<')
+          .replace(/&gt;/g, '>')
+          .replace(/<br>/g, '\n')
+          .replace(/<br\s*\/?>/g, '\n')
+          .replace(/&quot;/g, '"')
+          .replace(/<a\s+href="([^"]*)".*?>.*?<\/a>/g, '$1');
+    }
     async getDetail(url) {
         const baseUrl = this.source.baseUrl;
         const res = await this.client.get(baseUrl + url);
@@ -77,7 +87,7 @@ class DefaultExtension extends MProvider {
             document.selectFirst("div.seriesCoverBox img").attr("data-src");
         const name = document.selectFirst("div.series-title h1 span").text;
         const genre = document.select("div.genres ul li").map(e => e.text);
-        const description = document.selectFirst("p.seri_des").attr("data-full-description");
+        const description = this.cleanHtmlString(document.selectFirst("p.seri_des").attr("data-full-description"));
         const produzent = document.select("div.cast li")
             .filter(e => e.outerHtml.includes("Produzent:"));
         let author = "";
@@ -104,7 +114,7 @@ class DefaultExtension extends MProvider {
         const url = titleAnchor.attr("href");
         const dateUpload = await this.getUploadDateFromEpisode(url);
         const episodeSeasonId = element.attr("data-episode-season-id");
-        let episode = episodeSpan.text.replace(/&#039;/g, "'");
+        let episode = this.cleanHtmlString(episodeSpan.text);
         let name = "";
         if (url.includes("/film")) {
             name = `Film ${episodeSeasonId} : ${episode}`;
