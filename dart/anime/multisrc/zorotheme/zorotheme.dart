@@ -127,18 +127,21 @@ class ZoroTheme extends MProvider {
     final res = (await client.get(Uri.parse("${source.baseUrl}$url"))).body;
     MManga anime = MManga();
     final status = xpath(res,
-            '//*[@class="anisc-info"]/div[contains(text(),"Status:")]/span[2]/text()')
-        .first;
+        '//*[@class="anisc-info"]/div[contains(text(),"Status:")]/span[2]/text()');
+    if (status.isNotEmpty) {
+      anime.status = parseStatus(status.first, statusList);
+    }
 
-    anime.status = parseStatus(status, statusList);
-    anime.author = xpath(res,
-            '//*[@class="anisc-info"]/div[contains(text(),"Studios:")]/span/text()')
-        .first
-        .replaceAll("Studios:", "");
-    anime.description = xpath(res,
-            '//*[@class="anisc-info"]/div[contains(text(),"Overview:")]/text()')
-        .first
-        .replaceAll("Overview:", "");
+    final author = xpath(res,
+        '//*[@class="anisc-info"]/div[contains(text(),"Studios:")]/span/text()');
+    if (author.isNotEmpty) {
+      anime.author = author.first.replaceAll("Studios:", "");
+    }
+    final description = xpath(res,
+        '//*[@class="anisc-info"]/div[contains(text(),"Overview:")]/text()');
+    if (description.isNotEmpty) {
+      anime.description = description.first.replaceAll("Overview:", "");
+    }
     final genre = xpath(res,
         '//*[@class="anisc-info"]/div[contains(text(),"Genres:")]/a/text()');
 
