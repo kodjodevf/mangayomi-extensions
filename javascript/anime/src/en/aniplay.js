@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://aniplaynow.live/",
     "typeSource": "single",
     "itemType": 1,
-    "version": "0.0.3",
+    "version": "0.0.5",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/en/aniplay.js"
@@ -403,7 +403,8 @@ class DefaultExtension extends MProvider {
         var epData = JSON.parse(urlSplits[1])
         var providerId = urlSplits[2]
 
-        var subOrDub = "sub"
+        var user_audio_type = this.getPreference("aniplay_pref_audio_type");
+        var subOrDub = epData.hasDub && user_audio_type === "dub" ? "dub" : "sub"
 
         var slug = `watch/${anilistId}`
         var body = [
@@ -456,6 +457,15 @@ class DefaultExtension extends MProvider {
                     "valueIndex": 0,
                     "entries": ["Anya", "Yuki"],
                     "entryValues": ["anya", "yuki"],
+                }
+            }, {
+                "key": "aniplay_pref_audio_type",
+                "listPreference": {
+                    "title": "Preferred audio type",
+                    "summary": "Sub/Dub",
+                    "valueIndex": 0,
+                    "entries": ["Sub", "Dub"],
+                    "entryValues": ["sub", "dub"],
                 }
             },
 
