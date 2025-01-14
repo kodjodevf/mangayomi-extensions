@@ -284,15 +284,15 @@ class DefaultExtension extends MProvider {
         throw new Error("supportsLatest not implemented");
     }
 
-    async aniplayRequest(url, body) {
+    async aniplayRequest(slug, body) {
         var next_action = ""
 
-        if (url.indexOf("/info/") > -1) {
+        if (slug.indexOf("info/") > -1) {
             next_action = 'f3422af67c84852f5e63d50e1f51718f1c0225c4'
-        } else if (url.indexOf("/watch/") > -1) {
+        } else if (slug.indexOf("watch/") > -1) {
             next_action = '5dbcd21c7c276c4d15f8de29d9ef27aef5ea4a5e'
         }
-
+        var url = `${this.source.baseUrl}anime/${slug}`
         var headers = {
             "referer": "https://aniplaynow.live",
             'next-action': next_action,
@@ -313,9 +313,9 @@ class DefaultExtension extends MProvider {
         var animeData = await this.getAnimeDetails(anilistId)
 
 
-        var link = `${this.source.baseUrl}anime/info/${anilistId}`
+        var slug = `info/${anilistId}`
         var body = [anilistId, true, false]
-        var result = await this.aniplayRequest(link, body)
+        var result = await this.aniplayRequest(slug, body)
         if (result.length < 1) {
             throw new Error("Error: No data found for the given URL");
         }
@@ -336,16 +336,98 @@ class DefaultExtension extends MProvider {
             var name = `E${num}: ${title}`
             var dateUpload = "createdAt" in ep ? new Date(ep.createdAt) : new Date().now()
             dateUpload = dateUpload.valueOf().toString();
-            var epUrl = `${JSON.stringify(ep)}||${choice.providerId}`
+            delete ep.img
+            delete ep.title
+            delete ep.description
+            var epUrl = `${anilistId}||${JSON.stringify(ep)}||${choice.providerId}`
             chapters.push({ name, url: epUrl, dateUpload })
         }
-        animeData.link = link
+        animeData.link = `${this.source.baseUrl}anime/${slug}`
         animeData.chapters = chapters.reverse()
         return animeData
     }
+
+    // Extracts the streams url for different resolutions from a hls stream.
+    async extractStreams(url, providerId) {
+        const response = await new Client().get(url);
+        const body = response.body;
+        const lines = body.split('\n');
+        var streams = [{
+            url: url,
+            originalUrl: url,
+            quality: "auto",
+        }];
+
+        for (let i = 0; i < lines.length; i++) {
+            if (lines[i].startsWith('#EXT-X-STREAM-INF:')) {
+                var resolution = lines[i].match(/RESOLUTION=(\d+x\d+)/)[1];
+                var m3u8Url = lines[i + 1].trim();
+                if (providerId === "anya") {
+                    m3u8Url = `https://prox.uqable.easypanel.host${m3u8Url}`
+                } else if (providerId === "yuki") {
+                    var orginalUrl = url
+                    m3u8Url = orginalUrl.replace("master.m3u8", m3u8Url)
+                }
+                streams.push({
+                    url: m3u8Url,
+                    originalUrl: m3u8Url,
+                    quality: `${resolution} - ${providerId}`,
+                });
+            }
+        }
+        return streams
+
+    }
+
+    async getAnyaStreams(result) {
+        var m3u8Url = result.sources[0].url
+        m3u8Url = `https://prox.uqable.easypanel.host/fetch?url=${m3u8Url}&ref=https://anix.sh`
+        return await this.extractStreams(m3u8Url, "anya");
+    }
+
+    async getYukiStreams(result) {
+        var m3u8Url = result.sources[0].url
+        var streams = await this.extractStreams(m3u8Url, "yuki");
+
+
+        var subtitles = result.tracks
+        streams[0].subtitles = subtitles
+
+        return streams
+    }
+
     // For anime episode video list
     async getVideoList(url) {
-        throw new Error("getVideoList not implemented");
+        var urlSplits = url.split("||")
+        var anilistId = urlSplits[0]
+        var epData = JSON.parse(urlSplits[1])
+        var providerId = urlSplits[2]
+
+        var subOrDub = "sub"
+
+        var slug = `watch/${anilistId}`
+        var body = [
+            anilistId,
+            providerId,
+            epData.id,
+            epData.number.toString(),
+            subOrDub
+        ]
+        var result = await this.aniplayRequest(slug, body)
+        if (result === null) {
+            throw new Error("Error: No data found for the given URL");
+        }
+
+        var streams = []
+        if (providerId == "anya") {
+            streams = await this.getAnyaStreams(result)
+        }
+        else {
+            streams = await this.getYukiStreams(result)
+        }
+
+        return streams
+
     }
     // For manga chapter pages
     async getPageList() {
@@ -372,8 +454,8 @@ class DefaultExtension extends MProvider {
                     "title": "Preferred provider",
                     "summary": "",
                     "valueIndex": 0,
-                    "entries": ["Anya", "Yuki", "Kuro"],
-                    "entryValues": ["anya", "yuki", "kuro"],
+                    "entries": ["Anya", "Yuki"],
+                    "entryValues": ["anya", "yuki"],
                 }
             },
 
