@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://aniplaynow.live/",
     "typeSource": "single",
     "itemType": 1,
-    "version": "0.0.5",
+    "version": "0.0.6",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/en/aniplay.js"
@@ -342,12 +342,34 @@ class DefaultExtension extends MProvider {
             delete ep.img
             delete ep.title
             delete ep.description
+            delete ep.isFiller
             var epUrl = `${anilistId}||${JSON.stringify(ep)}||${choice.providerId}`
             chapters.push({ name, url: epUrl, dateUpload })
         }
         animeData.link = `${this.source.baseUrl}anime/${slug}`
         animeData.chapters = chapters.reverse()
         return animeData
+    }
+
+
+    // Sorts streams based on user preference.
+    async sortStreams(streams) {
+        var sortedStreams = [];
+        var copyStreams = streams.slice()
+
+        var pref = await this.getPreference("aniplay_pref_video_resolution");
+        for (var stream of streams) {
+
+            if (stream.quality.indexOf(pref) > -1) {
+                sortedStreams.push(stream);
+                var index = copyStreams.indexOf(stream);
+                if (index > -1) {
+                    copyStreams.splice(index, 1);
+                }
+                break;
+            }
+        }
+        return [...sortedStreams, ...copyStreams]
     }
 
     // Extracts the streams url for different resolutions from a hls stream.
@@ -430,7 +452,7 @@ class DefaultExtension extends MProvider {
             streams = await this.getYukiStreams(result)
         }
 
-        return streams
+        return await this.sortStreams(streams)
 
     }
     // For manga chapter pages
@@ -477,6 +499,15 @@ class DefaultExtension extends MProvider {
                     "valueIndex": 0,
                     "entries": ["Sub", "Dub"],
                     "entryValues": ["sub", "dub"],
+                }
+            }, {
+                key: 'aniplay_pref_video_resolution',
+                listPreference: {
+                    title: 'Preferred video resolution',
+                    summary: '',
+                    valueIndex: 0,
+                    entries: ["Auto", "1080p", "720p", "480p", "360p"],
+                    entryValues: ["auto", "1080", "720", "480", "360"]
                 }
             },
 
