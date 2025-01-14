@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://aniplaynow.live/",
     "typeSource": "single",
     "itemType": 1,
-    "version": "0.0.6",
+    "version": "1.0.0",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/en/aniplay.js"
@@ -142,6 +142,7 @@ class DefaultExtension extends MProvider {
                                 name
                             }
                         }
+                        format    
                         countryOfOrigin
                         isAdult
                     }
@@ -191,6 +192,7 @@ class DefaultExtension extends MProvider {
         anime.genre = [...new Set([...tagsList, ...genresList])].sort();
         const studiosList = media?.studios?.nodes?.map(node => node.name).filter(Boolean) || [];
         anime.author = studiosList.sort().join(", ");
+        anime.format = media.format
         return anime;
     }
 
@@ -335,8 +337,9 @@ class DefaultExtension extends MProvider {
             var title = ep.title
             var num = ep.number
             var isFiller = ep.isFiller
-            var name = `E${num}: ${title}`
-            name = isFiller && user_mark_filler_ep === true ? `E${num}: ${title} (F)` : name
+          
+            var name = isFiller && user_mark_filler_ep ? `E${num}:(F) ${title}` : `E${num}: ${title}`
+            
             var dateUpload = "createdAt" in ep ? new Date(ep.createdAt) : new Date().now()
             dateUpload = dateUpload.valueOf().toString();
             delete ep.img
@@ -346,6 +349,10 @@ class DefaultExtension extends MProvider {
             var epUrl = `${anilistId}||${JSON.stringify(ep)}||${choice.providerId}`
             chapters.push({ name, url: epUrl, dateUpload })
         }
+        
+        var format = animeData.format
+        if(format === "MOVIE") chapters[0].name = "Movie"
+        
         animeData.link = `${this.source.baseUrl}anime/${slug}`
         animeData.chapters = chapters.reverse()
         return animeData
