@@ -328,12 +328,15 @@ class DefaultExtension extends MProvider {
                 break;
             }
         }
+        var user_mark_filler_ep = this.getPreference("aniplay_pref_mark_filler");
         var chapters = []
         var epList = choice.episodes
         for (var ep of epList) {
             var title = ep.title
             var num = ep.number
+            var isFiller = ep.isFiller
             var name = `E${num}: ${title}`
+            name = isFiller && user_mark_filler_ep === true ? `E${num}: ${title} (F)` : name
             var dateUpload = "createdAt" in ep ? new Date(ep.createdAt) : new Date().now()
             dateUpload = dateUpload.valueOf().toString();
             delete ep.img
@@ -459,6 +462,14 @@ class DefaultExtension extends MProvider {
                     "entryValues": ["anya", "yuki"],
                 }
             }, {
+                "key": "aniplay_pref_mark_filler",
+                "switchPreferenceCompat": {
+                    "title": "Mark filler episodes",
+                    "summary": "Filler episodes will be marked with (F)",
+                    "value": false
+                }
+            },
+            {
                 "key": "aniplay_pref_audio_type",
                 "listPreference": {
                     "title": "Preferred audio type",
