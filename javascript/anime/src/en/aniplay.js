@@ -294,7 +294,7 @@ class DefaultExtension extends MProvider {
         } else if (slug.indexOf("watch/") > -1) {
             next_action = '5dbcd21c7c276c4d15f8de29d9ef27aef5ea4a5e'
         }
-        var url = `${this.source.baseUrl}anime/${slug}`
+        var url = `${this.source.baseUrl}/anime/${slug}`
         var headers = {
             "referer": "https://aniplaynow.live",
             'next-action': next_action,
@@ -353,7 +353,7 @@ class DefaultExtension extends MProvider {
         var format = animeData.format
         if(format === "MOVIE") chapters[0].name = "Movie"
         
-        animeData.link = `${this.source.baseUrl}anime/${slug}`
+        animeData.link = `${this.source.baseUrl}/anime/${slug}`
         animeData.chapters = chapters.reverse()
         return animeData
     }
