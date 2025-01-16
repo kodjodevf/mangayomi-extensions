@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://aniplaynow.live/",
     "typeSource": "single",
     "itemType": 1,
-    "version": "1.0.0",
+    "version": "1.0.1",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/en/aniplay.js"
@@ -322,37 +322,43 @@ class DefaultExtension extends MProvider {
             throw new Error("Error: No data found for the given URL");
         }
 
-        var user_provider = this.getPreference("aniplay_pref_provider");
-        var choice = result[0]
-        for (var ch of result) {
-            if (ch["providerId"] == user_provider) {
-                choice = ch
-                break;
+        var user_provider = this.getPreference("aniplay_pref_provider_new");
+        var choices = result
+        if (user_provider !== "all") {
+            for (var ch of result) {
+                if (ch["providerId"] == user_provider) {
+                    choices = [ch]
+                    break;
+                }
             }
         }
-        var user_mark_filler_ep = this.getPreference("aniplay_pref_mark_filler");
-        var chapters = []
-        var epList = choice.episodes
-        for (var ep of epList) {
-            var title = ep.title
-            var num = ep.number
-            var isFiller = ep.isFiller
-          
-            var name = isFiller && user_mark_filler_ep ? `E${num}:(F) ${title}` : `E${num}: ${title}`
-            
-            var dateUpload = "createdAt" in ep ? new Date(ep.createdAt) : new Date().now()
-            dateUpload = dateUpload.valueOf().toString();
-            delete ep.img
-            delete ep.title
-            delete ep.description
-            delete ep.isFiller
-            var epUrl = `${anilistId}||${JSON.stringify(ep)}||${choice.providerId}`
-            chapters.push({ name, url: epUrl, dateUpload })
+
+        for (const choice of choices) {
+            var user_mark_filler_ep = this.getPreference("aniplay_pref_mark_filler");
+            var chapters = []
+            var epList = choice.episodes
+            for (var ep of epList) {
+                var title = ep.title
+                var num = ep.number
+                var isFiller = ep.isFiller
+
+                var name = isFiller && user_mark_filler_ep ? `E${num}:(F) ${title}` : `E${num}: ${title}`
+
+                var dateUpload = "createdAt" in ep ? new Date(ep.createdAt) : new Date().now()
+                dateUpload = dateUpload.valueOf().toString();
+                delete ep.img
+                delete ep.title
+                delete ep.description
+                delete ep.isFiller
+                var epUrl = `${anilistId}||${JSON.stringify(ep)}||${choice.providerId}`
+                chapters.push({ name, url: epUrl, dateUpload })
+            }
         }
-        
+
+
         var format = animeData.format
-        if(format === "MOVIE") chapters[0].name = "Movie"
-        
+        if (format === "MOVIE") chapters[0].name = "Movie"
+
         animeData.link = `${this.source.baseUrl}/anime/${slug}`
         animeData.chapters = chapters.reverse()
         return animeData
@@ -462,13 +468,7 @@ class DefaultExtension extends MProvider {
         return await this.sortStreams(streams)
 
     }
-    // For manga chapter pages
-    async getPageList() {
-        throw new Error("getPageList not implemented");
-    }
-    getFilterList() {
-        throw new Error("getFilterList not implemented");
-    }
+
     getSourcePreferences() {
         return [
             {
@@ -482,13 +482,13 @@ class DefaultExtension extends MProvider {
                 }
             },
             {
-                "key": "aniplay_pref_provider",
+                "key": "aniplay_pref_provider_new",
                 "listPreference": {
                     "title": "Preferred provider",
                     "summary": "",
                     "valueIndex": 0,
-                    "entries": ["Anya", "Yuki"],
-                    "entryValues": ["anya", "yuki"],
+                    "entries": ["All", "Anya", "Yuki"],
+                    "entryValues": ["all", "anya", "yuki"],
                 }
             }, {
                 "key": "aniplay_pref_mark_filler",
