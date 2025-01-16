@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://aniplaynow.live/",
     "typeSource": "single",
     "itemType": 1,
-    "version": "1.0.1",
+    "version": "1.0.2",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/en/aniplay.js"
@@ -342,7 +342,7 @@ class DefaultExtension extends MProvider {
                 var num = ep.number
                 var isFiller = ep.isFiller
 
-                var name = isFiller && user_mark_filler_ep ? `E${num}:(F) ${title}` : `E${num}: ${title}`
+                var scanlator = isFiller && user_mark_filler_ep ? `Filler` : null;
 
                 var dateUpload = "createdAt" in ep ? new Date(ep.createdAt) : new Date().now()
                 dateUpload = dateUpload.valueOf().toString();
@@ -351,7 +351,7 @@ class DefaultExtension extends MProvider {
                 delete ep.description
                 delete ep.isFiller
                 var epUrl = `${anilistId}||${JSON.stringify(ep)}||${choice.providerId}`
-                chapters.push({ name, url: epUrl, dateUpload })
+                chapters.push({ name: `E${num}: ${title}`, url: epUrl, dateUpload, scanlator })
             }
         }
 
