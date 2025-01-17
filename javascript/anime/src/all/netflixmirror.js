@@ -36,9 +36,10 @@ class DefaultExtension extends MProvider {
         preferences.setString("cookie", cookie);
         return cookie;
     }
-    async request(url, cookie) {
+    async request(url, cookie, tvApi = false) {
         cookie = cookie ?? await this.getCookie();
-        return (await new Client().get(this.source.baseUrl + url, { "cookie": cookie })).body;
+        var api = tvApi ? this.getTVApi() : this.source.baseUrl;
+        return (await new Client().get(api + url, { "cookie": cookie })).body;
     }
     async getPopular(page) {
         return await this.getPages(await this.request("/home"), ".tray-container, #top10")
@@ -136,78 +137,63 @@ class DefaultExtension extends MProvider {
         return episodes;
     }
 
-
     async getVideoList(url) {
-        const baseUrl = this.source.baseUrl;
+        const baseUrl = this.getTVApi();
         const urlData = JSON.parse(url);
-        const data = JSON.parse(await this.request(`/playlist.php?id=${urlData.id}&t=${urlData.name}`));
-        const videoList = [];
+        const data = JSON.parse(await this.request(`/tv/playlist.php?id=${urlData.id}&t=${urlData.name}`, null, true));
+        let videoList = [];
+        let subtitles = [];
+        let audios = [];
         for (const playlist of data) {
-            for (const source of playlist.sources) {
-                try {
-                    const subtitles = [];
-                    playlist.tracks.filter(track => track.kind === 'captions').forEach(track => {
-                        subtitles.push({
-                            label: track.label,
-                            file: track.file
-                        });
-                    });
-                    const link = baseUrl + source.file;
-                    const headers =
+            var source = playlist.sources[0]
+            var link = baseUrl + source.file;
+            
+
+            var resp = await new Client().get(link);
+
+            if (resp.statusCode === 200) {
+                const masterPlaylist = resp.body;
+                masterPlaylist.substringAfter('#EXT-X-MEDIA:').split('#EXT-X-MEDIA:').forEach(it => {
+                    if (it.includes('TYPE=AUDIO')) {
+                        const audioInfo = it.substringAfter('TYPE=AUDIO').substringBefore('\n');
+                        const language = audioInfo.substringAfter('NAME="').substringBefore('"');
+                        const url = audioInfo.substringAfter('URI="').substringBefore('"');
+                        audios.push({ file: url, label: language });
+                    }
+                });
+
+                masterPlaylist.substringAfter('#EXT-X-STREAM-INF:').split('#EXT-X-STREAM-INF:').forEach(it => {
+
+                    var quality = `${it.substringAfter('RESOLUTION=').substringAfter('x').substringBefore(',')}p (${source.label})`;
+                    let videoUrl = it.substringAfter('\n').substringBefore('\n');
+
+                    if (!videoUrl.startsWith('http')) {
+                        videoUrl = resp.request.url.substringBeforeLast('/') + `/${videoUrl}`;
+                    }
+                    var headers =
                     {
-                        'Host': link.match(/^(?:https?:\/\/)?(?:www\.)?([^\/]+)/)[1],
+                        'Host': videoUrl.match(/^(?:https?:\/\/)?(?:www\.)?([^\/]+)/)[1],
                         'Origin': baseUrl,
                         'Referer': `${baseUrl}/`
                     };
-                    const resp = await new Client().get(link, headers);
+                    videoList.push({ url: videoUrl, quality, originalUrl: videoUrl, headers });
 
-                    if (resp.statusCode === 200) {
-                        const masterPlaylist = resp.body;
-                        const audios = [];
-                        masterPlaylist.substringAfter('#EXT-X-MEDIA:').split('#EXT-X-MEDIA:').forEach(it => {
-                            if (it.includes('TYPE=AUDIO')) {
-                                const audioInfo = it.substringAfter('TYPE=AUDIO').substringBefore('\n');
-                                const language = audioInfo.substringAfter('NAME="').substringBefore('"');
-                                const url = audioInfo.substringAfter('URI="').substringBefore('"');
-                                audios.push({ file: url, label: language });
-                            }
-                        });
-
-                        if (!masterPlaylist.includes('#EXT-X-STREAM-INF:')) {
-                            if (audios.length === 0) {
-                                videoList.push({ url: link, quality: source.label, originalUrl: link, subtitles, headers });
-                            } else {
-                                videoList.push({ url: link, quality: source.label, originalUrl: link, subtitles, audios, headers });
-                            }
-                        } else {
-                            masterPlaylist.substringAfter('#EXT-X-STREAM-INF:').split('#EXT-X-STREAM-INF:').forEach(it => {
-
-                                const quality = `${it.substringAfter('RESOLUTION=').substringAfter('x').substringBefore(',')}p (${source.label})`;
-                                let videoUrl = it.substringAfter('\n').substringBefore('\n');
-
-                                if (!videoUrl.startsWith('http')) {
-                                    videoUrl = resp.request.url.substringBeforeLast('/') + `/${videoUrl}`;
-                                }
-                                const headers =
-                                {
-                                    'Host': videoUrl.match(/^(?:https?:\/\/)?(?:www\.)?([^\/]+)/)[1],
-                                    'Origin': baseUrl,
-                                    'Referer': `${baseUrl}/`
-                                };
-                                if (audios.length === 0) {
-                                    videoList.push({ url: videoUrl, quality, originalUrl: videoUrl, subtitles, headers });
-                                } else {
-                                    videoList.push({ url: videoUrl, quality, originalUrl: videoUrl, subtitles, audios, headers });
-                                }
-
-                            });
-                        }
-                    }
-                } catch (_) {
-
-                }
+                });
             }
+
+
+
+            playlist.tracks.filter(track => track.kind === 'captions').forEach(track => {
+                subtitles.push({
+                    label: track.label,
+                    file: track.file
+                });
+            });
         }
+
+
+        videoList[0].audios = audios;
+        videoList[0].subtitles = subtitles;
         return videoList;
     }
 
