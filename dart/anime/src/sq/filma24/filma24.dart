@@ -10,7 +10,7 @@ class Filma24 extends MProvider {
       Client(source, json.encode({"useDartHttpClient": true}));
 
   @override
-  String get baseUrl => getPreferenceValue(source.id, "pref_domain");
+  String get baseUrl => getPreferenceValue(source.id, "pref_domain_new");
 
   @override
   Future<MPages> getPopular(int page) async {
@@ -122,13 +122,13 @@ class Filma24 extends MProvider {
   List<dynamic> getSourcePreferences() {
     return [
       EditTextPreference(
-          key: "pref_domain",
+          key: "pref_domain_new",
           title: "Domeni i përdorur aktualisht",
           summary: "",
-          value: "https://www.filma24.pl",
+          value: "https://www.filma24.band",
           dialogTitle: "Domeni i përdorur aktualisht",
           dialogMessage: "",
-          text: "https://www.filma24.pl"),
+          text: "https://www.filma24.band"),
     ];
   }
 
