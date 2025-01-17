@@ -34,7 +34,7 @@ class MangaReader extends MProvider {
   Future<MPages> search(String query, int page, FilterList filterList) async {
     final filters = filterList.filters;
 
-    String url = "$baseUrl/?&title=$query&page=$page";
+    String url = "$baseUrl${getMangaSearchUrl(page, query)}";
 
     for (var filter in filters) {
       if (filter.type == "AuthorFilter") {
@@ -277,37 +277,39 @@ class MangaReader extends MProvider {
 
   @override
   List<dynamic> getFilterList() {
-    return [
-      SeparatorFilter(),
-      TextFilter("AuthorFilter", "Author"),
-      TextFilter("YearFilter", "Year"),
-      SelectFilter("StatusFilter", "Status", 0, [
-        SelectFilterOption("All", ""),
-        SelectFilterOption("Ongoing", "ongoing"),
-        SelectFilterOption("Completed", "completed"),
-        SelectFilterOption("Hiatus", "hiatus"),
-        SelectFilterOption("Dropped", "dropped"),
-      ]),
-      SelectFilter("TypeFilter", "Type", 0, [
-        SelectFilterOption("All", ""),
-        SelectFilterOption("Manga", "Manga"),
-        SelectFilterOption("Manhwa", "Manhwa"),
-        SelectFilterOption("Manhua", "Manhua"),
-        SelectFilterOption("Comic", "Comic"),
-      ]),
-      SelectFilter("OrderByFilter", "Sort By", 0, [
-        SelectFilterOption("Default", ""),
-        SelectFilterOption("A-Z", "title"),
-        SelectFilterOption("Z-A", "titlereverse"),
-        SelectFilterOption("Latest Update", "update"),
-        SelectFilterOption("Latest Added", "latest"),
-        SelectFilterOption("Popular", "popular"),
-      ]),
-      HeaderFilter("Genre exclusion is not available for all sources"),
-      GroupFilter("GenreListFilter", "Genre", [
-        TriStateFilter("Press reset to attempt to fetch genres", ""),
-      ]),
-    ];
+    return ignoreFilter()
+        ? []
+        : [
+            SeparatorFilter(),
+            TextFilter("AuthorFilter", "Author"),
+            TextFilter("YearFilter", "Year"),
+            SelectFilter("StatusFilter", "Status", 0, [
+              SelectFilterOption("All", ""),
+              SelectFilterOption("Ongoing", "ongoing"),
+              SelectFilterOption("Completed", "completed"),
+              SelectFilterOption("Hiatus", "hiatus"),
+              SelectFilterOption("Dropped", "dropped"),
+            ]),
+            SelectFilter("TypeFilter", "Type", 0, [
+              SelectFilterOption("All", ""),
+              SelectFilterOption("Manga", "Manga"),
+              SelectFilterOption("Manhwa", "Manhwa"),
+              SelectFilterOption("Manhua", "Manhua"),
+              SelectFilterOption("Comic", "Comic"),
+            ]),
+            SelectFilter("OrderByFilter", "Sort By", 0, [
+              SelectFilterOption("Default", ""),
+              SelectFilterOption("A-Z", "title"),
+              SelectFilterOption("Z-A", "titlereverse"),
+              SelectFilterOption("Latest Update", "update"),
+              SelectFilterOption("Latest Added", "latest"),
+              SelectFilterOption("Popular", "popular"),
+            ]),
+            HeaderFilter("Genre exclusion is not available for all sources"),
+            GroupFilter("GenreListFilter", "Genre", [
+              TriStateFilter("Press reset to attempt to fetch genres", ""),
+            ]),
+          ];
   }
 
   @override
@@ -336,6 +338,17 @@ class MangaReader extends MProvider {
       return "/catalogue";
     }
     return "/manga";
+  }
+
+  String getMangaSearchUrl(int page, String query) {
+    if (["Sushi-Scan"].contains(source.name)) {
+      return "/page/$page/?s=$query";
+    }
+    return "/?s=$query&page=$page";
+  }
+
+  bool ignoreFilter() {
+    return ["Sushi-Scan"].contains(source.name);
   }
 }
 

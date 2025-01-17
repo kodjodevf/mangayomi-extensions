@@ -25,7 +25,6 @@ import 'src/raikiscan/raikiscan.dart';
 import 'src/ravenscans/ravenscans.dart';
 import 'src/shadowmangas/shadowmangas.dart';
 import 'src/suryascans/suryascans.dart';
-import 'src/sushiscans/sushiscans.dart';
 import 'src/sushiscan/sushiscan.dart';
 import 'src/tarotscans/tarotscans.dart';
 import 'src/tukangkomik/tukangkomik.dart';
@@ -93,7 +92,7 @@ import 'src/shijiescans/shijiescans.dart';
 import 'src/summertoon/summertoon.dart';
 import 'src/zenithscans/zenithscans.dart';
 
-const mangareaderVersion = "0.1.5";
+const mangareaderVersion = "0.1.6";
 const mangareaderSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/manga/multisrc/mangareader/mangareader.dart";
 
@@ -151,8 +150,6 @@ List<Source> _mangareaderSourcesList = [
   shadowmangasSource,
 //Surya Scans (EN)
   suryascansSource,
-//Sushi-Scans (FR)
-  sushiscansSource,
 //Sushi-Scan (FR)
   sushiscanSource,
 //Tarot Scans (TR)
