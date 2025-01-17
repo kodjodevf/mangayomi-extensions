@@ -2,38 +2,37 @@ const mangayomiSources = [{
     "name": "NetflixMirror",
     "lang": "all",
     "baseUrl": "https://iosmirror.cc",
-    "apiUrl": "",
+    "apiUrl": "https://pcmirror.cc",
     "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/all.netflixmirror.png",
     "typeSource": "single",
     "isManga": false,
     "itemType": 1,
-    "version": "0.0.6",
+    "version": "0.0.7",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/all/netflixmirror.js"
 }];
 
 class DefaultExtension extends MProvider {
+
+    getTVApi() {
+        return "https://pcmirror.cc"
+    }
+
     async getCookie() {
         const preferences = new SharedPreferences();
         let cookie;
         cookie = preferences.getString("cookie", "");
         const check = await new Client().get(`${this.source.baseUrl}/home`, { "cookie": cookie });
-        const elements = new Document(check.body).select(".tray-container, #top10");
+        const hDocBody = new Document(check.body).selectFirst("body")
+        const elements = hDocBody.select(".tray-container, #top10");
         if (elements && elements.length > 0) {
             return cookie;
         }
-        const hDoc = new Document((await new Client().get(`${this.source.baseUrl}/home`, { "cookie": "" })).body);
-        const addhash = hDoc.selectFirst("body").attr("data-addhash");
-        const time = hDoc.selectFirst("body").attr("data-time");
-        await new Client().get(`https://userverify.netmirror.app/?fr3=${addhash}&a=y&t=${time}`);
-        let body;
-        let res;
-        do {
-            res = await new Client().post(`${this.source.baseUrl}/verify2.php`, { "cookie": "" }, { "verify": addhash });
-            body = res.body;
-        } while (!body.includes('"statusup":"All Done"'));
-        cookie = `ott=nf; hd=on; ${res.headers["set-cookie"]}`;
+
+        const addhash = hDocBody.attr("data-addhash");
+        var res = await new Client().post(`${this.getTVApi()}/tv/p.php`, { "cookie": "" }, { "hash": addhash });
+        cookie = res.headers["set-cookie"];
         preferences.setString("cookie", cookie);
         return cookie;
     }
