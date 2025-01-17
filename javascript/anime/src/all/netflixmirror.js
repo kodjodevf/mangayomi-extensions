@@ -19,9 +19,13 @@ class DefaultExtension extends MProvider {
         return "https://pcmirror.cc"
     }
 
-    async getPreference(key) {
+    getPreference(key) {
         const preferences = new SharedPreferences();
         return preferences.get(key);
+    }
+
+    getPoster(id) {
+        return `https://imgcdn.media/poster/v/${id}.jpg`
     }
 
     async getCookie() {
@@ -53,6 +57,7 @@ class DefaultExtension extends MProvider {
         return await this.getPages(await this.request("/home"), ".inner-mob-tray-container")
     }
     async getPages(body, selector) {
+        var name_pref = this.getPreference("netmirror_pref_display_name");
         const elements = new Document(body).select(selector);
         const cookie = await this.getCookie();
         const list = [];
@@ -61,7 +66,9 @@ class DefaultExtension extends MProvider {
             const id = linkElement.selectFirst("a").attr("data-post");
             if (id.length > 0) {
                 const imageUrl = linkElement.selectFirst(".card-img-container img, .top10-img img").attr("data-src");
-                list.push({ name: JSON.parse(await this.request(`/post.php?id=${id}`, cookie)).title, imageUrl, link: id });
+                var name = name_pref ? JSON.parse(await this.request(`/post.php?id=${id}`, cookie)).title : `\n${id}`
+
+                list.push({ name, imageUrl, link: id });
             }
         }
         return {
@@ -74,7 +81,7 @@ class DefaultExtension extends MProvider {
         const list = [];
         data.searchResult.map(async (res) => {
             const id = res.id;
-            list.push({ name: res.t, imageUrl: `https://img.nfmirrorcdn.top/poster/v/${id}.jpg`, link: id });
+            list.push({ name: res.t, imageUrl: rhis.getPoster(id), link: id });
         })
 
         return {
@@ -115,7 +122,7 @@ class DefaultExtension extends MProvider {
         }
 
         return {
-            description, status: 1, genre, episodes
+            name, imageUrl: this.getPoster(url), description, status: 1, genre, episodes
         };
     }
     async getEpisodes(name, eid, sid, page, cookie) {
@@ -172,9 +179,13 @@ class DefaultExtension extends MProvider {
         for (const playlist of data) {
             var source = playlist.sources[0]
             var link = baseUrl + source.file;
+            var headers =
+            {
+                'Origin': baseUrl,
+                'Referer': `${baseUrl}/`
+            };
 
-
-            var resp = await new Client().get(link);
+            var resp = await new Client().get(link, headers);
 
             if (resp.statusCode === 200) {
                 const masterPlaylist = resp.body;
@@ -231,6 +242,13 @@ class DefaultExtension extends MProvider {
                 valueIndex: 0,
                 entries: ["1080p", "720p", "480"],
                 entryValues: ["1080", "720", "480"]
+            }
+        }, {
+            "key": "netmirror_pref_display_name",
+            "switchPreferenceCompat": {
+                "title": "Display media name on home page",
+                "summary": "Homepage loads faster by not calling details API",
+                "value": false
             }
         },];
     }
