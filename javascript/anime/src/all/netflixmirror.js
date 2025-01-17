@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "single",
     "isManga": false,
     "itemType": 1,
-    "version": "0.0.7",
+    "version": "0.0.9",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/all/netflixmirror.js"
@@ -17,6 +17,11 @@ class DefaultExtension extends MProvider {
 
     getTVApi() {
         return "https://pcmirror.cc"
+    }
+
+    async getPreference(key) {
+        const preferences = new SharedPreferences();
+        return preferences.get(key);
     }
 
     async getCookie() {
@@ -137,6 +142,26 @@ class DefaultExtension extends MProvider {
         return episodes;
     }
 
+    // Sorts streams based on user preference.
+    async sortStreams(streams) {
+        var sortedStreams = [];
+
+        var copyStreams = streams.slice()
+        var pref = await this.getPreference("netmirror_pref_video_resolution");
+        for (var i in streams) {
+            var stream = streams[i];
+            if (stream.quality.indexOf(pref) > -1) {
+                sortedStreams.push(stream);
+                var index = copyStreams.indexOf(stream);
+                if (index > -1) {
+                    copyStreams.splice(index, 1);
+                }
+                break;
+            }
+        }
+        return [...sortedStreams, ...copyStreams]
+    }
+
     async getVideoList(url) {
         const baseUrl = this.getTVApi();
         const urlData = JSON.parse(url);
@@ -147,7 +172,7 @@ class DefaultExtension extends MProvider {
         for (const playlist of data) {
             var source = playlist.sources[0]
             var link = baseUrl + source.file;
-            
+
 
             var resp = await new Client().get(link);
 
@@ -194,7 +219,20 @@ class DefaultExtension extends MProvider {
 
         videoList[0].audios = audios;
         videoList[0].subtitles = subtitles;
-        return videoList;
+        return this.sortStreams(videoList);
+    }
+
+    getSourcePreferences() {
+        return [{
+            key: 'netmirror_pref_video_resolution',
+            listPreference: {
+                title: 'Preferred video resolution',
+                summary: '',
+                valueIndex: 0,
+                entries: ["1080p", "720p", "480"],
+                entryValues: ["1080", "720", "480"]
+            }
+        },];
     }
 
 }
