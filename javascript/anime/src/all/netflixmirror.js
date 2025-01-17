@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "single",
     "isManga": false,
     "itemType": 1,
-    "version": "0.0.9",
+    "version": "0.0.10",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/all/netflixmirror.js"
@@ -30,19 +30,25 @@ class DefaultExtension extends MProvider {
 
     async getCookie() {
         const preferences = new SharedPreferences();
-        let cookie;
-        cookie = preferences.getString("cookie", "");
-        const check = await new Client().get(`${this.source.baseUrl}/home`, { "cookie": cookie });
-        const hDocBody = new Document(check.body).selectFirst("body")
-        const elements = hDocBody.select(".tray-container, #top10");
-        if (elements && elements.length > 0) {
-            return cookie;
+        let cookie = preferences.getString("cookie", "");
+        var cookie_ts = parseInt(preferences.getString("cookie_ts", "0"));
+        var now_ts = parseInt(new Date().getTime() / 1000);
+
+        // Cookie lasts for 24hrs but still checking for 12hrs
+        if (now_ts - cookie_ts > 60 * 60 * 12) {
+            const check = await new Client().get(`${this.source.baseUrl}/home`, { "cookie": cookie });
+            const hDocBody = new Document(check.body).selectFirst("body")
+
+            const addhash = hDocBody.attr("data-addhash");
+            const data_time = hDocBody.attr("data-time");
+
+            var res = await new Client().post(`${this.getTVApi()}/tv/p.php`, { "cookie": "" }, { "hash": addhash });
+            cookie = res.headers["set-cookie"];
+            preferences.setString("cookie", cookie);
+            preferences.setString("cookie_ts", data_time);
         }
 
-        const addhash = hDocBody.attr("data-addhash");
-        var res = await new Client().post(`${this.getTVApi()}/tv/p.php`, { "cookie": "" }, { "hash": addhash });
-        cookie = res.headers["set-cookie"];
-        preferences.setString("cookie", cookie);
+
         return cookie;
     }
     async request(url, cookie, tvApi = false) {
@@ -81,7 +87,7 @@ class DefaultExtension extends MProvider {
         const list = [];
         data.searchResult.map(async (res) => {
             const id = res.id;
-            list.push({ name: res.t, imageUrl: rhis.getPoster(id), link: id });
+            list.push({ name: res.t, imageUrl: this.getPoster(id), link: id });
         })
 
         return {
