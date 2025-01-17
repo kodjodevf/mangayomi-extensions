@@ -25,6 +25,7 @@ import 'src/raikiscan/raikiscan.dart';
 import 'src/ravenscans/ravenscans.dart';
 import 'src/shadowmangas/shadowmangas.dart';
 import 'src/suryascans/suryascans.dart';
+import 'src/sushiscans/sushiscans.dart';
 import 'src/sushiscan/sushiscan.dart';
 import 'src/tarotscans/tarotscans.dart';
 import 'src/tukangkomik/tukangkomik.dart';
@@ -150,6 +151,8 @@ List<Source> _mangareaderSourcesList = [
   shadowmangasSource,
 //Surya Scans (EN)
   suryascansSource,
+//Sushi-Scans (FR)
+  sushiscansSource,
 //Sushi-Scan (FR)
   sushiscanSource,
 //Tarot Scans (TR)
