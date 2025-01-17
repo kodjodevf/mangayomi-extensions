@@ -34,8 +34,8 @@ class AnimeSama extends MProvider {
         .where((MElement e) =>
             e.outerHtml.toLowerCase().contains("derniers épisodes ajoutés"))
         .toList();
-    final seasonElements = (latest.first.nextElementSibling as MElement)
-        .select(".scrollBarStyled > div")
+    final seasonElements = (latest.first.parent.nextElementSibling as MElement)
+        .select("div")
         .toList();
     List<MManga> seasons = [];
     for (var seasonElement in seasonElements) {
@@ -128,13 +128,22 @@ class AnimeSama extends MProvider {
     List<MChapter>? episodesList = [];
     for (var episodeNumber = 0; episodeNumber < maxLength; episodeNumber++) {
       List<String> langs = [];
+      bool isVf = false;
+      int iVostfr = 0;
+      int iVf = 0;
       List<Map<String, dynamic>> players = [];
-      for (var playerListt in playersList) {
-        for (var player in playerListt["players"]) {
+      for (var playerList in playersList) {
+        for (var player in playerList["players"]) {
           if (player.length > episodeNumber) {
-            langs.add(playerListt["lang"]);
-            players.add(
-                {"lang": playerListt["lang"], "player": player[episodeNumber]});
+            isVf = playerList["lang"] == "vf";
+            if ((isVf && iVf < 2) || (!isVf && iVostfr < 2)) {
+              var lang = playerList["lang"];
+              if (!langs.contains(lang)) {
+                langs.add(lang);
+              }
+              players.add({"lang": lang, "player": player[episodeNumber]});
+              isVf ? iVf++ : iVostfr++;
+            }
           }
         }
       }
@@ -162,13 +171,48 @@ class AnimeSama extends MProvider {
       List<MVideo> a = [];
       if (playerUrl.contains("sendvid")) {
         a = await sendVidExtractorr(playerUrl, "$lang ");
-      } else if (playerUrl.contains("sibnet.ru")) {
-        a = await sibnetExtractor(playerUrl, lang);
+      } else if (playerUrl.contains("vidmoly")) {
+        a = await vidmolyExtractor(playerUrl, lang);
       }
       videos.addAll(a);
     }
 
     return sortVideos(videos, source.id);
+  }
+
+  Future<List<MVideo>> vidmolyExtractor(String url, String lang) async {
+    final headers = {
+      'Referer': 'https://vidmoly.to',
+    };
+    List<MVideo> videos = [];
+    final playListUrlResponse = (await client.get(Uri.parse(url))).body;
+    final playlistUrl =
+        RegExp(r'file:"(\S+?)"').firstMatch(playListUrlResponse)?.group(1) ??
+            "";
+    if (playlistUrl.isEmpty) return [];
+    final masterPlaylistRes =
+        await client.get(Uri.parse(playlistUrl), headers: headers);
+
+    if (masterPlaylistRes.statusCode == 200) {
+      for (var it
+          in substringAfter(masterPlaylistRes.body, "#EXT-X-STREAM-INF:")
+              .split("#EXT-X-STREAM-INF:")) {
+        final quality =
+            "${substringBefore(substringBefore(substringAfter(substringAfter(it, "RESOLUTION="), "x"), ","), "\n")}p";
+
+        String videoUrl = substringBefore(substringAfter(it, "\n"), "\n");
+
+        MVideo video = MVideo();
+        video
+          ..url = videoUrl
+          ..originalUrl = videoUrl
+          ..quality = "$lang Vidmoly $quality"
+          ..headers = headers;
+        videos.add(video);
+      }
+    }
+
+    return videos;
   }
 
   Future<List<MVideo>> sendVidExtractorr(String url, String prefix) async {
