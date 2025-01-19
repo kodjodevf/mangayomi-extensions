@@ -8,7 +8,7 @@ const mangayomiSources = [{
     "typeSource": "single",
     "isManga": false,
     "itemType": 1,
-    "version": "0.1.0",
+    "version": "0.1.1",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/all/netflixmirror.js"
@@ -60,17 +60,15 @@ class DefaultExtension extends MProvider {
 
         return `ott=${service}; ${cookie}`;
     }
-    async request(url, cookie, tvApi = false) {
+    async request(url, cookie) {
         cookie = cookie ?? await this.getCookie();
 
         var service = this.getServiceDetails();
         var slug = "";
         if (url == "/home") slug = "";
         else if (service == "pv") slug = "/pv";
-        if (tvApi) slug = "/tv";
 
-        var api = tvApi ? this.getTVApi() : this.source.baseUrl;
-        return (await new Client().get(api + slug + url, { "cookie": cookie })).body;
+        return (await new Client().get(this.source.baseUrl + slug + url, { "cookie": cookie })).body;
     }
     async getPopular(page) {
         return await this.getPages(await this.request("/home"), ".tray-container, #top10")
@@ -121,11 +119,11 @@ class DefaultExtension extends MProvider {
         const description = data.desc;
         let episodes = [];
         if (data.episodes[0] === null) {
-            episodes.push({ name, url: JSON.stringify({ id: url, name }) });
+            episodes.push({ name, url: url });
         } else {
             episodes = data.episodes.map(ep => ({
                 name: `${ep.s.replace('S', 'Season ')} ${ep.ep.replace('E', 'Episode ')} : ${ep.t}`,
-                url: JSON.stringify({ id: ep.id, name })
+                url: ep.id
             }));
         }
         if (data.nextPageShow === 1) {
@@ -144,9 +142,12 @@ class DefaultExtension extends MProvider {
             episodes.push(...newEpisodes);
 
         }
+        var service = this.getServiceDetails();
+        var link = `https://netflix.com/title/${url}`
+        if (service === "pv") link = `https://www.primevideo.com/detail/${url}`
 
         return {
-            name, imageUrl: this.getPoster(url, service), description, status: 1, genre, episodes
+            name, imageUrl: this.getPoster(url, service), link, description, status: 1, genre, episodes
         };
     }
     async getEpisodes(name, eid, sid, page, cookie) {
@@ -159,7 +160,7 @@ class DefaultExtension extends MProvider {
                 data.episodes?.forEach(ep => {
                     episodes.push({
                         name: `${ep.s.replace('S', 'Season ')} ${ep.ep.replace('E', 'Episode ')} : ${ep.t}`,
-                        url: JSON.stringify({ id: ep.id, name })
+                        url: ep.id
                     });
                 });
 
@@ -194,20 +195,11 @@ class DefaultExtension extends MProvider {
     }
 
     async getVideoList(url) {
-        const urlData = JSON.parse(url);
-        var service = this.getServiceDetails()
+        var baseUrl = this.getTVApi()
+        var service = this.getServiceDetails();
+        if (service === "nf") baseUrl += "/tv";
 
-        let baseUrl = this.source.baseUrl
-        let isTVAPI = false;
-        if (service === "nf") {
-            baseUrl = this.getTVApi()
-            isTVAPI = true;
-
-        }
-
-
-
-        const data = JSON.parse(await this.request(`/playlist.php?id=${urlData.id}&t=${urlData.name}`, null, isTVAPI));
+        const data = JSON.parse(await this.request(`/playlist.php?id=${url}`));
         let videoList = [];
         let subtitles = [];
         let audios = [];
@@ -279,7 +271,7 @@ class DefaultExtension extends MProvider {
                 title: 'Preferred video resolution',
                 summary: '',
                 valueIndex: 0,
-                entries: ["1080p", "720p", "480"],
+                entries: ["1080p", "720p", "480p"],
                 entryValues: ["1080", "720", "480"]
             }
         }, {
