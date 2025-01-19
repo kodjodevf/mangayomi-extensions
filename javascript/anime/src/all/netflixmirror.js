@@ -1,5 +1,6 @@
 const mangayomiSources = [{
-    "name": "NetflixMirror",
+    "name": "NetMirror",
+    "id": 446414301,
     "lang": "all",
     "baseUrl": "https://iosmirror.cc",
     "apiUrl": "https://pcmirror.cc",
@@ -7,7 +8,7 @@ const mangayomiSources = [{
     "typeSource": "single",
     "isManga": false,
     "itemType": 1,
-    "version": "0.0.10",
+    "version": "0.1.0",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/all/netflixmirror.js"
@@ -24,8 +25,15 @@ class DefaultExtension extends MProvider {
         return preferences.get(key);
     }
 
-    getPoster(id) {
-        return `https://imgcdn.media/poster/v/${id}.jpg`
+    getPoster(id, service) {
+        if (service === "nf")
+            return `https://imgcdn.media/poster/v/${id}.jpg`
+        if (service === "pv")
+            return `https://imgcdn.media/pv/480/${id}.jpg`
+    }
+
+    getServiceDetails() {
+        return this.getPreference("netmirror_pref_service");
     }
 
     async getCookie() {
@@ -48,13 +56,21 @@ class DefaultExtension extends MProvider {
             preferences.setString("cookie_ts", data_time);
         }
 
+        var service = this.getServiceDetails();
 
-        return cookie;
+        return `ott=${service}; ${cookie}`;
     }
     async request(url, cookie, tvApi = false) {
         cookie = cookie ?? await this.getCookie();
+
+        var service = this.getServiceDetails();
+        var slug = "";
+        if (url == "/home") slug = "";
+        else if (service == "pv") slug = "/pv";
+        if (tvApi) slug = "/tv";
+
         var api = tvApi ? this.getTVApi() : this.source.baseUrl;
-        return (await new Client().get(api + url, { "cookie": cookie })).body;
+        return (await new Client().get(api + slug + url, { "cookie": cookie })).body;
     }
     async getPopular(page) {
         return await this.getPages(await this.request("/home"), ".tray-container, #top10")
@@ -83,11 +99,12 @@ class DefaultExtension extends MProvider {
         }
     }
     async search(query, page, filters) {
+        var service = this.getServiceDetails();
         const data = JSON.parse(await this.request(`/search.php?s=${query}`));
         const list = [];
         data.searchResult.map(async (res) => {
             const id = res.id;
-            list.push({ name: res.t, imageUrl: this.getPoster(id), link: id });
+            list.push({ name: res.t, imageUrl: this.getPoster(id, service), link: id });
         })
 
         return {
@@ -96,6 +113,7 @@ class DefaultExtension extends MProvider {
         }
     }
     async getDetail(url) {
+        var service = this.getServiceDetails();
         const cookie = await this.getCookie();
         const data = JSON.parse(await this.request(`/post.php?id=${url}`, cookie));
         const name = data.title;
@@ -128,7 +146,7 @@ class DefaultExtension extends MProvider {
         }
 
         return {
-            name, imageUrl: this.getPoster(url), description, status: 1, genre, episodes
+            name, imageUrl: this.getPoster(url, service), description, status: 1, genre, episodes
         };
     }
     async getEpisodes(name, eid, sid, page, cookie) {
@@ -160,7 +178,7 @@ class DefaultExtension extends MProvider {
         var sortedStreams = [];
 
         var copyStreams = streams.slice()
-        var pref = await this.getPreference("netmirror_pref_video_resolution");
+        var pref = this.getPreference("netmirror_pref_video_resolution");
         for (var i in streams) {
             var stream = streams[i];
             if (stream.quality.indexOf(pref) > -1) {
@@ -176,9 +194,20 @@ class DefaultExtension extends MProvider {
     }
 
     async getVideoList(url) {
-        const baseUrl = this.getTVApi();
         const urlData = JSON.parse(url);
-        const data = JSON.parse(await this.request(`/tv/playlist.php?id=${urlData.id}&t=${urlData.name}`, null, true));
+        var service = this.getServiceDetails()
+
+        let baseUrl = this.source.baseUrl
+        let isTVAPI = false;
+        if (service === "nf") {
+            baseUrl = this.getTVApi()
+            isTVAPI = true;
+
+        }
+
+
+
+        const data = JSON.parse(await this.request(`/playlist.php?id=${urlData.id}&t=${urlData.name}`, null, isTVAPI));
         let videoList = [];
         let subtitles = [];
         let audios = [];
@@ -224,13 +253,17 @@ class DefaultExtension extends MProvider {
             }
 
 
+            if ("tracks" in playlist) {
+                playlist.tracks.filter(track => track.kind === 'captions').forEach(track => {
+                    var subUrl = track.file
+                    subUrl = subUrl.startsWith("//") ? `https:${subUrl}` : subUrl;
 
-            playlist.tracks.filter(track => track.kind === 'captions').forEach(track => {
-                subtitles.push({
-                    label: track.label,
-                    file: track.file
+                    subtitles.push({
+                        label: track.label,
+                        file: subUrl
+                    });
                 });
-            });
+            }
         }
 
 
@@ -255,6 +288,15 @@ class DefaultExtension extends MProvider {
                 "title": "Display media name on home page",
                 "summary": "Homepage loads faster by not calling details API",
                 "value": false
+            }
+        }, {
+            key: 'netmirror_pref_service',
+            listPreference: {
+                title: 'Preferred OTT service',
+                summary: '',
+                valueIndex: 0,
+                entries: ["Net mirror", "Prime mirror"],
+                entryValues: ["nf", "pv",]
             }
         },];
     }
