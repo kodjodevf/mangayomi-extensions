@@ -590,12 +590,12 @@ class ZoroTheme extends MProvider {
             entryValues: ["HD-1", "HD-2", "StreamTape"],
             values: ["HD-1", "HD-2", "StreamTape"]),
       MultiSelectListPreference(
-          key: "type_selection",
+          key: "type_selection_new",
           title: "Enable/Disable Types",
           summary: "",
-          entries: ["Sub", "Dub"],
+          entries: ["Sub", "Dub", "Raw"],
           entryValues: ["sub", "dub"],
-          values: ["sub", "dub"]),
+          values: ["sub", "dub", "raw"]),
     ];
   }
 
@@ -636,7 +636,7 @@ class ZoroTheme extends MProvider {
   }
 
   List<String> preferenceTypeSelection(int sourceId) {
-    return getPreferenceValue(sourceId, "type_selection");
+    return getPreferenceValue(sourceId, "type_selection_new");
   }
 
   String ll(String url) {
@@ -650,6 +650,8 @@ class ZoroTheme extends MProvider {
 ZoroTheme main(MSource source) {
   return ZoroTheme(source: source);
 }
+
+// credits: https://github.com/Kohi-den/extensions-source/tree/main/lib/megacloud-extractor/src/main
 
 const decodePng = """"use strict";
 // https://megacloud.tv/images/image.png?v=0.1.0
