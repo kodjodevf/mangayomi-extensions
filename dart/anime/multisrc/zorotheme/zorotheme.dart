@@ -201,7 +201,7 @@ class ZoroTheme extends MProvider {
           .body;
       String epUrl = substringBefore(substringAfter(resE, "\"link\":\""), "\"");
       List<MVideo> a = [];
-      if (hosterSelection.contains(name) && typeSelection.contains(subDub)) {
+      if (hosterSelection.contains(name) && typeSelection.contains(subDub) || subDub == "raw") {
         if (name.contains("Vidstreaming")) {
           a = await rapidCloudExtractor(epUrl, "Vidstreaming - $subDub");
         } else if (name.contains("Vidcloud")) {
