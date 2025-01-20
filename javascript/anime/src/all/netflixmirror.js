@@ -1,45 +1,74 @@
 const mangayomiSources = [{
-    "name": "NetflixMirror",
+    "name": "NetMirror",
+    "id": 446414301,
     "lang": "all",
     "baseUrl": "https://iosmirror.cc",
-    "apiUrl": "",
+    "apiUrl": "https://pcmirror.cc",
     "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/all.netflixmirror.png",
     "typeSource": "single",
     "isManga": false,
     "itemType": 1,
-    "version": "0.0.6",
+    "version": "0.1.1",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/all/netflixmirror.js"
 }];
 
 class DefaultExtension extends MProvider {
+
+    getTVApi() {
+        return "https://pcmirror.cc"
+    }
+
+    getPreference(key) {
+        const preferences = new SharedPreferences();
+        return preferences.get(key);
+    }
+
+    getPoster(id, service) {
+        if (service === "nf")
+            return `https://imgcdn.media/poster/v/${id}.jpg`
+        if (service === "pv")
+            return `https://imgcdn.media/pv/480/${id}.jpg`
+    }
+
+    getServiceDetails() {
+        return this.getPreference("netmirror_pref_service");
+    }
+
     async getCookie() {
         const preferences = new SharedPreferences();
-        let cookie;
-        cookie = preferences.getString("cookie", "");
-        const check = await new Client().get(`${this.source.baseUrl}/home`, { "cookie": cookie });
-        const elements = new Document(check.body).select(".tray-container, #top10");
-        if (elements && elements.length > 0) {
-            return cookie;
+        let cookie = preferences.getString("cookie", "");
+        var cookie_ts = parseInt(preferences.getString("cookie_ts", "0"));
+        var now_ts = parseInt(new Date().getTime() / 1000);
+
+        // Cookie lasts for 24hrs but still checking for 12hrs
+        if (now_ts - cookie_ts > 60 * 60 * 12) {
+            const check = await new Client().get(`${this.source.baseUrl}/home`, { "cookie": cookie });
+            const hDocBody = new Document(check.body).selectFirst("body")
+
+            const addhash = hDocBody.attr("data-addhash");
+            const data_time = hDocBody.attr("data-time");
+
+            var res = await new Client().post(`${this.getTVApi()}/tv/p.php`, { "cookie": "" }, { "hash": addhash });
+            cookie = res.headers["set-cookie"];
+            preferences.setString("cookie", cookie);
+            preferences.setString("cookie_ts", data_time);
         }
-        const hDoc = new Document((await new Client().get(`${this.source.baseUrl}/home`, { "cookie": "" })).body);
-        const addhash = hDoc.selectFirst("body").attr("data-addhash");
-        const time = hDoc.selectFirst("body").attr("data-time");
-        await new Client().get(`https://userverify.netmirror.app/?fr3=${addhash}&a=y&t=${time}`);
-        let body;
-        let res;
-        do {
-            res = await new Client().post(`${this.source.baseUrl}/verify2.php`, { "cookie": "" }, { "verify": addhash });
-            body = res.body;
-        } while (!body.includes('"statusup":"All Done"'));
-        cookie = `ott=nf; hd=on; ${res.headers["set-cookie"]}`;
-        preferences.setString("cookie", cookie);
-        return cookie;
+
+        var service = this.getServiceDetails();
+
+        return `ott=${service}; ${cookie}`;
     }
     async request(url, cookie) {
         cookie = cookie ?? await this.getCookie();
-        return (await new Client().get(this.source.baseUrl + url, { "cookie": cookie })).body;
+
+        var service = this.getServiceDetails();
+        var slug = "";
+        if (url == "/home") slug = "";
+        else if (service == "pv") slug = "/pv";
+
+        return (await new Client().get(this.source.baseUrl + slug + url, { "cookie": cookie })).body;
     }
     async getPopular(page) {
         return await this.getPages(await this.request("/home"), ".tray-container, #top10")
@@ -48,6 +77,7 @@ class DefaultExtension extends MProvider {
         return await this.getPages(await this.request("/home"), ".inner-mob-tray-container")
     }
     async getPages(body, selector) {
+        var name_pref = this.getPreference("netmirror_pref_display_name");
         const elements = new Document(body).select(selector);
         const cookie = await this.getCookie();
         const list = [];
@@ -56,7 +86,9 @@ class DefaultExtension extends MProvider {
             const id = linkElement.selectFirst("a").attr("data-post");
             if (id.length > 0) {
                 const imageUrl = linkElement.selectFirst(".card-img-container img, .top10-img img").attr("data-src");
-                list.push({ name: JSON.parse(await this.request(`/post.php?id=${id}`, cookie)).title, imageUrl, link: id });
+                var name = name_pref ? JSON.parse(await this.request(`/post.php?id=${id}`, cookie)).title : `\n${id}`
+
+                list.push({ name, imageUrl, link: id });
             }
         }
         return {
@@ -65,11 +97,12 @@ class DefaultExtension extends MProvider {
         }
     }
     async search(query, page, filters) {
+        var service = this.getServiceDetails();
         const data = JSON.parse(await this.request(`/search.php?s=${query}`));
         const list = [];
         data.searchResult.map(async (res) => {
             const id = res.id;
-            list.push({ name: res.t, imageUrl: `https://img.nfmirrorcdn.top/poster/v/${id}.jpg`, link: id });
+            list.push({ name: res.t, imageUrl: this.getPoster(id, service), link: id });
         })
 
         return {
@@ -78,6 +111,7 @@ class DefaultExtension extends MProvider {
         }
     }
     async getDetail(url) {
+        var service = this.getServiceDetails();
         const cookie = await this.getCookie();
         const data = JSON.parse(await this.request(`/post.php?id=${url}`, cookie));
         const name = data.title;
@@ -85,11 +119,11 @@ class DefaultExtension extends MProvider {
         const description = data.desc;
         let episodes = [];
         if (data.episodes[0] === null) {
-            episodes.push({ name, url: JSON.stringify({ id: url, name }) });
+            episodes.push({ name, url: url });
         } else {
             episodes = data.episodes.map(ep => ({
                 name: `${ep.s.replace('S', 'Season ')} ${ep.ep.replace('E', 'Episode ')} : ${ep.t}`,
-                url: JSON.stringify({ id: ep.id, name })
+                url: ep.id
             }));
         }
         if (data.nextPageShow === 1) {
@@ -108,9 +142,12 @@ class DefaultExtension extends MProvider {
             episodes.push(...newEpisodes);
 
         }
+        var service = this.getServiceDetails();
+        var link = `https://netflix.com/title/${url}`
+        if (service === "pv") link = `https://www.primevideo.com/detail/${url}`
 
         return {
-            description, status: 1, genre, episodes
+            name, imageUrl: this.getPoster(url, service), link, description, status: 1, genre, episodes
         };
     }
     async getEpisodes(name, eid, sid, page, cookie) {
@@ -123,7 +160,7 @@ class DefaultExtension extends MProvider {
                 data.episodes?.forEach(ep => {
                     episodes.push({
                         name: `${ep.s.replace('S', 'Season ')} ${ep.ep.replace('E', 'Episode ')} : ${ep.t}`,
-                        url: JSON.stringify({ id: ep.id, name })
+                        url: ep.id
                     });
                 });
 
@@ -137,79 +174,123 @@ class DefaultExtension extends MProvider {
         return episodes;
     }
 
+    // Sorts streams based on user preference.
+    async sortStreams(streams) {
+        var sortedStreams = [];
+
+        var copyStreams = streams.slice()
+        var pref = this.getPreference("netmirror_pref_video_resolution");
+        for (var i in streams) {
+            var stream = streams[i];
+            if (stream.quality.indexOf(pref) > -1) {
+                sortedStreams.push(stream);
+                var index = copyStreams.indexOf(stream);
+                if (index > -1) {
+                    copyStreams.splice(index, 1);
+                }
+                break;
+            }
+        }
+        return [...sortedStreams, ...copyStreams]
+    }
 
     async getVideoList(url) {
-        const baseUrl = this.source.baseUrl;
-        const urlData = JSON.parse(url);
-        const data = JSON.parse(await this.request(`/playlist.php?id=${urlData.id}&t=${urlData.name}`));
-        const videoList = [];
+        var baseUrl = this.getTVApi()
+        var service = this.getServiceDetails();
+        if (service === "nf") baseUrl += "/tv";
+
+        const data = JSON.parse(await this.request(`/playlist.php?id=${url}`));
+        let videoList = [];
+        let subtitles = [];
+        let audios = [];
         for (const playlist of data) {
-            for (const source of playlist.sources) {
-                try {
-                    const subtitles = [];
-                    playlist.tracks.filter(track => track.kind === 'captions').forEach(track => {
-                        subtitles.push({
-                            label: track.label,
-                            file: track.file
-                        });
-                    });
-                    const link = baseUrl + source.file;
-                    const headers =
+            var source = playlist.sources[0]
+            var link = baseUrl + source.file;
+            var headers =
+            {
+                'Origin': baseUrl,
+                'Referer': `${baseUrl}/`
+            };
+
+            var resp = await new Client().get(link, headers);
+
+            if (resp.statusCode === 200) {
+                const masterPlaylist = resp.body;
+                masterPlaylist.substringAfter('#EXT-X-MEDIA:').split('#EXT-X-MEDIA:').forEach(it => {
+                    if (it.includes('TYPE=AUDIO')) {
+                        const audioInfo = it.substringAfter('TYPE=AUDIO').substringBefore('\n');
+                        const language = audioInfo.substringAfter('NAME="').substringBefore('"');
+                        const url = audioInfo.substringAfter('URI="').substringBefore('"');
+                        audios.push({ file: url, label: language });
+                    }
+                });
+
+                masterPlaylist.substringAfter('#EXT-X-STREAM-INF:').split('#EXT-X-STREAM-INF:').forEach(it => {
+
+                    var quality = `${it.substringAfter('RESOLUTION=').substringAfter('x').substringBefore(',')}p (${source.label})`;
+                    let videoUrl = it.substringAfter('\n').substringBefore('\n');
+
+                    if (!videoUrl.startsWith('http')) {
+                        videoUrl = resp.request.url.substringBeforeLast('/') + `/${videoUrl}`;
+                    }
+                    var headers =
                     {
-                        'Host': link.match(/^(?:https?:\/\/)?(?:www\.)?([^\/]+)/)[1],
+                        'Host': videoUrl.match(/^(?:https?:\/\/)?(?:www\.)?([^\/]+)/)[1],
                         'Origin': baseUrl,
                         'Referer': `${baseUrl}/`
                     };
-                    const resp = await new Client().get(link, headers);
+                    videoList.push({ url: videoUrl, quality, originalUrl: videoUrl, headers });
 
-                    if (resp.statusCode === 200) {
-                        const masterPlaylist = resp.body;
-                        const audios = [];
-                        masterPlaylist.substringAfter('#EXT-X-MEDIA:').split('#EXT-X-MEDIA:').forEach(it => {
-                            if (it.includes('TYPE=AUDIO')) {
-                                const audioInfo = it.substringAfter('TYPE=AUDIO').substringBefore('\n');
-                                const language = audioInfo.substringAfter('NAME="').substringBefore('"');
-                                const url = audioInfo.substringAfter('URI="').substringBefore('"');
-                                audios.push({ file: url, label: language });
-                            }
-                        });
+                });
+            }
 
-                        if (!masterPlaylist.includes('#EXT-X-STREAM-INF:')) {
-                            if (audios.length === 0) {
-                                videoList.push({ url: link, quality: source.label, originalUrl: link, subtitles, headers });
-                            } else {
-                                videoList.push({ url: link, quality: source.label, originalUrl: link, subtitles, audios, headers });
-                            }
-                        } else {
-                            masterPlaylist.substringAfter('#EXT-X-STREAM-INF:').split('#EXT-X-STREAM-INF:').forEach(it => {
 
-                                const quality = `${it.substringAfter('RESOLUTION=').substringAfter('x').substringBefore(',')}p (${source.label})`;
-                                let videoUrl = it.substringAfter('\n').substringBefore('\n');
+            if ("tracks" in playlist) {
+                playlist.tracks.filter(track => track.kind === 'captions').forEach(track => {
+                    var subUrl = track.file
+                    subUrl = subUrl.startsWith("//") ? `https:${subUrl}` : subUrl;
 
-                                if (!videoUrl.startsWith('http')) {
-                                    videoUrl = resp.request.url.substringBeforeLast('/') + `/${videoUrl}`;
-                                }
-                                const headers =
-                                {
-                                    'Host': videoUrl.match(/^(?:https?:\/\/)?(?:www\.)?([^\/]+)/)[1],
-                                    'Origin': baseUrl,
-                                    'Referer': `${baseUrl}/`
-                                };
-                                if (audios.length === 0) {
-                                    videoList.push({ url: videoUrl, quality, originalUrl: videoUrl, subtitles, headers });
-                                } else {
-                                    videoList.push({ url: videoUrl, quality, originalUrl: videoUrl, subtitles, audios, headers });
-                                }
-
-                            });
-                        }
-                    }
-                } catch (_) {
-
-                }
+                    subtitles.push({
+                        label: track.label,
+                        file: subUrl
+                    });
+                });
             }
         }
-        return videoList;
+
+
+        videoList[0].audios = audios;
+        videoList[0].subtitles = subtitles;
+        return this.sortStreams(videoList);
+    }
+
+    getSourcePreferences() {
+        return [{
+            key: 'netmirror_pref_video_resolution',
+            listPreference: {
+                title: 'Preferred video resolution',
+                summary: '',
+                valueIndex: 0,
+                entries: ["1080p", "720p", "480p"],
+                entryValues: ["1080", "720", "480"]
+            }
+        }, {
+            "key": "netmirror_pref_display_name",
+            "switchPreferenceCompat": {
+                "title": "Display media name on home page",
+                "summary": "Homepage loads faster by not calling details API",
+                "value": false
+            }
+        }, {
+            key: 'netmirror_pref_service',
+            listPreference: {
+                title: 'Preferred OTT service',
+                summary: '',
+                valueIndex: 0,
+                entries: ["Net mirror", "Prime mirror"],
+                entryValues: ["nf", "pv",]
+            }
+        },];
     }
 
 }
