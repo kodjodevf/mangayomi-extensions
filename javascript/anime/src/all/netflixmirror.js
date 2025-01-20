@@ -6,11 +6,8 @@ const mangayomiSources = [{
     "apiUrl": "https://pcmirror.cc",
     "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/all.netflixmirror.png",
     "typeSource": "single",
-    "isManga": false,
     "itemType": 1,
-    "version": "0.1.1",
-    "dateFormat": "",
-    "dateFormatLocale": "",
+    "version": "0.1.2",
     "pkgPath": "anime/src/all/netflixmirror.js"
 }];
 
@@ -77,7 +74,7 @@ class DefaultExtension extends MProvider {
         return await this.getPages(await this.request("/home"), ".inner-mob-tray-container")
     }
     async getPages(body, selector) {
-        var name_pref = this.getPreference("netmirror_pref_display_name");
+        var name_pref = this.getPreference("netmirror_pref_display_name_1");
         const elements = new Document(body).select(selector);
         const cookie = await this.getCookie();
         const list = [];
@@ -275,11 +272,11 @@ class DefaultExtension extends MProvider {
                 entryValues: ["1080", "720", "480"]
             }
         }, {
-            "key": "netmirror_pref_display_name",
+            "key": "netmirror_pref_display_name_1",
             "switchPreferenceCompat": {
                 "title": "Display media name on home page",
                 "summary": "Homepage loads faster by not calling details API",
-                "value": false
+                "value": true
             }
         }, {
             key: 'netmirror_pref_service',
