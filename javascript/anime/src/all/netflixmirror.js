@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/all.netflixmirror.png",
     "typeSource": "single",
     "itemType": 1,
-    "version": "0.1.2",
+    "version": "0.1.3",
     "pkgPath": "anime/src/all/netflixmirror.js"
 }];
 
@@ -110,6 +110,7 @@ class DefaultExtension extends MProvider {
     async getDetail(url) {
         var service = this.getServiceDetails();
         const cookie = await this.getCookie();
+        var name_pref = this.getPreference("netmirror_pref_display_name_1");
         const data = JSON.parse(await this.request(`/post.php?id=${url}`, cookie));
         const name = data.title;
         const genre = [data.ua, ...(data.genre || '').split(',').map(g => g.trim())];
@@ -144,7 +145,7 @@ class DefaultExtension extends MProvider {
         if (service === "pv") link = `https://www.primevideo.com/detail/${url}`
 
         return {
-            name, imageUrl: this.getPoster(url, service), link, description, status: 1, genre, episodes
+            name: name_pref ? name : null, imageUrl: this.getPoster(url, service), link, description, status: 1, genre, episodes
         };
     }
     async getEpisodes(name, eid, sid, page, cookie) {
