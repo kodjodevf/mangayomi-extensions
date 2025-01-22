@@ -45,7 +45,7 @@ class AnimeSaturn extends MProvider {
 
     final urls = xpath(res, '//*[@class="card mb-4 shadow-sm"]/a/@href');
 
-    final names = xpath(res, '///*[@class="card mb-4 shadow-sm"]/a/@title');
+    final names = xpath(res, '//*[@class="card mb-4 shadow-sm"]/a/@title');
 
     final images = xpath(res,
         '//*[@class="card mb-4 shadow-sm"]/a/img[@class="new-anime"]/@src');
@@ -149,15 +149,18 @@ class AnimeSaturn extends MProvider {
 
     final res = (await client.get(Uri.parse(url))).body;
     MManga anime = MManga();
-    final details = xpath(res,
-            '//div[@class="container shadow rounded bg-dark-as-box mb-3 p-3 w-100 text-white"]/text()')
-        .first;
+    final detailsList = xpath(res,
+        '//div[@class="container shadow rounded bg-dark-as-box mb-3 p-3 w-100 text-white"]/text()');
+    if (detailsList.isNotEmpty) {
+      final details = detailsList.first;
 
-    anime.status = parseStatus(
-        details.substring(
-            details.indexOf("Stato:") + 6, details.indexOf("Data di uscita:")),
-        statusList);
-    anime.author = details.substring(7, details.indexOf("Stato:"));
+      anime.status = parseStatus(
+          details.substring(
+              details.indexOf("Stato:") + 6, details.indexOf("Data di uscita:")),
+          statusList);
+      anime.author = details.substring(7, details.indexOf("Stato:"));
+    }
+
     final description = xpath(res, '//*[@id="shown-trama"]/text()');
     final descriptionFull = xpath(res, '//*[@id="full-trama"]/text()');
     if (description.isNotEmpty) {
