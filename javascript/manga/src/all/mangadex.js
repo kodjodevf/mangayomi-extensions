@@ -53,7 +53,7 @@ const mangayomiSources = [{
     "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/all.mangadex.png",
     "typeSource": "single",
     "itemType": 0,
-    "version": "0.1.2",
+    "version": "0.1.3",
     "pkgPath": "manga/src/all/mangadex.js"
 }];
 
@@ -268,8 +268,15 @@ class DefaultExtension extends MProvider {
         };
     }
     findTitle(data, lang) {
-        const title = data.attributes.title[lang] ?? data.attributes.title.en;
-        return title ?? data.attributes.altTitles.find(t => t[lang])[lang] ?? data.attributes.altTitles.find(t => t.en).en ?? "";
+        const titles = data.attributes.title;
+        const altTitles = data.attributes.altTitles || [];
+        if (titles[lang]) return titles[lang];
+        if (titles.en) return titles.en;
+        const altInLang = altTitles.find(t => t[lang]);
+        if (altInLang) return altInLang[lang];
+        const altInEn = altTitles.find(t => t.en);
+        if (altInEn) return altInEn.en;
+        return "";
     }
     getCover(data) {
         const coverArt = data.relationships?.find(r => r.type === "cover_art");
