@@ -147,11 +147,14 @@ class AnimePahe extends MProvider {
     final downloadLinks = document.select("div#pickDownload > a");
     final buttons = document.select("div#resolutionMenu > button");
     List<MVideo> videos = [];
+
     for (var i = 0; i < buttons.length; i++) {
       final btn = buttons[i];
+      final audio = btn.attr("data-audio"); // Get audio type (jpn/eng). Japanese or Dubbed.
       final kwikLink = btn.attr("data-src");
       final quality = btn.text;
       final paheWinLink = downloadLinks[i].attr("href");
+      
       if (getPreferenceValue(source.id, "preffered_link_type")) {
         final noRedirectClient = Client(source,
             json.encode({"followRedirects": false, "useDartHttpClient": true}));
@@ -266,8 +269,20 @@ class AnimePahe extends MProvider {
 
   List<MVideo> sortVideos(List<MVideo> videos) {
     String quality = getPreferenceValue(source.id, "preferred_quality");
+    String preferredAudio = getPreferenceValue(source.id, "preferred_audio"); // get user's audio preference
+
 
     videos.sort((MVideo a, MVideo b) {
+       // Prioritize audio first. 
+       // Preferred Audio: Videos with matching preferred audio are ranked highest.
+      int audioMatchA = a.quality.contains(preferredAudio) ? 1 : 0;
+      int audioMatchB = b.quality.contains(preferredAudio) ? 1 : 0;
+      if (audioMatchA != audioMatchB) {
+        return audioMatchB - audioMatchA;
+      }
+
+      // quality prioritized next
+      // Preferred Video Quality: If audio matches, videos with preferred video quality are ranked higher.
       int qualityMatchA = 0;
       if (a.quality.contains(quality)) {
         qualityMatchA = 1;
@@ -321,6 +336,14 @@ class AnimePahe extends MProvider {
           valueIndex: 0,
           entries: ["1080p", "720p", "360p"],
           entryValues: ["1080", "720", "360"]),
+      
+      ListPreference(
+          key: "preferred_audio", // Add new preference for audio
+          title: "Preferred Audio",
+          summary: "Select your preferred audio language (Japanese or English).",
+          valueIndex: 0, // Default to Japanese (or whichever you prefer)
+          entries: ["Japanese", "English"],
+          entryValues: ["jpn", "eng"]),
     ];
   }
 }
