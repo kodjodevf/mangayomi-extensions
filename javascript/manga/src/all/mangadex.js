@@ -53,7 +53,7 @@ const mangayomiSources = [{
     "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/all.mangadex.png",
     "typeSource": "single",
     "itemType": 0,
-    "version": "0.1.3",
+    "version": "0.1.4",
     "pkgPath": "manga/src/all/mangadex.js"
 }];
 
@@ -98,7 +98,7 @@ class DefaultExtension extends MProvider {
             if (filter.type === "HasAvailableChaptersFilter") {
                 if (filter.state) {
                     url += `${this.ll(url)}hasAvailableChapters=true`;
-                    url += `${this.ll(url)}availableTranslatedLanguage[]=${source.lang}`;
+                    url += `${this.ll(url)}availableTranslatedLanguage[]=${this.source.lang}`;
                 }
             } else if (filter.type === "OriginalLanguageList") {
                 const langs = filter.state.filter(e => e.state);
