@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/all.netflixmirror.png",
     "typeSource": "single",
     "itemType": 1,
-    "version": "0.1.4",
+    "version": "0.1.5",
     "pkgPath": "anime/src/all/netflixmirror.js"
 }];
 
@@ -194,7 +194,7 @@ class DefaultExtension extends MProvider {
 
     async getVideoList(url) {
         var src = this.getPreference("netmirror_pref_stream_extraction");
-        
+
         var baseUrl = src === 'tv' ? this.getTVApi() : this.source.baseUrl
         var service = this.getServiceDetails();
         if (service === "nf" && src === 'tv') baseUrl += "/tv";
@@ -216,45 +216,49 @@ class DefaultExtension extends MProvider {
 
             if (resp.statusCode === 200) {
                 const masterPlaylist = resp.body;
-                masterPlaylist.substringAfter('#EXT-X-MEDIA:').split('#EXT-X-MEDIA:').forEach(it => {
-                    if (it.includes('TYPE=AUDIO')) {
-                        const audioInfo = it.substringAfter('TYPE=AUDIO').substringBefore('\n');
-                        const language = audioInfo.substringAfter('NAME="').substringBefore('"');
-                        const url = audioInfo.substringAfter('URI="').substringBefore('"');
-                        audios.push({ file: url, label: language });
-                    }
-                });
 
-                masterPlaylist.substringAfter('#EXT-X-STREAM-INF:').split('#EXT-X-STREAM-INF:').forEach(it => {
+                if (masterPlaylist.indexOf("#EXT-X-STREAM-INF:") > 1) {
 
-                    var quality = `${it.substringAfter('RESOLUTION=').substringAfter('x').substringBefore(',')}p (${source.label})`;
-                    let videoUrl = it.substringAfter('\n').substringBefore('\n');
-
-                    if (!videoUrl.startsWith('http')) {
-                        videoUrl = resp.request.url.substringBeforeLast('/') + `/${videoUrl}`;
-                    }
-                    var headers =
-                    {
-                        'Host': videoUrl.match(/^(?:https?:\/\/)?(?:www\.)?([^\/]+)/)[1],
-                        'Origin': baseUrl,
-                        'Referer': `${baseUrl}/`
-                    };
-                    videoList.push({ url: videoUrl, quality, originalUrl: videoUrl, headers });
-
-                });
-            }
-
-
-            if ("tracks" in playlist) {
-                playlist.tracks.filter(track => track.kind === 'captions').forEach(track => {
-                    var subUrl = track.file
-                    subUrl = subUrl.startsWith("//") ? `https:${subUrl}` : subUrl;
-
-                    subtitles.push({
-                        label: track.label,
-                        file: subUrl
+                    masterPlaylist.substringAfter('#EXT-X-MEDIA:').split('#EXT-X-MEDIA:').forEach(it => {
+                        if (it.includes('TYPE=AUDIO')) {
+                            const audioInfo = it.substringAfter('TYPE=AUDIO').substringBefore('\n');
+                            const language = audioInfo.substringAfter('NAME="').substringBefore('"');
+                            const url = audioInfo.substringAfter('URI="').substringBefore('"');
+                            audios.push({ file: url, label: language });
+                        }
                     });
-                });
+
+
+                    masterPlaylist.substringAfter('#EXT-X-STREAM-INF:').split('#EXT-X-STREAM-INF:').forEach(it => {
+                        var quality = `${it.substringAfter('RESOLUTION=').substringAfter('x').substringBefore(',')}p (${source.label})`;
+                        let videoUrl = it.substringAfter('\n').substringBefore('\n');
+
+                        if (!videoUrl.startsWith('http')) {
+                            videoUrl = resp.request.url.substringBeforeLast('/') + `/${videoUrl}`;
+                        }
+                        var headers =
+                        {
+                            'Host': videoUrl.match(/^(?:https?:\/\/)?(?:www\.)?([^\/]+)/)[1],
+                            'Origin': baseUrl,
+                            'Referer': `${baseUrl}/`
+                        };
+                        videoList.push({ url: videoUrl, quality, originalUrl: videoUrl, headers });
+
+                    });
+                }
+
+
+                if ("tracks" in playlist) {
+                    playlist.tracks.filter(track => track.kind === 'captions').forEach(track => {
+                        var subUrl = track.file
+                        subUrl = subUrl.startsWith("//") ? `https:${subUrl}` : subUrl;
+
+                        subtitles.push({
+                            label: track.label,
+                            file: subUrl
+                        });
+                    });
+                }
             }
         }
 
