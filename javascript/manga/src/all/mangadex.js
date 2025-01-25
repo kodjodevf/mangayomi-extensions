@@ -53,7 +53,7 @@ const mangayomiSources = [{
     "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/all.mangadex.png",
     "typeSource": "single",
     "itemType": 0,
-    "version": "0.1.3",
+    "version": "0.1.4",
     "pkgPath": "manga/src/all/mangadex.js"
 }];
 
