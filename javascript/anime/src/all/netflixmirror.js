@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/all.netflixmirror.png",
     "typeSource": "single",
     "itemType": 1,
-    "version": "0.1.3",
+    "version": "0.1.4",
     "pkgPath": "anime/src/all/netflixmirror.js"
 }];
 
@@ -193,9 +193,11 @@ class DefaultExtension extends MProvider {
     }
 
     async getVideoList(url) {
-        var baseUrl = this.getTVApi()
+        var src = this.getPreference("netmirror_pref_stream_extraction");
+        
+        var baseUrl = src === 'tv' ? this.getTVApi() : this.source.baseUrl
         var service = this.getServiceDetails();
-        if (service === "nf") baseUrl += "/tv";
+        if (service === "nf" && src === 'tv') baseUrl += "/tv";
 
         const data = JSON.parse(await this.request(`/playlist.php?id=${url}`));
         let videoList = [];
@@ -288,7 +290,17 @@ class DefaultExtension extends MProvider {
                 entries: ["Net mirror", "Prime mirror"],
                 entryValues: ["nf", "pv",]
             }
-        },];
+        }, {
+            key: 'netmirror_pref_stream_extraction',
+            listPreference: {
+                title: 'Preferred stream extraction source',
+                summary: 'Extract stream from which source (if one source fails choose another)',
+                valueIndex: 0,
+                entries: ["TV", "Mobile"],
+                entryValues: ["tv", "mobile"]
+            }
+        },
+        ];
     }
 
 }
