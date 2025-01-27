@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://animeparadise.moe",
     "typeSource": "single",
     "itemType": 1,
-    "version": "0.0.1",
+    "version": "0.0.2",
     "pkgPath": "anime/src/en/animeparadise.js"
 }];
 
@@ -15,27 +15,42 @@ class DefaultExtension extends MProvider {
         throw new Error("getHeaders not implemented");
     }
 
-    async requestAPI(slug){
+    getPreference(key) {
+        const preferences = new SharedPreferences();
+        return preferences.get(key);
+    }
+
+    async requestAPI(slug) {
         var api = `${this.source.apiUrl}/${slug}`
         var response = await new Client().get(api);
         var body = JSON.parse(response.body);
         return body;
     }
 
-    async formList(slug){
+    async formList(slug) {
         var jsonData = await this.requestAPI(slug);
         var list = [];
-        jsonData.data.forEach(item => {
-            list.push({
-                "name": item.title,
-                "link": item.link,
-                "imageUrl": item.posterImage.original
-            });
-        })
-        
+        if ("episodes" in jsonData) {
+            jsonData.episodes.forEach(item => {
+                list.push({
+                    "name": item.origin.title,
+                    "link": item.origin.link,
+                    "imageUrl": item.image
+                });
+            })
+        } else {
+            jsonData.data.forEach(item => {
+                list.push({
+                    "name": item.title,
+                    "link": item.link,
+                    "imageUrl": item.posterImage.original
+                });
+            })
+        }
+
         return {
-            "list":list,
-            "hasNextPage":false
+            "list": list,
+            "hasNextPage": false
         }
 
     }
@@ -47,7 +62,12 @@ class DefaultExtension extends MProvider {
         throw new Error("supportsLatest not implemented");
     }
     async getLatestUpdates(page) {
-        return await this.formList('?sort={"postDate": -1 }')
+        var slug = '?sort={"postDate": -1 }';
+
+        var choice = this.getPreference("animeparadise_pref_latest_tab");
+        if (choice === "recent_ep") slug = 'ep/recently-added';
+
+        return await this.formList(slug)
     }
     async search(query, page, filters) {
         throw new Error("search not implemented");
@@ -75,6 +95,15 @@ class DefaultExtension extends MProvider {
         throw new Error("getFilterList not implemented");
     }
     getSourcePreferences() {
-        throw new Error("getSourcePreferences not implemented");
+        return [{
+            key: 'animeparadise_pref_latest_tab',
+            listPreference: {
+                title: 'Latest tab category',
+                summary: 'Anime list to be shown in latest tab',
+                valueIndex: 0,
+                entries: ["Recently added anime", "Recently added episode"],
+                entryValues: ["recent_ani", "recent_ep"]
+            }
+        },]
     }
 }
