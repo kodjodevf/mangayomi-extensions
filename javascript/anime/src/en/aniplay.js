@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://aniplaynow.live/",
     "typeSource": "single",
     "itemType": 1,
-    "version": "1.0.2",
+    "version": "1.0.3",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/en/aniplay.js"
@@ -427,8 +427,13 @@ class DefaultExtension extends MProvider {
         var m3u8Url = result.sources[0].url
         var streams = await this.extractStreams(m3u8Url, "yuki");
 
-
-        var subtitles = result.tracks
+        var subtitles = []
+        result.subtitles.forEach(sub => {
+            subtitles.push({
+                "label": sub.lang,
+                "file": sub.url,
+            });
+        })
         streams[0].subtitles = subtitles
 
         return streams
@@ -487,8 +492,8 @@ class DefaultExtension extends MProvider {
                     "title": "Preferred provider",
                     "summary": "",
                     "valueIndex": 0,
-                    "entries": ["All", "Anya", "Yuki"],
-                    "entryValues": ["all", "anya", "yuki"],
+                    "entries": ["Any", "Anya", "Yuki"],
+                    "entryValues": ["any", "anya", "yuki"],
                 }
             }, {
                 "key": "aniplay_pref_mark_filler",
