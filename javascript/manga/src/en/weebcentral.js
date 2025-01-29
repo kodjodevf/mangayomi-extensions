@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://weebcentral.com",
     "typeSource": "single",
     "itemType": 0,
-    "version": "0.0.1",
+    "version": "0.0.2",
     "pkgPath": "manga/src/en/weebcentral.js"
 }];
 
@@ -15,13 +15,18 @@ class DefaultExtension extends MProvider {
         throw new Error("getHeaders not implemented");
     }
 
-    async getMangaList(slug,page=0) {
-        var page = parseInt(page)
+    async request(slug) {
         var url = `${this.source.baseUrl}/${slug}`
-        url = page>0?url+`/${page}`:url
-
         var res = await new Client().get(url);
-        var doc = new Document(res.body);
+        return new Document(res.body);
+    }
+
+    async getMangaList(slug, page = 0) {
+        var page = parseInt(page)
+
+        slug = page > 0 ? `${slug}/${page}` : slug
+
+        var doc = await this.request(slug);
         var list = [];
         var mangaElements = doc.select("article.bg-base-100")
         for (var manga of mangaElements) {
@@ -38,7 +43,7 @@ class DefaultExtension extends MProvider {
 
             list.push({ name, imageUrl, link });
         }
-        var hasNextPage = page < 142? true : false;
+        var hasNextPage = page < 142 ? true : false;
         return { list, hasNextPage }
     }
 
@@ -49,13 +54,59 @@ class DefaultExtension extends MProvider {
         throw new Error("supportsLatest not implemented");
     }
     async getLatestUpdates(page) {
-        return await this.getMangaList("latest-updates",page)
+        return await this.getMangaList("latest-updates", page)
     }
     async search(query, page, filters) {
         throw new Error("search not implemented");
     }
+
+    getImageUrl(id) { return `https://temp.compsci88.com/cover/normal/${id}.webp`; }
+
+    statusCode(status) {
+        return {
+            "Ongoing": 0,
+            "Complete": 1,
+            "Hiatus": 2,
+            "Canceled": 3,
+        }[status] ?? 5;
+    }
+
     async getDetail(url) {
-        throw new Error("getDetail not implemented");
+        var slug = `series/${url}`
+        var link = `${this.source.baseUrl}/${slug}`
+        var doc = await this.request(slug);
+        var imageUrl = this.getImageUrl(url)
+        var title = doc.selectFirst("h1").text
+        var description = doc.selectFirst("p.whitespace-pre-wrap.break-words").text
+
+        var chapters = []
+        var ul = doc.select("ul.flex.flex-col.gap-4 > li")
+        var author = ""
+        var genre = []
+        var status = 5
+        for (var li of ul) {
+            var strongTxt = li.selectFirst("strong").text
+            if (strongTxt.indexOf("Author(s):") != -1) {
+                author = li.selectFirst("a").text
+            } else if (strongTxt.indexOf("Tags(s):") != -1) {
+                li.select("a").forEach(a => genre.push(a.text))
+            } else if (strongTxt.indexOf("Status:") != -1) {
+                status = this.statusCode(li.selectFirst("a").text)
+            }
+
+        }
+
+        var chapSlug = `${slug}/full-chapter-list`
+        doc = await this.request(chapSlug);
+        var chapList = doc.select("div.flex.items-center");
+        for (var chap of chapList) {
+            var name = chap.selectFirst("span.grow.flex.items-center.gap-2").selectFirst("span").text
+            var dateUpload = new Date(chap.selectFirst("time.text-datetime").text).valueOf().toString()
+            var url = chap.selectFirst("input").attr("value")
+            chapters.push({ name, url, dateUpload })
+        }
+        return { name: title, description, link, imageUrl, author, genre, status, chapters }
+
     }
     // For novel html content
     async getHtmlContent(url) {
