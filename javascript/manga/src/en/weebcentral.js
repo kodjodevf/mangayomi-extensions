@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://weebcentral.com",
     "typeSource": "single",
     "itemType": 0,
-    "version": "0.0.3",
+    "version": "0.0.5",
     "pkgPath": "manga/src/en/weebcentral.js"
 }];
 
@@ -56,11 +56,51 @@ class DefaultExtension extends MProvider {
     async getLatestUpdates(page) {
         return await this.getMangaList("latest-updates", page)
     }
-    async search(query, page, filters) {
-        throw new Error("search not implemented");
-    }
 
     getImageUrl(id) { return `https://temp.compsci88.com/cover/normal/${id}.webp`; }
+
+    async search(query, page, filters) {
+        var offset = 32 * (parseInt(page) - 1)
+        var sort = filters[0].values[filters[0].state].value
+        var order = filters[1].values[filters[1].state].value
+        var translation = filters[2].values[filters[2].state].value
+        var status = ""
+        for (var filter of filters[3].state) {
+            if (filter.state == true)
+                status += `&included_status=${filter.value}`
+        }
+        var type = ""
+        for (var filter of filters[4].state) {
+            if (filter.state == true)
+                type += `&included_type=${filter.value}`
+        }
+        var tags = ""
+        for (var filter of filters[5].state) {
+            if (filter.state == true)
+                tags += `&included_tag=${filter.value}`
+        }
+
+        var slug = `search/data?limit=32&offset=${offset}&author=&text=${query}&sort=${sort}&order=${order}&official=${translation}${status}${type}${tags}&display_mode=Minimal%20Display`
+        var doc = await this.request(slug);
+        var list = []
+        var mangaElements = doc.select("article.bg-base-300")
+        for (var manga of mangaElements) {
+            var details = manga.selectFirst('a')
+
+            var mangaLink = details.getHref;
+            var urlSplits = mangaLink.split("/")
+
+            var link = urlSplits[urlSplits.length - 2]
+            var name = details.selectFirst("h2").text
+            var imageUrl = this.getImageUrl(link)
+
+            list.push({ name, imageUrl, link });
+        }
+
+        var hasNextPage = doc.selectFirst("button").text.length > 0;
+        return { list, hasNextPage }
+
+    }
 
     statusCode(status) {
         return {
@@ -122,18 +162,109 @@ class DefaultExtension extends MProvider {
     }
     // For manga chapter pages
     async getPageList(url) {
-        var slug = `/chapters/${url}/images?current_page=1&reading_style=long_strip`
+        var slug = `chapters/${url}/images?current_page=1&reading_style=long_strip`
         var doc = await this.request(slug);
 
         var urls = [];
 
-        doc.select("section > img").forEach(page=>urls.push(page.attr("src")))
+        doc.select("section > img").forEach(page => urls.push(page.attr("src")))
 
         return urls
     }
-    
+
     getFilterList() {
-        throw new Error("getFilterList not implemented");
+        return [
+            {
+                type_name: "SelectFilter",
+                name: "Sort",
+                state: 0,
+                values: [
+                    ["Best Match", "Best Match"],
+                    ["Alphabet", "Alphabet"],
+                    ["Popularity", "Popularity"],
+                    ["Subscribers", "Subscribers"],
+                    ["Recently Added", "Recently Added"],
+                    ["Latest Updates", "Latest Updates"]
+                ].map(x => ({ type_name: 'SelectOption', name: x[0], value: x[1] }))
+            }, {
+                type_name: "SelectFilter",
+                name: "Order",
+                state: 0,
+                values: [
+                    ["Ascending", "Ascending"],
+                    ["Descending", "Descending"]
+                ].map(x => ({ type_name: 'SelectOption', name: x[0], value: x[1] }))
+            }, {
+                type_name: "SelectFilter",
+                name: "Official Translation",
+                state: 0,
+                values: [
+                    ["Any", "Any"],
+                    ["True", "True"],
+                    ["False", "False"],
+                ].map(x => ({ type_name: 'SelectOption', name: x[0], value: x[1] }))
+            }, {
+                type_name: "GroupFilter",
+                name: "Series Status",
+                state: [
+                    ["Ongoing", "Ongoing"],
+                    ["Complete", "Complete"],
+                    ["Hiatus", "Hiatus"],
+                    ["Canceled", "Canceled"],
+                ].map(x => ({ type_name: 'CheckBox', name: x[0], value: x[1] }))
+            }, {
+                type_name: "GroupFilter",
+                name: "Series Type",
+                state: [
+                    ["Manga", "Manga"],
+                    ["Manhwa", "Manhwa"],
+                    ["Manhua", "Manhua"],
+                    ["OEL", "OEL"],
+                ].map(x => ({ type_name: 'CheckBox', name: x[0], value: x[1] }))
+            }, {
+                type_name: "GroupFilter",
+                name: "Tags",
+                state: [
+                    ["Action", "Action"],
+                    ["Adventure", "Adventure"],
+                    ["Adult", "Adult"],
+                    ["Comedy", "Comedy"],
+                    ["Doujinshi", "Doujinshi"],
+                    ["Drama", "Drama"],
+                    ["Ecchi", "Ecchi"],
+                    ["Fantasy", "Fantasy"],
+                    ["Gender Bender", "Gender Bender"],
+                    ["Harem", "Harem"],
+                    ["Hentai", "Hentai"],
+                    ["Historical", "Historical"],
+                    ["Horror", "Horror"],
+                    ["Isekai", "Isekai"],
+                    ["Josei", "Josei"],
+                    ["Lolicon", "Lolicon"],
+                    ["Martial Arts", "Martial Arts"],
+                    ["Mature", "Mature"],
+                    ["Mecha", "Mecha"],
+                    ["Mystery", "Mystery"],
+                    ["Psychological", "Psychological"],
+                    ["Romance", "Romance"],
+                    ["School Life", "School Life"],
+                    ["Sci-Fi", "Sci-Fi"],
+                    ["Seinen", "Seinen"],
+                    ["Shotacon", "Shotacon"],
+                    ["Shoujo", "Shoujo"],
+                    ["Shoujo Ai", "Shoujo Ai"],
+                    ["Shounen", "Shounen"],
+                    ["Slice of Life", "Slice of Life"],
+                    ["Smut", "Smut"],
+                    ["Sports", "Sports"],
+                    ["Supernatural", "Supernatural"],
+                    ["Tragedy", "Tragedy"],
+                    ["Yaoi", "Yaoi"],
+                    ["Yuri", "Yuri"],
+                    ["Other", "Other"]
+                ].map(x => ({ type_name: 'CheckBox', name: x[0], value: x[1] }))
+            }
+        ]
     }
     getSourcePreferences() {
         throw new Error("getSourcePreferences not implemented");
