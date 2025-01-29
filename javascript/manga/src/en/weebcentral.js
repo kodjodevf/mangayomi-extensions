@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://weebcentral.com",
     "typeSource": "single",
     "itemType": 0,
-    "version": "0.0.2",
+    "version": "0.0.3",
     "pkgPath": "manga/src/en/weebcentral.js"
 }];
 
@@ -122,8 +122,16 @@ class DefaultExtension extends MProvider {
     }
     // For manga chapter pages
     async getPageList(url) {
-        throw new Error("getPageList not implemented");
+        var slug = `/chapters/${url}/images?current_page=1&reading_style=long_strip`
+        var doc = await this.request(slug);
+
+        var urls = [];
+
+        doc.select("section > img").forEach(page=>urls.push(page.attr("src")))
+
+        return urls
     }
+    
     getFilterList() {
         throw new Error("getFilterList not implemented");
     }
