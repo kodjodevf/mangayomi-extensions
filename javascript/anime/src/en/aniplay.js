@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://aniplaynow.live/",
     "typeSource": "single",
     "itemType": 1,
-    "version": "1.0.2",
+    "version": "1.1.0",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/en/aniplay.js"
@@ -322,7 +322,7 @@ class DefaultExtension extends MProvider {
             throw new Error("Error: No data found for the given URL");
         }
 
-        var user_provider = this.getPreference("aniplay_pref_provider_new");
+        var user_provider = this.getPreference("aniplay_pref_provider_2");
         var choices = result
         if (user_provider !== "all") {
             for (var ch of result) {
@@ -386,14 +386,15 @@ class DefaultExtension extends MProvider {
     }
 
     // Extracts the streams url for different resolutions from a hls stream.
-    async extractStreams(url, providerId) {
-        const response = await new Client().get(url);
+    async extractStreams(url, providerId, hdr = {}) {
+        const response = await new Client().get(url, hdr);
         const body = response.body;
         const lines = body.split('\n');
         var streams = [{
             url: url,
             originalUrl: url,
-            quality: "auto",
+            quality: `Auto - ${providerId}`,
+            headers: hdr
         }];
 
         for (let i = 0; i < lines.length; i++) {
@@ -410,6 +411,7 @@ class DefaultExtension extends MProvider {
                     url: m3u8Url,
                     originalUrl: m3u8Url,
                     quality: `${resolution} - ${providerId}`,
+                    headers: hdr
                 });
             }
         }
@@ -417,9 +419,8 @@ class DefaultExtension extends MProvider {
 
     }
 
-    async getAnyaStreams(result) {
+    async getAnyStreams(result) {
         var m3u8Url = result.sources[0].url
-        m3u8Url = `https://prox.uqable.easypanel.host/fetch?url=${m3u8Url}&ref=https://anix.sh`
         return await this.extractStreams(m3u8Url, "anya");
     }
 
@@ -427,11 +428,22 @@ class DefaultExtension extends MProvider {
         var m3u8Url = result.sources[0].url
         var streams = await this.extractStreams(m3u8Url, "yuki");
 
-
-        var subtitles = result.tracks
+        var subtitles = []
+        result.subtitles.forEach(sub => {
+            subtitles.push({
+                "label": sub.lang,
+                "file": sub.url,
+            });
+        })
         streams[0].subtitles = subtitles
 
         return streams
+    }
+
+    async getPaheStreams(result) {
+        var m3u8Url = result.sources[0].url
+        var hdr = result.headers;
+        return await this.extractStreams(m3u8Url, "pahe", hdr);
     }
 
     // For anime episode video list
@@ -458,12 +470,14 @@ class DefaultExtension extends MProvider {
         }
 
         var streams = []
-        if (providerId == "anya") {
-            streams = await this.getAnyaStreams(result)
-        }
-        else {
+        if (providerId == "yuki") {
             streams = await this.getYukiStreams(result)
+        } else if (providerId == "pahe") {
+            streams = await this.getPaheStreams(result)
+        } else {
+            streams = await this.getAnyStreams(result) //If new provider found getAnyaStreams will extract only the streams
         }
+
 
         return await this.sortStreams(streams)
 
@@ -482,13 +496,13 @@ class DefaultExtension extends MProvider {
                 }
             },
             {
-                "key": "aniplay_pref_provider_new",
+                "key": "aniplay_pref_provider_2",
                 "listPreference": {
                     "title": "Preferred provider",
                     "summary": "",
                     "valueIndex": 0,
-                    "entries": ["All", "Anya", "Yuki"],
-                    "entryValues": ["all", "anya", "yuki"],
+                    "entries": ["Any", "Yuki", "Pahe"],
+                    "entryValues": ["any", "yuki", "pahe"],
                 }
             }, {
                 "key": "aniplay_pref_mark_filler",
