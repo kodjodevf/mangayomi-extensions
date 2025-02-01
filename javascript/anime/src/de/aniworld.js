@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "single",
     "itemType": 1,
     "isNsfw": false,
-    "version": "0.3.3",
+    "version": "0.3.4",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/de/aniworld.js"
@@ -76,8 +76,38 @@ class DefaultExtension extends MProvider {
           .replace(/&gt;/g, '>')
           .replace(/<br>/g, '\n')
           .replace(/<br\s*\/?>/g, '\n')
+          .replace(/&#039;/g, "'")
           .replace(/&quot;/g, '"')
           .replace(/<a\s+href="([^"]*)".*?>.*?<\/a>/g, '$1');
+    }
+    /**
+     * Custom asyncPool implementation.
+     * @param {number} poolLimit - Maximum number of concurrent promises.
+     * @param {Array} array - Array of items to process.
+     * @param {function} iteratorFn - Function that returns a promise for each item.
+     * @returns {Promise<Array>} - Promise resolving to an array of results.
+     */
+    async asyncPool(poolLimit, array, iteratorFn) {
+        const ret = [];       // Array to store all promises
+        const executing = []; // Array to store currently executing promises
+    
+        for (const item of array) {
+          const p = Promise.resolve().then(() => iteratorFn(item));
+          ret.push(p);
+    
+          // When poolLimit is reached, wait for the fastest promise to complete
+          if (poolLimit <= array.length) {
+            const e = p.then(() => {
+              // Remove the promise from executing array once it resolves
+              executing.splice(executing.indexOf(e), 1);
+            });
+            executing.push(e);
+            if (executing.length >= poolLimit) {
+              await Promise.race(executing);
+            }
+          }
+        }
+        return Promise.all(ret);
     }
     async getDetail(url) {
         const baseUrl = this.source.baseUrl;
@@ -95,18 +125,18 @@ class DefaultExtension extends MProvider {
             author = produzent[0].select("li").map(e => e.text).join(", ");
         }
         const seasonsElements = document.select("#stream > ul:nth-child(1) > li > a");
-        const promises = seasonsElements.map(element => this.parseEpisodesFromSeries(element));
-        const episodes = (await Promise.allSettled(promises))
-            .filter(p => p.status === 'fulfilled')
-            .flatMap(p => p.value);
-        episodes.reverse();
+        // Use asyncPool to limit concurrency while processing seasons
+        const episodesArrays = await this.asyncPool(2, seasonsElements, element => this.parseEpisodesFromSeries(element));
+        // Flatten the resulting arrays and reverse the order
+        const episodes = episodesArrays.flat().reverse();
         return { name, imageUrl, description, author, status: 5, genre, episodes };
     }
     async parseEpisodesFromSeries(element) {
         const seasonId = element.getHref;
         const res = await this.client.get(this.source.baseUrl + seasonId);
         const episodeElements = new Document(res.body).select("table.seasonEpisodesList tbody tr");
-        return Promise.all(episodeElements.map(e => this.episodeFromElement(e)));
+        // Use asyncPool to limit concurrency while processing episodes of a season
+        return await this.asyncPool(13, episodeElements, e => this.episodeFromElement(e));
     }
     async episodeFromElement(element) {
         const titleAnchor = element.selectFirst("td.seasonEpisodeTitle a");
