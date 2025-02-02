@@ -7,14 +7,12 @@ import 'src/all/nyaa/source.dart';
 import 'src/ar/okanime/source.dart';
 import 'src/de/animetoast/source.dart';
 import 'src/en/animepahe/source.dart';
-import 'src/en/dramacool/source.dart';
 import 'src/en/gogoanime/source.dart';
 import 'src/en/nineanimetv/source.dart';
 import 'src/es/animeonlineninja/source.dart';
 import 'src/fr/animesama/source.dart';
 import 'src/fr/anizone/source.dart';
 import 'src/hi/yomovies/source.dart';
-import 'src/en/kisskh/source.dart';
 import 'src/en/uhdmovies/source.dart';
 import 'src/fr/animesultra/source.dart';
 import 'src/fr/franime/source.dart';
@@ -33,7 +31,6 @@ List<Source> dartAnimesourceList = [
   otakufr,
   animesultraSource,
   ...zorothemeSourcesList,
-  kisskhSource,
   okanimeSource,
   otakudesu,
   nimegami,
@@ -43,7 +40,6 @@ List<Source> dartAnimesourceList = [
   uhdmoviesSource,
   ...datalifeengineSourcesList,
   filma24,
-  dramacoolSource,
   yomoviesSource,
   animesamaSource,
   nineanimetv,
