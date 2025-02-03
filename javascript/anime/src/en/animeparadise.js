@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://animeparadise.moe",
     "typeSource": "single",
     "itemType": 1,
-    "version": "0.0.2",
+    "version": "0.0.3",
     "pkgPath": "anime/src/en/animeparadise.js"
 }];
 
@@ -18,6 +18,13 @@ class DefaultExtension extends MProvider {
     getPreference(key) {
         const preferences = new SharedPreferences();
         return preferences.get(key);
+    }
+
+    async extractFromUrl(url) {
+        var res = await new Client().get(url);
+        var doc = new Document(res.body);
+        var jsonData = doc.selectFirst("#__NEXT_DATA__").text
+        return JSON.parse(jsonData).props.pageProps.data;
     }
 
     async requestAPI(slug) {
@@ -72,8 +79,33 @@ class DefaultExtension extends MProvider {
     async search(query, page, filters) {
         throw new Error("search not implemented");
     }
+    statusCode(status) {
+        return {
+            "current": 0,
+            "finished": 1,
+        }[status] ?? 5;
+    }
+
     async getDetail(url) {
-        throw new Error("getDetail not implemented");
+        var link = this.source.baseUrl + `/anime/${url}`
+        var jsonData = await this.extractFromUrl(link)
+        var details = {}
+        var chapters = []
+        details.name = jsonData.title
+        details.link = link
+        details.imageUrl = jsonData.posterImage.original
+        details.description = jsonData.synopsys
+        details.genre = jsonData.genres
+        details.status = this.statusCode(jsonData.status)
+        var id = jsonData._id
+        var epAPI = await this.requestAPI(`anime/${id}/episode`)
+        epAPI.data.forEach(ep => {
+            var epName = `E${ep.number}: ${ep.title}`;
+            var epUrl = `${ep.uid}?origin=${ep.origin}`
+            chapters.push({ name: epName, url: epUrl })
+        })
+        details.chapters = chapters.reverse();
+        return details;
     }
     // For novel html content
     async getHtmlContent(url) {
