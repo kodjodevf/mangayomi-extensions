@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://animeparadise.moe",
     "typeSource": "single",
     "itemType": 1,
-    "version": "0.0.3",
+    "version": "0.0.4",
     "pkgPath": "anime/src/en/animeparadise.js"
 }];
 
@@ -21,10 +21,10 @@ class DefaultExtension extends MProvider {
     }
 
     async extractFromUrl(url) {
-        var res = await new Client().get(url);
+        var res = await new Client().get(this.source.baseUrl + url);
         var doc = new Document(res.body);
         var jsonData = doc.selectFirst("#__NEXT_DATA__").text
-        return JSON.parse(jsonData).props.pageProps.data;
+        return JSON.parse(jsonData).props.pageProps
     }
 
     async requestAPI(slug) {
@@ -88,7 +88,8 @@ class DefaultExtension extends MProvider {
 
     async getDetail(url) {
         var link = this.source.baseUrl + `/anime/${url}`
-        var jsonData = await this.extractFromUrl(link)
+        var jsonData = await this.extractFromUrl(`/anime/${url}`)
+        jsonData = jsonData.data
         var details = {}
         var chapters = []
         details.name = jsonData.title
@@ -115,9 +116,73 @@ class DefaultExtension extends MProvider {
     async cleanHtmlContent(html) {
         throw new Error("cleanHtmlContent not implemented");
     }
+    // Sorts streams based on user preference.
+    async sortStreams(streams) {
+        var sortedStreams = [];
+        var copyStreams = streams.slice()
+
+        var pref = await this.getPreference("animeparadise_pref_video_resolution");
+        for (var stream of streams) {
+
+            if (stream.quality.indexOf(pref) > -1) {
+                sortedStreams.push(stream);
+                var index = copyStreams.indexOf(stream);
+                if (index > -1) {
+                    copyStreams.splice(index, 1);
+                }
+                break;
+            }
+        }
+        return [...sortedStreams, ...copyStreams]
+    }
+
+    // Extracts the streams url for different resolutions from a hls stream.
+    async extractStreams(url) {
+        const response = await new Client().get(url);
+        const body = response.body;
+        const lines = body.split('\n');
+        var streams = [{
+            url: url,
+            originalUrl: url,
+            quality: `Auto`,
+        }];
+
+        for (let i = 0; i < lines.length; i++) {
+            if (lines[i].startsWith('#EXT-X-STREAM-INF:')) {
+                var resolution = lines[i].match(/RESOLUTION=(\d+x\d+)/)[1];
+                var m3u8Url = lines[i + 1].trim();
+                m3u8Url = url.replace("master.m3u8", m3u8Url)
+
+                streams.push({
+                    url: m3u8Url,
+                    originalUrl: m3u8Url,
+                    quality: resolution
+                });
+            }
+        }
+        return streams
+
+    }
+
     // For anime episode video list
     async getVideoList(url) {
-        throw new Error("getVideoList not implemented");
+        var streams = []
+        var jsonData = await this.extractFromUrl(`/watch/${url}`);
+        var epData = jsonData.episode
+        streams = await this.extractStreams(epData.streamLink)
+
+        var subtitles = []
+        epData.subData.forEach(sub => {
+            subtitles.push({
+                "label": sub.label,
+                "file": `${this.source.apiUrl}/stream/file/${sub.src}`,
+            });
+        })
+
+        streams[0].subtitles = subtitles
+
+        return streams
+
     }
     // For manga chapter pages
     async getPageList(url) {
@@ -136,6 +201,16 @@ class DefaultExtension extends MProvider {
                 entries: ["Recently added anime", "Recently added episode"],
                 entryValues: ["recent_ani", "recent_ep"]
             }
-        },]
+        }, {
+            key: 'animeparadise_pref_video_resolution',
+            listPreference: {
+                title: 'Preferred video resolution',
+                summary: '',
+                valueIndex: 0,
+                entries: ["Auto", "1080p", "720p", "360p"],
+                entryValues: ["auto", "1080", "720", "360"]
+            }
+        },
+        ]
     }
 }
