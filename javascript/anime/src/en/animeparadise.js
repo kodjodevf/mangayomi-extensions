@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://animeparadise.moe",
     "typeSource": "single",
     "itemType": 1,
-    "version": "0.0.4",
+    "version": "0.0.5",
     "pkgPath": "anime/src/en/animeparadise.js"
 }];
 
@@ -77,7 +77,16 @@ class DefaultExtension extends MProvider {
         return await this.formList(slug)
     }
     async search(query, page, filters) {
-        throw new Error("search not implemented");
+        var season = filters[0].values[filters[0].state].value
+        var year = filters[1].values[filters[1].state].value
+
+        var genre = "genre[]="
+        for (var filter of filters[2].state) {
+            if (filter.state == true)
+                genre += `${filter.value}&genre[]=`
+        }
+        var slug = `search?q=${query}&year=${year}&season=${season}&${genre}`
+        return await this.formList(slug);
     }
     statusCode(status) {
         return {
@@ -188,9 +197,44 @@ class DefaultExtension extends MProvider {
     async getPageList(url) {
         throw new Error("getPageList not implemented");
     }
-    getFilterList() {
-        throw new Error("getFilterList not implemented");
+
+    addCatogory(arr, typ) {
+        arr = arr.map(x => ({ type_name: typ, name: x, value: x }))
+        arr.unshift({
+            type_name: typ,
+            name: 'All',
+            value: ''
+        })
+        return arr
     }
+
+    getFilterList() {
+        var seasons = ["Winter", "Spring", "Summer", "Fall"]
+
+        const currentYear = new Date().getFullYear();
+        var years = Array.from({ length: currentYear - 1939 }, (_, i) => (i + 1940).toString()).reverse()
+
+        var genres = ["Action", "Adventure", "Comedy", "Drama", "Ecchi", "Fantasy", "Horror", "Mahou Shojo", "Mecha", "Music", "Mystery", "Psychological", "Romance", "Sci-Fi", "Slice of Life", "Sports", "Supernatural", "Thriller"].map(x => ({ type_name: "CheckBox", name: x, value: x }))
+
+        return [
+            {
+                type_name: "SelectFilter",
+                name: "Season",
+                state: 0,
+                values: this.addCatogory(seasons, "SelectOption")
+            }, {
+                type_name: "SelectFilter",
+                name: "Year",
+                state: 0,
+                values: this.addCatogory(years, "SelectOption")
+            }, {
+                type_name: "GroupFilter",
+                name: "Genres",
+                state: genres
+            }
+        ]
+    }
+
     getSourcePreferences() {
         return [{
             key: 'animeparadise_pref_latest_tab',
