@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://animeparadise.moe",
     "typeSource": "single",
     "itemType": 1,
-    "version": "0.0.5",
+    "version": "0.0.6",
     "pkgPath": "anime/src/en/animeparadise.js"
 }];
 
@@ -117,14 +117,6 @@ class DefaultExtension extends MProvider {
         details.chapters = chapters.reverse();
         return details;
     }
-    // For novel html content
-    async getHtmlContent(url) {
-        throw new Error("getHtmlContent not implemented");
-    }
-    // Clean html up for reader
-    async cleanHtmlContent(html) {
-        throw new Error("cleanHtmlContent not implemented");
-    }
     // Sorts streams based on user preference.
     async sortStreams(streams) {
         var sortedStreams = [];
@@ -192,10 +184,6 @@ class DefaultExtension extends MProvider {
 
         return streams
 
-    }
-    // For manga chapter pages
-    async getPageList(url) {
-        throw new Error("getPageList not implemented");
     }
 
     addCatogory(arr, typ) {
