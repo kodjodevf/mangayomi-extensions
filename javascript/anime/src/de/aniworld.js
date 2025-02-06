@@ -7,14 +7,14 @@ const mangayomiSources = [{
     "typeSource": "single",
     "itemType": 1,
     "isNsfw": false,
-    "version": "0.3.4",
+    "version": "0.3.5",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/de/aniworld.js"
 }];
 
 class DefaultExtension extends MProvider {
-    constructor () {
+    constructor() {
         super();
         this.client = new Client();
     }
@@ -70,15 +70,15 @@ class DefaultExtension extends MProvider {
         }
     }
     cleanHtmlString(input) {
-      if (!input) return "";
-      return input
-          .replace(/&lt;/g, '<')
-          .replace(/&gt;/g, '>')
-          .replace(/<br>/g, '\n')
-          .replace(/<br\s*\/?>/g, '\n')
-          .replace(/&#039;/g, "'")
-          .replace(/&quot;/g, '"')
-          .replace(/<a\s+href="([^"]*)".*?>.*?<\/a>/g, '$1');
+        if (!input) return "";
+        return input
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/<br>/g, '\n')
+            .replace(/<br\s*\/?>/g, '\n')
+            .replace(/&#039;/g, "'")
+            .replace(/&quot;/g, '"')
+            .replace(/<a\s+href="([^"]*)".*?>.*?<\/a>/g, '$1');
     }
     /**
      * Custom asyncPool implementation.
@@ -90,22 +90,22 @@ class DefaultExtension extends MProvider {
     async asyncPool(poolLimit, array, iteratorFn) {
         const ret = [];       // Array to store all promises
         const executing = []; // Array to store currently executing promises
-    
+
         for (const item of array) {
-          const p = Promise.resolve().then(() => iteratorFn(item));
-          ret.push(p);
-    
-          // When poolLimit is reached, wait for the fastest promise to complete
-          if (poolLimit <= array.length) {
-            const e = p.then(() => {
-              // Remove the promise from executing array once it resolves
-              executing.splice(executing.indexOf(e), 1);
-            });
-            executing.push(e);
-            if (executing.length >= poolLimit) {
-              await Promise.race(executing);
+            const p = Promise.resolve().then(() => iteratorFn(item));
+            ret.push(p);
+
+            // When poolLimit is reached, wait for the fastest promise to complete
+            if (poolLimit <= array.length) {
+                const e = p.then(() => {
+                    // Remove the promise from executing array once it resolves
+                    executing.splice(executing.indexOf(e), 1);
+                });
+                executing.push(e);
+                if (executing.length >= poolLimit) {
+                    await Promise.race(executing);
+                }
             }
-          }
         }
         return Promise.all(ret);
     }
@@ -142,7 +142,6 @@ class DefaultExtension extends MProvider {
         const titleAnchor = element.selectFirst("td.seasonEpisodeTitle a");
         const episodeSpan = titleAnchor.selectFirst("span");
         const url = titleAnchor.attr("href");
-        const dateUpload = await this.getUploadDateFromEpisode(url);
         const episodeSeasonId = element.attr("data-episode-season-id");
         let episode = this.cleanHtmlString(episodeSpan.text);
         let name = "";
@@ -152,37 +151,9 @@ class DefaultExtension extends MProvider {
             const seasonMatch = url.match(/staffel-(\d+)\/episode/);
             name = `Staffel ${seasonMatch[1]} Folge ${episodeSeasonId} : ${episode}`;
         }
-        return name && url ? { name, url, dateUpload } : {};
+        return name && url ? { name, url } : {};
     }
-    async getUploadDateFromEpisode(url) {
-        const baseUrl = this.source.baseUrl;
-        const res = await this.client.get(baseUrl + url);
-        const getLastSundayOfMonth = (year, month) => {
-            const lastDay = new Date(year, month, 0);
-            const lastSunday = lastDay.getDate() - lastDay.getDay();
-            return new Date(year, month - 1, lastSunday);
-        };
-        const document = new Document(res.body);
-        const dateString = document.selectFirst('strong[style="color: white;"]').text;
-        const dateTimePart = dateString.split(", ")[1];
-        const [date, time] = dateTimePart.split(" ");
-        const [day, month, year] = date.split(".");
-        const [hours, minutes] = time.split(":");
-        const dayInt = parseInt(day);
-        const monthInt = parseInt(month);
-        const yearInt = parseInt(year);
-        const hoursInt = parseInt(hours);
-        const minutesInt = parseInt(minutes);
-        const lastSundayOfMarch = getLastSundayOfMonth(yearInt, 3);
-        const lastSundayOfOctober = getLastSundayOfMonth(yearInt, 10);
-        const jsDate = new Date(yearInt, monthInt - 1, dayInt, hoursInt, minutesInt);
-        // If Date between lastSundayOfMarch & lastSundayOfOctober -> CEST (MESZ)
-        const isInDST = jsDate >= lastSundayOfMarch && jsDate < lastSundayOfOctober;
-        let timeZoneOffset = isInDST ? 0 : 1;
-        // If it's in CEST, subtract 1 hour from UTC (to get local time in CEST)
-        const correctedTime = new Date(jsDate.getTime() + (timeZoneOffset - 1) * 60 * 60 * 1000);
-        return String(correctedTime.valueOf()); // dateUpload is a string containing date expressed in millisecondsSinceEpoch.
-    }
+
     async getVideoList(url) {
         const baseUrl = this.source.baseUrl;
         const res = await this.client.get(baseUrl + url, {
@@ -212,7 +183,7 @@ class DefaultExtension extends MProvider {
                 const redirect = baseUrl + element.selectFirst("a.watchEpisode").attr("href");
                 promises.push((async (redirect, lang, type, host) => {
                     const location = (await dartClient.get(redirect)).headers.location;
-                    return await extractAny(location, host.toLowerCase(), lang, type, host, {'Referer': this.source.baseUrl});
+                    return await extractAny(location, host.toLowerCase(), lang, type, host, { 'Referer': this.source.baseUrl });
                 })(redirect, lang, type, host));
             }
         }
@@ -446,7 +417,7 @@ async function filemoonExtractor(url, headers) {
     headers = headers ?? {};
     headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36';
     delete headers['user-agent'];
-    
+
     let res = await new Client().get(url, headers);
     const src = res.body.match(/iframe src="(.*?)"/)?.[1];
     if (src) {
@@ -460,14 +431,14 @@ async function filemoonExtractor(url, headers) {
 }
 
 async function mixdropExtractor(url) {
-    headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'};
+    headers = { 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36' };
     let res = await new Client({ 'useDartHttpClient': true, "followRedirects": false }).get(url, headers);
     while ("location" in res.headers) {
         res = await new Client({ 'useDartHttpClient': true, "followRedirects": false }).get(res.headers.location, headers);
     }
     const newUrl = res.request.url;
     let doc = new Document(res.body);
-    
+
     const code = doc.selectFirst('script:contains(MDCore):contains(eval)').text;
     const unpacked = unpackJs(code);
     let videoUrl = unpacked.match(/wurl="(.*?)"/)?.[1];
@@ -476,14 +447,14 @@ async function mixdropExtractor(url) {
 
     videoUrl = 'https:' + videoUrl;
     headers.referer = newUrl;
-    
-    return [{url: videoUrl, originalUrl: videoUrl, quality: '', headers: headers}];
+
+    return [{ url: videoUrl, originalUrl: videoUrl, quality: '', headers: headers }];
 }
 
 async function speedfilesExtractor(url) {
     let res = await new Client().get(url);
     let doc = new Document(res.body);
-    
+
     const code = doc.selectFirst('script:contains(var)').text;
     let b64;
 
@@ -507,15 +478,15 @@ async function speedfilesExtractor(url) {
     step3 = String.fromCharCode(...step3.reverse()).swapcase();
     // decode b64 => url
     const videoUrl = Uint8Array.fromBase64(step3).decode();
-    
-    return [{url: videoUrl, originalUrl: videoUrl, quality: '', headers: null}];
+
+    return [{ url: videoUrl, originalUrl: videoUrl, quality: '', headers: null }];
 }
 
 async function luluvdoExtractor(url) {
-    const client = new Client();    
+    const client = new Client();
     const match = url.match(/(.*?:\/\/.*?)\/.*\/(.*)/);
-    const headers = {'user-agent': 'Mangayomi'};
-    const res = await client.get(`${match[1]}/dl?op=embed&file_code=${match[2]}`, headers);    
+    const headers = { 'user-agent': 'Mangayomi' };
+    const res = await client.get(`${match[1]}/dl?op=embed&file_code=${match[2]}`, headers);
     return await jwplayerExtractor(res.body, headers);
 }
 
@@ -574,11 +545,11 @@ mp4UploadExtractor = async (url) => {
 _yourUploadExtractor = yourUploadExtractor;
 yourUploadExtractor = async (url) => {
     return (await _yourUploadExtractor(url))
-    .filter(v => !v.url.includes('/novideo'))
-    .map(v => {
-        v.quality = '';
-        return v;
-    });
+        .filter(v => !v.url.includes('/novideo'))
+        .map(v => {
+            v.quality = '';
+            return v;
+        });
 }
 
 _streamTapeExtractor = streamTapeExtractor;
@@ -595,12 +566,12 @@ sendVidExtractor = async (url) => {
         quality = res.body.match(/og:video:height" content="(.*?)"/)?.[1];
         quality = quality ? quality + 'p' : '';
     } catch (error) {
-        
+
     }
     if (!videoUrl) {
         return _sendVidExtractor(url, null, '');
     }
-    return [{url: videoUrl, originalUrl: videoUrl, quality: quality, headers: null}];
+    return [{ url: videoUrl, originalUrl: videoUrl, quality: quality, headers: null }];
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -753,7 +724,7 @@ async function jwplayerExtractor(text, headers) {
 
     const data = eval('(' + (getsetup.exec(text) || getsetup.exec(unpacked))?.[1] + ')');
 
-    if (data){
+    if (data) {
         var sources = data.sources;
         var tracks = data.tracks;
     } else {
@@ -762,16 +733,16 @@ async function jwplayerExtractor(text, headers) {
     }
     for (t of tracks) {
         if (t.type == "captions") {
-            subtitles.push({file: t.file, label: t.label});
+            subtitles.push({ file: t.file, label: t.label });
         }
     }
     for (s of sources) {
         if (s.file.includes('master.m3u8')) {
             videos.push(...(await m3u8Extractor(s.file, headers)));
         } else if (s.file.includes('.mpd')) {
-            
+
         } else {
-            videos.push({url: s.file, originalUrl: s.file, quality: '', headers: headers});
+            videos.push({ url: s.file, originalUrl: s.file, quality: '', headers: headers });
         }
     }
     return videos.map(v => {
