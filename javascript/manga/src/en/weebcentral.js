@@ -1,60 +1,42 @@
 const mangayomiSources = [{
-    "name": "Weebcentral",
+    "id": 693275080,
+    "name": "Weeb Central",
     "lang": "en",
     "baseUrl": "https://weebcentral.com",
     "apiUrl": "",
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://weebcentral.com",
     "typeSource": "single",
     "itemType": 0,
-    "version": "0.0.5",
+    "version": "0.0.6",
     "pkgPath": "manga/src/en/weebcentral.js"
 }];
 
 class DefaultExtension extends MProvider {
+    constructor() {
+        super();
+        this.client = new Client();
+    }
     getHeaders(url) {
-        throw new Error("getHeaders not implemented");
+        return { "Referer": "$baseUrl/" };
     }
 
     async request(slug) {
-        var url = `${this.source.baseUrl}/${slug}`
-        var res = await new Client().get(url);
+        var url = `${this.source.baseUrl}${slug}`
+        var res = await this.client.get(url);
         return new Document(res.body);
     }
 
-    async getMangaList(slug, page = 0) {
-        var page = parseInt(page)
-
-        slug = page > 0 ? `${slug}/${page}` : slug
-
-        var doc = await this.request(slug);
-        var list = [];
-        var mangaElements = doc.select("article.bg-base-100")
-        for (var manga of mangaElements) {
-            var details = manga.selectFirst('a')
-            if (details.getHref.indexOf("/series/") < 0) continue;
-
-            details = details.selectFirst("img");
-
-            var imageUrl = details.getSrc;
-            var urlSplits = imageUrl.split("/")
-
-            var link = urlSplits[urlSplits.length - 1].split(".")[0]
-            var name = details.attr("alt")
-
-            list.push({ name, imageUrl, link });
-        }
-        var hasNextPage = page < 142 ? true : false;
-        return { list, hasNextPage }
-    }
 
     async getPopular(page) {
-        return await this.getMangaList("hot-updates")
+        const filters = this.getFilterList();
+        filters[0].state = 2;
+        return await this.search("", page, filters)
     }
-    get supportsLatest() {
-        throw new Error("supportsLatest not implemented");
-    }
+
     async getLatestUpdates(page) {
-        return await this.getMangaList("latest-updates", page)
+        const filters = this.getFilterList();
+        filters[0].state = 5;
+        return await this.search("", page, filters)
     }
 
     getImageUrl(id) { return `https://temp.compsci88.com/cover/normal/${id}.webp`; }
@@ -79,21 +61,16 @@ class DefaultExtension extends MProvider {
             if (filter.state == true)
                 tags += `&included_tag=${filter.value}`
         }
-
-        var slug = `search/data?limit=32&offset=${offset}&author=&text=${query}&sort=${sort}&order=${order}&official=${translation}${status}${type}${tags}&display_mode=Minimal%20Display`
+        var slug = `/search/data?limit=32&offset=${offset}&author=&text=${query}&sort=${sort}&order=${order}&official=${translation}${status}${type}${tags}&display_mode=Full%20Display`
         var doc = await this.request(slug);
-        var list = []
-        var mangaElements = doc.select("article.bg-base-300")
+        var list = [];
+        var mangaElements = doc.select("article:has(section)")
         for (var manga of mangaElements) {
-            var details = manga.selectFirst('a')
-
-            var mangaLink = details.getHref;
-            var urlSplits = mangaLink.split("/")
-
+            var imageUrl = manga.selectFirst("img").getSrc;
+            var details = manga.selectFirst("div > a");
+            var urlSplits = details.getHref.split("/")
             var link = urlSplits[urlSplits.length - 2]
-            var name = details.selectFirst("h2").text
-            var imageUrl = this.getImageUrl(link)
-
+            var name = details.text
             list.push({ name, imageUrl, link });
         }
 
@@ -101,7 +78,6 @@ class DefaultExtension extends MProvider {
         return { list, hasNextPage }
 
     }
-
     statusCode(status) {
         return {
             "Ongoing": 0,
@@ -112,11 +88,9 @@ class DefaultExtension extends MProvider {
     }
 
     async getDetail(url) {
-        var slug = `series/${url}`
-        var link = `${this.source.baseUrl}/${slug}`
+        var slug = `/series/${url}`;
         var doc = await this.request(slug);
-        var imageUrl = this.getImageUrl(url)
-        var title = doc.selectFirst("h1").text
+        var imageUrl = this.getImageUrl(url);
         var description = doc.selectFirst("p.whitespace-pre-wrap.break-words").text
 
         var chapters = []
@@ -145,24 +119,11 @@ class DefaultExtension extends MProvider {
             var url = chap.selectFirst("input").attr("value")
             chapters.push({ name, url, dateUpload })
         }
-        return { name: title, description, link, imageUrl, author, genre, status, chapters }
+        return { description, imageUrl, author, genre, status, chapters }
 
     }
-    // For novel html content
-    async getHtmlContent(url) {
-        throw new Error("getHtmlContent not implemented");
-    }
-    // Clean html up for reader
-    async cleanHtmlContent(html) {
-        throw new Error("cleanHtmlContent not implemented");
-    }
-    // For anime episode video list
-    async getVideoList(url) {
-        throw new Error("getVideoList not implemented");
-    }
-    // For manga chapter pages
     async getPageList(url) {
-        var slug = `chapters/${url}/images?current_page=1&reading_style=long_strip`
+        var slug = `/chapters/${url}/images?current_page=1&reading_style=long_strip`
         var doc = await this.request(slug);
 
         var urls = [];
@@ -265,8 +226,5 @@ class DefaultExtension extends MProvider {
                 ].map(x => ({ type_name: 'CheckBox', name: x[0], value: x[1] }))
             }
         ]
-    }
-    getSourcePreferences() {
-        throw new Error("getSourcePreferences not implemented");
     }
 }
