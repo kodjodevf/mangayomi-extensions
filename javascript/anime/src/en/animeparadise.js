@@ -1,19 +1,16 @@
 const mangayomiSources = [{
-    "name": "Animeparadise",
+    "name": "AnimeParadise",
     "lang": "en",
     "baseUrl": "https://animeparadise.moe",
     "apiUrl": "https://api.animeparadise.moe",
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://animeparadise.moe",
     "typeSource": "single",
     "itemType": 1,
-    "version": "0.0.6",
+    "version": "0.0.1",
     "pkgPath": "anime/src/en/animeparadise.js"
 }];
 
 class DefaultExtension extends MProvider {
-    getHeaders(url) {
-        throw new Error("getHeaders not implemented");
-    }
 
     getPreference(key) {
         const preferences = new SharedPreferences();
@@ -65,9 +62,7 @@ class DefaultExtension extends MProvider {
     async getPopular(page) {
         return await this.formList('?sort={"rate": -1 }')
     }
-    get supportsLatest() {
-        throw new Error("supportsLatest not implemented");
-    }
+
     async getLatestUpdates(page) {
         var slug = '?sort={"postDate": -1 }';
 
@@ -101,8 +96,6 @@ class DefaultExtension extends MProvider {
         jsonData = jsonData.data
         var details = {}
         var chapters = []
-        details.name = jsonData.title
-        details.link = link
         details.imageUrl = jsonData.posterImage.original
         details.description = jsonData.synopsys
         details.genre = jsonData.genres
