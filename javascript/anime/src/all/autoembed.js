@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "multi",
     "isManga": false,
     "itemType": 1,
-    "version": "1.2.0",
+    "version": "1.2.1",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/all/autoembed.js"
@@ -326,8 +326,8 @@ class DefaultExtension extends MProvider {
                 if (media_type == "tv") {
                     id = `${id}&season=${s}&episode=${e}`
                 }
-                var api = `https://player.flicky.host/Server-main.php?id=${id}`
-                var response = await new Client().get(api, { "Referer": "https://flicky.host/" });
+                var api = `https://flicky.host/player/desi.php?id=${id}`
+                var response = await new Client().get(api, { "Referer": "https://flicky.host/" ,"sec-fetch-dest":"iframe"});
 
                 if (response.statusCode != 200) {
                     throw new Error("Video unavailable");
