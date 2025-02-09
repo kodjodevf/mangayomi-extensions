@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "multi",
     "isManga": false,
     "itemType": 1,
-    "version": "1.1.5",
+    "version": "1.2.0",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/all/autoembed.js"
@@ -253,7 +253,7 @@ class DefaultExtension extends MProvider {
 
     // For anime episode video list
     async getVideoList(url) {
-        var streamAPI = parseInt(this.getPreference("pref_stream_source"))
+        var streamAPI = parseInt(this.getPreference("autoembed_stream_source"))
 
         var parts = url.split("||");
         var media_type = parts[0];
@@ -369,7 +369,54 @@ class DefaultExtension extends MProvider {
                 streams = await this.extractStreams(link);
                 break;
             }
+            case 6: {
+                if (media_type == "tv") {
+                    id = `${id}/${s}/${e}`
+                }
+                var api = `https://sources.hexa.watch/plsdontscrapemeuwu/${id}`
+                var hdr = { "Origin": "https://api.hexa.watch" }
+                var response = await new Client().get(api, hdr);
 
+                if (response.statusCode != 200) {
+                    throw new Error("Video unavailable");
+                }
+
+                var body = JSON.parse(response.body);
+                var strms = body.streams
+                for (var strm of strms) {
+                    streams.push({
+                        url: strm.url,
+                        originalUrl: strm.url,
+                        quality: strm.quality,
+                        headers: strm.headers
+                    });
+                }
+                break;
+            }
+            case 7: {
+                if (media_type == "tv") {
+                    id = `${id}/${s}/${e}`
+                }
+                var api = `https://febapi.bludclart.com/${media_type}/${id}`
+                var response = await new Client().get(api);
+
+                if (response.statusCode != 200) {
+                    throw new Error("Video unavailable");
+                }
+
+                var body = JSON.parse(response.body);
+                var strms = body.streams.qualities
+                for (var strm in strms) {
+                    var quality = strm === "ORG" ? "auto" : strm
+                    var url = strms[strm]
+                    streams.push({
+                        url: url,
+                        originalUrl: url,
+                        quality: quality,
+                    });
+                }
+                break;
+            }
             default: {
                 if (media_type == "tv") {
                     id = `${id}/${s}/${e}`
@@ -436,13 +483,13 @@ class DefaultExtension extends MProvider {
             }
         },
         {
-            key: 'pref_stream_source',
+            key: 'autoembed_stream_source',
             listPreference: {
                 title: 'Preferred stream source',
                 summary: '',
                 valueIndex: 0,
-                entries: ["tom.autoembed.cc", "123embed.net", "autoembed.cc - Indian languages", "flicky.host - Indian languages", "vidapi.click"],
-                entryValues: ["1", "2", "3", "4", "5"]
+                entries: ["tom.autoembed.cc", "123embed.net", "autoembed.cc - Indian languages", "flicky.host - Indian languages", "vidapi.click", "hexa.watch", "febapi (supports 4K)"],
+                entryValues: ["1", "2", "3", "4", "5", "6", "7"]
             }
         },
         {
