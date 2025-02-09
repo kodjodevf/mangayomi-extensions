@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://aniplaynow.live/",
     "typeSource": "single",
     "itemType": 1,
-    "version": "1.1.0",
+    "version": "1.1.2",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/en/aniplay.js"
@@ -17,12 +17,6 @@ class DefaultExtension extends MProvider {
     constructor() {
         super();
         this.client = new Client();
-    }
-
-    getHeaders(url) {
-        return {
-            Referer: this.source.apiUrl
-        }
     }
 
     getPreference(key) {
@@ -294,9 +288,10 @@ class DefaultExtension extends MProvider {
         } else if (slug.indexOf("watch/") > -1) {
             next_action = '5dbcd21c7c276c4d15f8de29d9ef27aef5ea4a5e'
         }
-        var url = `${this.source.baseUrl}/anime/${slug}`
+        var baseUrl = "https://" + this.getPreference("aniplay_override_base_url")
+        var url = `${baseUrl}/anime/${slug}`
         var headers = {
-            "referer": "https://aniplaynow.live",
+            "referer": baseUrl,
             'next-action': next_action,
             "Content-Type": "application/json",
         }
@@ -322,7 +317,7 @@ class DefaultExtension extends MProvider {
             throw new Error("Error: No data found for the given URL");
         }
 
-        var user_provider = this.getPreference("aniplay_pref_provider_2");
+        var user_provider = this.getPreference("aniplay_pref_provider_3");
         var choices = result
         if (user_provider !== "all") {
             for (var ch of result) {
@@ -359,7 +354,8 @@ class DefaultExtension extends MProvider {
         var format = animeData.format
         if (format === "MOVIE") chapters[0].name = "Movie"
 
-        animeData.link = `${this.source.baseUrl}/anime/${slug}`
+        var baseUrl = "https://" + this.getPreference("aniplay_override_base_url")
+        animeData.link = `${baseUrl}/anime/${slug}`
         animeData.chapters = chapters.reverse()
         return animeData
     }
@@ -401,9 +397,7 @@ class DefaultExtension extends MProvider {
             if (lines[i].startsWith('#EXT-X-STREAM-INF:')) {
                 var resolution = lines[i].match(/RESOLUTION=(\d+x\d+)/)[1];
                 var m3u8Url = lines[i + 1].trim();
-                if (providerId === "anya") {
-                    m3u8Url = `https://prox.uqable.easypanel.host${m3u8Url}`
-                } else if (providerId === "yuki") {
+                if (providerId === "yuki") {
                     var orginalUrl = url
                     m3u8Url = orginalUrl.replace("master.m3u8", m3u8Url)
                 }
@@ -446,6 +440,29 @@ class DefaultExtension extends MProvider {
         return await this.extractStreams(m3u8Url, "pahe", hdr);
     }
 
+    async getMazeStreams(result) {
+        var m3u8Url = result.sources[0].url
+        var hdr = result.headers;
+        return await this.extractStreams(m3u8Url, "maze", hdr);
+    }
+
+    async getKuroStreams(result) {
+        var links = result.sources
+        var hdr = result.headers;
+        var streams = [];
+        for (var stream of links) {
+            var quality = stream.quality
+            quality = quality == "default" ? "auto" : quality
+            streams.push({
+                url: stream.url,
+                originalUrl: stream.url,
+                quality: `${quality} - kuro`,
+                headers: hdr
+            });
+        }
+        return streams
+    }
+
     // For anime episode video list
     async getVideoList(url) {
         var urlSplits = url.split("||")
@@ -474,63 +491,74 @@ class DefaultExtension extends MProvider {
             streams = await this.getYukiStreams(result)
         } else if (providerId == "pahe") {
             streams = await this.getPaheStreams(result)
+        } else if (providerId === "maze") {
+            streams = await this.getMazeStreams(result)
+        } else if (providerId === "kuro") {
+            streams = await this.getKuroStreams(result)
         } else {
-            streams = await this.getAnyStreams(result) //If new provider found getAnyaStreams will extract only the streams
+            streams = await this.getAnyStreams(result) //If new provider found getAnyStreams will extract only the streams
         }
 
-
         return await this.sortStreams(streams)
-
     }
 
     getSourcePreferences() {
-        return [
-            {
-                "key": "aniplay_pref_title",
-                "listPreference": {
-                    "title": "Preferred Title",
-                    "summary": "",
-                    "valueIndex": 0,
-                    "entries": ["Romaji", "English", "Native"],
-                    "entryValues": ["romaji", "english", "native"],
-                }
-            },
-            {
-                "key": "aniplay_pref_provider_2",
-                "listPreference": {
-                    "title": "Preferred provider",
-                    "summary": "",
-                    "valueIndex": 0,
-                    "entries": ["Any", "Yuki", "Pahe"],
-                    "entryValues": ["any", "yuki", "pahe"],
-                }
-            }, {
-                "key": "aniplay_pref_mark_filler",
-                "switchPreferenceCompat": {
-                    "title": "Mark filler episodes",
-                    "summary": "Filler episodes will be marked with (F)",
-                    "value": false
-                }
-            },
-            {
-                "key": "aniplay_pref_audio_type",
-                "listPreference": {
-                    "title": "Preferred audio type",
-                    "summary": "Sub/Dub",
-                    "valueIndex": 0,
-                    "entries": ["Sub", "Dub"],
-                    "entryValues": ["sub", "dub"],
-                }
-            }, {
-                key: 'aniplay_pref_video_resolution',
-                listPreference: {
-                    title: 'Preferred video resolution',
-                    summary: '',
-                    valueIndex: 0,
-                    entries: ["Auto", "1080p", "720p", "480p", "360p"],
-                    entryValues: ["auto", "1080", "720", "480", "360"]
-                }
-            },
+        return [{
+            key: 'aniplay_override_base_url',
+            listPreference: {
+                title: 'Override base url',
+                summary: '',
+                valueIndex: 0,
+                entries: ["aniplaynow.live (Main)", "aniplay.lol (Backup)"],
+                entryValues: ["aniplaynow.live", "aniplay.lol"]
+            }
+        },
+        {
+            "key": "aniplay_pref_title",
+            "listPreference": {
+                "title": "Preferred Title",
+                "summary": "",
+                "valueIndex": 0,
+                "entries": ["Romaji", "English", "Native"],
+                "entryValues": ["romaji", "english", "native"],
+            }
+        },
+        {
+            "key": "aniplay_pref_provider_3",
+            "listPreference": {
+                "title": "Preferred provider",
+                "summary": "",
+                "valueIndex": 0,
+                "entries": ["Any", "Yuki", "Pahe", "Maze", "Kuro"],
+                "entryValues": ["any", "yuki", "pahe", "maze", "kuro"],
+            }
+        }, {
+            "key": "aniplay_pref_mark_filler",
+            "switchPreferenceCompat": {
+                "title": "Mark filler episodes",
+                "summary": "Filler episodes will be marked with (F)",
+                "value": false
+            }
+        },
+        {
+            "key": "aniplay_pref_audio_type",
+            "listPreference": {
+                "title": "Preferred audio type",
+                "summary": "Sub/Dub",
+                "valueIndex": 0,
+                "entries": ["Sub", "Dub"],
+                "entryValues": ["sub", "dub"],
+            }
+        }, {
+            key: 'aniplay_pref_video_resolution',
+            listPreference: {
+                title: 'Preferred video resolution',
+                summary: '',
+                valueIndex: 0,
+                entries: ["Auto", "1080p", "720p", "480p", "360p"],
+                entryValues: ["auto", "1080", "720", "480", "360"]
+            }
+        },
 
         ]
     }
