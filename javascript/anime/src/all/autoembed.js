@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "multi",
     "isManga": false,
     "itemType": 1,
-    "version": "1.1.4",
+    "version": "1.2.1",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/all/autoembed.js"
@@ -21,7 +21,7 @@ class DefaultExtension extends MProvider {
         }
     }
 
-    async getPreference(key) {
+    getPreference(key) {
         const preferences = new SharedPreferences();
         return preferences.get(key);
     }
@@ -62,7 +62,7 @@ class DefaultExtension extends MProvider {
 
         var fullList = [];
 
-        var priority = await this.getPreference("pref_content_priority");
+        var priority = this.getPreference("pref_content_priority");
         if (priority === "series") {
             fullList = [...popSeries, ...popMovie];
         } else {
@@ -85,7 +85,7 @@ class DefaultExtension extends MProvider {
         throw new Error("supportsLatest not implemented");
     }
     async getLatestUpdates(page) {
-        var trend_window = await this.getPreference("pref_latest_time_window");
+        var trend_window = this.getPreference("pref_latest_time_window");
         var skip = (page - 1) * 20;
         return await this.getSearchInfo(`tmdb.trending/genre=${trend_window}&skip=${skip}.json`);
     }
@@ -208,7 +208,7 @@ class DefaultExtension extends MProvider {
         var sortedStreams = [];
 
         var copyStreams = streams.slice()
-        var pref = await this.getPreference("pref_video_resolution");
+        var pref = this.getPreference("pref_video_resolution");
         for (var i in streams) {
             var stream = streams[i];
             if (stream.quality.indexOf(pref) > -1) {
@@ -225,9 +225,19 @@ class DefaultExtension extends MProvider {
 
     // Gets subtitles based on TMDB id.
     async getSubtitleList(id, s, e) {
+        var subPref = parseInt(this.getPreference("autoembed_pref_subtitle_source"));
+
         var api = `https://sub.wyzie.ru/search?id=${id}`
-        if (s != "0") api = `${api}&season=${s}&episode=${e}`
-        var response = await new Client().get(api);
+        var hdr = {}
+
+        if (subPref === 2) {
+            api = `https://sources.hexa.watch/subs/${id}`
+            hdr = { "Origin": "https://api.hexa.watch" }
+            if (s != "0") api = `${api}/${s}/${e}`
+        } else {
+            if (s != "0") api = `${api}&season=${s}&episode=${e}`
+        }
+        var response = await new Client().get(api, hdr);
         var body = JSON.parse(response.body);
 
         var subs = []
@@ -243,21 +253,25 @@ class DefaultExtension extends MProvider {
 
     // For anime episode video list
     async getVideoList(url) {
-        var streamAPI = parseInt(await this.getPreference("pref_stream_source"))
+        var streamAPI = parseInt(this.getPreference("autoembed_stream_source"))
 
         var parts = url.split("||");
         var media_type = parts[0];
         var id = parts[1];
+
+        var s = "0"
+        var e = "0"
+        if (media_type == "tv") {
+            s = parts[2]
+            e = parts[3]
+        }
+
         var tmdb = id
         var streams = []
         var subtitles = []
         switch (streamAPI) {
             case 2: {
-                var s = "0"
-                var e = "0"
                 if (media_type == "tv") {
-                    s = parts[2]
-                    e = parts[3]
                     id = `${id}/${s}/${e}`
                 }
                 var api = `https://play2.123embed.net/server/3?path=/${media_type}/${id}`
@@ -278,11 +292,7 @@ class DefaultExtension extends MProvider {
                 break;
             }
             case 3: {
-                var s = "0"
-                var e = "0"
                 if (media_type == "tv") {
-                    s = parts[2]
-                    e = parts[3]
                     id = `${id}&s=${s}&e=${e}`
                 }
                 var api = `https://autoembed.cc/embed/player.php?id=${id}`
@@ -313,15 +323,11 @@ class DefaultExtension extends MProvider {
                 break;
             }
             case 4: {
-                var s = "0"
-                var e = "0"
                 if (media_type == "tv") {
-                    s = parts[2]
-                    e = parts[3]
                     id = `${id}&season=${s}&episode=${e}`
                 }
-                var api = `https://player.flicky.host/Server-main.php?id=${id}`
-                var response = await new Client().get(api, { "Referer": "https://flicky.host/" });
+                var api = `https://flicky.host/player/desi.php?id=${id}`
+                var response = await new Client().get(api, { "Referer": "https://flicky.host/" ,"sec-fetch-dest":"iframe"});
 
                 if (response.statusCode != 200) {
                     throw new Error("Video unavailable");
@@ -349,7 +355,7 @@ class DefaultExtension extends MProvider {
             }
             case 5: {
                 if (media_type == "tv") {
-                    id = `${id}/${parts[2]}/${parts[3]}`
+                    id = `${id}/${s}/${e}`
                 }
                 var api = `https://vidapi.click/api/video/${media_type}/${id}`
                 var response = await new Client().get(api);
@@ -360,14 +366,60 @@ class DefaultExtension extends MProvider {
 
                 var body = JSON.parse(response.body);
                 var link = body.sources[0].file
-                subtitles = body.tracks
                 streams = await this.extractStreams(link);
                 break;
             }
+            case 6: {
+                if (media_type == "tv") {
+                    id = `${id}/${s}/${e}`
+                }
+                var api = `https://sources.hexa.watch/plsdontscrapemeuwu/${id}`
+                var hdr = { "Origin": "https://api.hexa.watch" }
+                var response = await new Client().get(api, hdr);
 
+                if (response.statusCode != 200) {
+                    throw new Error("Video unavailable");
+                }
+
+                var body = JSON.parse(response.body);
+                var strms = body.streams
+                for (var strm of strms) {
+                    streams.push({
+                        url: strm.url,
+                        originalUrl: strm.url,
+                        quality: strm.quality,
+                        headers: strm.headers
+                    });
+                }
+                break;
+            }
+            case 7: {
+                if (media_type == "tv") {
+                    id = `${id}/${s}/${e}`
+                }
+                var api = `https://febapi.bludclart.com/${media_type}/${id}`
+                var response = await new Client().get(api);
+
+                if (response.statusCode != 200) {
+                    throw new Error("Video unavailable");
+                }
+
+                var body = JSON.parse(response.body);
+                var strms = body.streams.qualities
+                for (var strm in strms) {
+                    var quality = strm === "ORG" ? "auto" : strm
+                    var url = strms[strm]
+                    streams.push({
+                        url: url,
+                        originalUrl: url,
+                        quality: quality,
+                    });
+                }
+                break;
+            }
             default: {
                 if (media_type == "tv") {
-                    id = `${id}/${parts[2]}/${parts[3]}`
+                    id = `${id}/${s}/${e}`
                 }
                 var api = `${this.source.apiUrl}/api/getVideoSource?type=${media_type}&id=${id}`
                 var response = await new Client().get(api, this.getHeaders());
@@ -378,7 +430,6 @@ class DefaultExtension extends MProvider {
 
                 var body = JSON.parse(response.body);
                 var link = body.videoSource
-                subtitles = body.subtitles
                 streams = await this.extractStreams(link);
                 break;
             }
@@ -388,13 +439,12 @@ class DefaultExtension extends MProvider {
             throw new Error("Video unavailable");
         }
 
-        if (subtitles.length < 1) {
-            subtitles = await this.getSubtitleList(tmdb, s, e)
-        }
-        streams[0].subtitles = subtitles
+
+        streams[0].subtitles = await this.getSubtitleList(tmdb, s, e)
 
         return await this.sortStreams(streams)
     }
+
     // For manga chapter pages
     async getPageList() {
         throw new Error("getPageList not implemented");
@@ -433,13 +483,23 @@ class DefaultExtension extends MProvider {
             }
         },
         {
-            key: 'pref_stream_source',
+            key: 'autoembed_stream_source',
             listPreference: {
                 title: 'Preferred stream source',
                 summary: '',
                 valueIndex: 0,
-                entries: ["tom.autoembed.cc", "123embed.net", "autoembed.cc - Indian languages", "flicky.host - Indian languages", "vidapi.click"],
-                entryValues: ["1", "2", "3", "4", "5"]
+                entries: ["tom.autoembed.cc", "123embed.net", "autoembed.cc - Indian languages", "flicky.host - Indian languages", "vidapi.click", "hexa.watch", "febapi (supports 4K)"],
+                entryValues: ["1", "2", "3", "4", "5", "6", "7"]
+            }
+        },
+        {
+            key: 'autoembed_pref_subtitle_source',
+            listPreference: {
+                title: 'Preferred subtitle source',
+                summary: '',
+                valueIndex: 0,
+                entries: ["sub.wyzie.ru", "hexa.watch"],
+                entryValues: ["1", "2"]
             }
         },
         ];
