@@ -8,7 +8,6 @@ const mangayomiSources = [{
     "isManga": false,
     "itemType": 1,
     "version": "0.0.25",
-    "appMinVerReq": "0.3.8",
     "pkgPath": "anime/src/all/torrentio.js"
 }];
 

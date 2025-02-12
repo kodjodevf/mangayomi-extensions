@@ -54,7 +54,7 @@ class Source {
       this.isManga,
       this.itemType = ItemType.manga,
       this.isFullData = false,
-      this.appMinVerReq = "0.2.0",
+      this.appMinVerReq = "0.5.0",
       this.additionalParams = "",
       this.sourceCodeLanguage = 0});
   Source.fromJson(Map<String, dynamic> json) {

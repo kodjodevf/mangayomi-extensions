@@ -15,6 +15,5 @@ List<Source> _zorothemeSourcesList = [
 ]
     .map((e) => e
       ..sourceCodeUrl = _zorothemeSourceCodeUrl
-      ..appMinVerReq = "0.4.0"
       ..version = _zorothemeVersion)
     .toList();
