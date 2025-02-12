@@ -11,7 +11,6 @@ const mangayomiSources = [{
   "dateFormat": "",
   "dateFormatLocale": "",
   "pkgPath": "novel/src/en/wordrain69.js",
-  "appMinVerReq": "0.4.0",
   "isNsfw": false,
   "hasCloudflare": false
 }];

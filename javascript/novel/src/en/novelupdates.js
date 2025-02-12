@@ -11,7 +11,6 @@ const mangayomiSources = [{
   "dateFormat": "",
   "dateFormatLocale": "",
   "pkgPath": "novel/src/en/novelupdates.js",
-  "appMinVerReq": "0.4.0",
   "isNsfw": false,
   "hasCloudflare": true
 }];
@@ -195,7 +194,7 @@ class DefaultExtension extends MProvider {
     const client = await new Client();
     const doc = new Document(html);
     const domain = html;
-    
+
     if (domain.includes("anotivereads")) {
       const title =
         doc.selectFirst("#comic-nav-name")?.text.trim() ||
@@ -203,7 +202,7 @@ class DefaultExtension extends MProvider {
       const content = doc.selectFirst("#spliced-comic")?.innerHtml;
       return `<h2>${title}</h2><hr><br>${content}`;
     }
-    
+
     if (domain.includes("asuratls")) {
       const title =
         doc.selectFirst(".post-body > div > b")?.text.trim() ||
@@ -211,7 +210,7 @@ class DefaultExtension extends MProvider {
       const content = doc.selectFirst(".post-body")?.innerHtml?.replace(title, "");
       return `<h2>${title}</h2><hr><br>${content}`;
     }
-    
+
     if (domain.includes("daoist")) {
       const title =
         doc.selectFirst(".chapter__title")?.text.trim() ||
@@ -219,7 +218,7 @@ class DefaultExtension extends MProvider {
       const content = doc.selectFirst(".chapter__content")?.innerHtml;
       return `<h2>${title}</h2><hr><br>${content}`;
     }
-    
+
     if (domain.includes("darkstartranslations")) {
       const title =
         doc.selectFirst("ol.breadcrumb > li")?.text.trim() ||
@@ -227,7 +226,7 @@ class DefaultExtension extends MProvider {
       const content = doc.selectFirst(".text-left")?.innerHtml?.replace("<br>", "<br><br>");
       return `<h2>${title}</h2><hr><br>${content}`;
     }
-    
+
     if (domain.includes("fictionread")) {
       const title =
         doc.selectFirst(".title-image > span")?.text.trim() ||
@@ -235,7 +234,7 @@ class DefaultExtension extends MProvider {
       const content = doc.selectFirst(".content")?.innerHtml;
       return `<h2>${title}</h2><hr><br>${content}`;
     }
-    
+
     if (domain.includes("helscans")) {
       const title =
         doc.selectFirst(".entry-title-main")?.text.trim() ||
@@ -243,7 +242,7 @@ class DefaultExtension extends MProvider {
       const content = doc.selectFirst("#readerarea.rdminimal")?.innerHtml;
       return `<h2>${title}</h2><hr><br>${content}`;
     }
-    
+
     if (domain.includes("hiraethtranslation")) {
       const title =
         doc.selectFirst("li.active")?.text.trim() ||
@@ -251,7 +250,7 @@ class DefaultExtension extends MProvider {
       const content = doc.selectFirst(".text-left")?.innerHtml;
       return `<h2>${title}</h2><hr><br>${content}`;
     }
-    
+
     if (domain.includes("hostednovel")) {
       const title =
         doc.selectFirst("#chapter-title")?.text.trim() ||
@@ -259,12 +258,12 @@ class DefaultExtension extends MProvider {
       const content = doc.selectFirst("#chapter-content")?.innerHtml;
       return `<h2>${title}</h2><hr><br>${content}`;
     }
-    
+
     if (domain.includes("inoveltranslation")) {
       const content = doc.selectFirst(".styles_content__JHK8G")?.innerHtml;
       return `${content}`;
     }
-    
+
     if (domain.includes("isotls")) {
       const title =
         doc.selectFirst("head > title")?.text.trim() ||
@@ -272,7 +271,7 @@ class DefaultExtension extends MProvider {
       const content = doc.selectFirst("main > article")?.innerHtml;
       return `<h2>${title}</h2><hr><br>${content}`;
     }
-    
+
     if (domain.includes("mirilu")) {
       const title =
         doc.selectFirst(".entry-content > p > strong")?.text.trim() ||
@@ -280,7 +279,7 @@ class DefaultExtension extends MProvider {
       const content = doc.selectFirst(".entry-content")?.innerHtml;
       return `<h2>${title}</h2><hr><br>${content}`;
     }
-    
+
     if (domain.includes("novelplex")) {
       const title =
         doc.selectFirst(".halChap--jud")?.text.trim() ||
@@ -288,7 +287,7 @@ class DefaultExtension extends MProvider {
       const content = doc.selectFirst(".halChap--kontenInner")?.innerHtml;
       return `<h2>${title}</h2><hr><br>${content}`;
     }
-    
+
     if (domain.includes("novelworldtranslations")) {
       const title =
         doc.selectFirst(".entry-title")?.text.trim() ||
@@ -296,12 +295,12 @@ class DefaultExtension extends MProvider {
       const content = doc.selectFirst(".entry-content")?.innerHtml?.replace(/&nbsp;/g, '')?.replace(/\n/g, '<br>');
       return `<h2>${title}</h2><hr><br>${content}`;
     }
-    
+
     if (domain.includes("readingpia")) {
       const content = doc.selectFirst(".chapter-body")?.innerHtml;
       return `${content}`;
     }
-    
+
     if (domain.includes("sacredtexttranslations")) {
       const title =
         doc.selectFirst(".entry-title")?.text.trim() ||
@@ -309,7 +308,7 @@ class DefaultExtension extends MProvider {
       const content = doc.selectFirst(".entry-content")?.innerHtml;
       return `<h2>${title}</h2><hr><br>${content}`;
     }
-    
+
     if (domain.includes("scribblehub")) {
       const title =
         doc.selectFirst(".chapter-title")?.text.trim() ||
@@ -317,7 +316,7 @@ class DefaultExtension extends MProvider {
       const content = doc.selectFirst(".chp_raw")?.innerHtml;
       return `<h2>${title}</h2><hr><br>${content}`;
     }
-    
+
     if (domain.includes("tinytranslation")) {
       const title =
         doc.selectFirst(".title-content")?.text.trim() ||
@@ -325,12 +324,12 @@ class DefaultExtension extends MProvider {
       const content = doc.selectFirst(".content")?.innerHtml;
       return `<h2>${title}</h2><hr><br>${content}`;
     }
-    
+
     if (domain.includes("tumblr")) {
       const content = doc.selectFirst(".post")?.innerHtml;
       return `${content}`;
     }
-    
+
     if (domain.includes("wattpad")) {
       const title =
         doc.selectFirst(".h2")?.text.trim() ||
@@ -338,7 +337,7 @@ class DefaultExtension extends MProvider {
       const content = doc.selectFirst(".part-content > pre")?.innerHtml;
       return `<h2>${title}</h2><hr><br>${content}`;
     }
-    
+
     if (domain.includes("webnovel")) {
       const title =
         doc.selectFirst(".cha-tit > .pr > .dib")?.text.trim() ||
@@ -346,7 +345,7 @@ class DefaultExtension extends MProvider {
       const content = doc.selectFirst(".cha-words")?.innerHtml || doc.selectFirst("._content")?.innerHtml;
       return `<h2>${title}</h2><hr><br>${content}`;
     }
-    
+
     if (domain.includes("wetriedtls")) {
       const content = doc.selectFirst("script:contains(\"p dir=\")")?.innerHtml || doc.selectFirst("script:contains(\"u003c\")")?.innerHtml;
       if (content) {
@@ -358,7 +357,7 @@ class DefaultExtension extends MProvider {
       }
       return "<p>Failed to parse JSON content!</p>";
     }
-    
+
     if (domain.includes("wuxiaworld")) {
       const title =
         doc.selectFirst("h4 > span")?.text.trim() ||
@@ -366,7 +365,7 @@ class DefaultExtension extends MProvider {
       const content = doc.selectFirst(".chapter-content")?.innerHtml;
       return `<h2>${title}</h2><hr><br>${content}`;
     }
-    
+
     if (domain.includes("zetrotranslation")) {
       const title =
         doc.selectFirst(".text-left h2")?.text.trim() ||
@@ -375,7 +374,7 @@ class DefaultExtension extends MProvider {
       const content = doc.selectFirst(".text-left")?.innerHtml;
       return `<h2>${title}</h2><hr><br>${content}`;
     }
-    
+
     if (domain.includes("webnovel")) {
       const title =
         doc.selectFirst("#page > .chapter_content > .cha-tit > div > div")?.text.trim() ||
@@ -383,7 +382,7 @@ class DefaultExtension extends MProvider {
       const content = doc.selectFirst("#page > .chapter_content > .cha-content > .cha-words")?.innerHtml.replaceAll(/<i\s*.*?>.*?<\/i>/gm, "");
       return `<h2>${title}</h2><hr><br>${content}`;
     }
-    
+
     if (domain.includes("re-library")) {
       const redirectUrl = doc.selectFirst(".entry-content > div > div > p > a").getHref;
       const redirectRes = await client.get(redirectUrl, {
@@ -393,7 +392,7 @@ class DefaultExtension extends MProvider {
       });
       const redirectDoc = new Document(redirectRes.body);
       const title =
-      redirectDoc.selectFirst(".entry-header > .entry-title")?.text.trim() ||
+        redirectDoc.selectFirst(".entry-header > .entry-title")?.text.trim() ||
         "";
       const content = redirectDoc.selectFirst(".entry-content")?.innerHtml.replaceAll(/<i\s*.*?>.*?<\/i>/gm, "");
       return `<h2>${title}</h2><hr><br>${content}`;
@@ -406,7 +405,7 @@ class DefaultExtension extends MProvider {
     const isBlogspot = blogspotElements.some(e => {
       return e?.toLowerCase().includes("blogspot") || e?.toLowerCase().includes("blogger")
     });
-    
+
     if (isBlogspot) {
       const title =
         doc.selectFirst("h3.post-title")?.text.trim() ||
@@ -466,12 +465,12 @@ class DefaultExtension extends MProvider {
       doc.selectFirst("#content")?.innerHtml ||
       doc.selectFirst("#the-content")?.innerHtml ||
       doc.selectFirst("article.post")?.innerHtml;
-    
-      if (isWordpress || domain.includes("etherreads") || domain.includes("soafp")) {
-        return `<h2>${title}</h2><hr><br>${content}`;
-      }
-    
-      return `<p>Domain not supported yet. Content might not load properly!</p>
+
+    if (isWordpress || domain.includes("etherreads") || domain.includes("soafp")) {
+      return `<h2>${title}</h2><hr><br>${content}`;
+    }
+
+    return `<p>Domain not supported yet. Content might not load properly!</p>
             <br><h2>${title}</h2><hr><br>${content}`;
   }
 
