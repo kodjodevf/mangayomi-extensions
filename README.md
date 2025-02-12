@@ -2,6 +2,23 @@
 
 This repository contains the available extension catalogues for the Mangayomi app.
 
+## Guide
+just paste them into your:
+
+manga repo 
+```
+https://kodjodevf.github.io/mangayomi-extensions/index.json
+```
+
+anime repo 
+```
+https://kodjodevf.github.io/mangayomi-extensions/anime_index.json
+```
+
+novel repo 
+```
+https://kodjodevf.github.io/mangayomi-extensions/novel_index.json
+```
 
 # Contributing
 
