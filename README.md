@@ -1,6 +1,6 @@
 # Mangayomi Extensions
 
-This repository contains the available extension catalogues for the [Mangayomi](https://github.com/kodjodevf/mangayomi) app.
+This repository contains the available extension catalogues for the Mangayomi app.
 
 
 # Contributing
