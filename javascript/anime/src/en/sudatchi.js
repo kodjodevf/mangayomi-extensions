@@ -5,7 +5,7 @@ const mangayomiSources = [{
     "apiUrl": "",
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://sudatchi.com",
     "typeSource": "single",
-    "version": "1.0.2",
+    "version": "1.1.0",
     "dateFormat": "",
     "dateFormatLocale": "",
     "itemType": 1,
@@ -28,20 +28,50 @@ class DefaultExtension extends MProvider {
         return `https://ipfs.sudatchi.com/ipfs/${slug}`
     }
 
-    async extractFromUrl(url) {
+    async requestApi(slug) {
+        var url = this.source.baseUrl + "/api" + slug
+
         var res = await new Client().get(url, this.getHeaders());
-        var doc = new Document(res.body);
-        var jsonData = doc.selectFirst("#__NEXT_DATA__").text
-        return JSON.parse(jsonData).props.pageProps;
+
+        return JSON.parse(res.body);
     }
 
+    async formListForAnilist(animes) {
+        var list = []
+        var lang = this.getPreference("sudatchi_pref_lang")
+        for (var item of animes) {
+            var titles = item.title
+            var name = titles.romaji
+            switch (lang) {
+                case "e": {
+                    name = titles.english != null ? titles.english : name;
+                    break;
+                }
+                case "j": {
+                    name = titles.native != null ? titles.native : name;
+                    break;
+                }
 
-    async formListFromHome(animes) {
+            }
+            var link = item.id
+            var coverImage = item.coverImage
+            var imageUrl = "large" in coverImage ? coverImage.large : coverImage.medium
+
+            list.push({
+                name,
+                imageUrl,
+                link: `${link}`
+            });
+        }
+        return list;
+    }
+
+    async formList(animes) {
         var list = []
         var lang = this.getPreference("sudatchi_pref_lang")
         for (var item of animes) {
             var details = "Anime" in item ? item.Anime : item
-            var name = details.titleRomanji
+            var name = "titleRomanji" in details ? details.titleRomanji : details.title
             switch (lang) {
                 case "e": {
                     name = "titleEnglish" in details ? details.titleEnglish : name;
@@ -53,25 +83,24 @@ class DefaultExtension extends MProvider {
                 }
 
             }
-            var link = details.slug
-            var imageUrl = this.getUrl(details.imgUrl)
+            var link = "anilistId" in details ? details.anilistId : details.id
+            var imageUrl = "coverImage" in details ? details.coverImage : this.getUrl(details.imgUrl)
             list.push({
                 name,
                 imageUrl,
-                link
+                link: `${link}`
             });
         }
         return list;
     }
 
     async getPopular(page) {
-        var pageProps = await this.extractFromUrl(this.source.baseUrl)
+        var pageProps = await this.requestApi("/fetchHomeData")
         //  var  = extract
-        var latestEpisodes = await this.formListFromHome(pageProps.latestEpisodes)
-        var latestAnimes = await this.formListFromHome(pageProps.latestAnimes)
-        var newAnimes = await this.formListFromHome(pageProps.newAnimes)
-        var animeSpotlight = await this.formListFromHome(pageProps.AnimeSpotlight)
-        var list = [...animeSpotlight, ...latestAnimes, ...latestEpisodes, ...newAnimes]
+        var latestEpisodes = await this.formList(pageProps.latestEpisodes)
+        var latestAnimes = await this.formListForAnilist(pageProps.ongoingAnimes)
+        var animeSpotlight = await this.formList(pageProps.AnimeSpotlight)
+        var list = [...animeSpotlight, ...latestAnimes, ...latestEpisodes]
         return {
             list,
             hasNextPage: false
@@ -81,9 +110,8 @@ class DefaultExtension extends MProvider {
         throw new Error("supportsLatest not implemented");
     }
     async getLatestUpdates(page) {
-        var extract = await this.extractFromUrl(this.source.baseUrl)
-        var latest = extract.props.pageProps.latestEpisodes
-        var list = await this.formListFromHome(latest)
+        var pageProps = await this.requestApi("/fetchHomeData")
+        var list = await this.formList(pageProps.latestEpisodes)
 
         return {
             list,
@@ -91,20 +119,15 @@ class DefaultExtension extends MProvider {
         };
     }
     async search(query, page, filters) {
-        var type = '';
-        for (var filter of filters[0].state) if (filter.state) type += `,${filter.value}`;
-        var status = '';
-        for (var filter of filters[1].state) if (filter.state) status += `,${filter.value}`;
-        var genre = '';
-        for (var filter of filters[2].state) if (filter.state) genre += `,${filter.value}`;
-        var year = '';
-        for (var filter of filters[3].state) if (filter.state) year += `,${filter.value}`;
 
-        var api = `https://sudatchi.com/api/directory?page=${page}&genres=${genre}&years=${year}&types=${type}&status=${status}&title=${query}&category=`
-        var response = await new Client().get(api);
-        var body = JSON.parse(response.body);
+        var body = await this.requestApi("/fetchAnime",);
 
-        var list = await this.formListFromHome(body.animes)
+        var url = this.source.baseUrl + "/api/fetchAnime"
+
+        var res = await new Client().post(url, this.getHeaders(), { "query": query });
+        var body = JSON.parse(res.body);
+
+        var list = await this.formListForAnilist(body.results)
         var hasNextPage = body.pages > page ? true : false;
 
         return {
@@ -125,49 +148,48 @@ class DefaultExtension extends MProvider {
 
 
     async getDetail(url) {
-        var link = `https://sudatchi.com/anime/${url}`
-        var jsonData = await this.extractFromUrl(link);
-        var details = jsonData.animeData
-        var name = details.titleRomanji
         var lang = this.getPreference("sudatchi_pref_lang")
+        var link = `https://sudatchi.com/anime/${url}`
+        var details = await this.requestApi(`/anime/${url}`);
+        var titles = details.title
+        var name = titles.romaji
         switch (lang) {
             case "e": {
-                name = "titleEnglish" in details ? details.titleEnglish : name;
+                name = titles.english != null ? titles.english : name;
                 break;
             }
             case "j": {
-                name = "titleJapanese" in details ? details.titleJapanese : name;
+                name = titles.native != null ? titles.native : name;
                 break;
             }
+
         }
-        var description = details.synopsis
-        var status = this.statusCode(details.Status.name)
-        var imageUrl = this.getUrl(details.imgUrl)
-        var genre = []
-        var animeGenres = details.AnimeGenres
-        for (var gObj of animeGenres) {
-            genre.push(gObj.Genre.name)
-        }
+        var description = details.description
+        var status = this.statusCode(details.status)
+        var imageUrl = details.coverImage
+        var genre = details.genres
 
         var chapters = []
-        var episodes = details.Episodes
-        var typeId = details.typeId
-        if (typeId == 6) {
-            var number = episodes[0].number
-            var epUrl = `${url}/${number}`
-            chapters.push({ name: "Movie", url: epUrl })
-        } else {
-            for (var eObj of episodes) {
-                var epName = eObj.title
-                var number = eObj.number
+        var episodes = details.episodes
+        if (episodes.length > 0) {
+            var typeId = details.format
+            if (typeId == "MOVIE") {
+                var number = episodes[0].number
                 var epUrl = `${url}/${number}`
-                chapters.push({ name:epName, url: epUrl })
+                chapters.push({ name: "Movie", url: epUrl })
+            } else {
+                for (var eObj of episodes) {
+                    var epName = eObj.title
+                    var number = eObj.number
+                    var epUrl = `${url}/${number}`
+                    chapters.push({ name: epName, url: epUrl })
+                }
             }
         }
 
         chapters.reverse()
 
-        return { name, description, status, imageUrl, genre, chapters ,link}
+        return { name, description, status, imageUrl, genre, chapters, link }
 
     }
     // For novel html content
@@ -225,18 +247,17 @@ class DefaultExtension extends MProvider {
 
     // For anime episode video list
     async getVideoList(url) {
-        var link = `https://sudatchi.com/watch/${url}`
-        var jsonData = await this.extractFromUrl(link);
-        var episodeData = jsonData.episodeData.episode;
+        var jsonData = await this.requestApi(`/episode/${url}`);
+        var episodeData = jsonData.episode;
         var epId = episodeData.id;
 
         var epLink = `https://sudatchi.com/videos/m3u8/episode-${epId}.m3u8`
         var streams = await this.extractStreams(epLink);
 
-        var subs = JSON.parse(jsonData.episodeData.subtitlesJson)
+        var subs = JSON.parse(jsonData.subtitlesJson)
         var subtitles = [];
         for (var sub of subs) {
-            var file = this.getUrl(sub.url)
+            var file = `https://ipfs.sudatchi.com${sub.url}`
             var label = sub.SubtitlesName.name;
             subtitles.push({ file: file, label: label });
         }
@@ -250,85 +271,9 @@ class DefaultExtension extends MProvider {
         throw new Error("getPageList not implemented");
     }
     getFilterList() {
-        var currentYear = new Date().getFullYear();
-        var formattedYears = Array.from({ length: currentYear - 2003 }, (_, i) => (i + 2004).toString()).map(year => ({ type_name: 'CheckBox', name: year, value: year }));
-
-        return [
-            {
-                type_name: "GroupFilter",
-                name: "Type",
-                state: [
-                    ["All", ""],
-                    ["BD", "BD"],
-                    ["Movie", "Movie"],
-                    ["ONA", "ONA"],
-                    ["OVA", "OVA"],
-                    ["Special", "Special"],
-                    ["TV", "TV"]
-                ].map(x => ({ type_name: 'CheckBox', name: x[0], value: x[1] }))
-            },
-            {
-                type_name: "GroupFilter",
-                name: "Status",
-                state: [
-                    ["All", ""],
-                    ["Currently Airing", "Currently Airing"],
-                    ["Finished Airing", "Finished Airing"],
-                    ["Hiatus", "Hiatus"],
-                    ["Not Yet Released", "Not Yet Released"]
-                ].map(x => ({ type_name: 'CheckBox', name: x[0], value: x[1] }))
-            }, {
-                type_name: "GroupFilter",
-                name: "Genre",
-                state: [
-                    ["Action", "Action"],
-                    ["Adventure", "Adventure"],
-                    ["Comedy", "Comedy"],
-                    ["Cyberpunk", "Cyberpunk"],
-                    ["Demons", "Demons"],
-                    ["Drama", "Drama"],
-                    ["Ecchi", "Ecchi"],
-                    ["Fantasy", "Fantasy"],
-                    ["Harem", "Harem"],
-                    ["Hentai", "Hentai"],
-                    ["Historical", "Historical"],
-                    ["Horror", "Horror"],
-                    ["Isekai", "Isekai"],
-                    ["Josei", "Josei"],
-                    ["Magic", "Magic"],
-                    ["Martial Arts", "Martial Arts"],
-                    ["Mecha", "Mecha"],
-                    ["Military", "Military"],
-                    ["Music", "Music"],
-                    ["Mystery", "Mystery"],
-                    ["Police", "Police"],
-                    ["Post-Apocalyptic", "Post-Apocalyptic"],
-                    ["Psychological", "Psychological"],
-                    ["Romance", "Romance"],
-                    ["School", "School"],
-                    ["Sci-Fi ", "Sci-Fi "],
-                    ["Seinen", "Seinen"],
-                    ["Shoujo", "Shoujo"],
-                    ["Shounen", "Shounen"],
-                    ["Slice of Life", "Slice of Life"],
-                    ["Space", "Space"],
-                    ["Sports", "Sports"],
-                    ["Super Power", "Super Power"],
-                    ["Supernatural", "Supernatural"],
-                    ["Thriller", "Thriller"],
-                    ["Tragedy", "Tragedy"],
-                    ["Vampire", "Vampire"],
-                    ["Yaoi", "Yaoi"],
-                    ["Yuri", "Yuri"]
-                ].map(x => ({ type_name: 'CheckBox', name: x[0], value: x[1] }))
-            }, {
-                type_name: "GroupFilter",
-                name: "Year",
-                state: formattedYears
-            },
-
-        ];
+        throw new Error("getFilterList not implemented");
     }
+
     getSourcePreferences() {
         return [{
             key: 'sudatchi_pref_lang',
