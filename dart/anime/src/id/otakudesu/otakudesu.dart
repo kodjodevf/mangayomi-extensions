@@ -123,8 +123,8 @@ class OtakuDesu extends MProvider {
         "action": action
       }))
           .body;
-      final html = utf8.decode(
-          base64Url.decode(substringBefore(substringAfter(res, ":\""), '"')));
+      final resJson = json.decode(res);
+      final html = utf8.decode(base64Url.decode(resJson["data"]));
       String url = xpath(html, '//iframe/@src').first;
       if (url.contains("yourupload")) {
         final id = substringBefore(substringAfter(url, "id="), "&");
@@ -136,10 +136,10 @@ class OtakuDesu extends MProvider {
         final response = (await Client().get(Uri.parse(url)));
         final res = response.body;
         final script =
-            xpath(res, '//script[contains(text(), "sources")]/text()').first;
-        final videoUrl = substringBefore(
-            substringAfter(substringAfter(script, "sources:[{"), "file':'"),
-            "'");
+            xpath(res, '//script[contains(text(), "file")]/text()').first;
+        final regex = RegExp(r'file:"(https?://[^"]+)"');
+        final match = regex.firstMatch(script);
+        final videoUrl = match.group(1);
         if (videoUrl.endsWith(".mp4")) {
           MVideo video = MVideo();
           video
