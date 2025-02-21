@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://weebcentral.com",
     "typeSource": "single",
     "itemType": 0,
-    "version": "0.0.6",
+    "version": "0.0.7",
     "pkgPath": "manga/src/en/weebcentral.js"
 }];
 
@@ -17,7 +17,7 @@ class DefaultExtension extends MProvider {
         this.client = new Client();
     }
     getHeaders(url) {
-        return { "Referer": "$baseUrl/" };
+        return { "Referer": `${baseUrl}/` };
     }
 
     async request(slug) {
@@ -67,10 +67,10 @@ class DefaultExtension extends MProvider {
         var mangaElements = doc.select("article:has(section)")
         for (var manga of mangaElements) {
             var imageUrl = manga.selectFirst("img").getSrc;
-            var details = manga.selectFirst("div > a");
-            var urlSplits = details.getHref.split("/")
-            var link = urlSplits[urlSplits.length - 2]
-            var name = details.text
+            var details = manga.selectFirst("section > a");
+            var urlSplits = details.getHref.split("/");
+            var link = urlSplits[urlSplits.length - 2];
+            var name = manga.selectFirst("article > div > div > div").text;
             list.push({ name, imageUrl, link });
         }
 
