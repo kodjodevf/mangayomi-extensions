@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://aniplaynow.live/",
     "typeSource": "single",
     "itemType": 1,
-    "version": "1.1.2",
+    "version": "1.1.3",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/en/aniplay.js"
@@ -161,7 +161,8 @@ class DefaultExtension extends MProvider {
                     return "";
             }
         })();
-        anime.imageUrl = media?.coverImage?.extraLarge || "";
+        anime.imageUrl = media?.coverImage?.extraLarge || 
+            media?.coverImage?.large || "";
         anime.description = (media?.description || "No Description")
             .replace(/<br><br>/g, "\n")
             .replace(/<.*?>/g, "");
@@ -231,7 +232,8 @@ class DefaultExtension extends MProvider {
                             return "";
                     }
                 })();
-                anime.imageUrl = media?.coverImage?.extraLarge || "";
+                anime.imageUrl = media?.coverImage?.extraLarge || 
+                    media?.coverImage?.large || "";
 
                 return anime;
             });
@@ -339,7 +341,7 @@ class DefaultExtension extends MProvider {
 
                 var scanlator = isFiller && user_mark_filler_ep ? `Filler` : null;
 
-                var dateUpload = "createdAt" in ep ? new Date(ep.createdAt) : new Date().now()
+                var dateUpload = "createdAt" in ep ? new Date(ep.createdAt) : Date.now()
                 dateUpload = dateUpload.valueOf().toString();
                 delete ep.img
                 delete ep.title
