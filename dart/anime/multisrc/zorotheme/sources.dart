@@ -2,7 +2,7 @@ import '../../../../model/source.dart';
 import 'src/hianime/hianime.dart';
 import 'src/kaido/kaido.dart';
 
-const _zorothemeVersion = "0.1.2";
+const _zorothemeVersion = "0.1.3";
 const _zorothemeSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/multisrc/zorotheme/zorotheme.dart";
 
