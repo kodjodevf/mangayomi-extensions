@@ -637,11 +637,11 @@ class ZoroTheme extends MProvider {
           values: ["HD-1", "HD-2", "StreamTape"],
         ),
       MultiSelectListPreference(
-        key: "type_selection_new",
+        key: "type_selection_1",
         title: "Enable/Disable Types",
         summary: "",
         entries: ["Sub", "Dub", "Raw"],
-        entryValues: ["sub", "dub"],
+        entryValues: ["sub", "dub", "raw"],
         values: ["sub", "dub", "raw"],
       ),
     ];
@@ -684,7 +684,7 @@ class ZoroTheme extends MProvider {
   }
 
   List<String> preferenceTypeSelection(int sourceId) {
-    return getPreferenceValue(sourceId, "type_selection_new");
+    return getPreferenceValue(sourceId, "type_selection_1");
   }
 
   String ll(String url) {
