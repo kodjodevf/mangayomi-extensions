@@ -6,8 +6,10 @@ class DataLifeEngine extends MProvider {
 
   MSource source;
 
-  final Client client =
-      Client(source, json.encode({"useDartHttpClient": true}));
+  final Client client = Client(
+    source,
+    json.encode({"useDartHttpClient": true}),
+  );
 
   @override
   bool get supportsLatest => false;
@@ -18,8 +20,9 @@ class DataLifeEngine extends MProvider {
   @override
   Future<MPages> getPopular(int page) async {
     final res =
-        (await client.get(Uri.parse("$baseUrl${getPath(source)}page/$page")))
-            .body;
+        (await client.get(
+          Uri.parse("$baseUrl${getPath(source)}page/$page"),
+        )).body;
     return animeFromElement(res);
   }
 
@@ -38,21 +41,25 @@ class DataLifeEngine extends MProvider {
       final headers = {
         "Host": Uri.parse(baseUrl).host,
         "Origin": baseUrl,
-        "Referer": "$baseUrl/"
+        "Referer": "$baseUrl/",
       };
       final cleanQuery = query.replaceAll(" ", "+");
       if (page == 1) {
-        res = (await client.post(
-                Uri.parse(
-                    "$baseUrl?do=search&subaction=search&story=$cleanQuery"),
-                headers: headers))
-            .body;
+        res =
+            (await client.post(
+              Uri.parse(
+                "$baseUrl?do=search&subaction=search&story=$cleanQuery",
+              ),
+              headers: headers,
+            )).body;
       } else {
-        res = (await client.post(
-                Uri.parse(
-                    "$baseUrl?do=search&subaction=search&search_start=$page&full_search=0&result_from=11&story=$cleanQuery"),
-                headers: headers))
-            .body;
+        res =
+            (await client.post(
+              Uri.parse(
+                "$baseUrl?do=search&subaction=search&search_start=$page&full_search=0&result_from=11&story=$cleanQuery",
+              ),
+              headers: headers,
+            )).body;
       }
     } else {
       String url = "";
@@ -76,8 +83,9 @@ class DataLifeEngine extends MProvider {
   @override
   Future<MManga> getDetail(String url) async {
     String res =
-        (await client.get(Uri.parse("$baseUrl${getUrlWithoutDomain(url)}")))
-            .body;
+        (await client.get(
+          Uri.parse("$baseUrl${getUrlWithoutDomain(url)}"),
+        )).body;
     MManga anime = MManga();
     final description = xpath(res, '//span[@itemprop="description"]/text()');
     anime.description = description.isNotEmpty ? description.first : "";
@@ -96,10 +104,13 @@ class DataLifeEngine extends MProvider {
       }
     } else {
       final doc = parseHtml(res);
-      final elements = doc
-          .select(".hostsblock div:has(a)")
-          .where((MElement e) => e.outerHtml.contains("loadVideo('https://"))
-          .toList();
+      final elements =
+          doc
+              .select(".hostsblock div:has(a)")
+              .where(
+                (MElement e) => e.outerHtml.contains("loadVideo('https://"),
+              )
+              .toList();
       if (elements.isNotEmpty) {
         for (var element in elements) {
           element = element as MElement;
@@ -110,8 +121,12 @@ class DataLifeEngine extends MProvider {
               .replaceAll("vf", " VF");
           ep.url = element
               .select("a")
-              .map((MElement e) => substringBefore(
-                  substringAfter(e.attr('onclick'), "loadVideo('"), "')"))
+              .map(
+                (MElement e) => substringBefore(
+                  substringAfter(e.attr('onclick'), "loadVideo('"),
+                  "')",
+                ),
+              )
               .toList()
               .join(",")
               .replaceAll("/vd.php?u=", "");
@@ -124,8 +139,12 @@ class DataLifeEngine extends MProvider {
         ep.url = doc
             .select("a")
             .where((MElement e) => e.outerHtml.contains("loadVideo('https://"))
-            .map((MElement e) => substringBefore(
-                substringAfter(e.attr('onclick'), "loadVideo('"), "')"))
+            .map(
+              (MElement e) => substringBefore(
+                substringAfter(e.attr('onclick'), "loadVideo('"),
+                "')",
+              ),
+            )
             .toList()
             .join(",")
             .replaceAll("/vd.php?u=", "");
@@ -145,8 +164,12 @@ class DataLifeEngine extends MProvider {
       List<MVideo> a = [];
       if (sUrl.contains("dood") || sUrl.contains("d000")) {
         a = await doodExtractor(sUrl, "DoodStream");
-      } else if (["streamhide", "guccihide", "streamvid", "dhtpre"]
-          .any((a) => sUrl.contains(a))) {
+      } else if ([
+        "streamhide",
+        "guccihide",
+        "streamvid",
+        "dhtpre",
+      ].any((a) => sUrl.contains(a))) {
         a = await streamHideExtractor(sUrl);
       } else if (sUrl.contains("uqload")) {
         a = await uqloadExtractor(sUrl);
@@ -191,15 +214,18 @@ class DataLifeEngine extends MProvider {
   Future<List<MVideo>> streamHideExtractor(String url) async {
     final res = (await client.get(Uri.parse(url))).body;
     final masterUrl = substringBefore(
-        substringAfter(
-            substringAfter(
-                substringAfter(unpackJs(res), "sources:"), "file:\""),
-            "src:\""),
-        '"');
+      substringAfter(
+        substringAfter(substringAfter(unpackJs(res), "sources:"), "file:\""),
+        "src:\"",
+      ),
+      '"',
+    );
     final masterPlaylistRes = (await client.get(Uri.parse(masterUrl))).body;
     List<MVideo> videos = [];
-    for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
-        .split("#EXT-X-STREAM-INF:")) {
+    for (var it in substringAfter(
+      masterPlaylistRes,
+      "#EXT-X-STREAM-INF:",
+    ).split("#EXT-X-STREAM-INF:")) {
       final quality =
           "${substringBefore(substringBefore(substringAfter(substringAfter(it, "RESOLUTION="), "x"), ","), "\n")}p";
 
@@ -226,12 +252,16 @@ class DataLifeEngine extends MProvider {
     if (js.isEmpty) {
       return [];
     }
-    final masterUrl =
-        substringBefore(substringAfter(unpackJs(js.first), "{file:\""), "\"}");
+    final masterUrl = substringBefore(
+      substringAfter(unpackJs(js.first), "{file:\""),
+      "\"}",
+    );
     final masterPlaylistRes = (await client.get(Uri.parse(masterUrl))).body;
     List<MVideo> videos = [];
-    for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
-        .split("#EXT-X-STREAM-INF:")) {
+    for (var it in substringAfter(
+      masterPlaylistRes,
+      "#EXT-X-STREAM-INF:",
+    ).split("#EXT-X-STREAM-INF:")) {
       final quality =
           "${substringBefore(substringBefore(substringAfter(substringAfter(it, "RESOLUTION="), "x"), ","), "\n")}p";
 
@@ -259,8 +289,10 @@ class DataLifeEngine extends MProvider {
       return [];
     }
 
-    final videoUrl =
-        substringBefore(substringAfter(js.first, "sources: [\""), '"');
+    final videoUrl = substringBefore(
+      substringAfter(js.first, "sources: [\""),
+      '"',
+    );
     MVideo video = MVideo();
     video
       ..url = videoUrl
@@ -271,22 +303,23 @@ class DataLifeEngine extends MProvider {
   }
 
   Future<List<MVideo>> vidmolyExtractor(String url) async {
-    final headers = {
-      'Referer': 'https://vidmoly.to',
-    };
+    final headers = {'Referer': 'https://vidmoly.to'};
     List<MVideo> videos = [];
     final playListUrlResponse = (await client.get(Uri.parse(url))).body;
     final playlistUrl =
         RegExp(r'file:"(\S+?)"').firstMatch(playListUrlResponse)?.group(1) ??
-            "";
+        "";
     if (playlistUrl.isEmpty) return [];
-    final masterPlaylistRes =
-        await client.get(Uri.parse(playlistUrl), headers: headers);
+    final masterPlaylistRes = await client.get(
+      Uri.parse(playlistUrl),
+      headers: headers,
+    );
 
     if (masterPlaylistRes.statusCode == 200) {
-      for (var it
-          in substringAfter(masterPlaylistRes.body, "#EXT-X-STREAM-INF:")
-              .split("#EXT-X-STREAM-INF:")) {
+      for (var it in substringAfter(
+        masterPlaylistRes.body,
+        "#EXT-X-STREAM-INF:",
+      ).split("#EXT-X-STREAM-INF:")) {
         final quality =
             "${substringBefore(substringBefore(substringAfter(substringAfter(it, "RESOLUTION="), "x"), ","), "\n")}p";
 
@@ -315,22 +348,24 @@ class DataLifeEngine extends MProvider {
     return [
       if (source.name == "Wiflix")
         EditTextPreference(
-            key: "overrideBaseUrl",
-            title: "Changer l'url de base",
-            summary: "",
-            value: "https://wiflix-hd.vip",
-            dialogTitle: "Changer l'url de base",
-            dialogMessage: "",
-            text: "https://wiflix-hd.vip"),
+          key: "overrideBaseUrl",
+          title: "Changer l'url de base",
+          summary: "",
+          value: "https://wiflix-hd.vip",
+          dialogTitle: "Changer l'url de base",
+          dialogMessage: "",
+          text: "https://wiflix-hd.vip",
+        ),
       if (source.name == "French Anime")
         EditTextPreference(
-            key: "overrideBaseUrl",
-            title: "Changer l'url de base",
-            summary: "",
-            value: "https://french-anime.com",
-            dialogTitle: "Changer l'url de base",
-            dialogMessage: "",
-            text: "https://french-anime.com"),
+          key: "overrideBaseUrl",
+          title: "Changer l'url de base",
+          summary: "",
+          value: "https://french-anime.com",
+          dialogTitle: "Changer l'url de base",
+          dialogMessage: "",
+          text: "https://french-anime.com",
+        ),
     ];
   }
 
@@ -360,20 +395,20 @@ class DataLifeEngine extends MProvider {
           SelectFilterOption("Seinen", "/genre/seinen/"),
           SelectFilterOption("Horreur", "/genre/horreur/"),
           SelectFilterOption("Tranche de vie", "/genre/tranchedevie/"),
-          SelectFilterOption("Psychologique", "/genre/psychologique/")
+          SelectFilterOption("Psychologique", "/genre/psychologique/"),
         ]),
       if (source.name == "French Anime")
         SelectFilter("GenresFilter", "Genres", 0, [
           SelectFilterOption("<Sélectionner>", ""),
           SelectFilterOption("Animes VF", "/animes-vf/"),
           SelectFilterOption("Animes VOSTFR", "/animes-vostfr/"),
-          SelectFilterOption("Films VF et VOSTFR", "/films-vf-vostfr/")
+          SelectFilterOption("Films VF et VOSTFR", "/films-vf-vostfr/"),
         ]),
       if (source.name == "Wiflix")
         SelectFilter("CategoriesFilter", "Catégories", 0, [
           SelectFilterOption("<Sélectionner>", ""),
           SelectFilterOption("Séries", "/serie-en-streaming/"),
-          SelectFilterOption("Films", "/film-en-streaming/")
+          SelectFilterOption("Films", "/film-en-streaming/"),
         ]),
       if (source.name == "Wiflix")
         SelectFilter("GenresFilter", "Genres", 0, [
@@ -381,17 +416,25 @@ class DataLifeEngine extends MProvider {
           SelectFilterOption("Action", "/film-en-streaming/action/"),
           SelectFilterOption("Animation", "/film-en-streaming/animation/"),
           SelectFilterOption(
-              "Arts Martiaux", "/film-en-streaming/arts-martiaux/"),
+            "Arts Martiaux",
+            "/film-en-streaming/arts-martiaux/",
+          ),
           SelectFilterOption("Aventure", "/film-en-streaming/aventure/"),
           SelectFilterOption("Biopic", "/film-en-streaming/biopic/"),
           SelectFilterOption("Comédie", "/film-en-streaming/comedie/"),
           SelectFilterOption(
-              "Comédie Dramatique", "/film-en-streaming/comedie-dramatique/"),
+            "Comédie Dramatique",
+            "/film-en-streaming/comedie-dramatique/",
+          ),
           SelectFilterOption(
-              "Épouvante Horreur", "/film-en-streaming/horreur/"),
+            "Épouvante Horreur",
+            "/film-en-streaming/horreur/",
+          ),
           SelectFilterOption("Drame", "/film-en-streaming/drame/"),
           SelectFilterOption(
-              "Documentaire", "/film-en-streaming/documentaire/"),
+            "Documentaire",
+            "/film-en-streaming/documentaire/",
+          ),
           SelectFilterOption("Espionnage", "/film-en-streaming/espionnage/"),
           SelectFilterOption("Famille", "/film-en-streaming/famille/"),
           SelectFilterOption("Fantastique", "/film-en-streaming/fantastique/"),
@@ -401,7 +444,9 @@ class DataLifeEngine extends MProvider {
           SelectFilterOption("Policier", "/film-en-streaming/policier/"),
           SelectFilterOption("Romance", "/film-en-streaming/romance/"),
           SelectFilterOption(
-              "Science-Fiction", "/film-en-streaming/science-fiction/"),
+            "Science-Fiction",
+            "/film-en-streaming/science-fiction/",
+          ),
           SelectFilterOption("Spectacles", "/film-en-streaming/spectacles/"),
           SelectFilterOption("Thriller", "/film-en-streaming/thriller/"),
           SelectFilterOption("Western", "/film-en-streaming/western/"),

@@ -13,16 +13,17 @@ class AnimesVision extends MProvider {
 
   @override
   Map<String, String> get headers => {
-        "Referer": baseUrl,
-        "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7"
-      };
+    "Referer": baseUrl,
+    "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
+  };
 
   @override
   Future<MPages> getPopular(int page) async {
     final res = (await client.get(Uri.parse(baseUrl), headers: headers)).body;
     final document = parseHtml(res);
-    final elements =
-        document.select("div#anime-trending div.item > a.film-poster");
+    final elements = document.select(
+      "div#anime-trending div.item > a.film-poster",
+    );
     List<MManga> animeList = [];
     for (var element in elements) {
       var anime = MManga();
@@ -37,12 +38,15 @@ class AnimesVision extends MProvider {
 
   @override
   Future<MPages> getLatestUpdates(int page) async {
-    final res = (await client.get(Uri.parse("$baseUrl/lancamentos?page=$page"),
-            headers: headers))
-        .body;
+    final res =
+        (await client.get(
+          Uri.parse("$baseUrl/lancamentos?page=$page"),
+          headers: headers,
+        )).body;
     final document = parseHtml(res);
-    final elements =
-        document.select("div.container div.screen-items > div.item");
+    final elements = document.select(
+      "div.container div.screen-items > div.item",
+    );
     List<MManga> animeList = [];
     for (var element in elements) {
       var anime = MManga();
@@ -56,9 +60,10 @@ class AnimesVision extends MProvider {
 
   @override
   Future<MPages> search(String query, int page, FilterList filterList) async {
-    final res = (await client
-            .get(Uri.parse("$baseUrl/search-anime?nome=$query&page=$page")))
-        .body;
+    final res =
+        (await client.get(
+          Uri.parse("$baseUrl/search-anime?nome=$query&page=$page"),
+        )).body;
     final document = parseHtml(res);
     final elements = document.select("div.film_list-wrap div.film-poster");
     List<MManga> animeList = [];
@@ -76,7 +81,7 @@ class AnimesVision extends MProvider {
   @override
   Future<MManga> getDetail(String url) async {
     final statusList = [
-      {"Atualmente sendo exibido": 0, "Fim da exibição": 1}
+      {"Atualmente sendo exibido": 0, "Fim da exibição": 1},
     ];
     MManga anime = MManga();
     final res = (await client.get(Uri.parse("$baseUrl$url"))).body;
@@ -113,8 +118,9 @@ class AnimesVision extends MProvider {
 
     while (hasNextPage(document)) {
       if (episodeList.isNotEmpty) {
-        final nextUrl =
-            nextPageElements(document)[0].selectFirst("a").attr("href");
+        final nextUrl = nextPageElements(
+          document,
+        )[0].selectFirst("a").attr("href");
         document = parseHtml((await client.get(Uri.parse(nextUrl))).body);
       }
       for (var element
@@ -131,13 +137,15 @@ class AnimesVision extends MProvider {
   Future<List<MVideo>> getVideoList(String url) async {
     final res = (await client.get(Uri.parse("$baseUrl$url"))).body;
     final document = parseHtml(res);
-    final encodedScript = document
-        .selectFirst("div.player-frame div#playerglobalapi ~ script")
-        .text;
+    final encodedScript =
+        document
+            .selectFirst("div.player-frame div#playerglobalapi ~ script")
+            .text;
     final decodedScript = decodeScriptFromString(encodedScript);
     List<MVideo> videos = [];
-    for (RegExpMatch match in RegExp(r'"file":"(\S+?)",.*?"label":"(.*?)"')
-        .allMatches(decodedScript)) {
+    for (RegExpMatch match in RegExp(
+      r'"file":"(\S+?)",.*?"label":"(.*?)"',
+    ).allMatches(decodedScript)) {
       final videoUrl = match.group(1)!.replaceAll('\\', '');
       final qualityName = match.group(2);
       var video = MVideo();
@@ -155,11 +163,15 @@ class AnimesVision extends MProvider {
   }
 
   List<MElement> nextPageElements(MDocument document) {
-    final elements = document
-        .select("ul.pagination li.page-item")
-        .where((MElement e) =>
-            e.outerHtml.contains("›") && !e.outerHtml.contains("disabled"))
-        .toList();
+    final elements =
+        document
+            .select("ul.pagination li.page-item")
+            .where(
+              (MElement e) =>
+                  e.outerHtml.contains("›") &&
+                  !e.outerHtml.contains("disabled"),
+            )
+            .toList();
     return elements;
   }
 
@@ -173,10 +185,11 @@ class AnimesVision extends MProvider {
   }
 
   String getInfo(MElement element, String key) {
-    final divs = element
-        .select("div.item")
-        .where((MElement e) => e.outerHtml.contains(key))
-        .toList();
+    final divs =
+        element
+            .select("div.item")
+            .where((MElement e) => e.outerHtml.contains(key))
+            .toList();
     String text = "";
     if (divs.isNotEmpty) {
       MElement div = divs[0];
@@ -230,12 +243,13 @@ class AnimesVision extends MProvider {
   List<dynamic> getSourcePreferences() {
     return [
       ListPreference(
-          key: "preferred_quality",
-          title: "Qualidade preferida",
-          summary: "",
-          valueIndex: 1,
-          entries: ["480p", "720p", "1080p", "4K"],
-          entryValues: ["1080", "720", "480", "4K"]),
+        key: "preferred_quality",
+        title: "Qualidade preferida",
+        summary: "",
+        valueIndex: 1,
+        entries: ["480p", "720p", "1080p", "4K"],
+        entryValues: ["1080", "720", "480", "4K"],
+      ),
     ];
   }
 
@@ -251,7 +265,11 @@ class AnimesVision extends MProvider {
   }
 
   String decodeScript(
-      String encodedString, String magicStr, int offset, int limit) {
+    String encodedString,
+    String magicStr,
+    int offset,
+    int limit,
+  ) {
     RegExp regex = RegExp('\\w');
     List<String> parts = encodedString.split(magicStr[limit]);
     List<String> decodedParts = [];
@@ -259,7 +277,9 @@ class AnimesVision extends MProvider {
       String replaced = part;
       for (Match match in regex.allMatches(part)) {
         replaced = replaced.replaceFirst(
-            match.group(0)!, magicStr.indexOf(match.group(0)!).toString());
+          match.group(0)!,
+          magicStr.indexOf(match.group(0)!).toString(),
+        );
       }
       int charInt = convertToNum(replaced, limit) - offset;
       decodedParts.add(String.fromCharCode(charInt));

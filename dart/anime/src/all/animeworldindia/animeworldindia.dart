@@ -10,18 +10,24 @@ class AnimeWorldIndia extends MProvider {
 
   @override
   Future<MPages> getPopular(int page) async {
-    final res = (await client.get(Uri.parse(
-            "${source.baseUrl}/advanced-search/page/$page/?s_lang=${source.lang}&s_orderby=viewed")))
-        .body;
+    final res =
+        (await client.get(
+          Uri.parse(
+            "${source.baseUrl}/advanced-search/page/$page/?s_lang=${source.lang}&s_orderby=viewed",
+          ),
+        )).body;
 
     return parseAnimeList(res);
   }
 
   @override
   Future<MPages> getLatestUpdates(int page) async {
-    final res = (await client.get(Uri.parse(
-            "${source.baseUrl}/advanced-search/page/$page/?s_lang=${source.lang}&s_orderby=update")))
-        .body;
+    final res =
+        (await client.get(
+          Uri.parse(
+            "${source.baseUrl}/advanced-search/page/$page/?s_lang=${source.lang}&s_orderby=update",
+          ),
+        )).body;
 
     return parseAnimeList(res);
   }
@@ -80,7 +86,9 @@ class AnimeWorldIndia extends MProvider {
       anime.status = MStatus.completed;
     } else {
       final eps = xpath(
-          res, '//ul/li/a[contains(@href,"${source.baseUrl}/watch")]/text()');
+        res,
+        '//ul/li/a[contains(@href,"${source.baseUrl}/watch")]/text()',
+      );
       if (eps.isNotEmpty) {
         final epParts = eps.first
             .substring(3)
@@ -101,19 +109,26 @@ class AnimeWorldIndia extends MProvider {
         .xpath('//li[contains(text(),"Producers:")]/span/a/text()')
         .join(', ');
     anime.genre = document.xpath(
-        '//span[@class="leading-6"]/a[contains(@class,"border-opacity-30")]/text()');
-    final seasonsJson = json.decode(substringBeforeLast(
-        substringBefore(
-            substringAfter(res, "var season_list = "), "var season_label ="),
-        ";")) as List<Map<String, dynamic>>;
+      '//span[@class="leading-6"]/a[contains(@class,"border-opacity-30")]/text()',
+    );
+    final seasonsJson =
+        json.decode(
+              substringBeforeLast(
+                substringBefore(
+                  substringAfter(res, "var season_list = "),
+                  "var season_label =",
+                ),
+                ";",
+              ),
+            )
+            as List<Map<String, dynamic>>;
     bool isSingleSeason = seasonsJson.length == 1;
     List<MChapter>? episodesList = [];
     for (var i = 0; i < seasonsJson.length; i++) {
       final seasonJson = seasonsJson[i];
       final seasonName = isSingleSeason ? "" : "Season ${i + 1}";
       final episodesJson =
-          (seasonJson["episodes"]["all"] as List<Map<String, dynamic>>)
-              .reversed
+          (seasonJson["episodes"]["all"] as List<Map<String, dynamic>>).reversed
               .toList();
       for (var j = 0; j < episodesJson.length; j++) {
         final episodeJson = episodesJson[j];
@@ -148,17 +163,25 @@ class AnimeWorldIndia extends MProvider {
   Future<List<MVideo>> getVideoList(String url) async {
     final res = (await client.get(Uri.parse("${source.baseUrl}$url"))).body;
     var resJson = substringBefore(
-        substringAfterLast(res, "\"players\":"), ",\"noplayer\":");
-    var streams = (json.decode(resJson) as List<Map<String, dynamic>>)
-        .where((e) =>
-            (e["type"] == "stream" ? true : false) &&
-            (e["url"] as String).isNotEmpty)
-        .toList()
-        .where((e) => language(source.lang).isEmpty ||
-                language(source.lang) == e["language"]
-            ? true
-            : false)
-        .toList();
+      substringAfterLast(res, "\"players\":"),
+      ",\"noplayer\":",
+    );
+    var streams =
+        (json.decode(resJson) as List<Map<String, dynamic>>)
+            .where(
+              (e) =>
+                  (e["type"] == "stream" ? true : false) &&
+                  (e["url"] as String).isNotEmpty,
+            )
+            .toList()
+            .where(
+              (e) =>
+                  language(source.lang).isEmpty ||
+                          language(source.lang) == e["language"]
+                      ? true
+                      : false,
+            )
+            .toList();
     List<MVideo> videos = [];
     for (var stream in streams) {
       String videoUrl = stream["url"];
@@ -183,9 +206,11 @@ class AnimeWorldIndia extends MProvider {
           "${source.baseUrl}${getUrlWithoutDomain(element.selectFirst("img").getSrc)}";
       animeList.add(anime);
     }
-    final hasNextPage = xpath(res,
-            '//li/span[@class="page-numbers current"]/parent::li//following-sibling::li/a/@href')
-        .isNotEmpty;
+    final hasNextPage =
+        xpath(
+          res,
+          '//li/span[@class="page-numbers current"]/parent::li//following-sibling::li/a/@href',
+        ).isNotEmpty;
     return MPages(animeList, hasNextPage);
   }
 
@@ -199,7 +224,7 @@ class AnimeWorldIndia extends MProvider {
       "ml": "malayalam",
       "mr": "marathi",
       "ta": "tamil",
-      "te": "telugu"
+      "te": "telugu",
     };
     return languages[lang] ?? "";
   }
@@ -208,17 +233,23 @@ class AnimeWorldIndia extends MProvider {
     List<MVideo> videos = [];
     final res = (await client.get(Uri.parse(url))).body;
     final streamCode = substringBefore(
-        substringAfter(substringAfter(res, "sniff("), ", \""), '"');
+      substringAfter(substringAfter(res, "sniff("), ", \""),
+      '"',
+    );
 
     final streamUrl =
         "${substringBefore(url, "/watch")}/m3u8/$streamCode/master.txt?s=1&cache=1";
     final masterPlaylistRes = (await client.get(Uri.parse(streamUrl))).body;
 
     List<MTrack> audios = [];
-    for (var it in substringAfter(masterPlaylistRes, "#EXT-X-MEDIA:TYPE=AUDIO")
-        .split("#EXT-X-MEDIA:TYPE=AUDIO")) {
-      final line =
-          substringBefore(substringAfter(it, "#EXT-X-MEDIA:TYPE=AUDIO"), "\n");
+    for (var it in substringAfter(
+      masterPlaylistRes,
+      "#EXT-X-MEDIA:TYPE=AUDIO",
+    ).split("#EXT-X-MEDIA:TYPE=AUDIO")) {
+      final line = substringBefore(
+        substringAfter(it, "#EXT-X-MEDIA:TYPE=AUDIO"),
+        "\n",
+      );
       final audioUrl = substringBefore(substringAfter(line, "URI=\""), "\"");
       MTrack audio = MTrack();
       audio
@@ -227,8 +258,10 @@ class AnimeWorldIndia extends MProvider {
       audios.add(audio);
     }
 
-    for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
-        .split("#EXT-X-STREAM-INF:")) {
+    for (var it in substringAfter(
+      masterPlaylistRes,
+      "#EXT-X-STREAM-INF:",
+    ).split("#EXT-X-STREAM-INF:")) {
       final quality =
           "${substringBefore(substringBefore(substringAfter(substringAfter(it, "RESOLUTION="), "x"), ","), "\n")}p";
 
@@ -299,7 +332,7 @@ class AnimeWorldIndia extends MProvider {
         SelectFilterOption("1993", "1993"),
         SelectFilterOption("1992", "1992"),
         SelectFilterOption("1991", "1991"),
-        SelectFilterOption("1990", "1990")
+        SelectFilterOption("1990", "1990"),
       ]),
       SelectFilter("SortFilter", "Sort", 0, [
         SelectFilterOption("Default", "default"),
@@ -348,12 +381,13 @@ class AnimeWorldIndia extends MProvider {
   List<dynamic> getSourcePreferences() {
     return [
       ListPreference(
-          key: "preferred_quality",
-          title: "Preferred Quality",
-          summary: "",
-          valueIndex: 0,
-          entries: ["1080p", "720p", "480p", "360p", "240p"],
-          entryValues: ["1080", "720", "480", "360", "240"]),
+        key: "preferred_quality",
+        title: "Preferred Quality",
+        summary: "",
+        valueIndex: 0,
+        entries: ["1080p", "720p", "480p", "360p", "240p"],
+        entryValues: ["1080", "720", "480", "360", "240"],
+      ),
     ];
   }
 

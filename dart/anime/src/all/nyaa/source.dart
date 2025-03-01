@@ -9,11 +9,12 @@ String _iconUrl =
 
 Source get nyaaSource => _nyaaSource;
 Source _nyaaSource = Source(
-    name: 'Nyaa',
-    baseUrl: "https://nyaa.si",
-    lang: "all",
-    typeSource: "torrent",
-    iconUrl: _iconUrl,
-    version: _nyaaVersion,
-    itemType: ItemType.anime,
-    sourceCodeUrl: _nyaaSourceCodeUrl);
+  name: 'Nyaa',
+  baseUrl: "https://nyaa.si",
+  lang: "all",
+  typeSource: "torrent",
+  iconUrl: _iconUrl,
+  version: _nyaaVersion,
+  itemType: ItemType.anime,
+  sourceCodeUrl: _nyaaSourceCodeUrl,
+);

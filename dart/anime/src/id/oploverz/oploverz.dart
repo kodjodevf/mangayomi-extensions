@@ -10,32 +10,35 @@ class OploVerz extends MProvider {
 
   @override
   Future<MPages> getPopular(int page) async {
-    final res = (await client.get(Uri.parse(
-            "${source.baseUrl}/anime-list/page/$page/?order=popular")))
-        .body;
+    final res =
+        (await client.get(
+          Uri.parse("${source.baseUrl}/anime-list/page/$page/?order=popular"),
+        )).body;
     return parseAnimeList(res);
   }
 
   @override
   Future<MPages> getLatestUpdates(int page) async {
-    final res = (await client.get(
-            Uri.parse("${source.baseUrl}/anime-list/page/$page/?order=latest")))
-        .body;
+    final res =
+        (await client.get(
+          Uri.parse("${source.baseUrl}/anime-list/page/$page/?order=latest"),
+        )).body;
     return parseAnimeList(res);
   }
 
   @override
   Future<MPages> search(String query, int page, FilterList filterList) async {
-    final res = (await client.get(
-            Uri.parse("${source.baseUrl}/anime-list/page/$page/?title=$query")))
-        .body;
+    final res =
+        (await client.get(
+          Uri.parse("${source.baseUrl}/anime-list/page/$page/?title=$query"),
+        )).body;
     return parseAnimeList(res);
   }
 
   @override
   Future<MManga> getDetail(String url) async {
     final statusList = [
-      {"ongoing": 0, "completed": 1}
+      {"ongoing": 0, "completed": 1},
     ];
 
     final res = (await client.get(Uri.parse(url))).body;
@@ -47,12 +50,18 @@ class OploVerz extends MProvider {
     anime.description = xpath(res, '//*[@class="desc"]/div/text()').first;
 
     anime.genre = xpath(res, '//*[@class="genre-info"]/a/text()');
-    final epUrls =
-        xpath(res, '//div[@class="epsleft")]/span[@class="lchx"]/a/@href');
-    final names =
-        xpath(res, '//div[@class="epsleft")]/span[@class="lchx"]/a/text()');
-    final dates =
-        xpath(res, '//div[@class="epsleft")]/span[@class="date"]/text()');
+    final epUrls = xpath(
+      res,
+      '//div[@class="epsleft")]/span[@class="lchx"]/a/@href',
+    );
+    final names = xpath(
+      res,
+      '//div[@class="epsleft")]/span[@class="lchx"]/a/text()',
+    );
+    final dates = xpath(
+      res,
+      '//div[@class="epsleft")]/span[@class="date"]/text()',
+    );
     final dateUploads = parseDates(dates, "dd/MM/yyyy", "id");
     List<MChapter>? episodesList = [];
     for (var i = 0; i < epUrls.length; i++) {
@@ -70,28 +79,33 @@ class OploVerz extends MProvider {
   @override
   Future<List<MVideo>> getVideoList(String url) async {
     final res = (await client.get(Uri.parse(url))).body;
-    final dataPost = xpath(res,
-            '//*[@id="server"]/ul/li/div[contains(@id,"player-option")]/@data-post')
-        .first;
-    final dataNume = xpath(res,
-            '//*[@id="server"]/ul/li/div[contains(@id,"player-option")]/@data-nume')
-        .first;
-    final dataType = xpath(res,
-            '//*[@id="server"]/ul/li/div[contains(@id,"player-option")]/@data-type')
-        .first;
+    final dataPost =
+        xpath(
+          res,
+          '//*[@id="server"]/ul/li/div[contains(@id,"player-option")]/@data-post',
+        ).first;
+    final dataNume =
+        xpath(
+          res,
+          '//*[@id="server"]/ul/li/div[contains(@id,"player-option")]/@data-nume',
+        ).first;
+    final dataType =
+        xpath(
+          res,
+          '//*[@id="server"]/ul/li/div[contains(@id,"player-option")]/@data-type',
+        ).first;
 
-    final ress = (await client.post(
-            Uri.parse("${source.baseUrl}/wp-admin/admin-ajax.php"),
-            headers: {
-          "_": "_"
-        },
-            body: {
-          "action": "player_ajax",
-          "post": dataPost,
-          "nume": dataNume,
-          "type": dataType
-        }))
-        .body;
+    final ress =
+        (await client.post(
+          Uri.parse("${source.baseUrl}/wp-admin/admin-ajax.php"),
+          headers: {"_": "_"},
+          body: {
+            "action": "player_ajax",
+            "post": dataPost,
+            "nume": dataNume,
+            "type": dataType,
+          },
+        )).body;
 
     final playerLink =
         xpath(ress, '//iframe[@class="playeriframe"]/@src').first;
@@ -127,8 +141,10 @@ class OploVerz extends MProvider {
     List<MManga> animeList = [];
     final urls = xpath(res, '//div[@class="relat"]/article/div/div/a/@href');
     final names = xpath(res, '//div[@class="relat"]/article/div/div/a/@title');
-    final images =
-        xpath(res, '//div[@class="relat"]/article/div/div/a/div/img/@src');
+    final images = xpath(
+      res,
+      '//div[@class="relat"]/article/div/div/a/div/img/@src',
+    );
 
     for (var i = 0; i < names.length; i++) {
       MManga anime = MManga();
@@ -138,8 +154,10 @@ class OploVerz extends MProvider {
       animeList.add(anime);
     }
     final pages = xpath(res, '//div[@class="pagination"]/a/@href');
-    final pageNumberCurrent = xpath(res,
-        '//div[@class="pagination"]/span[@class="page-numbers current"]/text()');
+    final pageNumberCurrent = xpath(
+      res,
+      '//div[@class="pagination"]/span[@class="page-numbers current"]/text()',
+    );
 
     bool hasNextPage = true;
     if (pageNumberCurrent.isNotEmpty && pages.isNotEmpty) {

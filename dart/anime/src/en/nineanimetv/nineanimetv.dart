@@ -10,17 +10,21 @@ class NineAnimeTv extends MProvider {
 
   @override
   Future<MPages> getPopular(int page) async {
-    final res = (await client
-            .get(Uri.parse("${source.baseUrl}/filter?sort=all&page=$page")))
-        .body;
+    final res =
+        (await client.get(
+          Uri.parse("${source.baseUrl}/filter?sort=all&page=$page"),
+        )).body;
     return parseAnimeList(res);
   }
 
   @override
   Future<MPages> getLatestUpdates(int page) async {
-    final res = (await client.get(Uri.parse(
-            "${source.baseUrl}/filter?sort=recently_updated&page=$page")))
-        .body;
+    final res =
+        (await client.get(
+          Uri.parse(
+            "${source.baseUrl}/filter?sort=recently_updated&page=$page",
+          ),
+        )).body;
     return parseAnimeList(res);
   }
 
@@ -116,30 +120,36 @@ class NineAnimeTv extends MProvider {
   @override
   Future<MManga> getDetail(String url) async {
     final statusList = [
-      {"Currently Airing": 0, "Finished Airing": 1}
+      {"Currently Airing": 0, "Finished Airing": 1},
     ];
 
     final res = (await client.get(Uri.parse("${source.baseUrl}$url"))).body;
     MManga anime = MManga();
     final document = parseHtml(res);
     final infoElement = document.selectFirst("div.film-infor");
-    final status = infoElement.xpathFirst(
-            '//div[contains(text(),"Status:")]/following-sibling::div/span/text()') ??
+    final status =
+        infoElement.xpathFirst(
+          '//div[contains(text(),"Status:")]/following-sibling::div/span/text()',
+        ) ??
         "";
     anime.status = parseStatus(status, statusList);
     anime.description =
         infoElement.selectFirst("div.film-description > p")?.text ?? "";
-    anime.author = infoElement.xpathFirst(
-            '//div[contains(text(),"Studios:")]/following-sibling::div/a/text()') ??
+    anime.author =
+        infoElement.xpathFirst(
+          '//div[contains(text(),"Studios:")]/following-sibling::div/a/text()',
+        ) ??
         "";
 
     anime.genre = infoElement.xpath(
-        '//div[contains(text(),"Genre:")]/following-sibling::div/a/text()');
+      '//div[contains(text(),"Genre:")]/following-sibling::div/a/text()',
+    );
     final id = parseHtml(res).selectFirst("div[data-id]").attr("data-id");
 
     final resEp =
-        (await client.get(Uri.parse("${source.baseUrl}/ajax/episode/list/$id")))
-            .body;
+        (await client.get(
+          Uri.parse("${source.baseUrl}/ajax/episode/list/$id"),
+        )).body;
     final html = json.decode(resEp)["html"];
 
     List<MChapter>? episodesList = [];
@@ -163,9 +173,10 @@ class NineAnimeTv extends MProvider {
 
   @override
   Future<List<MVideo>> getVideoList(String url) async {
-    final res = (await client.get(
-            Uri.parse("${source.baseUrl}/ajax/episode/servers?episodeId=$url")))
-        .body;
+    final res =
+        (await client.get(
+          Uri.parse("${source.baseUrl}/ajax/episode/servers?episodeId=$url"),
+        )).body;
 
     final html = json.decode(res)["html"];
 
@@ -178,9 +189,10 @@ class NineAnimeTv extends MProvider {
       final name = serverElement.text;
       final id = serverElement.attr("data-id");
       final subDub = serverElement.attr("data-type");
-      final res = (await client
-              .get(Uri.parse("${source.baseUrl}/ajax/episode/sources?id=$id")))
-          .body;
+      final res =
+          (await client.get(
+            Uri.parse("${source.baseUrl}/ajax/episode/sources?id=$id"),
+          )).body;
       final epUrl = json.decode(res)["link"];
       List<MVideo> a = [];
 
@@ -214,17 +226,22 @@ class NineAnimeTv extends MProvider {
   Future<List<MVideo>> rapidCloudExtractor(String url, String name) async {
     final serverUrl = ['https://megacloud.tv', 'https://rapid-cloud.co'];
 
-    final serverType = url.startsWith('https://megacloud.tv') || url.startsWith('https://megacloud.club') ? 0 : 1;
+    final serverType =
+        url.startsWith('https://megacloud.tv') ||
+                url.startsWith('https://megacloud.club')
+            ? 0
+            : 1;
     final sourceUrl = [
       '/embed-2/ajax/e-1/getSources?id=',
-      '/ajax/embed-6-v2/getSources?id='
+      '/ajax/embed-6-v2/getSources?id=',
     ];
     final sourceSpliter = ['/e-1/', '/embed-6-v2/'];
     final id = url.split(sourceSpliter[serverType]).last.split('?').first;
-    final resServer = (await client.get(
-            Uri.parse('${serverUrl[serverType]}${sourceUrl[serverType]}$id'),
-            headers: {"X-Requested-With": "XMLHttpRequest"}))
-        .body;
+    final resServer =
+        (await client.get(
+          Uri.parse('${serverUrl[serverType]}${sourceUrl[serverType]}$id'),
+          headers: {"X-Requested-With": "XMLHttpRequest"},
+        )).body;
     final encrypted = getMapValue(resServer, "encrypted");
     String videoResJson = "";
     List<MVideo> videos = [];
@@ -245,18 +262,21 @@ class NineAnimeTv extends MProvider {
       videoResJson = decryptAESCryptoJS(ciphertext, password);
     } else {
       videoResJson = json.encode(
-          (json.decode(resServer)["sources"] as List<Map<String, dynamic>>));
+        (json.decode(resServer)["sources"] as List<Map<String, dynamic>>),
+      );
     }
 
     String masterUrl =
         ((json.decode(videoResJson) as List<Map<String, dynamic>>)
             .first)['file'];
-    String type = ((json.decode(videoResJson) as List<Map<String, dynamic>>)
-        .first)['type'];
+    String type =
+        ((json.decode(videoResJson) as List<Map<String, dynamic>>)
+            .first)['type'];
 
-    final tracks = (json.decode(resServer)['tracks'] as List)
-        .where((e) => e['kind'] == 'captions' ? true : false)
-        .toList();
+    final tracks =
+        (json.decode(resServer)['tracks'] as List)
+            .where((e) => e['kind'] == 'captions' ? true : false)
+            .toList();
     List<MTrack> subtitles = [];
 
     for (var sub in tracks) {
@@ -272,8 +292,10 @@ class NineAnimeTv extends MProvider {
     if (type == "hls") {
       final masterPlaylistRes = (await client.get(Uri.parse(masterUrl))).body;
 
-      for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
-          .split("#EXT-X-STREAM-INF:")) {
+      for (var it in substringAfter(
+        masterPlaylistRes,
+        "#EXT-X-STREAM-INF:",
+      ).split("#EXT-X-STREAM-INF:")) {
         final quality =
             "${substringBefore(substringBefore(substringAfter(substringAfter(it, "RESOLUTION="), "x"), ","), "\n")}p";
 
@@ -307,19 +329,22 @@ class NineAnimeTv extends MProvider {
   Future<List<List<int>>> generateIndexPairs(int serverType) async {
     final jsPlayerUrl = [
       "https://megacloud.tv/js/player/a/prod/e1-player.min.js",
-      "https://rapid-cloud.co/js/player/prod/e6-player-v2.min.js"
+      "https://rapid-cloud.co/js/player/prod/e6-player-v2.min.js",
     ];
     final scriptText =
         (await client.get(Uri.parse(jsPlayerUrl[serverType]))).body;
 
     final switchCode = scriptText.substring(
-        scriptText.lastIndexOf('switch'), scriptText.indexOf('=partKey'));
+      scriptText.lastIndexOf('switch'),
+      scriptText.indexOf('=partKey'),
+    );
 
     List<int> indexes = [];
     for (var variableMatch
         in RegExp(r'=(\w+)').allMatches(switchCode).toList()) {
       final regex = RegExp(
-          ',${(variableMatch as RegExpMatch).group(1)}=((?:0x)?([0-9a-fA-F]+))');
+        ',${(variableMatch as RegExpMatch).group(1)}=((?:0x)?([0-9a-fA-F]+))',
+      );
       Match? match = regex.firstMatch(scriptText);
 
       if (match != null) {
@@ -391,13 +416,13 @@ class NineAnimeTv extends MProvider {
         CheckBoxFilter("Super Power", "31"),
         CheckBoxFilter("Supernatural", "37"),
         CheckBoxFilter("Thriller", "41"),
-        CheckBoxFilter("Vampire", "32")
+        CheckBoxFilter("Vampire", "32"),
       ]),
       GroupFilter("SeasonFilter", "Season", [
         CheckBoxFilter("Fall", "3"),
         CheckBoxFilter("Summer", "2"),
         CheckBoxFilter("Spring", "1"),
-        CheckBoxFilter("Winter", "4")
+        CheckBoxFilter("Winter", "4"),
       ]),
       GroupFilter("YearFilter", "Year", [
         CheckBoxFilter("2024", "2024"),
@@ -423,7 +448,7 @@ class NineAnimeTv extends MProvider {
         CheckBoxFilter("2004", "2004"),
         CheckBoxFilter("2003", "2003"),
         CheckBoxFilter("2002", "2002"),
-        CheckBoxFilter("2001", "2001")
+        CheckBoxFilter("2001", "2001"),
       ]),
       SelectFilter("SortFilter", "Sort by", 0, [
         SelectFilterOption("All", "all"),
@@ -433,7 +458,7 @@ class NineAnimeTv extends MProvider {
         SelectFilterOption("Score", "score"),
         SelectFilterOption("Name A-Z", "name_az"),
         SelectFilterOption("Released Date", "released_date"),
-        SelectFilterOption("Most Watched", "most_watched")
+        SelectFilterOption("Most Watched", "most_watched"),
       ]),
       GroupFilter("TypeFilter", "Type", [
         CheckBoxFilter("Movie", "1"),
@@ -441,16 +466,18 @@ class NineAnimeTv extends MProvider {
         CheckBoxFilter("OVA", "3"),
         CheckBoxFilter("ONA", "4"),
         CheckBoxFilter("Special", "5"),
-        CheckBoxFilter("Music", "6")
+        CheckBoxFilter("Music", "6"),
       ]),
       SelectFilter("StatusFilter", "Status", 0, [
         SelectFilterOption("All", "all"),
         SelectFilterOption("Finished Airing", "1"),
         SelectFilterOption("Currently Airing", "2"),
-        SelectFilterOption("Not yet aired", "3")
+        SelectFilterOption("Not yet aired", "3"),
       ]),
-      GroupFilter("LanguageFilter", "Language",
-          [CheckBoxFilter("Sub", "sub"), CheckBoxFilter("Dub", "dub")]),
+      GroupFilter("LanguageFilter", "Language", [
+        CheckBoxFilter("Sub", "sub"),
+        CheckBoxFilter("Dub", "dub"),
+      ]),
     ];
   }
 
@@ -458,40 +485,45 @@ class NineAnimeTv extends MProvider {
   List<dynamic> getSourcePreferences() {
     return [
       ListPreference(
-          key: "preferred_quality",
-          title: "Preferred Quality",
-          summary: "",
-          valueIndex: 1,
-          entries: ["1080p", "720p", "480p", "360p"],
-          entryValues: ["1080", "720", "480", "360"]),
+        key: "preferred_quality",
+        title: "Preferred Quality",
+        summary: "",
+        valueIndex: 1,
+        entries: ["1080p", "720p", "480p", "360p"],
+        entryValues: ["1080", "720", "480", "360"],
+      ),
       ListPreference(
-          key: "preferred_server",
-          title: "Preferred server",
-          summary: "",
-          valueIndex: 0,
-          entries: ["Vidstreaming", "VidCloud"],
-          entryValues: ["Vidstreaming", "VidCloud"]),
+        key: "preferred_server",
+        title: "Preferred server",
+        summary: "",
+        valueIndex: 0,
+        entries: ["Vidstreaming", "VidCloud"],
+        entryValues: ["Vidstreaming", "VidCloud"],
+      ),
       ListPreference(
-          key: "preferred_type",
-          title: "Preferred Type",
-          summary: "",
-          valueIndex: 0,
-          entries: ["Sub", "Dub"],
-          entryValues: ["sub", "dub"]),
+        key: "preferred_type",
+        title: "Preferred Type",
+        summary: "",
+        valueIndex: 0,
+        entries: ["Sub", "Dub"],
+        entryValues: ["sub", "dub"],
+      ),
       MultiSelectListPreference(
-          key: "hoster_selection",
-          title: "Enable/Disable Hosts",
-          summary: "",
-          entries: ["Vidstreaming", "VidCloud"],
-          entryValues: ["Vidstreaming", "Vidcloud"],
-          values: ["Vidstreaming", "Vidcloud"]),
+        key: "hoster_selection",
+        title: "Enable/Disable Hosts",
+        summary: "",
+        entries: ["Vidstreaming", "VidCloud"],
+        entryValues: ["Vidstreaming", "Vidcloud"],
+        values: ["Vidstreaming", "Vidcloud"],
+      ),
       MultiSelectListPreference(
-          key: "type_selection",
-          title: "Enable/Disable Types",
-          summary: "",
-          entries: ["Sub", "Dub"],
-          entryValues: ["sub", "dub"],
-          values: ["sub", "dub"]),
+        key: "type_selection",
+        title: "Enable/Disable Types",
+        summary: "",
+        entries: ["Sub", "Dub"],
+        entryValues: ["sub", "dub"],
+        values: ["sub", "dub"],
+      ),
     ];
   }
 

@@ -14,8 +14,9 @@ class OtakuDesu extends MProvider {
   @override
   Future<MPages> getPopular(int page) async {
     final res =
-        (await client.get(Uri.parse("$baseUrl/complete-anime/page/$page")))
-            .body;
+        (await client.get(
+          Uri.parse("$baseUrl/complete-anime/page/$page"),
+        )).body;
     return parseAnimeList(res);
   }
 
@@ -29,8 +30,9 @@ class OtakuDesu extends MProvider {
   @override
   Future<MPages> search(String query, int page, FilterList filterList) async {
     final res =
-        (await client.get(Uri.parse("$baseUrl/?s=$query&post_type=anime")))
-            .body;
+        (await client.get(
+          Uri.parse("$baseUrl/?s=$query&post_type=anime"),
+        )).body;
     List<MManga> animeList = [];
     final images = xpath(res, '//ul[@class="chivsrc"]/li/img/@src');
     final names = xpath(res, '//ul[@class="chivsrc"]/li/h2/a/text()');
@@ -49,12 +51,14 @@ class OtakuDesu extends MProvider {
   @override
   Future<MManga> getDetail(String url) async {
     final statusList = [
-      {"Ongoing": 0, "Completed": 1}
+      {"Ongoing": 0, "Completed": 1},
     ];
     final res = (await client.get(Uri.parse(url))).body;
     MManga anime = MManga();
     final status = xpath(
-        res, '//*[@class="infozingle"]/p[contains(text(), "Status")]/text()');
+      res,
+      '//*[@class="infozingle"]/p[contains(text(), "Status")]/text()',
+    );
     if (status.isNotEmpty) {
       anime.status = parseStatus(status.first.split(':').last, statusList);
     }
@@ -64,7 +68,9 @@ class OtakuDesu extends MProvider {
     }
 
     final genre = xpath(
-        res, '//*[@class="infozingle"]/p[contains(text(), "Genre")]/text()');
+      res,
+      '//*[@class="infozingle"]/p[contains(text(), "Genre")]/text()',
+    );
     if (genre.isNotEmpty) {
       anime.genre = genre.first.split(':').last.split(',');
     }
@@ -73,7 +79,9 @@ class OtakuDesu extends MProvider {
     final names = xpath(res, '//div[@class="episodelist"]/ul/li/span/a/text()');
 
     final dates = xpath(
-        res, '//div[@class="episodelist"]/ul/li/span[@class="zeebr"]/text()');
+      res,
+      '//div[@class="episodelist"]/ul/li/span[@class="zeebr"]/text()',
+    );
     final dateUploads = parseDates(dates, "d MMMM,yyyy", "id");
     List<MChapter>? episodesList = [];
     for (var i = 1; i < epUrls.length; i++) {
@@ -93,18 +101,23 @@ class OtakuDesu extends MProvider {
     final res = (await client.get(Uri.parse(url))).body;
     final script =
         xpath(res, '//script[contains(text(), "{action:")]/text()').first;
-    final nonceAction =
-        substringBefore(substringAfter(script, "{action:\""), '"');
+    final nonceAction = substringBefore(
+      substringAfter(script, "{action:\""),
+      '"',
+    );
     final action = substringBefore(substringAfter(script, "action:\""), '"');
 
-    final resNonceAction = (await client.post(
-            Uri.parse("$baseUrl/wp-admin/admin-ajax.php"),
-            headers: {"_": "_"},
-            body: {"action": nonceAction}))
-        .body;
+    final resNonceAction =
+        (await client.post(
+          Uri.parse("$baseUrl/wp-admin/admin-ajax.php"),
+          headers: {"_": "_"},
+          body: {"action": nonceAction},
+        )).body;
     final nonce = substringBefore(substringAfter(resNonceAction, ":\""), '"');
-    final mirrorstream =
-        xpath(res, '//*[@class="mirrorstream"]/ul/li/a/@data-content');
+    final mirrorstream = xpath(
+      res,
+      '//*[@class="mirrorstream"]/ul/li/a/@data-content',
+    );
     for (var stream in mirrorstream) {
       List<MVideo> a = [];
       final decodedData = json.decode(utf8.decode(base64Url.decode(stream)));
@@ -112,17 +125,12 @@ class OtakuDesu extends MProvider {
       final id = decodedData["id"];
       final i = decodedData["i"];
 
-      final res = (await client
-              .post(Uri.parse("$baseUrl/wp-admin/admin-ajax.php"), headers: {
-        "_": "_"
-      }, body: {
-        "i": i,
-        "id": id,
-        "q": q,
-        "nonce": nonce,
-        "action": action
-      }))
-          .body;
+      final res =
+          (await client.post(
+            Uri.parse("$baseUrl/wp-admin/admin-ajax.php"),
+            headers: {"_": "_"},
+            body: {"i": i, "id": id, "q": q, "nonce": nonce, "action": action},
+          )).body;
       final resJson = json.decode(res);
       final html = utf8.decode(base64Url.decode(resJson["data"]));
       String url = xpath(html, '//iframe/@src').first;
@@ -152,8 +160,10 @@ class OtakuDesu extends MProvider {
         final res = (await client.get(Uri.parse(url))).body;
         final script =
             xpath(res, '//script[contains(text(), "player.src")]/text()').first;
-        final videoUrl =
-            substringBefore(substringAfter(script, "src: \""), '"');
+        final videoUrl = substringBefore(
+          substringAfter(script, "src: \""),
+          '"',
+        );
         MVideo video = MVideo();
         video
           ..url = videoUrl
@@ -196,12 +206,18 @@ class OtakuDesu extends MProvider {
 
   MPages parseAnimeList(String res) {
     List<MManga> animeList = [];
-    final urls =
-        xpath(res, '//div[@class="detpost"]/div[@class="thumb"]/a/@href');
-    final names = xpath(res,
-        '//div[@class="detpost"]/div[@class="thumb"]/a/div[@class="thumbz"]/h2/text()');
-    final images = xpath(res,
-        '//div[@class="detpost"]/div[@class="thumb"]/a/div[@class="thumbz"]/img/@src');
+    final urls = xpath(
+      res,
+      '//div[@class="detpost"]/div[@class="thumb"]/a/@href',
+    );
+    final names = xpath(
+      res,
+      '//div[@class="detpost"]/div[@class="thumb"]/a/div[@class="thumbz"]/h2/text()',
+    );
+    final images = xpath(
+      res,
+      '//div[@class="detpost"]/div[@class="thumb"]/a/div[@class="thumbz"]/img/@src',
+    );
 
     for (var i = 0; i < names.length; i++) {
       MManga anime = MManga();
@@ -211,27 +227,31 @@ class OtakuDesu extends MProvider {
       animeList.add(anime);
     }
     final pages = xpath(
-        res, '//div[@class="pagenavix"]/a[@class="next page-numbers"]/@href');
+      res,
+      '//div[@class="pagenavix"]/a[@class="next page-numbers"]/@href',
+    );
     return MPages(animeList, pages.isNotEmpty);
   }
 
   List<dynamic> getSourcePreferences() {
     return [
       EditTextPreference(
-          key: "overrideBaseUrl",
-          title: "Override BaseUrl",
-          summary: "",
-          value: "https://otakudesu.cloud",
-          dialogTitle: "Override BaseUrl",
-          dialogMessage: "",
-          text: "https://otakudesu.cloud"),
+        key: "overrideBaseUrl",
+        title: "Override BaseUrl",
+        summary: "",
+        value: "https://otakudesu.cloud",
+        dialogTitle: "Override BaseUrl",
+        dialogMessage: "",
+        text: "https://otakudesu.cloud",
+      ),
       ListPreference(
-          key: "preferred_quality",
-          title: "Preferred quality",
-          summary: "",
-          valueIndex: 1,
-          entries: ["1080p", "720p", "480p", "360p"],
-          entryValues: ["1080", "720", "480", "360"])
+        key: "preferred_quality",
+        title: "Preferred quality",
+        summary: "",
+        valueIndex: 1,
+        entries: ["1080p", "720p", "480p", "360p"],
+        entryValues: ["1080", "720", "480", "360"],
+      ),
     ];
   }
 }

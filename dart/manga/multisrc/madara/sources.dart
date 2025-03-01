@@ -190,388 +190,392 @@ const madaraSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/manga/multisrc/madara/madara.dart";
 
 List<Source> get madaraSourcesList => _madaraSourcesList;
-List<Source> _madaraSourcesList = [
-//1st Kiss-Manga (unoriginal) (EN)
-  firstkissdashmangaSource,
-//AQUA Scans (EN)
-  manhwaworldSource,
-//Akuma no Tenshi (PT-BR)
-  akumanotenshiSource,
-//Anikiga (TR)
-  anikigaSource,
-//ArazNovel (TR)
-  araznovelSource,
-//Arthur Scan (PT-BR)
-  arthurscanSource,
-//AstralManga (FR)
-  astralmangaSource,
-//Asura Scans.us (unoriginal) (EN)
-  asurascansusSource,
-//BarManga (ES)
-  barmangaSource,
-//BestManga (RU)
-  bestmangaSource,
-//Chibi Manga (EN)
-  chibimangaSource,
-//Clover Manga (TR)
-  clovermangaSource,
-//Coco Rip (ES)
-  cocoripSource,
-//Coffee Manga (EN)
-  coffeemangaSource,
-//Doodmanga (TH)
-  doodmangaSource,
-//Elite Manga (EN)
-  elitemangaSource,
-//Emperor Scan (ES)
-  emperorscanSource,
-//EvaScans (TR)
-  evascansSource,
-//FR-Scan (FR)
-  frscanSource,
-//FactManga (EN)
-  factmangaSource,
-//FreeMangaTop (EN)
-  freemangatopSource,
-//Glory Manga (TR)
-  glorymangaSource,
-//Harimanga (EN)
-  harimangaSource,
-//Immortal Updates (EN)
-  immortalupdatesSource,
-//Império Scans (PT-BR)
-  imperioscansSource,
-//Inmortal Scan (ES)
-  inmortalscanSource,
-//IsekaiScanManga (unoriginal) (EN)
-  isekaiscanmangaSource,
-//Jimanga (EN)
-  jimangaSource,
-//KSGroupScans (EN)
-  ksgroupscansSource,
-//Kakusei Project (PT-BR)
-  kakuseiprojectSource,
-//Kami Sama Explorer (PT-BR)
-  kamisamaexplorerSource,
-//Komik Chan (EN)
-  komikchanSource,
-//LHTranslation (EN)
-  lhtranslationSource,
-//Lady Estelar Scan (PT-BR)
-  ladyestelarscanSource,
-//Leviatan Scans (EN)
-  leviatanscansSource,
-//Luffy Manga (EN)
-  luffymangaSource,
-//Maid Scan (PT-BR)
-  maidscanSource,
-//Manga Diyari (TR)
-  mangadiyariSource,
-//Manga Fenix (ES)
-  mangafenixSource,
-//Manga Galaxy (EN)
-  mangagalaxySource,
-//Manga Read (EN)
-  mangareadSource,
-//Manga Tx.gg (unoriginal) (EN)
-  mangatxggSource,
-//Manga Weebs (EN)
-  mangaweebsSource,
-//Manga Şehri (TR)
-  mangasehriSource,
-//Manga-TX (EN)
-  mangatxunoriginalSource,
-//MangaClash (EN)
-  mangaclashSource,
-//MangaFreak.online (EN)
-  mangafreakonlineSource,
-//MangaGreat (EN)
-  mangagreatSource,
-//MangaKomi (EN)
-  mangakomiSource,
-//MangaRead.org (EN)
-  mangareadorgSource,
-//MangaRolls (EN)
-  mangarollsSource,
-//MangaTyrant (EN)
-  mangatyrantSource,
-//MangaUS (EN)
-  mangausSource,
-//Mangasushi (EN)
-  mangasushiSource,
-//Mangá Nanquim (PT-BR)
-  mangananquimSource,
-//Manhua ES (EN)
-  manhuaesSource,
-//ManhuaUS (EN)
-  manhuausSource,
-//ManhuaZone (EN)
-  manhuazoneSource,
-//ManhwaClan (EN)
-  manhwaclanSource,
-//Manhwafull (EN)
-  manhwafullSource,
-//Mantraz Scan (ES)
-  mantrazscanSource,
-//Momo no Hana Scan (PT-BR)
-  momonohanascanSource,
-//MonarcaManga (ES)
-  monarcamangaSource,
-//Moon Witch In Love (PT-BR)
-  moonwitchinloveSource,
-//NekoPost.co (unoriginal) (TH)
-  nekopostcoSource,
-//Niji Translations (AR)
-  nijitranslationsSource,
-//Pantheon Scan (FR)
-  pantheonscanSource,
-//Pojok Manga (ID)
-  pojokmangaSource,
-//Projeto Scanlator (PT-BR)
-  projetoscanlatorSource,
-//ROG Mangás (PT-BR)
-  mangasoverallSource,
-//Ragnarok Scanlation (ES)
-  ragnarokscanlationSource,
-//Rainbow Fairy Scan (PT-BR)
-  rainbowfairyscanSource,
-//Random Scan (PT-BR)
-  randomscanSource,
-//ReaderGen (FR)
-  readergenSource,
-//RichtoScan (ES)
-  richtoscanSource,
-//Rightdark Scan (ES)
-  rightdarkscanSource,
-//Rio2 Manga (EN)
-  rio2mangaSource,
-//Romantik Manga (TR)
-  romantikmangaSource,
-//S2Manga (EN)
-  s2mangaSource,
-//SamuraiScan (ES)
-  samuraiscanSource,
-//ScamberTraslator (ES)
-  scambertraslatorSource,
-//Scantrad-VF (FR)
-  scantradvfSource,
-//Shadowtrad (FR)
-  shadowtradSource,
-//Shiba Manga (EN)
-  shibamangaSource,
-//Sinensis Scan (PT-BR)
-  sinensisSource,
-//Sweet Time Scan (PT-BR)
-  sweettimescanSource,
-//Tatakae Scan (PT-BR)
-  tatakaescanSource,
-//Taurus Fansub (ES)
-  taurusfansubSource,
-//The Beginning After The End (FR)
-  thebeginningaftertheendSource,
-//Tortuga Ceviri (TR)
-  tortugaceviriSource,
-//Wicked Witch Scan (PT-BR)
-  wickedwitchscanSource,
-//Winter Scan (PT-BR)
-  winterscanSource,
-//Wonderland Scan (PT-BR)
-  wonderlandscanSource,
-//Yuri Verso (PT-BR)
-  yuriversoSource,
-//فالكون مانجا (AR)
-  falconmangaSource,
-//مانجا العاشق (AR)
-  manga3asqSource,
-//Grabber Zone (ALL)
-  grabberzoneSource,
-//Gatemanga (AR)
-  gatemangaSource,
-//GMANGA (unoriginal) (AR)
-  gmangasiteSource,
-//مانجا لينك (AR)
-  mangalinkSource,
-//MangaLionz (AR)
-  mangalionzSource,
-//Manga Rose (AR)
-  mangaroseSource,
-//MangaSpark (AR)
-  mangasparkSource,
-//Manga Starz (AR)
-  mangastarzSource,
-//Manga Time (AR)
-  mangatimeSource,
-//Olaoe (AR)
-  olaoeSource,
-//Rocks Manga (AR)
-  rocksmangaSource,
-//DragonTea (EN)
-  dragonteaSource,
-//Global Bloging (EN)
-  globalblogingSource,
-//Manga347 (EN)
-  manga347Source,
-//MangaEffect (EN)
-  mangaeffectSource,
-//Manga-fast.com (EN)
-  mangafastcomSource,
-//Manga Leveling (EN)
-  mangalevelingSource,
-//NeatManga (EN)
-  neatmangaSource,
-//NvManga (EN)
-  nvmangaSource,
-//PMScans (EN)
-  pmscansSource,
-//ReadManhua (EN)
-  readmanhuaSource,
-//StoneScape (EN)
-  stonescapeSource,
-//TappyToon.Net (EN)
-  tappytoonnetSource,
-//Zinmanga.net (EN)
-  zinmanganetSource,
-//BokugenTranslation (ES)
-  bokugentranslationSource,
-//DapRob (ES)
-  daprobSource,
-//DeManhuas (ES)
-  demanhuasSource,
-//HerenScan (ES)
-  herenscanSource,
-//HouseMangas (ES)
-  housemangasSource,
-//InfraFandub (ES)
-  infrafandubSource,
-//Inmoral No Fansub (ES)
-  inmoralnofansubSource,
-//JeazScans (ES)
-  jeazscansSource,
-//Jobsibe (ES)
-  jobsibeSource,
-//LegnMangas (ES)
-  legendsnofansubSource,
-//Manga Crab (ES)
-  mangacrabSource,
-//MMFenix (ES)
-  mangafenixSource,
-//Mangas No Sekai (ES)
-  mangasnosekaiSource,
-//Manhua Online (ES)
-  manhuaonlineSource,
-//MHScans (ES)
-  mhscansSource,
-//Visormonarca (ES)
-  monarcamangaSource,
-//Noblesse Translations (ES)
-  noblessetranslationsSource,
-//Prince Ediciones (ES)
-  princedicionesSource,
-//SapphireScan (ES)
-  sapphirescanSource,
-//Tres Daos Scan (ES)
-  tresdaosscanSource,
-//Unitoon (ES)
-  unitoonSource,
-//Manga-Scantrad (FR)
-  mangascantradSource,
-//Mangas-Origines.fr (FR)
-  mangasoriginesfrSource,
-//Raijin Scans (FR)
-  raijinscansSource,
-//Reaper Scans (EN)
-  reaperscansSource,
-//Soft Epsilon Scan (FR)
-  softepsilonscanSource,
-//Hwago (ID)
-  hwagoSource,
-//KlikManga (ID)
-  klikmangaSource,
-//Komikuzan (ID)
-  komikuzanSource,
-//MG Komik (ID)
-  mgkomikSource,
-//Siimanga (ID)
-  siimangaSource,
-//Yubikiri (ID)
-  yubikiriSource,
-//MangaHoNa (PL)
-  mangahonaSource,
-//Alone Scanlator (PT-BR)
-  alonescanlatorSource,
-//Boruto Explorer (PT-BR)
-  borutoexplorerSource,
-//Crystal Comics (PT-BR)
-  crystalcomicsSource,
-//Fay Scans (PT-BR)
-  fayscansSource,
-//Galinha Samurai Scan (PT-BR)
-  galinhasamuraiscanSource,
-//Hikari Ga Nai (PT-BR)
-  hikariganaiSource,
-//Sagrado Império da Britannia (PT-BR)
-  imperiodabritanniaSource,
-//Neroxus (PT-BR)
-  imperioscansSource,
-//Leitor de Mangá (PT-BR)
-  leitordemangaSource,
-//L Scans (PT-BR)
-  lscansSource,
-//Lunar Scan (PT-BR)
-  lunarscanSource,
-//MiniTwo Scan (PT-BR)
-  minitwoscanSource,
-//Nexo Scans (PT-BR)
-  nexoscansSource,
-//Ninja Scan (PT-BR)
-  ninjascanSource,
-//One Piece TECA (PT-BR)
-  onepiecetecaSource,
-//Demon Sect (PT-BR)
-  prismascansSource,
-//Sussy Scan (PT-BR)
-  sussyscanSource,
-//Kings-Manga (TH)
-  kingsmangaSource,
-//MangaDeemak (TH)
-  mangadeemakSource,
-//ManhuaBug (TH)
-  manhuabugSource,
-//ManhuaThai (TH)
-  manhuathaiSource,
-//ManhwaBreakup (TH)
-  manhwabreakupSource,
-//Atikrost (TR)
-  atikrostSource,
-//DiamondFansub (TR)
-  diamondfansubSource,
-//ManWe (TR)
-  evascansSource,
-//Garcia Manga (TR)
-  garciamangaSource,
-//GuncelManga (TR)
-  guncelmangaSource,
-//LilyumFansub (TR)
-  lilyumfansubSource,
-//MangaGezgini (TR)
-  mangagezginiSource,
-//Manga Keyfi (TR)
-  mangakeyfiSource,
-//Manga Oku (TR)
-  mangaokuSource,
-//MangaWOW (TR)
-  mangawowSource,
-//Merlin Scans (TR)
-  merlinscansSource,
-//Rüya Manga (TR)
-  ruyamangaSource,
-//Türkçe Manga Oku (TR)
-  turkcemangaokuSource,
-//Webtoon Hatti (TR)
-  webtoonhattiSource,
-]
-    .map((e) => e
-      ..itemType = ItemType.manga
-      ..sourceCodeUrl = madaraSourceCodeUrl
-      ..version = madaraVersion)
-    .toList();
+List<Source> _madaraSourcesList =
+    [
+          //1st Kiss-Manga (unoriginal) (EN)
+          firstkissdashmangaSource,
+          //AQUA Scans (EN)
+          manhwaworldSource,
+          //Akuma no Tenshi (PT-BR)
+          akumanotenshiSource,
+          //Anikiga (TR)
+          anikigaSource,
+          //ArazNovel (TR)
+          araznovelSource,
+          //Arthur Scan (PT-BR)
+          arthurscanSource,
+          //AstralManga (FR)
+          astralmangaSource,
+          //Asura Scans.us (unoriginal) (EN)
+          asurascansusSource,
+          //BarManga (ES)
+          barmangaSource,
+          //BestManga (RU)
+          bestmangaSource,
+          //Chibi Manga (EN)
+          chibimangaSource,
+          //Clover Manga (TR)
+          clovermangaSource,
+          //Coco Rip (ES)
+          cocoripSource,
+          //Coffee Manga (EN)
+          coffeemangaSource,
+          //Doodmanga (TH)
+          doodmangaSource,
+          //Elite Manga (EN)
+          elitemangaSource,
+          //Emperor Scan (ES)
+          emperorscanSource,
+          //EvaScans (TR)
+          evascansSource,
+          //FR-Scan (FR)
+          frscanSource,
+          //FactManga (EN)
+          factmangaSource,
+          //FreeMangaTop (EN)
+          freemangatopSource,
+          //Glory Manga (TR)
+          glorymangaSource,
+          //Harimanga (EN)
+          harimangaSource,
+          //Immortal Updates (EN)
+          immortalupdatesSource,
+          //Império Scans (PT-BR)
+          imperioscansSource,
+          //Inmortal Scan (ES)
+          inmortalscanSource,
+          //IsekaiScanManga (unoriginal) (EN)
+          isekaiscanmangaSource,
+          //Jimanga (EN)
+          jimangaSource,
+          //KSGroupScans (EN)
+          ksgroupscansSource,
+          //Kakusei Project (PT-BR)
+          kakuseiprojectSource,
+          //Kami Sama Explorer (PT-BR)
+          kamisamaexplorerSource,
+          //Komik Chan (EN)
+          komikchanSource,
+          //LHTranslation (EN)
+          lhtranslationSource,
+          //Lady Estelar Scan (PT-BR)
+          ladyestelarscanSource,
+          //Leviatan Scans (EN)
+          leviatanscansSource,
+          //Luffy Manga (EN)
+          luffymangaSource,
+          //Maid Scan (PT-BR)
+          maidscanSource,
+          //Manga Diyari (TR)
+          mangadiyariSource,
+          //Manga Fenix (ES)
+          mangafenixSource,
+          //Manga Galaxy (EN)
+          mangagalaxySource,
+          //Manga Read (EN)
+          mangareadSource,
+          //Manga Tx.gg (unoriginal) (EN)
+          mangatxggSource,
+          //Manga Weebs (EN)
+          mangaweebsSource,
+          //Manga Şehri (TR)
+          mangasehriSource,
+          //Manga-TX (EN)
+          mangatxunoriginalSource,
+          //MangaClash (EN)
+          mangaclashSource,
+          //MangaFreak.online (EN)
+          mangafreakonlineSource,
+          //MangaGreat (EN)
+          mangagreatSource,
+          //MangaKomi (EN)
+          mangakomiSource,
+          //MangaRead.org (EN)
+          mangareadorgSource,
+          //MangaRolls (EN)
+          mangarollsSource,
+          //MangaTyrant (EN)
+          mangatyrantSource,
+          //MangaUS (EN)
+          mangausSource,
+          //Mangasushi (EN)
+          mangasushiSource,
+          //Mangá Nanquim (PT-BR)
+          mangananquimSource,
+          //Manhua ES (EN)
+          manhuaesSource,
+          //ManhuaUS (EN)
+          manhuausSource,
+          //ManhuaZone (EN)
+          manhuazoneSource,
+          //ManhwaClan (EN)
+          manhwaclanSource,
+          //Manhwafull (EN)
+          manhwafullSource,
+          //Mantraz Scan (ES)
+          mantrazscanSource,
+          //Momo no Hana Scan (PT-BR)
+          momonohanascanSource,
+          //MonarcaManga (ES)
+          monarcamangaSource,
+          //Moon Witch In Love (PT-BR)
+          moonwitchinloveSource,
+          //NekoPost.co (unoriginal) (TH)
+          nekopostcoSource,
+          //Niji Translations (AR)
+          nijitranslationsSource,
+          //Pantheon Scan (FR)
+          pantheonscanSource,
+          //Pojok Manga (ID)
+          pojokmangaSource,
+          //Projeto Scanlator (PT-BR)
+          projetoscanlatorSource,
+          //ROG Mangás (PT-BR)
+          mangasoverallSource,
+          //Ragnarok Scanlation (ES)
+          ragnarokscanlationSource,
+          //Rainbow Fairy Scan (PT-BR)
+          rainbowfairyscanSource,
+          //Random Scan (PT-BR)
+          randomscanSource,
+          //ReaderGen (FR)
+          readergenSource,
+          //RichtoScan (ES)
+          richtoscanSource,
+          //Rightdark Scan (ES)
+          rightdarkscanSource,
+          //Rio2 Manga (EN)
+          rio2mangaSource,
+          //Romantik Manga (TR)
+          romantikmangaSource,
+          //S2Manga (EN)
+          s2mangaSource,
+          //SamuraiScan (ES)
+          samuraiscanSource,
+          //ScamberTraslator (ES)
+          scambertraslatorSource,
+          //Scantrad-VF (FR)
+          scantradvfSource,
+          //Shadowtrad (FR)
+          shadowtradSource,
+          //Shiba Manga (EN)
+          shibamangaSource,
+          //Sinensis Scan (PT-BR)
+          sinensisSource,
+          //Sweet Time Scan (PT-BR)
+          sweettimescanSource,
+          //Tatakae Scan (PT-BR)
+          tatakaescanSource,
+          //Taurus Fansub (ES)
+          taurusfansubSource,
+          //The Beginning After The End (FR)
+          thebeginningaftertheendSource,
+          //Tortuga Ceviri (TR)
+          tortugaceviriSource,
+          //Wicked Witch Scan (PT-BR)
+          wickedwitchscanSource,
+          //Winter Scan (PT-BR)
+          winterscanSource,
+          //Wonderland Scan (PT-BR)
+          wonderlandscanSource,
+          //Yuri Verso (PT-BR)
+          yuriversoSource,
+          //فالكون مانجا (AR)
+          falconmangaSource,
+          //مانجا العاشق (AR)
+          manga3asqSource,
+          //Grabber Zone (ALL)
+          grabberzoneSource,
+          //Gatemanga (AR)
+          gatemangaSource,
+          //GMANGA (unoriginal) (AR)
+          gmangasiteSource,
+          //مانجا لينك (AR)
+          mangalinkSource,
+          //MangaLionz (AR)
+          mangalionzSource,
+          //Manga Rose (AR)
+          mangaroseSource,
+          //MangaSpark (AR)
+          mangasparkSource,
+          //Manga Starz (AR)
+          mangastarzSource,
+          //Manga Time (AR)
+          mangatimeSource,
+          //Olaoe (AR)
+          olaoeSource,
+          //Rocks Manga (AR)
+          rocksmangaSource,
+          //DragonTea (EN)
+          dragonteaSource,
+          //Global Bloging (EN)
+          globalblogingSource,
+          //Manga347 (EN)
+          manga347Source,
+          //MangaEffect (EN)
+          mangaeffectSource,
+          //Manga-fast.com (EN)
+          mangafastcomSource,
+          //Manga Leveling (EN)
+          mangalevelingSource,
+          //NeatManga (EN)
+          neatmangaSource,
+          //NvManga (EN)
+          nvmangaSource,
+          //PMScans (EN)
+          pmscansSource,
+          //ReadManhua (EN)
+          readmanhuaSource,
+          //StoneScape (EN)
+          stonescapeSource,
+          //TappyToon.Net (EN)
+          tappytoonnetSource,
+          //Zinmanga.net (EN)
+          zinmanganetSource,
+          //BokugenTranslation (ES)
+          bokugentranslationSource,
+          //DapRob (ES)
+          daprobSource,
+          //DeManhuas (ES)
+          demanhuasSource,
+          //HerenScan (ES)
+          herenscanSource,
+          //HouseMangas (ES)
+          housemangasSource,
+          //InfraFandub (ES)
+          infrafandubSource,
+          //Inmoral No Fansub (ES)
+          inmoralnofansubSource,
+          //JeazScans (ES)
+          jeazscansSource,
+          //Jobsibe (ES)
+          jobsibeSource,
+          //LegnMangas (ES)
+          legendsnofansubSource,
+          //Manga Crab (ES)
+          mangacrabSource,
+          //MMFenix (ES)
+          mangafenixSource,
+          //Mangas No Sekai (ES)
+          mangasnosekaiSource,
+          //Manhua Online (ES)
+          manhuaonlineSource,
+          //MHScans (ES)
+          mhscansSource,
+          //Visormonarca (ES)
+          monarcamangaSource,
+          //Noblesse Translations (ES)
+          noblessetranslationsSource,
+          //Prince Ediciones (ES)
+          princedicionesSource,
+          //SapphireScan (ES)
+          sapphirescanSource,
+          //Tres Daos Scan (ES)
+          tresdaosscanSource,
+          //Unitoon (ES)
+          unitoonSource,
+          //Manga-Scantrad (FR)
+          mangascantradSource,
+          //Mangas-Origines.fr (FR)
+          mangasoriginesfrSource,
+          //Raijin Scans (FR)
+          raijinscansSource,
+          //Reaper Scans (EN)
+          reaperscansSource,
+          //Soft Epsilon Scan (FR)
+          softepsilonscanSource,
+          //Hwago (ID)
+          hwagoSource,
+          //KlikManga (ID)
+          klikmangaSource,
+          //Komikuzan (ID)
+          komikuzanSource,
+          //MG Komik (ID)
+          mgkomikSource,
+          //Siimanga (ID)
+          siimangaSource,
+          //Yubikiri (ID)
+          yubikiriSource,
+          //MangaHoNa (PL)
+          mangahonaSource,
+          //Alone Scanlator (PT-BR)
+          alonescanlatorSource,
+          //Boruto Explorer (PT-BR)
+          borutoexplorerSource,
+          //Crystal Comics (PT-BR)
+          crystalcomicsSource,
+          //Fay Scans (PT-BR)
+          fayscansSource,
+          //Galinha Samurai Scan (PT-BR)
+          galinhasamuraiscanSource,
+          //Hikari Ga Nai (PT-BR)
+          hikariganaiSource,
+          //Sagrado Império da Britannia (PT-BR)
+          imperiodabritanniaSource,
+          //Neroxus (PT-BR)
+          imperioscansSource,
+          //Leitor de Mangá (PT-BR)
+          leitordemangaSource,
+          //L Scans (PT-BR)
+          lscansSource,
+          //Lunar Scan (PT-BR)
+          lunarscanSource,
+          //MiniTwo Scan (PT-BR)
+          minitwoscanSource,
+          //Nexo Scans (PT-BR)
+          nexoscansSource,
+          //Ninja Scan (PT-BR)
+          ninjascanSource,
+          //One Piece TECA (PT-BR)
+          onepiecetecaSource,
+          //Demon Sect (PT-BR)
+          prismascansSource,
+          //Sussy Scan (PT-BR)
+          sussyscanSource,
+          //Kings-Manga (TH)
+          kingsmangaSource,
+          //MangaDeemak (TH)
+          mangadeemakSource,
+          //ManhuaBug (TH)
+          manhuabugSource,
+          //ManhuaThai (TH)
+          manhuathaiSource,
+          //ManhwaBreakup (TH)
+          manhwabreakupSource,
+          //Atikrost (TR)
+          atikrostSource,
+          //DiamondFansub (TR)
+          diamondfansubSource,
+          //ManWe (TR)
+          evascansSource,
+          //Garcia Manga (TR)
+          garciamangaSource,
+          //GuncelManga (TR)
+          guncelmangaSource,
+          //LilyumFansub (TR)
+          lilyumfansubSource,
+          //MangaGezgini (TR)
+          mangagezginiSource,
+          //Manga Keyfi (TR)
+          mangakeyfiSource,
+          //Manga Oku (TR)
+          mangaokuSource,
+          //MangaWOW (TR)
+          mangawowSource,
+          //Merlin Scans (TR)
+          merlinscansSource,
+          //Rüya Manga (TR)
+          ruyamangaSource,
+          //Türkçe Manga Oku (TR)
+          turkcemangaokuSource,
+          //Webtoon Hatti (TR)
+          webtoonhattiSource,
+        ]
+        .map(
+          (e) =>
+              e
+                ..itemType = ItemType.manga
+                ..sourceCodeUrl = madaraSourceCodeUrl
+                ..version = madaraVersion,
+        )
+        .toList();

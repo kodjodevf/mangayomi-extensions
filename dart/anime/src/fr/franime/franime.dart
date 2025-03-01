@@ -46,8 +46,9 @@ class FrAnime extends MProvider {
     var seasonsJson = seasons.first;
 
     if (url.contains("s=")) {
-      int seasonNumber =
-          int.parse(substringBefore(substringAfter(url, "s="), "&"));
+      int seasonNumber = int.parse(
+        substringBefore(substringAfter(url, "s="), "&"),
+      );
       seasonsJson = seasons[seasonNumber - 1];
     }
 
@@ -103,8 +104,9 @@ class FrAnime extends MProvider {
     videoBaseUrl += "/$animeId/";
 
     if (url.contains("s=")) {
-      int seasonNumber =
-          int.parse(substringBefore(substringAfter(url, "s="), "&"));
+      int seasonNumber = int.parse(
+        substringBefore(substringAfter(url, "s="), "&"),
+      );
       videoBaseUrl += "${seasonNumber - 1}/";
       seasonsJson = seasons[seasonNumber - 1];
     } else {
@@ -141,17 +143,21 @@ class FrAnime extends MProvider {
 
       MVideo video = MVideo();
 
-      final playerUrl = (await client.get(Uri.parse(apiUrl),
-              headers: {"Referer": "https://franime.fr/"}))
-          .body;
+      final playerUrl =
+          (await client.get(
+            Uri.parse(apiUrl),
+            headers: {"Referer": "https://franime.fr/"},
+          )).body;
 
       List<MVideo> a = [];
       print(playerName);
       if (playerName.contains("vido")) {
-        videos.add(video
-          ..url = playerUrl
-          ..originalUrl = playerUrl
-          ..quality = "FRAnime (Vido)");
+        videos.add(
+          video
+            ..url = playerUrl
+            ..originalUrl = playerUrl
+            ..quality = "FRAnime (Vido)",
+        );
       } else if (playerName.contains("sendvid")) {
         a = await sendVidExtractorr(playerUrl, "");
       } else if (playerName.contains("sibnet")) {
@@ -165,7 +171,7 @@ class FrAnime extends MProvider {
 
   MPages animeResList(String res) {
     final statusList = [
-      {"EN COURS": 0, "TERMINÉ": 1}
+      {"EN COURS": 0, "TERMINÉ": 1},
     ];
     List<MManga> animeList = [];
 
@@ -233,7 +239,7 @@ class FrAnime extends MProvider {
 
   MPages animeSeachFetch(String res, String query) {
     final statusList = [
-      {"EN COURS": 0, "TERMINÉ": 1}
+      {"EN COURS": 0, "TERMINÉ": 1},
     ];
     List<MManga> animeList = [];
     final jsonResList = json.decode(res);
@@ -241,20 +247,23 @@ class FrAnime extends MProvider {
       MManga anime = MManga();
 
       final titleO = getMapValue(json.encode(animeJson), "titleO");
-      final titleAlt =
-          getMapValue(json.encode(animeJson), "titles", encode: true);
-      final containsEn = getMapValue(titleAlt, "en")
-          .toString()
-          .toLowerCase()
-          .contains(query.toLowerCase());
-      final containsEnJp = getMapValue(titleAlt, "en_jp")
-          .toString()
-          .toLowerCase()
-          .contains(query.toLowerCase());
-      final containsJaJp = getMapValue(titleAlt, "ja_jp")
-          .toString()
-          .toLowerCase()
-          .contains(query.toLowerCase());
+      final titleAlt = getMapValue(
+        json.encode(animeJson),
+        "titles",
+        encode: true,
+      );
+      final containsEn = getMapValue(
+        titleAlt,
+        "en",
+      ).toString().toLowerCase().contains(query.toLowerCase());
+      final containsEnJp = getMapValue(
+        titleAlt,
+        "en_jp",
+      ).toString().toLowerCase().contains(query.toLowerCase());
+      final containsJaJp = getMapValue(
+        titleAlt,
+        "ja_jp",
+      ).toString().toLowerCase().contains(query.toLowerCase());
       final containsTitleO = titleO.toLowerCase().contains(query.toLowerCase());
 
       if (containsEn || containsEnJp || containsJaJp || containsTitleO) {
@@ -319,16 +328,19 @@ class FrAnime extends MProvider {
   }
 
   Future<String> dataBase() async {
-    return (await client.get(Uri.parse("https://api.franime.fr/api/animes/"),
-            headers: {"Referer": "https://franime.fr/"}))
-        .body;
+    return (await client.get(
+      Uri.parse("https://api.franime.fr/api/animes/"),
+      headers: {"Referer": "https://franime.fr/"},
+    )).body;
   }
 
   String databaseAnimeByTitleO(String res, String titleO) {
     final datas = json.decode(res) as List<Map<String, dynamic>>;
     for (var data in datas) {
-      String title =
-          (data["titleO"] as String).replaceAll(RegExp("[^A-Za-z0-9 ]"), "");
+      String title = (data["titleO"] as String).replaceAll(
+        RegExp("[^A-Za-z0-9 ]"),
+        "",
+      );
       if (title.replaceAll(" ", "-").toLowerCase() == "${titleO}") {
         return json.encode(data);
       }
@@ -351,8 +363,10 @@ class FrAnime extends MProvider {
     if (masterUrl.contains(".m3u8")) {
       final masterPlaylistRes = (await client.get(Uri.parse(masterUrl))).body;
 
-      for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
-          .split("#EXT-X-STREAM-INF:")) {
+      for (var it in substringAfter(
+        masterPlaylistRes,
+        "#EXT-X-STREAM-INF:",
+      ).split("#EXT-X-STREAM-INF:")) {
         final quality =
             "${substringBefore(substringBefore(substringAfter(substringAfter(it, "RESOLUTION="), "x"), ","), "\n")}p";
 

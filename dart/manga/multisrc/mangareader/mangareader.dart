@@ -16,17 +16,23 @@ class MangaReader extends MProvider {
 
   @override
   Future<MPages> getPopular(int page) async {
-    final res = (await client.get(Uri.parse(
-            "$baseUrl${getMangaUrlDirectory(source.name)}/?page=$page&order=popular")))
-        .body;
+    final res =
+        (await client.get(
+          Uri.parse(
+            "$baseUrl${getMangaUrlDirectory(source.name)}/?page=$page&order=popular",
+          ),
+        )).body;
     return mangaRes(res);
   }
 
   @override
   Future<MPages> getLatestUpdates(int page) async {
-    final res = (await client.get(Uri.parse(
-            "$baseUrl${getMangaUrlDirectory(source.name)}/?page=$page&order=update")))
-        .body;
+    final res =
+        (await client.get(
+          Uri.parse(
+            "$baseUrl${getMangaUrlDirectory(source.name)}/?page=$page&order=update",
+          ),
+        )).body;
     return mangaRes(res);
   }
 
@@ -51,12 +57,14 @@ class MangaReader extends MProvider {
         final order = filter.values[filter.state].value;
         url += "${ll(url)}order=$order";
       } else if (filter.type == "GenreListFilter") {
-        final included = (filter.state as List)
-            .where((e) => e.state == 1 ? true : false)
-            .toList();
-        final excluded = (filter.state as List)
-            .where((e) => e.state == 2 ? true : false)
-            .toList();
+        final included =
+            (filter.state as List)
+                .where((e) => e.state == 1 ? true : false)
+                .toList();
+        final excluded =
+            (filter.state as List)
+                .where((e) => e.state == 2 ? true : false)
+                .toList();
         if (included.isNotEmpty) {
           url += "${ll(url)}genres[]=";
           for (var val in included) {
@@ -154,8 +162,8 @@ class MangaReader extends MProvider {
         "cancelados": 3,
         "dropped": 3,
         "discontinued": 3,
-        "abandonné": 3
-      }
+        "abandonné": 3,
+      },
     ];
 
     url = getUrlWithoutDomain(url);
@@ -164,44 +172,56 @@ class MangaReader extends MProvider {
     final res = (await client.get(Uri.parse("$baseUrl$url"))).body;
     final document = parseHtml(res);
     final seriesDetails = document.selectFirst(
-        "div.bigcontent, div.animefull, div.main-info, div.postbody");
-    manga.author = seriesDetails
-        .selectFirst(".infotable tr:contains(Author) td:last-child, .tsinfo .imptdt:contains(Author) i, .fmed b:contains(Author)+span, span:contains(Author), " +
-            ".infotable tr:contains(Auteur) td:last-child, .tsinfo .imptdt:contains(Auteur) i, .fmed b:contains(Auteur)+span, span:contains(Auteur), " +
-            ".infotable tr:contains(autor) td:last-child, .tsinfo .imptdt:contains(autor) i, .fmed b:contains(autor)+span, span:contains(autor), " +
-            ".infotable tr:contains(المؤلف) td:last-child, .tsinfo .imptdt:contains(المؤلف) i, .fmed b:contains(المؤلف)+span, span:contains(المؤلف), " +
-            ".infotable tr:contains(Mangaka) td:last-child, .tsinfo .imptdt:contains(Mangaka) i, .fmed b:contains(Mangaka)+span, span:contains(Mangaka), " +
-            ".infotable tr:contains(seniman) td:last-child, .tsinfo .imptdt:contains(seniman) i, .fmed b:contains(seniman)+span, span:contains(seniman), " +
-            ".infotable tr:contains(Pengarang) td:last-child, .tsinfo .imptdt:contains(Pengarang) i, .fmed b:contains(Pengarang)+span, span:contains(Pengarang), " +
-            ".infotable tr:contains(Yazar) td:last-child, .tsinfo .imptdt:contains(Yazar) i, .fmed b:contains(Yazar)+span, span:contains(Yazar), " +
-            ".infotable tr:contains(ผู้วาด) td:last-child, .tsinfo .imptdt:contains(ผู้วาด) i, .fmed b:contains(ผู้วาด)+span, span:contains(ผู้วาด), ")
-        .text;
+      "div.bigcontent, div.animefull, div.main-info, div.postbody",
+    );
+    manga.author =
+        seriesDetails
+            .selectFirst(
+              ".infotable tr:contains(Author) td:last-child, .tsinfo .imptdt:contains(Author) i, .fmed b:contains(Author)+span, span:contains(Author), " +
+                  ".infotable tr:contains(Auteur) td:last-child, .tsinfo .imptdt:contains(Auteur) i, .fmed b:contains(Auteur)+span, span:contains(Auteur), " +
+                  ".infotable tr:contains(autor) td:last-child, .tsinfo .imptdt:contains(autor) i, .fmed b:contains(autor)+span, span:contains(autor), " +
+                  ".infotable tr:contains(المؤلف) td:last-child, .tsinfo .imptdt:contains(المؤلف) i, .fmed b:contains(المؤلف)+span, span:contains(المؤلف), " +
+                  ".infotable tr:contains(Mangaka) td:last-child, .tsinfo .imptdt:contains(Mangaka) i, .fmed b:contains(Mangaka)+span, span:contains(Mangaka), " +
+                  ".infotable tr:contains(seniman) td:last-child, .tsinfo .imptdt:contains(seniman) i, .fmed b:contains(seniman)+span, span:contains(seniman), " +
+                  ".infotable tr:contains(Pengarang) td:last-child, .tsinfo .imptdt:contains(Pengarang) i, .fmed b:contains(Pengarang)+span, span:contains(Pengarang), " +
+                  ".infotable tr:contains(Yazar) td:last-child, .tsinfo .imptdt:contains(Yazar) i, .fmed b:contains(Yazar)+span, span:contains(Yazar), " +
+                  ".infotable tr:contains(ผู้วาด) td:last-child, .tsinfo .imptdt:contains(ผู้วาด) i, .fmed b:contains(ผู้วาด)+span, span:contains(ผู้วาด), ",
+            )
+            .text;
 
-    manga.description = seriesDetails
-        .selectFirst(".desc, .entry-content[itemprop=description]")
-        ?.text;
-    final status = seriesDetails
-            .selectFirst(".infotable tr:contains(status) td:last-child, .tsinfo .imptdt:contains(status) i, .fmed b:contains(status)+span span:contains(status), " +
-                ".infotable tr:contains(Statut) td:last-child, .tsinfo .imptdt:contains(Statut) i, .fmed b:contains(Statut)+span span:contains(Statut), " +
-                ".infotable tr:contains(Durum) td:last-child, .tsinfo .imptdt:contains(Durum) i, .fmed b:contains(Durum)+span span:contains(Durum), " +
-                ".infotable tr:contains(連載状況) td:last-child, .tsinfo .imptdt:contains(連載状況) i, .fmed b:contains(連載状況)+span span:contains(連載状況), " +
-                ".infotable tr:contains(Estado) td:last-child, .tsinfo .imptdt:contains(Estado) i, .fmed b:contains(Estado)+span span:contains(Estado), " +
-                ".infotable tr:contains(الحالة) td:last-child, .tsinfo .imptdt:contains(الحالة) i, .fmed b:contains(الحالة)+span span:contains(الحالة), " +
-                ".infotable tr:contains(حالة العمل) td:last-child, .tsinfo .imptdt:contains(حالة العمل) i, .fmed b:contains(حالة العمل)+span span:contains(حالة العمل), " +
-                ".infotable tr:contains(สถานะ) td:last-child, .tsinfo .imptdt:contains(สถานะ) i, .fmed b:contains(สถานะ)+span span:contains(สถานะ), " +
-                ".infotable tr:contains(stato) td:last-child, .tsinfo .imptdt:contains(stato) i, .fmed b:contains(stato)+span span:contains(stato), " +
-                ".infotable tr:contains(Statüsü) td:last-child, .tsinfo .imptdt:contains(Statüsü) i, .fmed b:contains(Statüsü)+span span:contains(Statüsü), " +
-                ".infotable tr:contains(สถานะ) td:last-child, .tsinfo .imptdt:contains(สถานะ) i, .fmed b:contains(สถานะ)+span span:contains(สถานะ)")
+    manga.description =
+        seriesDetails
+            .selectFirst(".desc, .entry-content[itemprop=description]")
+            ?.text;
+    final status =
+        seriesDetails
+            .selectFirst(
+              ".infotable tr:contains(status) td:last-child, .tsinfo .imptdt:contains(status) i, .fmed b:contains(status)+span span:contains(status), " +
+                  ".infotable tr:contains(Statut) td:last-child, .tsinfo .imptdt:contains(Statut) i, .fmed b:contains(Statut)+span span:contains(Statut), " +
+                  ".infotable tr:contains(Durum) td:last-child, .tsinfo .imptdt:contains(Durum) i, .fmed b:contains(Durum)+span span:contains(Durum), " +
+                  ".infotable tr:contains(連載状況) td:last-child, .tsinfo .imptdt:contains(連載状況) i, .fmed b:contains(連載状況)+span span:contains(連載状況), " +
+                  ".infotable tr:contains(Estado) td:last-child, .tsinfo .imptdt:contains(Estado) i, .fmed b:contains(Estado)+span span:contains(Estado), " +
+                  ".infotable tr:contains(الحالة) td:last-child, .tsinfo .imptdt:contains(الحالة) i, .fmed b:contains(الحالة)+span span:contains(الحالة), " +
+                  ".infotable tr:contains(حالة العمل) td:last-child, .tsinfo .imptdt:contains(حالة العمل) i, .fmed b:contains(حالة العمل)+span span:contains(حالة العمل), " +
+                  ".infotable tr:contains(สถานะ) td:last-child, .tsinfo .imptdt:contains(สถานะ) i, .fmed b:contains(สถานะ)+span span:contains(สถานะ), " +
+                  ".infotable tr:contains(stato) td:last-child, .tsinfo .imptdt:contains(stato) i, .fmed b:contains(stato)+span span:contains(stato), " +
+                  ".infotable tr:contains(Statüsü) td:last-child, .tsinfo .imptdt:contains(Statüsü) i, .fmed b:contains(Statüsü)+span span:contains(Statüsü), " +
+                  ".infotable tr:contains(สถานะ) td:last-child, .tsinfo .imptdt:contains(สถานะ) i, .fmed b:contains(สถานะ)+span span:contains(สถานะ)",
+            )
             ?.text ??
         "";
     manga.status = parseStatus(status, statusList);
-    manga.genre = seriesDetails
-        .select("div.gnr a, .mgen a, .seriestugenre a, " +
-            "span:contains(genre) , span:contains(التصنيف)")
-        .map((e) => e.text)
-        .toList();
+    manga.genre =
+        seriesDetails
+            .select(
+              "div.gnr a, .mgen a, .seriestugenre a, " +
+                  "span:contains(genre) , span:contains(التصنيف)",
+            )
+            .map((e) => e.text)
+            .toList();
     final elements = document.select(
-        "div.bxcl li, div.cl li, #chapterlist li, ul li:has(div.chbox):has(div.eph-num)");
+      "div.bxcl li, div.cl li, #chapterlist li, ul li:has(div.chbox):has(div.eph-num)",
+    );
     List<MChapter>? chaptersList = [];
     for (var element in elements) {
       final urlElements = element.selectFirst("a");
@@ -210,10 +230,15 @@ class MangaReader extends MProvider {
       var chapter = MChapter();
       chapter.name = name;
       chapter.url = urlElements.attr("href");
-      chapter.dateUpload = parseDates([
-        element.selectFirst(".chapterdate")?.text ??
-            DateTime.now().millisecondsSinceEpoch.toString()
-      ], source.dateFormat, source.dateFormatLocale)[0];
+      chapter.dateUpload =
+          parseDates(
+            [
+              element.selectFirst(".chapterdate")?.text ??
+                  DateTime.now().millisecondsSinceEpoch.toString(),
+            ],
+            source.dateFormat,
+            source.dateFormatLocale,
+          )[0];
       chaptersList.add(chapter);
     }
     manga.chapters = chaptersList;
@@ -258,8 +283,9 @@ class MangaReader extends MProvider {
   MPages mangaRes(String res) {
     List<MManga> mangaList = [];
     final document = parseHtml(res);
-    final elements =
-        document.select(".utao .uta .imgu, .listupd .bs .bsx, .listo .bs .bsx");
+    final elements = document.select(
+      ".utao .uta .imgu, .listupd .bs .bsx, .listo .bs .bsx",
+    );
     for (var element in elements) {
       String img = element.getSrc;
       if (img.contains("data:image")) {
@@ -280,49 +306,50 @@ class MangaReader extends MProvider {
     return ignoreFilter()
         ? []
         : [
-            SeparatorFilter(),
-            TextFilter("AuthorFilter", "Author"),
-            TextFilter("YearFilter", "Year"),
-            SelectFilter("StatusFilter", "Status", 0, [
-              SelectFilterOption("All", ""),
-              SelectFilterOption("Ongoing", "ongoing"),
-              SelectFilterOption("Completed", "completed"),
-              SelectFilterOption("Hiatus", "hiatus"),
-              SelectFilterOption("Dropped", "dropped"),
-            ]),
-            SelectFilter("TypeFilter", "Type", 0, [
-              SelectFilterOption("All", ""),
-              SelectFilterOption("Manga", "Manga"),
-              SelectFilterOption("Manhwa", "Manhwa"),
-              SelectFilterOption("Manhua", "Manhua"),
-              SelectFilterOption("Comic", "Comic"),
-            ]),
-            SelectFilter("OrderByFilter", "Sort By", 0, [
-              SelectFilterOption("Default", ""),
-              SelectFilterOption("A-Z", "title"),
-              SelectFilterOption("Z-A", "titlereverse"),
-              SelectFilterOption("Latest Update", "update"),
-              SelectFilterOption("Latest Added", "latest"),
-              SelectFilterOption("Popular", "popular"),
-            ]),
-            HeaderFilter("Genre exclusion is not available for all sources"),
-            GroupFilter("GenreListFilter", "Genre", [
-              TriStateFilter("Press reset to attempt to fetch genres", ""),
-            ]),
-          ];
+          SeparatorFilter(),
+          TextFilter("AuthorFilter", "Author"),
+          TextFilter("YearFilter", "Year"),
+          SelectFilter("StatusFilter", "Status", 0, [
+            SelectFilterOption("All", ""),
+            SelectFilterOption("Ongoing", "ongoing"),
+            SelectFilterOption("Completed", "completed"),
+            SelectFilterOption("Hiatus", "hiatus"),
+            SelectFilterOption("Dropped", "dropped"),
+          ]),
+          SelectFilter("TypeFilter", "Type", 0, [
+            SelectFilterOption("All", ""),
+            SelectFilterOption("Manga", "Manga"),
+            SelectFilterOption("Manhwa", "Manhwa"),
+            SelectFilterOption("Manhua", "Manhua"),
+            SelectFilterOption("Comic", "Comic"),
+          ]),
+          SelectFilter("OrderByFilter", "Sort By", 0, [
+            SelectFilterOption("Default", ""),
+            SelectFilterOption("A-Z", "title"),
+            SelectFilterOption("Z-A", "titlereverse"),
+            SelectFilterOption("Latest Update", "update"),
+            SelectFilterOption("Latest Added", "latest"),
+            SelectFilterOption("Popular", "popular"),
+          ]),
+          HeaderFilter("Genre exclusion is not available for all sources"),
+          GroupFilter("GenreListFilter", "Genre", [
+            TriStateFilter("Press reset to attempt to fetch genres", ""),
+          ]),
+        ];
   }
 
   @override
   List<dynamic> getSourcePreferences() {
     return [
       EditTextPreference(
-          key: "override_baseurl",
-          title: "Override BaseUrl",
-          summary: "",
-          value: source.baseUrl,
-          dialogTitle: "Override BaseUrl",
-          dialogMessage: "Default: ${source.baseUrl}",
-          text: source.baseUrl),
+        key: "override_baseurl",
+        title: "Override BaseUrl",
+        summary: "",
+        value: source.baseUrl,
+        dialogTitle: "Override BaseUrl",
+        dialogMessage: "Default: ${source.baseUrl}",
+        text: source.baseUrl,
+      ),
     ];
   }
 

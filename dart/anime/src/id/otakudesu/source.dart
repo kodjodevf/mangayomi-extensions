@@ -5,12 +5,13 @@ const _otakudesuVersion = "0.0.56";
 const _otakudesuCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/src/id/otakudesu/otakudesu.dart";
 Source _otakudesu = Source(
-    name: "OtakuDesu",
-    baseUrl: "https://otakudesu.cloud",
-    lang: "id",
-    typeSource: "single",
-    iconUrl:
-        "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/src/id/otakudesu/icon.png",
-    sourceCodeUrl: _otakudesuCodeUrl,
-    version: _otakudesuVersion,
-    itemType: ItemType.anime);
+  name: "OtakuDesu",
+  baseUrl: "https://otakudesu.cloud",
+  lang: "id",
+  typeSource: "single",
+  iconUrl:
+      "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/src/id/otakudesu/icon.png",
+  sourceCodeUrl: _otakudesuCodeUrl,
+  version: _otakudesuVersion,
+  itemType: ItemType.anime,
+);

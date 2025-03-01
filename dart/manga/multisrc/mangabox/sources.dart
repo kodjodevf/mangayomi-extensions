@@ -9,18 +9,22 @@ const mangaboxSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/manga/multisrc/mangabox/mangabox.dart";
 
 List<Source> get mangaboxSourcesList => _mangaboxSourcesList;
-List<Source> _mangaboxSourcesList = [
-  //Mangabat (EN)
-  mangabatSource,
-  //Mangairo (EN)
-  mangairoSource,
-  //Mangakakalot (EN)
-  mangakakalotSource,
-  //Manganato (EN)
-  manganatoSource
-]
-    .map((e) => e
-      ..itemType = ItemType.manga
-      ..sourceCodeUrl = mangaboxSourceCodeUrl
-      ..version = mangaboxVersion)
-    .toList();
+List<Source> _mangaboxSourcesList =
+    [
+          //Mangabat (EN)
+          mangabatSource,
+          //Mangairo (EN)
+          mangairoSource,
+          //Mangakakalot (EN)
+          mangakakalotSource,
+          //Manganato (EN)
+          manganatoSource,
+        ]
+        .map(
+          (e) =>
+              e
+                ..itemType = ItemType.manga
+                ..sourceCodeUrl = mangaboxSourceCodeUrl
+                ..version = mangaboxVersion,
+        )
+        .toList();
