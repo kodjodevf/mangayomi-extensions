@@ -10,18 +10,25 @@ class MangaHere extends MProvider {
 
   @override
   Future<MPages> getPopular(int page) async {
-    final res = (await client.get(
-            Uri.parse("${source.baseUrl}/directory/$page.htm"),
-            headers: getHeader(source.baseUrl)))
-        .body;
+    final res =
+        (await client.get(
+          Uri.parse("${source.baseUrl}/directory/$page.htm"),
+          headers: getHeader(source.baseUrl),
+        )).body;
 
     List<MManga> mangaList = [];
-    final names =
-        xpath(res, '//*[ contains(@class, "manga-list-1-list")]/li/a/@title');
-    final images = xpath(res,
-        '//*[ contains(@class, "manga-list-1-list")]/li/a/img[@class="manga-list-1-cover"]/@src');
-    final urls =
-        xpath(res, '//*[ contains(@class, "manga-list-1-list")]/li/a/@href');
+    final names = xpath(
+      res,
+      '//*[ contains(@class, "manga-list-1-list")]/li/a/@title',
+    );
+    final images = xpath(
+      res,
+      '//*[ contains(@class, "manga-list-1-list")]/li/a/img[@class="manga-list-1-cover"]/@src',
+    );
+    final urls = xpath(
+      res,
+      '//*[ contains(@class, "manga-list-1-list")]/li/a/@href',
+    );
 
     for (var i = 0; i < names.length; i++) {
       MManga manga = MManga();
@@ -36,18 +43,25 @@ class MangaHere extends MProvider {
 
   @override
   Future<MPages> getLatestUpdates(int page) async {
-    final res = (await client.get(
-            Uri.parse("${source.baseUrl}/directory/$page.htm?latest"),
-            headers: getHeader(source.baseUrl)))
-        .body;
+    final res =
+        (await client.get(
+          Uri.parse("${source.baseUrl}/directory/$page.htm?latest"),
+          headers: getHeader(source.baseUrl),
+        )).body;
 
     List<MManga> mangaList = [];
-    final names =
-        xpath(res, '//*[ contains(@class, "manga-list-1-list")]/li/a/@title');
-    final images = xpath(res,
-        '//*[ contains(@class, "manga-list-1-list")]/li/a/img[@class="manga-list-1-cover"]/@src');
-    final urls =
-        xpath(res, '//*[ contains(@class, "manga-list-1-list")]/li/a/@href');
+    final names = xpath(
+      res,
+      '//*[ contains(@class, "manga-list-1-list")]/li/a/@title',
+    );
+    final images = xpath(
+      res,
+      '//*[ contains(@class, "manga-list-1-list")]/li/a/img[@class="manga-list-1-cover"]/@src',
+    );
+    final urls = xpath(
+      res,
+      '//*[ contains(@class, "manga-list-1-list")]/li/a/@href',
+    );
 
     for (var i = 0; i < names.length; i++) {
       MManga manga = MManga();
@@ -77,12 +91,14 @@ class MangaHere extends MProvider {
         final rt = filter.values[filter.state].value;
         url += "${ll(url)}rating=$rt";
       } else if (filter.type == "GenreList") {
-        final included = (filter.state as List)
-            .where((e) => e.state == 1 ? true : false)
-            .toList();
-        final excluded = (filter.state as List)
-            .where((e) => e.state == 2 ? true : false)
-            .toList();
+        final included =
+            (filter.state as List)
+                .where((e) => e.state == 1 ? true : false)
+                .toList();
+        final excluded =
+            (filter.state as List)
+                .where((e) => e.state == 2 ? true : false)
+                .toList();
         if (included.isNotEmpty) {
           url += "${ll(url)}genres=";
           for (var val in included) {
@@ -108,16 +124,24 @@ class MangaHere extends MProvider {
     }
     url += "${ll(url)}title=$query&page=$page";
     final res =
-        (await client.get(Uri.parse(url), headers: getHeader(source.baseUrl)))
-            .body;
+        (await client.get(
+          Uri.parse(url),
+          headers: getHeader(source.baseUrl),
+        )).body;
 
     List<MManga> mangaList = [];
-    final names =
-        xpath(res, '//*[contains(@class, "manga-list-4-list")]/li/a/@title');
-    final images = xpath(res,
-        '//*[contains(@class, "manga-list-4-list")]/li/a/img[@class="manga-list-4-cover"]/@src');
-    final urls =
-        xpath(res, '//*[contains(@class, "manga-list-4-list")]/li/a/@href');
+    final names = xpath(
+      res,
+      '//*[contains(@class, "manga-list-4-list")]/li/a/@title',
+    );
+    final images = xpath(
+      res,
+      '//*[contains(@class, "manga-list-4-list")]/li/a/img[@class="manga-list-4-cover"]/@src',
+    );
+    final urls = xpath(
+      res,
+      '//*[contains(@class, "manga-list-4-list")]/li/a/@href',
+    );
 
     for (var i = 0; i < names.length; i++) {
       MManga manga = MManga();
@@ -133,11 +157,13 @@ class MangaHere extends MProvider {
   @override
   Future<MManga> getDetail(String url) async {
     final statusList = [
-      {"Ongoing": 0, "Completed": 1}
+      {"Ongoing": 0, "Completed": 1},
     ];
-    final res = (await client.get(Uri.parse("${source.baseUrl}/$url"),
-            headers: getHeader(source.baseUrl)))
-        .body;
+    final res =
+        (await client.get(
+          Uri.parse("${source.baseUrl}/$url"),
+          headers: getHeader(source.baseUrl),
+        )).body;
     MManga manga = MManga();
     manga.author =
         xpath(res, '//*[@class="detail-info-right-say"]/a/text()').first;
@@ -145,16 +171,25 @@ class MangaHere extends MProvider {
     final status =
         xpath(res, '//*[@class="detail-info-right-title-tip"]/text()').first;
     manga.status = parseStatus(status, statusList);
-    manga.genre =
-        xpath(res, '//*[@class="detail-info-right-tag-list"]/a/text()');
+    manga.genre = xpath(
+      res,
+      '//*[@class="detail-info-right-tag-list"]/a/text()',
+    );
 
     var chapUrls = xpath(res, '//*[@class="detail-main-list"]/li/a/@href');
-    var chaptersNames = xpath(res,
-        '//*[@class="detail-main-list"]/li/a/div/p[@class="title3"]/text()');
-    final chapterDates = xpath(res,
-        '//*[@class="detail-main-list"]/li/a/div/p[@class="title2"]/text()');
-    var dateUploads =
-        parseDates(chapterDates, source.dateFormat, source.dateFormatLocale);
+    var chaptersNames = xpath(
+      res,
+      '//*[@class="detail-main-list"]/li/a/div/p[@class="title3"]/text()',
+    );
+    final chapterDates = xpath(
+      res,
+      '//*[@class="detail-main-list"]/li/a/div/p[@class="title2"]/text()',
+    );
+    var dateUploads = parseDates(
+      chapterDates,
+      source.dateFormat,
+      source.dateFormatLocale,
+    );
 
     List<MChapter>? chaptersList = [];
     for (var i = 0; i < chaptersNames.length; i++) {
@@ -177,9 +212,9 @@ class MangaHere extends MProvider {
     List<String> pageUrls = [];
     if (pages.isEmpty) {
       final script = xpath(
-              res, "//script[contains(text(),'function(p,a,c,k,e,d)')]/text()")
-          .first
-          .replaceAll("eval", "");
+        res,
+        "//script[contains(text(),'function(p,a,c,k,e,d)')]/text()",
+      ).first.replaceAll("eval", "");
       String deobfuscatedScript = unpackJs(script);
       int a = deobfuscatedScript.indexOf("newImgs=['") + 10;
       int b = deobfuscatedScript.indexOf("'];");
@@ -191,8 +226,10 @@ class MangaHere extends MProvider {
       final pagesNumberList = pages;
       int pagesNumber = int.parse(pagesNumberList[pagesNumberList.length - 2]);
       int secretKeyScriptLocation = res.indexOf("eval(function(p,a,c,k,e,d)");
-      int secretKeyScriptEndLocation =
-          res.indexOf("</script>", secretKeyScriptLocation);
+      int secretKeyScriptEndLocation = res.indexOf(
+        "</script>",
+        secretKeyScriptLocation,
+      );
       String secretKeyScript = res
           .substring(secretKeyScriptLocation, secretKeyScriptEndLocation)
           .replaceAll("eval", "");
@@ -201,10 +238,14 @@ class MangaHere extends MProvider {
       int secretKeyEndLoc = secretKeyDeobfuscatedScript.indexOf(";");
 
       String secretKey = secretKeyDeobfuscatedScript.substring(
-          secretKeyStartLoc, secretKeyEndLoc);
+        secretKeyStartLoc,
+        secretKeyEndLoc,
+      );
       int chapterIdStartLoc = res.indexOf("chapterid");
       String chapterId = res.substring(
-          chapterIdStartLoc + 11, res.indexOf(";", chapterIdStartLoc));
+        chapterIdStartLoc + 11,
+        res.indexOf(";", chapterIdStartLoc),
+      );
       String pageBase = urll.substring(0, urll.lastIndexOf("/"));
       for (int i = 1; i <= pagesNumber; i++) {
         String pageLink =
@@ -218,7 +259,7 @@ class MangaHere extends MProvider {
               "Accept-Language": "en-US,en;q=0.9",
               "Connection": "keep-alive",
               "Host": "www.mangahere.cc",
-              "X-Requested-With": "XMLHttpRequest"
+              "X-Requested-With": "XMLHttpRequest",
             };
 
             final ress =
@@ -231,20 +272,27 @@ class MangaHere extends MProvider {
             }
           }
         }
-        String deobfuscatedScript =
-            unpackJs(responseText.replaceAll("eval", ""));
+        String deobfuscatedScript = unpackJs(
+          responseText.replaceAll("eval", ""),
+        );
 
         int baseLinkStartPos = deobfuscatedScript.indexOf("pix=") + 5;
         int baseLinkEndPos =
             deobfuscatedScript.indexOf(";", baseLinkStartPos) - 1;
-        String baseLink =
-            deobfuscatedScript.substring(baseLinkStartPos, baseLinkEndPos);
+        String baseLink = deobfuscatedScript.substring(
+          baseLinkStartPos,
+          baseLinkEndPos,
+        );
 
         int imageLinkStartPos = deobfuscatedScript.indexOf("pvalue=") + 9;
-        int imageLinkEndPos =
-            deobfuscatedScript.indexOf("\"", imageLinkStartPos);
-        String imageLink =
-            deobfuscatedScript.substring(imageLinkStartPos, imageLinkEndPos);
+        int imageLinkEndPos = deobfuscatedScript.indexOf(
+          "\"",
+          imageLinkStartPos,
+        );
+        String imageLink = deobfuscatedScript.substring(
+          imageLinkStartPos,
+          imageLinkEndPos,
+        );
         pageUrls.add("https:$baseLink$imageLink");
       }
     }

@@ -9,17 +9,19 @@ class MangaBox extends MProvider {
 
   @override
   Future<MPages> getPopular(int page) async {
-    final res = (await client.get(Uri.parse(
-            "${source.baseUrl}/${popularUrlPath(source.name, page)}")))
-        .body;
+    final res =
+        (await client.get(
+          Uri.parse("${source.baseUrl}/${popularUrlPath(source.name, page)}"),
+        )).body;
     return mangaRes(res);
   }
 
   @override
   Future<MPages> getLatestUpdates(int page) async {
-    final res = (await client.get(
-            Uri.parse("${source.baseUrl}/${latestUrlPath(source.name, page)}")))
-        .body;
+    final res =
+        (await client.get(
+          Uri.parse("${source.baseUrl}/${latestUrlPath(source.name, page)}"),
+        )).body;
     return mangaRes(res);
   }
 
@@ -49,12 +51,14 @@ class MangaBox extends MProvider {
             final status = filter.values[filter.state].value;
             url += "${ll(url)}sts=$status";
           } else if (filter.type == "GenreListFilter") {
-            final included = (filter.state as List)
-                .where((e) => e.state == 1 ? true : false)
-                .toList();
-            final excluded = (filter.state as List)
-                .where((e) => e.state == 2 ? true : false)
-                .toList();
+            final included =
+                (filter.state as List)
+                    .where((e) => e.state == 1 ? true : false)
+                    .toList();
+            final excluded =
+                (filter.state as List)
+                    .where((e) => e.state == 2 ? true : false)
+                    .toList();
             if (included.isNotEmpty) {
               for (var val in included) {
                 genreInclude += "_${val.value}";
@@ -89,24 +93,38 @@ class MangaBox extends MProvider {
 
     List<MManga> mangaList = [];
     List<String> urls = [];
-    urls = xpath(res,
-        '//*[ @class^="genres-item"  or @class="list-truyen-item-wrap" or @class="story-item" or @class="story_item_right"]/h3/a/@href');
+    urls = xpath(
+      res,
+      '//*[ @class^="genres-item"  or @class="list-truyen-item-wrap" or @class="story-item" or @class="story_item_right"]/h3/a/@href',
+    );
     List<String> names = [];
-    names = xpath(res,
-        '//*[ @class^="genres-item"  or @class="list-truyen-item-wrap" or @class="story-item" or @class="story_item_right"]/h3/a/text()');
-    final images = xpath(res,
-        '//*[@class="search-story-item" or @class="story_item" or @class="content-genres-item"  or @class="list-story-item" or @class="story-item" or @class="list-truyen-item-wrap"]/a/img/@src');
+    names = xpath(
+      res,
+      '//*[ @class^="genres-item"  or @class="list-truyen-item-wrap" or @class="story-item" or @class="story_item_right"]/h3/a/text()',
+    );
+    final images = xpath(
+      res,
+      '//*[@class="search-story-item" or @class="story_item" or @class="content-genres-item"  or @class="list-story-item" or @class="story-item" or @class="list-truyen-item-wrap"]/a/img/@src',
+    );
     if (names.isEmpty) {
-      urls = xpath(res,
-          '//*[ @class^="genres-item"  or @class="list-truyen-item-wrap" or @class="story-item"]/h2/a/@href');
-      names = xpath(res,
-          '//*[ @class^="genres-item"  or @class="list-truyen-item-wrap" or @class="story-item"]/h2/a/text()');
+      urls = xpath(
+        res,
+        '//*[ @class^="genres-item"  or @class="list-truyen-item-wrap" or @class="story-item"]/h2/a/@href',
+      );
+      names = xpath(
+        res,
+        '//*[ @class^="genres-item"  or @class="list-truyen-item-wrap" or @class="story-item"]/h2/a/text()',
+      );
     }
     if (names.isEmpty) {
-      names = xpath(res,
-          '//*[@class="search-story-item" or @class="list-story-item"]/a/@title');
-      urls = xpath(res,
-          '//*[@class="search-story-item" or @class="list-story-item"]/a/@href');
+      names = xpath(
+        res,
+        '//*[@class="search-story-item" or @class="list-story-item"]/a/@title',
+      );
+      urls = xpath(
+        res,
+        '//*[@class="search-story-item" or @class="list-story-item"]/a/@href',
+      );
     }
     for (var i = 0; i < names.length; i++) {
       MManga manga = MManga();
@@ -122,21 +140,27 @@ class MangaBox extends MProvider {
   @override
   Future<MManga> getDetail(String url) async {
     final statusList = [
-      {"Ongoing": 0, "Completed": 1}
+      {"Ongoing": 0, "Completed": 1},
     ];
     MManga manga = MManga();
     final res = (await client.get(Uri.parse(url))).body;
     final document = parseHtml(res);
-    manga.author = document.xpathFirst(
-            '//*[@class="table-label" and contains(text(), "Author")]/parent::tr/td[2]/text()|//li[contains(text(), "Author")]/a/text()') ??
+    manga.author =
+        document.xpathFirst(
+          '//*[@class="table-label" and contains(text(), "Author")]/parent::tr/td[2]/text()|//li[contains(text(), "Author")]/a/text()',
+        ) ??
         "";
 
-    final alternative = document.xpathFirst(
-            '//*[@class="table-label" and contains(text(), "Alternative")]/parent::tr/td[2]/text()') ??
+    final alternative =
+        document.xpathFirst(
+          '//*[@class="table-label" and contains(text(), "Alternative")]/parent::tr/td[2]/text()',
+        ) ??
         "";
 
-    final description = document.xpathFirst(
-            '//*[@id="panel-story-info-description" ]/text() | //*[@id="story_discription" ]/text() | //div[@id="noidungm"]/text()') ??
+    final description =
+        document.xpathFirst(
+          '//*[@id="panel-story-info-description" ]/text() | //*[@id="story_discription" ]/text() | //div[@id="noidungm"]/text()',
+        ) ??
         "";
 
     if (description.isNotEmpty) {
@@ -152,16 +176,20 @@ class MangaBox extends MProvider {
             "${manga.description}\n\nAlternative Name: $alternative";
       }
     }
-    final status = document.xpathFirst(
-            '//*[@class="table-label" and contains(text(), "Status")]/parent::tr/td[2]/text() | //li[contains(text(), "Status")]/text() | //li[contains(text(), "Status")]/a/text()') ??
+    final status =
+        document.xpathFirst(
+          '//*[@class="table-label" and contains(text(), "Status")]/parent::tr/td[2]/text() | //li[contains(text(), "Status")]/text() | //li[contains(text(), "Status")]/a/text()',
+        ) ??
         "";
     if (status.isNotEmpty) {
       manga.status = parseStatus(status.split(":").last.trim(), statusList);
     }
     manga.genre = document.xpath(
-        '//*[@class="table-label" and contains(text(), "Genres")]/parent::tr/td[2]/a/text() | //li[contains(text(), "Genres")]/a/text()');
+      '//*[@class="table-label" and contains(text(), "Genres")]/parent::tr/td[2]/a/text() | //li[contains(text(), "Genres")]/a/text()',
+    );
     final chaptersElements = document.select(
-        "div.chapter-list div.row, ul.row-content-chapter li, div#chapter_list li");
+      "div.chapter-list div.row, ul.row-content-chapter li, div#chapter_list li",
+    );
     List<MChapter>? chaptersList = [];
     for (var element in chaptersElements) {
       final a = element.selectFirst("a");
@@ -175,10 +203,14 @@ class MangaBox extends MProvider {
         dateStr = element.selectFirst("p")?.text ?? "";
       }
       chapter.url = a.getHref;
-      chapter.dateUpload = dateStr.isEmpty
-          ? DateTime.now().millisecondsSinceEpoch.toString()
-          : parseDates(
-              [dateStr], source.dateFormat, source.dateFormatLocale)[0];
+      chapter.dateUpload =
+          dateStr.isEmpty
+              ? DateTime.now().millisecondsSinceEpoch.toString()
+              : parseDates(
+                [dateStr],
+                source.dateFormat,
+                source.dateFormatLocale,
+              )[0];
       chaptersList.add(chapter);
     }
     manga.chapters = chaptersList;
@@ -189,12 +221,15 @@ class MangaBox extends MProvider {
   Future<List<String>> getPageList(String url) async {
     final res = (await client.get(Uri.parse(url))).body;
     List<String> pageUrls = [];
-    final urls = xpath(res,
-        '//div[@class="container-chapter-reader" or @class="panel-read-story"]/img/@src');
+    final urls = xpath(
+      res,
+      '//div[@class="container-chapter-reader" or @class="panel-read-story"]/img/@src',
+    );
     for (var url in urls) {
       if (url.startsWith("https://convert_image_digi.mgicdn.com")) {
-        pageUrls
-            .add("https://images.weserv.nl/?url=${substringAfter(url, "//")}");
+        pageUrls.add(
+          "https://images.weserv.nl/?url=${substringAfter(url, "//")}",
+        );
       } else {
         pageUrls.add(url);
       }
@@ -206,13 +241,19 @@ class MangaBox extends MProvider {
   MPages mangaRes(String res) {
     List<MManga> mangaList = [];
     List<String> urls = [];
-    urls = xpath(res,
-        '//*[ @class^="genres-item"  or @class="list-truyen-item-wrap" or @class="story-item"]/h3/a/@href');
+    urls = xpath(
+      res,
+      '//*[ @class^="genres-item"  or @class="list-truyen-item-wrap" or @class="story-item"]/h3/a/@href',
+    );
     List<String> names = [];
-    names = xpath(res,
-        '//*[ @class^="genres-item"  or @class="list-truyen-item-wrap" or @class="story-item"]/h3/a/text()');
-    final images = xpath(res,
-        '//*[ @class="content-genres-item"  or @class="list-story-item" or @class="story-item" or @class="list-truyen-item-wrap"]/a/img/@src');
+    names = xpath(
+      res,
+      '//*[ @class^="genres-item"  or @class="list-truyen-item-wrap" or @class="story-item"]/h3/a/text()',
+    );
+    final images = xpath(
+      res,
+      '//*[ @class="content-genres-item"  or @class="list-story-item" or @class="story-item" or @class="list-truyen-item-wrap"]/a/img/@src',
+    );
     if (names.isEmpty) {
       names = xpath(res, '//*[@class="list-story-item"]/a/@title');
       urls = xpath(res, '//*[@class="list-story-item"]/a/@href');
@@ -274,10 +315,11 @@ class MangaBox extends MProvider {
     str = str.replaceAll(RegExp(r'[ỳýỵỷỹ]'), 'y');
     str = str.replaceAll(RegExp(r'đ'), 'd');
     str = str.replaceAll(
-        RegExp(
-          r"""!|@|%|\^|\*|\(|\)|\+|=|<|>|\?|/|,|\.|:|;|'| |"|&|#|\[|]|~|-|$|_""",
-        ),
-        "_");
+      RegExp(
+        r"""!|@|%|\^|\*|\(|\)|\+|=|<|>|\?|/|,|\.|:|;|'| |"|&|#|\[|]|~|-|$|_""",
+      ),
+      "_",
+    );
     str = str.replaceAll(RegExp(r'_+'), '_');
     str = str.replaceAll(RegExp(r'^_+|_+$'), '');
     return str;

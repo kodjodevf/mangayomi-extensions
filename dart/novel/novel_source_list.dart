@@ -1,4 +1,3 @@
 import '../../model/source.dart';
 
-List<Source> dartNovelSourceList = [
-];
+List<Source> dartNovelSourceList = [];

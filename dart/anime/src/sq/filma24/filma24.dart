@@ -6,8 +6,10 @@ class Filma24 extends MProvider {
 
   MSource source;
 
-  final Client client =
-      Client(source, json.encode({"useDartHttpClient": true}));
+  final Client client = Client(
+    source,
+    json.encode({"useDartHttpClient": true}),
+  );
 
   @override
   String get baseUrl => getPreferenceValue(source.id, "pref_domain_new");
@@ -122,13 +124,14 @@ class Filma24 extends MProvider {
   List<dynamic> getSourcePreferences() {
     return [
       EditTextPreference(
-          key: "pref_domain_new",
-          title: "Domeni i përdorur aktualisht",
-          summary: "",
-          value: "https://www.filma24.band",
-          dialogTitle: "Domeni i përdorur aktualisht",
-          dialogMessage: "",
-          text: "https://www.filma24.band"),
+        key: "pref_domain_new",
+        title: "Domeni i përdorur aktualisht",
+        summary: "",
+        value: "https://www.filma24.band",
+        dialogTitle: "Domeni i përdorur aktualisht",
+        dialogMessage: "",
+        text: "https://www.filma24.band",
+      ),
     ];
   }
 
@@ -192,22 +195,23 @@ class Filma24 extends MProvider {
   }
 
   Future<List<MVideo>> vidmolyExtractor(String url) async {
-    final headers = {
-      'Referer': 'https://vidmoly.to',
-    };
+    final headers = {'Referer': 'https://vidmoly.to'};
     List<MVideo> videos = [];
     final playListUrlResponse = (await client.get(Uri.parse(url))).body;
     final playlistUrl =
         RegExp(r'file:"(\S+?)"').firstMatch(playListUrlResponse)?.group(1) ??
-            "";
+        "";
     if (playlistUrl.isEmpty) return [];
-    final masterPlaylistRes =
-        await client.get(Uri.parse(playlistUrl), headers: headers);
+    final masterPlaylistRes = await client.get(
+      Uri.parse(playlistUrl),
+      headers: headers,
+    );
 
     if (masterPlaylistRes.statusCode == 200) {
-      for (var it
-          in substringAfter(masterPlaylistRes.body, "#EXT-X-STREAM-INF:")
-              .split("#EXT-X-STREAM-INF:")) {
+      for (var it in substringAfter(
+        masterPlaylistRes.body,
+        "#EXT-X-STREAM-INF:",
+      ).split("#EXT-X-STREAM-INF:")) {
         final quality =
             "${substringBefore(substringBefore(substringAfter(substringAfter(it, "RESOLUTION="), "x"), ","), "\n")}p";
 
@@ -231,11 +235,13 @@ class Filma24 extends MProvider {
     final playListUrlResponse = (await client.get(Uri.parse(url))).body;
     final playlistUrl =
         RegExp(r'file:"(\S+?)"').firstMatch(playListUrlResponse)?.group(1) ??
-            "";
+        "";
     if (playlistUrl.isEmpty) return [];
     final masterPlaylistRes = (await client.get(Uri.parse(playlistUrl))).body;
-    for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
-        .split("#EXT-X-STREAM-INF:")) {
+    for (var it in substringAfter(
+      masterPlaylistRes,
+      "#EXT-X-STREAM-INF:",
+    ).split("#EXT-X-STREAM-INF:")) {
       final quality =
           "${substringBefore(substringBefore(substringAfter(substringAfter(it, "RESOLUTION="), "x"), ","), "\n")}p";
 
@@ -258,8 +264,10 @@ class Filma24 extends MProvider {
       return [];
     }
 
-    final videoUrl =
-        substringBefore(substringAfter(js.first, "sources: [\""), '"');
+    final videoUrl = substringBefore(
+      substringAfter(js.first, "sources: [\""),
+      '"',
+    );
     MVideo video = MVideo();
     video
       ..url = videoUrl
@@ -283,8 +291,10 @@ class Filma24 extends MProvider {
       mangaList.add(manga);
     }
 
-    return MPages(mangaList,
-        document.selectFirst("div > a.nextpostslink")?.attr("href") != null);
+    return MPages(
+      mangaList,
+      document.selectFirst("div > a.nextpostslink")?.attr("href") != null,
+    );
   }
 }
 

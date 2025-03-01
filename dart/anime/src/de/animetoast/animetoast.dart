@@ -23,9 +23,11 @@ class AnimeToast extends MProvider {
       MManga anime = MManga();
       anime.name = element.selectFirst("div.item-thumbnail a").attr("title");
       anime.link = getUrlWithoutDomain(
-          element.selectFirst("div.item-thumbnail a").attr("href"));
-      anime.imageUrl =
-          element.selectFirst("div.item-thumbnail a img").attr("src");
+        element.selectFirst("div.item-thumbnail a").attr("href"),
+      );
+      anime.imageUrl = element
+          .selectFirst("div.item-thumbnail a img")
+          .attr("src");
       animeList.add(anime);
     }
     return MPages(animeList, false);
@@ -46,7 +48,9 @@ class AnimeToast extends MProvider {
       animeList.add(anime);
     }
     return MPages(
-        animeList, document.selectFirst("li.next a")?.attr("href") != null);
+      animeList,
+      document.selectFirst("li.next a")?.attr("href") != null,
+    );
   }
 
   @override
@@ -106,7 +110,8 @@ class AnimeToast extends MProvider {
       MChapter ep = MChapter();
       ep.name = document.selectFirst("h1.light-title")?.text ?? "Film";
       ep.url = getUrlWithoutDomain(
-          document.selectFirst("link[rel=canonical]").attr("href"));
+        document.selectFirst("link[rel=canonical]").attr("href"),
+      );
       episodesList.add(ep);
     }
     anime.chapters = episodesList.reversed.toList();
@@ -134,16 +139,24 @@ class AnimeToast extends MProvider {
         final doc = parseHtml((await client.get(Uri.parse(sUrl))).body);
         final nUrl = doc.selectFirst("#player-embed a").attr("href");
         final nDoc = parseHtml((await client.get(Uri.parse(nUrl))).body);
-        epcu = int.tryParse(substringAfter(
+        epcu =
+            int.tryParse(
+              substringAfter(
                 document.selectFirst("div.tab-pane a.current-link")?.text ?? "",
-                "Ep.")) ??
+                "Ep.",
+              ),
+            ) ??
             100;
         ep = nDoc.select("div.tab-pane a");
       }
     } else {
-      epcu = int.tryParse(substringAfter(
+      epcu =
+          int.tryParse(
+            substringAfter(
               document.selectFirst("div.tab-pane a.current-link")?.text ?? "",
-              "Ep.")) ??
+              "Ep.",
+            ),
+          ) ??
           100;
       ep = document.select("div.tab-pane a");
     }
@@ -213,19 +226,21 @@ class AnimeToast extends MProvider {
   List<dynamic> getSourcePreferences() {
     return [
       ListPreference(
-          key: "preferred_hoster",
-          title: "Standard-Hoster",
-          summary: "",
-          valueIndex: 0,
-          entries: ["Voe", "DoodStream", "Filemoon", "Mp4upload"],
-          entryValues: ["voe", "doodStream", "filemoon", "mp4upload"]),
+        key: "preferred_hoster",
+        title: "Standard-Hoster",
+        summary: "",
+        valueIndex: 0,
+        entries: ["Voe", "DoodStream", "Filemoon", "Mp4upload"],
+        entryValues: ["voe", "doodStream", "filemoon", "mp4upload"],
+      ),
       MultiSelectListPreference(
-          key: "hoster_selection",
-          title: "Hoster auswählen",
-          summary: "",
-          entries: ["Voe", "DoodStream", "Filemoon", "Mp4upload"],
-          entryValues: ["voe", "dood", "filemoon", "mp4upload"],
-          values: ["voe", "dood", "filemoon", "mp4upload"]),
+        key: "hoster_selection",
+        title: "Hoster auswählen",
+        summary: "",
+        entries: ["Voe", "DoodStream", "Filemoon", "Mp4upload"],
+        entryValues: ["voe", "dood", "filemoon", "mp4upload"],
+        values: ["voe", "dood", "filemoon", "mp4upload"],
+      ),
     ];
   }
 }

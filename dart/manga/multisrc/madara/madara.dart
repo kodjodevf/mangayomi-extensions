@@ -10,18 +10,20 @@ class Madara extends MProvider {
 
   @override
   Future<MPages> getPopular(int page) async {
-    final res = (await client.get(
-            Uri.parse("${source.baseUrl}/manga/page/$page/?m_orderby=views")))
-        .body;
+    final res =
+        (await client.get(
+          Uri.parse("${source.baseUrl}/manga/page/$page/?m_orderby=views"),
+        )).body;
     final document = parseHtml(res);
     return mangaFromElements(document.select("div.page-item-detail"));
   }
 
   @override
   Future<MPages> getLatestUpdates(int page) async {
-    final res = (await client.get(
-            Uri.parse("${source.baseUrl}/manga/page/$page/?m_orderby=latest")))
-        .body;
+    final res =
+        (await client.get(
+          Uri.parse("${source.baseUrl}/manga/page/$page/?m_orderby=latest"),
+        )).body;
     final document = parseHtml(res);
     return mangaFromElements(document.select("div.page-item-detail"));
   }
@@ -95,7 +97,10 @@ class Madara extends MProvider {
             var chd = element.selectFirst("span.chapter-release-date");
             if (chd != null && chd.text.isNotEmpty) {
               var dates = parseDates(
-                  [chd.text], source.dateFormat, source.dateFormatLocale);
+                [chd.text],
+                source.dateFormat,
+                source.dateFormatLocale,
+              );
               chapter.dateUpload = dates[0];
             } else {
               chapter.dateUpload =
@@ -153,7 +158,7 @@ class Madara extends MProvider {
         "En espera": 2,
         "Canceled": 3,
         "Cancelado": 3,
-      }
+      },
     ];
     MManga manga = MManga();
     String res = "";
@@ -161,19 +166,23 @@ class Madara extends MProvider {
     final document = parseHtml(res);
     manga.author = document.selectFirst("div.author-content > a")?.text ?? "";
 
-    manga.description = document
+    manga.description =
+        document
             .selectFirst(
-                "div.description-summary div.summary__content, div.summary_content div.post-content_item > h5 + div, div.summary_content div.manga-excerpt, div.sinopsis div.contenedor, .description-summary > p")
+              "div.description-summary div.summary__content, div.summary_content div.post-content_item > h5 + div, div.summary_content div.manga-excerpt, div.sinopsis div.contenedor, .description-summary > p",
+            )
             ?.text ??
         "";
 
     final imageElement = document.selectFirst("div.summary_image img");
-    manga.imageUrl = imageElement?.attr("data-src") ??
-          imageElement?.attr("data-lazy-src") ??
-          imageElement?.attr("srcset") ??
-          imageElement?.getSrc;
+    manga.imageUrl =
+        imageElement?.attr("data-src") ??
+        imageElement?.attr("data-lazy-src") ??
+        imageElement?.attr("srcset") ??
+        imageElement?.getSrc;
 
-    final id = document
+    final id =
+        document
             .selectFirst("div[id^=manga-chapters-holder]")
             ?.attr("data-id") ??
         "";
@@ -185,19 +194,22 @@ class Madara extends MProvider {
     manga.status = parseStatus(status, statusList);
     manga.genre =
         document.select("div.genres-content a")?.map((e) => e.text).toList() ??
-            [];
+        [];
 
     final baseUrl = "${source.baseUrl}/";
     final headers = {"Referer": baseUrl, "X-Requested-With": "XMLHttpRequest"};
 
     final oldXhrChaptersRequest = await client.post(
-        Uri.parse("${baseUrl}wp-admin/admin-ajax.php"),
-        headers: headers,
-        body: {"action": "manga_get_chapters", "manga": mangaId});
+      Uri.parse("${baseUrl}wp-admin/admin-ajax.php"),
+      headers: headers,
+      body: {"action": "manga_get_chapters", "manga": mangaId},
+    );
     if (oldXhrChaptersRequest.statusCode == 400) {
-      res = (await client.post(Uri.parse("${url}ajax/chapters"),
-              headers: headers))
-          .body;
+      res =
+          (await client.post(
+            Uri.parse("${url}ajax/chapters"),
+            headers: headers,
+          )).body;
     } else {
       res = oldXhrChaptersRequest.body;
     }
@@ -205,9 +217,11 @@ class Madara extends MProvider {
     MDocument chapDoc = parseHtml(res);
     manga.chapters = getChapters(chapDoc);
     if (manga.chapters.isEmpty) {
-      res = (await client.post(Uri.parse("${url}ajax/chapters"),
-              headers: headers))
-          .body;
+      res =
+          (await client.post(
+            Uri.parse("${url}ajax/chapters"),
+            headers: headers,
+          )).body;
       chapDoc = parseHtml(res);
       manga.chapters = getChapters(chapDoc);
     }
@@ -221,13 +235,15 @@ class Madara extends MProvider {
     final document = parseHtml(res.body);
 
     final pageElements = document.select(
-        "div.page-break, li.blocks-gallery-item, .reading-content .text-left:not(:has(.blocks-gallery-item)) img");
+      "div.page-break, li.blocks-gallery-item, .reading-content .text-left:not(:has(.blocks-gallery-item)) img",
+    );
 
     List<String> imgs = [];
     for (var element in pageElements) {
       try {
         final imgElement = element.selectFirst("img");
-        final img = imgElement.attr("src") ??
+        final img =
+            imgElement.attr("src") ??
             imgElement.attr("data-src") ??
             imgElement.attr("data-lazy-src") ??
             imgElement.attr("srcset");
@@ -261,7 +277,8 @@ class Madara extends MProvider {
     for (var i = 0; i < elements.length; i++) {
       final postTitle = elements[i].selectFirst("div.post-title a");
       final imageElement = elements[i].selectFirst("img");
-      final image = imageElement?.attr("data-src") ??
+      final image =
+          imageElement?.attr("data-src") ??
           imageElement?.attr("data-lazy-src") ??
           imageElement?.attr("srcset") ??
           imageElement?.getSrc ??
@@ -301,7 +318,7 @@ class Madara extends MProvider {
         SelectFilterOption("All", ""),
         SelectFilterOption("None", "0"),
         SelectFilterOption("Only", "1"),
-      ])
+      ]),
     ];
   }
 

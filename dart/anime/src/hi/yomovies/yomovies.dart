@@ -22,9 +22,9 @@ class YoMovies extends MProvider {
         (await client.get(Uri.parse("$baseUrl/most-favorites/$pageNu"))).body;
     final document = parseHtml(res);
     return animeFromElement(
-        document.select("div.movies-list > div.ml-item"),
-        document.selectFirst("ul.pagination > li.active + li")?.getHref !=
-            null);
+      document.select("div.movies-list > div.ml-item"),
+      document.selectFirst("ul.pagination > li.active + li")?.getHref != null,
+    );
   }
 
   @override
@@ -53,9 +53,9 @@ class YoMovies extends MProvider {
     final res = (await client.get(Uri.parse(url))).body;
     final document = parseHtml(res);
     return animeFromElement(
-        document.select("div.movies-list > div.ml-item"),
-        document.selectFirst("ul.pagination > li.active + li")?.getHref !=
-            null);
+      document.select("div.movies-list > div.ml-item"),
+      document.selectFirst("ul.pagination > li.active + li")?.getHref != null,
+    );
   }
 
   @override
@@ -68,8 +68,10 @@ class YoMovies extends MProvider {
     var infoElement = document.selectFirst("div.mvi-content");
     anime.description = infoElement.selectFirst("p.f-desc")?.text ?? "";
 
-    anime.genre = xpath(res,
-        '//div[@class="mvici-left" and contains(text(),"Genre:")]/p/a/text()');
+    anime.genre = xpath(
+      res,
+      '//div[@class="mvici-left" and contains(text(),"Genre:")]/p/a/text()',
+    );
 
     List<MChapter> episodeList = [];
     final seasonListElements = document.select("div#seasons > div.tvseason");
@@ -118,20 +120,22 @@ class YoMovies extends MProvider {
   List<dynamic> getSourcePreferences() {
     return [
       EditTextPreference(
-          key: "overrideBaseUrl",
-          title: "Override BaseUrl",
-          summary: "",
-          value: "https://yomovies.boo",
-          dialogTitle: "Override BaseUrl",
-          dialogMessage: "",
-          text: "https://yomovies.boo"),
+        key: "overrideBaseUrl",
+        title: "Override BaseUrl",
+        summary: "",
+        value: "https://yomovies.boo",
+        dialogTitle: "Override BaseUrl",
+        dialogMessage: "",
+        text: "https://yomovies.boo",
+      ),
       ListPreference(
-          key: "preferred_quality",
-          title: "Preferred quality",
-          summary: "",
-          valueIndex: 0,
-          entries: ["1080p", "720p", "480p", "360p"],
-          entryValues: ["1080", "720", "480", "360"])
+        key: "preferred_quality",
+        title: "Preferred quality",
+        summary: "",
+        valueIndex: 0,
+        entries: ["1080p", "720p", "480p", "360p"],
+        entryValues: ["1080", "720", "480", "360"],
+      ),
     ];
   }
 
@@ -142,11 +146,15 @@ class YoMovies extends MProvider {
         (await client.get(Uri.parse(url), headers: {"Referer": url})).body;
     final script = xpath(res, '//script[contains(text(),"sources:")]/text()');
     if (script.isEmpty) return [];
-    final masterUrl =
-        substringBefore(substringAfter(script.first, "file:\""), '"');
+    final masterUrl = substringBefore(
+      substringAfter(script.first, "file:\""),
+      '"',
+    );
     final masterPlaylistRes = (await client.get(Uri.parse(masterUrl))).body;
-    for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
-        .split("#EXT-X-STREAM-INF:")) {
+    for (var it in substringAfter(
+      masterPlaylistRes,
+      "#EXT-X-STREAM-INF:",
+    ).split("#EXT-X-STREAM-INF:")) {
       final quality =
           "${substringBefore(substringBefore(substringAfter(substringAfter(it, "RESOLUTION="), "x"), ","), "\n")}p";
 
@@ -169,7 +177,7 @@ class YoMovies extends MProvider {
       anime.name = element.selectFirst("div.qtip-title").text;
       anime.imageUrl =
           element.selectFirst("img[data-original]")?.attr("data-original") ??
-              "";
+          "";
       anime.link = element.selectFirst("a[href]").getHref;
       animeList.add(anime);
     }
@@ -207,38 +215,57 @@ class YoMovies extends MProvider {
   List<dynamic> getFilterList() {
     return [
       HeaderFilter(
-          "Note: Only one selection at a time works, and it ignores text search"),
+        "Note: Only one selection at a time works, and it ignores text search",
+      ),
       SeparatorFilter(),
       SelectFilter("BollywoodFilter", "Bollywood", 0, [
         SelectFilterOption("<select>", ""),
         SelectFilterOption("Bollywood", "/genre/bollywood"),
         SelectFilterOption("Trending", "/genre/top-rated"),
-        SelectFilterOption("Bollywood (2024)",
-            "/account/?ptype=post&tax_category%5B%5D=bollywood&tax_release-year=2024&wpas=1"),
-        SelectFilterOption("Bollywood (2023)",
-            "/account/?ptype=post&tax_category%5B%5D=bollywood&tax_release-year=2023&wpas=1"),
-        SelectFilterOption("Bollywood (2022)",
-            "/account/?ptype=post&tax_category%5B%5D=bollywood&tax_release-year=2022&wpas=1"),
-        SelectFilterOption("Bollywood (2021)",
-            "/account/?ptype=post&tax_category%5B%5D=bollywood&tax_release-year=2021&wpas=1"),
+        SelectFilterOption(
+          "Bollywood (2024)",
+          "/account/?ptype=post&tax_category%5B%5D=bollywood&tax_release-year=2024&wpas=1",
+        ),
+        SelectFilterOption(
+          "Bollywood (2023)",
+          "/account/?ptype=post&tax_category%5B%5D=bollywood&tax_release-year=2023&wpas=1",
+        ),
+        SelectFilterOption(
+          "Bollywood (2022)",
+          "/account/?ptype=post&tax_category%5B%5D=bollywood&tax_release-year=2022&wpas=1",
+        ),
+        SelectFilterOption(
+          "Bollywood (2021)",
+          "/account/?ptype=post&tax_category%5B%5D=bollywood&tax_release-year=2021&wpas=1",
+        ),
       ]),
       SelectFilter("DualAudioFilter", "Dual Audio", 0, [
         SelectFilterOption("<select>", ""),
         SelectFilterOption("Dual Audio", "/genre/dual-audio"),
-        SelectFilterOption("Hollywood Dubbed",
-            "/account/?ptype=post&tax_category%5B%5D=dual-audio&wpas=1"),
-        SelectFilterOption("South Dubbed",
-            "/account/?ptype=post&tax_category%5B%5D=dual-audio&tax_category%5B%5D=south-special&wpas=1"),
+        SelectFilterOption(
+          "Hollywood Dubbed",
+          "/account/?ptype=post&tax_category%5B%5D=dual-audio&wpas=1",
+        ),
+        SelectFilterOption(
+          "South Dubbed",
+          "/account/?ptype=post&tax_category%5B%5D=dual-audio&tax_category%5B%5D=south-special&wpas=1",
+        ),
       ]),
       SelectFilter("HollywoodFilter", "Hollywood", 0, [
         SelectFilterOption("<select>", ""),
         SelectFilterOption("Hollywood", "/genre/hollywood"),
-        SelectFilterOption("Hollywood (2023)",
-            "/account/?ptype=post&tax_category%5B%5D=hollywood&tax_release-year=2023&wpas=1"),
-        SelectFilterOption("Hollywood (2022)",
-            "/account/?ptype=post&tax_category%5B%5D=hollywood&tax_release-year=2022&wpas=1"),
-        SelectFilterOption("Hollywood (2021)",
-            "/account/?ptype=post&tax_category%5B%5D=hollywood&tax_release-year=2021&wpas=1"),
+        SelectFilterOption(
+          "Hollywood (2023)",
+          "/account/?ptype=post&tax_category%5B%5D=hollywood&tax_release-year=2023&wpas=1",
+        ),
+        SelectFilterOption(
+          "Hollywood (2022)",
+          "/account/?ptype=post&tax_category%5B%5D=hollywood&tax_release-year=2022&wpas=1",
+        ),
+        SelectFilterOption(
+          "Hollywood (2021)",
+          "/account/?ptype=post&tax_category%5B%5D=hollywood&tax_release-year=2021&wpas=1",
+        ),
       ]),
       SelectFilter("EnglishSeriesFilter", "Hindi Series", 0, [
         SelectFilterOption("<select>", ""),
@@ -319,13 +346,17 @@ class YoMovies extends MProvider {
         SelectFilterOption("Hootzy", "/director/hootzy-channel"),
         SelectFilterOption("Balloons", "/director/balloons-originals"),
         SelectFilterOption(
-            "Big Movie Zoo", "/director/big-movie-zoo-originals"),
+          "Big Movie Zoo",
+          "/director/big-movie-zoo-originals",
+        ),
         SelectFilterOption("Bambooflix", "/director/bambooflix"),
         SelectFilterOption("Piliflix", "/director/piliflix-originals"),
         SelectFilterOption("11upmovies", "/director/11upmovies-originals"),
         SelectFilterOption("Eightshots", "/director/eightshots-originals"),
         SelectFilterOption(
-            "I-Entertainment", "/director/i-entertainment-exclusive"),
+          "I-Entertainment",
+          "/director/i-entertainment-exclusive",
+        ),
         SelectFilterOption("Hotprime", "/director/hotprime-originals"),
         SelectFilterOption("BananaPrime", "/director/banana-prime"),
         SelectFilterOption("HotHitFilms", "/director/hothitfilms"),

@@ -37,26 +37,27 @@ class Source {
 
   int? sourceCodeLanguage;
 
-  Source(
-      {this.id = null,
-      this.name = "",
-      this.baseUrl = "",
-      this.lang = "",
-      this.typeSource = "",
-      this.iconUrl = "",
-      this.dateFormat = "",
-      this.dateFormatLocale = "",
-      this.isNsfw = false,
-      this.hasCloudflare = false,
-      this.sourceCodeUrl = "",
-      this.apiUrl = "",
-      this.version = "",
-      this.isManga,
-      this.itemType = ItemType.manga,
-      this.isFullData = false,
-      this.appMinVerReq = "0.5.0",
-      this.additionalParams = "",
-      this.sourceCodeLanguage = 0});
+  Source({
+    this.id = null,
+    this.name = "",
+    this.baseUrl = "",
+    this.lang = "",
+    this.typeSource = "",
+    this.iconUrl = "",
+    this.dateFormat = "",
+    this.dateFormatLocale = "",
+    this.isNsfw = false,
+    this.hasCloudflare = false,
+    this.sourceCodeUrl = "",
+    this.apiUrl = "",
+    this.version = "",
+    this.isManga,
+    this.itemType = ItemType.manga,
+    this.isFullData = false,
+    this.appMinVerReq = "0.5.0",
+    this.additionalParams = "",
+    this.sourceCodeLanguage = 0,
+  });
   Source.fromJson(Map<String, dynamic> json) {
     final sourceCodeLang = json['sourceCodeLanguage'] ?? 0;
     apiUrl = json['apiUrl'] ?? "";
@@ -66,11 +67,12 @@ class Source {
     dateFormatLocale = json['dateFormatLocale'] ?? "";
     hasCloudflare = json['hasCloudflare'] ?? false;
     iconUrl = json['iconUrl'] ?? "";
-    id = (json['id'] ??
-            (sourceCodeLang == 0
-                ? 'mangayomi-"${json['lang'] ?? ""}"."${json['name'] ?? ""}"'
-                : 'mangayomi-js-"${json['lang'] ?? ""}"."${json['name'] ?? ""}"'))
-        .hashCode;
+    id =
+        (json['id'] ??
+                (sourceCodeLang == 0
+                    ? 'mangayomi-"${json['lang'] ?? ""}"."${json['name'] ?? ""}"'
+                    : 'mangayomi-js-"${json['lang'] ?? ""}"."${json['name'] ?? ""}"'))
+            .hashCode;
     isFullData = json['isFullData'] ?? false;
     itemType = ItemType.values[json['itemType'] ?? 0];
     isNsfw = json['isNsfw'] ?? false;
@@ -104,7 +106,7 @@ class Source {
       "isFullData": isFullData,
       "appMinVerReq": appMinVerReq,
       "additionalParams": additionalParams,
-      "sourceCodeLanguage": sourceCodeLanguage
+      "sourceCodeLanguage": sourceCodeLanguage,
     };
   }
 }

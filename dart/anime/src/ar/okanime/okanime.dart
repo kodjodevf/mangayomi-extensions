@@ -30,9 +30,10 @@ class OkAnime extends MProvider {
 
   @override
   Future<MPages> getLatestUpdates(int page) async {
-    final res = (await client
-            .get(Uri.parse("${source.baseUrl}/espisode-list?page=$page")))
-        .body;
+    final res =
+        (await client.get(
+          Uri.parse("${source.baseUrl}/espisode-list?page=$page"),
+        )).body;
     List<MManga> animeList = [];
     String path = '//*[contains(@class,"anime-card")]';
     final urls = xpath(res, '$path/div[@class="anime-title")]/h4/a/@href');
@@ -46,8 +47,10 @@ class OkAnime extends MProvider {
       anime.link = urls[i];
       animeList.add(anime);
     }
-    final nextPage =
-        xpath(res, '//li[@class="page-item"]/a[@rel="next"]/@href');
+    final nextPage = xpath(
+      res,
+      '//li[@class="page-item"]/a[@rel="next"]/@href',
+    );
     return MPages(animeList, nextPage.isNotEmpty);
   }
 
@@ -73,34 +76,40 @@ class OkAnime extends MProvider {
       anime.link = urls[i];
       animeList.add(anime);
     }
-    final nextPage =
-        xpath(res, '//li[@class="page-item"]/a[@rel="next"]/@href');
+    final nextPage = xpath(
+      res,
+      '//li[@class="page-item"]/a[@rel="next"]/@href',
+    );
     return MPages(animeList, nextPage.isNotEmpty);
   }
 
   @override
   Future<MManga> getDetail(String url) async {
     final statusList = [
-      {"يعرض الان": 0, "مكتمل": 1}
+      {"يعرض الان": 0, "مكتمل": 1},
     ];
     final res = (await client.get(Uri.parse(url))).body;
     MManga anime = MManga();
-    final status = xpath(res,
-        '//*[@class="full-list-info" and contains(text(),"حالة الأنمي")]/small/a/text()');
+    final status = xpath(
+      res,
+      '//*[@class="full-list-info" and contains(text(),"حالة الأنمي")]/small/a/text()',
+    );
     if (status.isNotEmpty) {
       anime.status = parseStatus(status.first, statusList);
     }
     anime.description = xpath(res, '//*[@class="review-content"]/text()').first;
 
     anime.genre = xpath(res, '//*[@class="review-author-info"]/a/text()');
-    final epUrls = xpath(res,
-            '//*[contains(@class,"anime-card")]/div[@class="anime-title")]/h5/a/@href')
-        .reversed
-        .toList();
-    final names = xpath(res,
-            '//*[contains(@class,"anime-card")]/div[@class="anime-title")]/h5/a/text()')
-        .reversed
-        .toList();
+    final epUrls =
+        xpath(
+          res,
+          '//*[contains(@class,"anime-card")]/div[@class="anime-title")]/h5/a/@href',
+        ).reversed.toList();
+    final names =
+        xpath(
+          res,
+          '//*[contains(@class,"anime-card")]/div[@class="anime-title")]/h5/a/text()',
+        ).reversed.toList();
 
     List<MChapter>? episodesList = [];
     for (var i = 0; i < epUrls.length; i++) {
@@ -147,19 +156,21 @@ class OkAnime extends MProvider {
   List<dynamic> getSourcePreferences() {
     return [
       ListPreference(
-          key: "preferred_quality",
-          title: "Preferred Quality",
-          summary: "",
-          valueIndex: 1,
-          entries: ["1080p", "720p", "480p", "360p"],
-          entryValues: ["1080", "720", "480", "360"]),
+        key: "preferred_quality",
+        title: "Preferred Quality",
+        summary: "",
+        valueIndex: 1,
+        entries: ["1080p", "720p", "480p", "360p"],
+        entryValues: ["1080", "720", "480", "360"],
+      ),
       MultiSelectListPreference(
-          key: "hoster_selection",
-          title: "Enable/Disable Hosts",
-          summary: "",
-          entries: ["Dood", "Voe", "Mp4upload", "VidBom", "Okru"],
-          entryValues: ["Dood", "Voe", "Mp4upload", "VidBom", "Okru"],
-          values: ["Dood", "Voe", "Mp4upload", "VidBom", "Okru"]),
+        key: "hoster_selection",
+        title: "Enable/Disable Hosts",
+        summary: "",
+        entries: ["Dood", "Voe", "Mp4upload", "VidBom", "Okru"],
+        entryValues: ["Dood", "Voe", "Mp4upload", "VidBom", "Okru"],
+        values: ["Dood", "Voe", "Mp4upload", "VidBom", "Okru"],
+      ),
     ];
   }
 

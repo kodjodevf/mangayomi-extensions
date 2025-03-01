@@ -10,9 +10,12 @@ class MMRCMS extends MProvider {
 
   @override
   Future<MPages> getPopular(int page) async {
-    final res = (await client.get(Uri.parse(
-            "${source.baseUrl}/filterList?page=$page&sortBy=views&asc=false")))
-        .body;
+    final res =
+        (await client.get(
+          Uri.parse(
+            "${source.baseUrl}/filterList?page=$page&sortBy=views&asc=false",
+          ),
+        )).body;
 
     List<MManga> mangaList = [];
     final urls = xpath(res, '//*[ @class="chart-title"]/@href');
@@ -24,7 +27,8 @@ class MMRCMS extends MProvider {
         images.add("${source.baseUrl}/uploads/manga/${slug}.jpg");
       } else {
         images.add(
-            "${source.baseUrl}/uploads/manga/${slug}/cover/cover_250x350.jpg");
+          "${source.baseUrl}/uploads/manga/${slug}/cover/cover_250x350.jpg",
+        );
       }
     }
 
@@ -41,9 +45,10 @@ class MMRCMS extends MProvider {
 
   @override
   Future<MPages> getLatestUpdates(int page) async {
-    final res = (await client
-            .get(Uri.parse("${source.baseUrl}/latest-release?page=$page")))
-        .body;
+    final res =
+        (await client.get(
+          Uri.parse("${source.baseUrl}/latest-release?page=$page"),
+        )).body;
 
     List<MManga> mangaList = [];
     final urls = xpath(res, '//*[@class="manga-item"]/h3/a/@href');
@@ -55,7 +60,8 @@ class MMRCMS extends MProvider {
         images.add("${source.baseUrl}/uploads/manga/${slug}.jpg");
       } else {
         images.add(
-            "${source.baseUrl}/uploads/manga/${slug}/cover/cover_250x350.jpg");
+          "${source.baseUrl}/uploads/manga/${slug}/cover/cover_250x350.jpg",
+        );
       }
     }
 
@@ -124,7 +130,8 @@ class MMRCMS extends MProvider {
           images.add("${source.baseUrl}/uploads/manga/$data.jpg");
         } else {
           images.add(
-              "${source.baseUrl}/uploads/manga/$data/cover/cover_250x350.jpg");
+            "${source.baseUrl}/uploads/manga/$data/cover/cover_250x350.jpg",
+          );
         }
       }
     } else {
@@ -136,7 +143,8 @@ class MMRCMS extends MProvider {
           images.add("${source.baseUrl}/uploads/manga/${slug}.jpg");
         } else {
           images.add(
-              "${source.baseUrl}/uploads/manga/${slug}/cover/cover_250x350.jpg");
+            "${source.baseUrl}/uploads/manga/${slug}/cover/cover_250x350.jpg",
+          );
         }
       }
     }
@@ -168,39 +176,52 @@ class MMRCMS extends MProvider {
         "prace w toku": 0,
         "ativo": 0,
         "مستمرة": 0,
-        "em andamento": 0
-      }
+        "em andamento": 0,
+      },
     ];
     MManga manga = MManga();
     final res = (await client.get(Uri.parse(url))).body;
 
-    final author = xpath(res,
-        '//*[@class="dl-horizontal"]/dt[contains(text(), "Auteur(s)") or contains(text(), "Author(s)") or contains(text(), "Autor(es)") or contains(text(), "Yazar(lar) or contains(text(), "Mangaka(lar)")]//following-sibling::dd[1]/text()');
+    final author = xpath(
+      res,
+      '//*[@class="dl-horizontal"]/dt[contains(text(), "Auteur(s)") or contains(text(), "Author(s)") or contains(text(), "Autor(es)") or contains(text(), "Yazar(lar) or contains(text(), "Mangaka(lar)")]//following-sibling::dd[1]/text()',
+    );
     if (author.isNotEmpty) {
       manga.author = author.first;
     }
-    final status = xpath(res,
-        '//*[@class="dl-horizontal"]/dt[contains(text(), "Statut") or contains(text(), "Status") or contains(text(), "Estado") or contains(text(), "Durum")]/following-sibling::dd[1]/text()');
+    final status = xpath(
+      res,
+      '//*[@class="dl-horizontal"]/dt[contains(text(), "Statut") or contains(text(), "Status") or contains(text(), "Estado") or contains(text(), "Durum")]/following-sibling::dd[1]/text()',
+    );
     if (status.isNotEmpty) {
       manga.status = parseStatus(status.first, statusList);
     }
 
-    final description =
-        xpath(res, '//*[@class="well" or @class="manga well"]/p/text()');
+    final description = xpath(
+      res,
+      '//*[@class="well" or @class="manga well"]/p/text()',
+    );
     if (description.isNotEmpty) {
       manga.description = description.first;
     }
 
-    manga.genre = xpath(res,
-        '//*[@class="dl-horizontal"]/dt[contains(text(), "Categories") or contains(text(), "Categorias") or contains(text(), "Categorías") or contains(text(), "Catégories") or contains(text(), "Kategoriler" or contains(text(), "Kategorie") or contains(text(), "Kategori") or contains(text(), "Tagi"))]/following-sibling::dd[1]/text()');
+    manga.genre = xpath(
+      res,
+      '//*[@class="dl-horizontal"]/dt[contains(text(), "Categories") or contains(text(), "Categorias") or contains(text(), "Categorías") or contains(text(), "Catégories") or contains(text(), "Kategoriler" or contains(text(), "Kategorie") or contains(text(), "Kategori") or contains(text(), "Tagi"))]/following-sibling::dd[1]/text()',
+    );
 
     var chapUrls = xpath(res, '//*[@class="chapter-title-rtl"]/a/@href');
     var chaptersNames = xpath(res, '//*[@class="chapter-title-rtl"]/a/text()');
-    var chaptersDates =
-        xpath(res, '//*[@class="date-chapter-title-rtl"]/text()');
+    var chaptersDates = xpath(
+      res,
+      '//*[@class="date-chapter-title-rtl"]/text()',
+    );
 
-    var dateUploads =
-        parseDates(chaptersDates, source.dateFormat, source.dateFormatLocale);
+    var dateUploads = parseDates(
+      chaptersDates,
+      source.dateFormat,
+      source.dateFormatLocale,
+    );
 
     List<MChapter>? chaptersList = [];
     for (var i = 0; i < chaptersNames.length; i++) {
@@ -219,8 +240,10 @@ class MMRCMS extends MProvider {
     final res = (await client.get(Uri.parse(url))).body;
 
     List<String> pagesUrl = [];
-    final pages =
-        xpath(res, '//*[@id="all"]/img[@class="img-responsive"]/@data-src');
+    final pages = xpath(
+      res,
+      '//*[@id="all"]/img[@class="img-responsive"]/@data-src',
+    );
     for (var page in pages) {
       if (page.startsWith('//')) {
         pagesUrl.add(page.replaceAll('//', 'https://'));
@@ -306,7 +329,7 @@ class MMRCMS extends MProvider {
         SelectFilterOption("Name", "name"),
         SelectFilterOption("Popularity", "views"),
         SelectFilterOption("Last update", "last_release"),
-      ])
+      ]),
     ];
   }
 

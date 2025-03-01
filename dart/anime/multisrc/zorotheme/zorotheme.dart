@@ -10,18 +10,20 @@ class ZoroTheme extends MProvider {
 
   @override
   Future<MPages> getPopular(int page) async {
-    final res = (await client
-            .get(Uri.parse("${source.baseUrl}/most-popular?page=$page")))
-        .body;
+    final res =
+        (await client.get(
+          Uri.parse("${source.baseUrl}/most-popular?page=$page"),
+        )).body;
 
     return animeElementM(res);
   }
 
   @override
   Future<MPages> getLatestUpdates(int page) async {
-    final res = (await client
-            .get(Uri.parse("${source.baseUrl}/recently-updated?page=$page")))
-        .body;
+    final res =
+        (await client.get(
+          Uri.parse("${source.baseUrl}/recently-updated?page=$page"),
+        )).body;
 
     return animeElementM(res);
   }
@@ -122,28 +124,36 @@ class ZoroTheme extends MProvider {
   @override
   Future<MManga> getDetail(String url) async {
     final statusList = [
-      {"Currently Airing": 0, "Finished Airing": 1}
+      {"Currently Airing": 0, "Finished Airing": 1},
     ];
     final res = (await client.get(Uri.parse("${source.baseUrl}$url"))).body;
     MManga anime = MManga();
-    final status = xpath(res,
-        '//*[@class="anisc-info"]/div[contains(text(),"Status:")]/span[2]/text()');
+    final status = xpath(
+      res,
+      '//*[@class="anisc-info"]/div[contains(text(),"Status:")]/span[2]/text()',
+    );
     if (status.isNotEmpty) {
       anime.status = parseStatus(status.first, statusList);
     }
 
-    final author = xpath(res,
-        '//*[@class="anisc-info"]/div[contains(text(),"Studios:")]/span/text()');
+    final author = xpath(
+      res,
+      '//*[@class="anisc-info"]/div[contains(text(),"Studios:")]/span/text()',
+    );
     if (author.isNotEmpty) {
       anime.author = author.first.replaceAll("Studios:", "");
     }
-    final description = xpath(res,
-        '//*[@class="anisc-info"]/div[contains(text(),"Overview:")]/text()');
+    final description = xpath(
+      res,
+      '//*[@class="anisc-info"]/div[contains(text(),"Overview:")]/text()',
+    );
     if (description.isNotEmpty) {
       anime.description = description.first.replaceAll("Overview:", "");
     }
-    final genre = xpath(res,
-        '//*[@class="anisc-info"]/div[contains(text(),"Genres:")]/a/text()');
+    final genre = xpath(
+      res,
+      '//*[@class="anisc-info"]/div[contains(text(),"Genres:")]/a/text()',
+    );
 
     anime.genre = genre;
     final id = substringAfterLast(url, '-');
@@ -177,11 +187,13 @@ class ZoroTheme extends MProvider {
   Future<List<MVideo>> getVideoList(String url) async {
     final id = substringAfterLast(url, '?ep=');
 
-    final res = (await client.get(
-            Uri.parse(
-                "${source.baseUrl}/ajax${ajaxRoute('${source.baseUrl}')}/episode/servers?episodeId=$id"),
-            headers: {"referer": "${source.baseUrl}/$url"}))
-        .body;
+    final res =
+        (await client.get(
+          Uri.parse(
+            "${source.baseUrl}/ajax${ajaxRoute('${source.baseUrl}')}/episode/servers?episodeId=$id",
+          ),
+          headers: {"referer": "${source.baseUrl}/$url"},
+        )).body;
     final html = json.decode(res)["html"];
 
     final serverElements = parseHtml(html).select("div.server-item");
@@ -194,11 +206,13 @@ class ZoroTheme extends MProvider {
       final id = serverElement.attr("data-id");
       final subDub = serverElement.attr("data-type");
 
-      final resE = (await client.get(
-              Uri.parse(
-                  "${source.baseUrl}/ajax${ajaxRoute('${source.baseUrl}')}/episode/sources?id=$id"),
-              headers: {"referer": "${source.baseUrl}/$url"}))
-          .body;
+      final resE =
+          (await client.get(
+            Uri.parse(
+              "${source.baseUrl}/ajax${ajaxRoute('${source.baseUrl}')}/episode/sources?id=$id",
+            ),
+            headers: {"referer": "${source.baseUrl}/$url"},
+          )).body;
       String epUrl = substringBefore(substringAfter(resE, "\"link\":\""), "\"");
       List<MVideo> a = [];
       if (hosterSelection.contains(name) && typeSelection.contains(subDub)) {
@@ -222,30 +236,36 @@ class ZoroTheme extends MProvider {
   Future<List<MVideo>> rapidCloudExtractor(String url, String name) async {
     final serverUrl = ['https://megacloud.tv', 'https://rapid-cloud.co'];
 
-    final serverType = url.startsWith('https://megacloud.tv') || url.startsWith('https://megacloud.club') ? 0 : 1;
+    final serverType =
+        url.startsWith('https://megacloud.tv') ||
+                url.startsWith('https://megacloud.club')
+            ? 0
+            : 1;
     final sourceUrl = [
       '/embed-2/ajax/e-1/getSources?id=',
-      '/ajax/embed-6-v2/getSources?id='
+      '/ajax/embed-6-v2/getSources?id=',
     ];
     final sourceSpliter = ['/e-1/', '/embed-6-v2/'];
     final id = url.split(sourceSpliter[serverType]).last.split('?').first;
 
     String resServer = "";
     if (serverType == 0) {
-      resServer =
-          await evaluateJavascriptViaWebview("https://megacloud.tv/about", {
-        "X-Requested-With": "org.lineageos.jelly"
-      }, [
-        cryptoStr,
-        decodePng,
-        getSrcStr,
-        "getSources('$id').then(s => window.flutter_inappwebview.callHandler('setResponse', JSON.stringify(s)))"
-      ]);
+      resServer = await evaluateJavascriptViaWebview(
+        "https://megacloud.tv/about",
+        {"X-Requested-With": "org.lineageos.jelly"},
+        [
+          cryptoStr,
+          decodePng,
+          getSrcStr,
+          "getSources('$id').then(s => window.flutter_inappwebview.callHandler('setResponse', JSON.stringify(s)))",
+        ],
+      );
     } else {
-      resServer = (await client.get(
-              Uri.parse('${serverUrl[serverType]}${sourceUrl[serverType]}$id'),
-              headers: {"X-Requested-With": "XMLHttpRequest"}))
-          .body;
+      resServer =
+          (await client.get(
+            Uri.parse('${serverUrl[serverType]}${sourceUrl[serverType]}$id'),
+            headers: {"X-Requested-With": "XMLHttpRequest"},
+          )).body;
     }
 
     final encrypted = getMapValue(resServer, "encrypted");
@@ -268,18 +288,21 @@ class ZoroTheme extends MProvider {
       videoResJson = decryptAESCryptoJS(ciphertext, password);
     } else {
       videoResJson = json.encode(
-          (json.decode(resServer)["sources"] as List<Map<String, dynamic>>));
+        (json.decode(resServer)["sources"] as List<Map<String, dynamic>>),
+      );
     }
 
     String masterUrl =
         ((json.decode(videoResJson) as List<Map<String, dynamic>>)
             .first)['file'];
-    String type = ((json.decode(videoResJson) as List<Map<String, dynamic>>)
-        .first)['type'];
+    String type =
+        ((json.decode(videoResJson) as List<Map<String, dynamic>>)
+            .first)['type'];
 
-    final tracks = (json.decode(resServer)['tracks'] as List)
-        .where((e) => e['kind'] == 'captions' ? true : false)
-        .toList();
+    final tracks =
+        (json.decode(resServer)['tracks'] as List)
+            .where((e) => e['kind'] == 'captions' ? true : false)
+            .toList();
     List<MTrack> subtitles = [];
 
     for (var sub in tracks) {
@@ -295,8 +318,10 @@ class ZoroTheme extends MProvider {
     if (type == "hls") {
       final masterPlaylistRes = (await client.get(Uri.parse(masterUrl))).body;
 
-      for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
-          .split("#EXT-X-STREAM-INF:")) {
+      for (var it in substringAfter(
+        masterPlaylistRes,
+        "#EXT-X-STREAM-INF:",
+      ).split("#EXT-X-STREAM-INF:")) {
         final quality =
             "${substringBefore(substringBefore(substringAfter(substringAfter(it, "RESOLUTION="), "x"), ","), "\n")}p";
 
@@ -330,19 +355,22 @@ class ZoroTheme extends MProvider {
   Future<List<List<int>>> generateIndexPairs(int serverType) async {
     final jsPlayerUrl = [
       "https://megacloud.tv/js/player/a/prod/e1-player.min.js",
-      "https://rapid-cloud.co/js/player/prod/e6-player-v2.min.js"
+      "https://rapid-cloud.co/js/player/prod/e6-player-v2.min.js",
     ];
     final scriptText =
         (await client.get(Uri.parse(jsPlayerUrl[serverType]))).body;
 
     final switchCode = scriptText.substring(
-        scriptText.lastIndexOf('switch'), scriptText.indexOf('=partKey'));
+      scriptText.lastIndexOf('switch'),
+      scriptText.indexOf('=partKey'),
+    );
 
     List<int> indexes = [];
     for (var variableMatch
         in RegExp(r'=(\w+)').allMatches(switchCode).toList()) {
       final regex = RegExp(
-          ',${(variableMatch as RegExpMatch).group(1)}=((?:0x)?([0-9a-fA-F]+))');
+        ',${(variableMatch as RegExpMatch).group(1)}=((?:0x)?([0-9a-fA-F]+))',
+      );
       Match? match = regex.firstMatch(scriptText);
 
       if (match != null) {
@@ -374,13 +402,19 @@ class ZoroTheme extends MProvider {
     List<MManga> animeList = [];
 
     final urls = xpath(
-        res, '//*[@class^="flw-item"]/div[@class="film-detail"]/h3/a/@href');
+      res,
+      '//*[@class^="flw-item"]/div[@class="film-detail"]/h3/a/@href',
+    );
 
-    final names = xpath(res,
-        '//*[@class^="flw-item"]/div[@class="film-detail"]/h3/a/@data-jname');
+    final names = xpath(
+      res,
+      '//*[@class^="flw-item"]/div[@class="film-detail"]/h3/a/@data-jname',
+    );
 
     final images = xpath(
-        res, '//*[@class^="flw-item"]/div[@class="film-poster"]/img/@data-src');
+      res,
+      '//*[@class^="flw-item"]/div[@class="film-poster"]/img/@data-src',
+    );
     for (var i = 0; i < names.length; i++) {
       MManga anime = MManga();
       anime.name = names[i];
@@ -388,8 +422,11 @@ class ZoroTheme extends MProvider {
       anime.link = urls[i];
       animeList.add(anime);
     }
-    final nextPage =
-        xpath(res, '//li[@class="page-item"]/a[@title="Next"]/@href', "");
+    final nextPage = xpath(
+      res,
+      '//li[@class="page-item"]/a[@title="Next"]/@href',
+      "",
+    );
     return MPages(animeList, !nextPage.isEmpty);
   }
 
@@ -403,7 +440,7 @@ class ZoroTheme extends MProvider {
   List<SelectFilterOption> yearList = [
     for (var i = 1917; i < 2024; i++)
       SelectFilterOption(i.toString(), i.toString()),
-    SelectFilterOption("All", "")
+    SelectFilterOption("All", ""),
   ];
 
   @override
@@ -416,13 +453,13 @@ class ZoroTheme extends MProvider {
         SelectFilterOption("OVA", "3"),
         SelectFilterOption("ONA", "4"),
         SelectFilterOption("Special", "5"),
-        SelectFilterOption("Music", "6")
+        SelectFilterOption("Music", "6"),
       ]),
       SelectFilter("StatusFilter", "Status", 0, [
         SelectFilterOption("All", ""),
         SelectFilterOption("Finished Airing", "1"),
         SelectFilterOption("Currently Airing", "2"),
-        SelectFilterOption("Not yet aired", "3")
+        SelectFilterOption("Not yet aired", "3"),
       ]),
       SelectFilter("RatedFilter", "Rated", 0, [
         SelectFilterOption("All", ""),
@@ -431,7 +468,7 @@ class ZoroTheme extends MProvider {
         SelectFilterOption("PG-13", "3"),
         SelectFilterOption("R", "4"),
         SelectFilterOption("R+", "5"),
-        SelectFilterOption("Rx", "6")
+        SelectFilterOption("Rx", "6"),
       ]),
       SelectFilter("ScoreFilter", "Score", 0, [
         SelectFilterOption("All", ""),
@@ -444,20 +481,20 @@ class ZoroTheme extends MProvider {
         SelectFilterOption("(7) Good", "7"),
         SelectFilterOption("(8) Very Good", "8"),
         SelectFilterOption("(9) Great", "9"),
-        SelectFilterOption("(10) Masterpiece", "10")
+        SelectFilterOption("(10) Masterpiece", "10"),
       ]),
       SelectFilter("SeasonFilter", "Season", 0, [
         SelectFilterOption("All", ""),
         SelectFilterOption("Spring", "1"),
         SelectFilterOption("Summer", "2"),
         SelectFilterOption("Fall", "3"),
-        SelectFilterOption("Winter", "4")
+        SelectFilterOption("Winter", "4"),
       ]),
       SelectFilter("LanguageFilter", "Language", 0, [
         SelectFilterOption("All", ""),
         SelectFilterOption("SUB", "1"),
         SelectFilterOption("DUB", "2"),
-        SelectFilterOption("SUB & DUB", "3")
+        SelectFilterOption("SUB & DUB", "3"),
       ]),
       SelectFilter("SortFilter", "Sort by", 0, [
         SelectFilterOption("All", ""),
@@ -467,14 +504,18 @@ class ZoroTheme extends MProvider {
         SelectFilterOption("Score", "score"),
         SelectFilterOption("Name A-Z", "name_az"),
         SelectFilterOption("Released Date", "released_date"),
-        SelectFilterOption("Most Watched", "most_watched")
+        SelectFilterOption("Most Watched", "most_watched"),
       ]),
       SelectFilter(
-          "StartYearFilter", "Start year", 0, yearList.reversed.toList()),
+        "StartYearFilter",
+        "Start year",
+        0,
+        yearList.reversed.toList(),
+      ),
       SelectFilter("StartMonthFilter", "Start month", 0, [
         SelectFilterOption("All", ""),
         for (var i = 1; i < 13; i++)
-          SelectFilterOption(i.toString(), i.toString())
+          SelectFilterOption(i.toString(), i.toString()),
       ]),
       SelectFilter("StartDayFilter", "Start day", 0, [
         SelectFilterOption("All", ""),
@@ -485,12 +526,12 @@ class ZoroTheme extends MProvider {
       SelectFilter("EndmonthFilter", "End month", 0, [
         SelectFilterOption("All", ""),
         for (var i = 1; i < 32; i++)
-          SelectFilterOption(i.toString(), i.toString())
+          SelectFilterOption(i.toString(), i.toString()),
       ]),
       SelectFilter("EndDayFilter", "End day", 0, [
         SelectFilterOption("All", ""),
         for (var i = 1; i < 32; i++)
-          SelectFilterOption(i.toString(), i.toString())
+          SelectFilterOption(i.toString(), i.toString()),
       ]),
       GroupFilter("GenreFilter", "Genre", [
         CheckBoxFilter("Action", "1"),
@@ -535,7 +576,7 @@ class ZoroTheme extends MProvider {
         CheckBoxFilter("Thriller", "41"),
         CheckBoxFilter("Vampire", "32"),
         CheckBoxFilter("Yaoi", "33"),
-        CheckBoxFilter("Yuri", "34")
+        CheckBoxFilter("Yuri", "34"),
       ]),
     ];
   }
@@ -544,58 +585,65 @@ class ZoroTheme extends MProvider {
   List<dynamic> getSourcePreferences() {
     return [
       ListPreference(
-          key: "preferred_quality",
-          title: "Preferred Quality",
-          summary: "",
-          valueIndex: 1,
-          entries: ["1080p", "720p", "480p", "360p"],
-          entryValues: ["1080", "720", "480", "360"]),
+        key: "preferred_quality",
+        title: "Preferred Quality",
+        summary: "",
+        valueIndex: 1,
+        entries: ["1080p", "720p", "480p", "360p"],
+        entryValues: ["1080", "720", "480", "360"],
+      ),
       if (source.name == "HiAnime")
         ListPreference(
-            key: "preferred_server1",
-            title: "Preferred server",
-            summary: "",
-            valueIndex: 0,
-            entries: ["HD-1", "HD-2", "StreamTape"],
-            entryValues: ["HD-1", "HD-2", "StreamTape"]),
-      if (source.name != "HiAnime")
-        ListPreference(
-            key: "preferred_server1",
-            title: "Preferred server",
-            summary: "",
-            valueIndex: 0,
-            entries: ["Vidstreaming", "VidCloud", "StreamTape"],
-            entryValues: ["Vidstreaming", "VidCloud", "StreamTape"]),
-      ListPreference(
-          key: "preferred_type1",
-          title: "Preferred Type",
+          key: "preferred_server1",
+          title: "Preferred server",
           summary: "",
           valueIndex: 0,
-          entries: ["Sub", "Dub"],
-          entryValues: ["sub", "dub"]),
+          entries: ["HD-1", "HD-2", "StreamTape"],
+          entryValues: ["HD-1", "HD-2", "StreamTape"],
+        ),
+      if (source.name != "HiAnime")
+        ListPreference(
+          key: "preferred_server1",
+          title: "Preferred server",
+          summary: "",
+          valueIndex: 0,
+          entries: ["Vidstreaming", "VidCloud", "StreamTape"],
+          entryValues: ["Vidstreaming", "VidCloud", "StreamTape"],
+        ),
+      ListPreference(
+        key: "preferred_type1",
+        title: "Preferred Type",
+        summary: "",
+        valueIndex: 0,
+        entries: ["Sub", "Dub"],
+        entryValues: ["sub", "dub"],
+      ),
       if (source.name != "HiAnime")
         MultiSelectListPreference(
-            key: "hoster_selection1",
-            title: "Enable/Disable Hosts",
-            summary: "",
-            entries: ["Vidstreaming", "VidCloud", "StreamTape"],
-            entryValues: ["Vidstreaming", "VidCloud", "StreamTape"],
-            values: ["Vidstreaming", "VidCloud", "StreamTape"]),
+          key: "hoster_selection1",
+          title: "Enable/Disable Hosts",
+          summary: "",
+          entries: ["Vidstreaming", "VidCloud", "StreamTape"],
+          entryValues: ["Vidstreaming", "VidCloud", "StreamTape"],
+          values: ["Vidstreaming", "VidCloud", "StreamTape"],
+        ),
       if (source.name == "HiAnime")
         MultiSelectListPreference(
-            key: "hoster_selection1",
-            title: "Enable/Disable Hosts",
-            summary: "",
-            entries: ["HD-1", "HD-2", "StreamTape"],
-            entryValues: ["HD-1", "HD-2", "StreamTape"],
-            values: ["HD-1", "HD-2", "StreamTape"]),
-      MultiSelectListPreference(
-          key: "type_selection_new",
-          title: "Enable/Disable Types",
+          key: "hoster_selection1",
+          title: "Enable/Disable Hosts",
           summary: "",
-          entries: ["Sub", "Dub", "Raw"],
-          entryValues: ["sub", "dub"],
-          values: ["sub", "dub", "raw"]),
+          entries: ["HD-1", "HD-2", "StreamTape"],
+          entryValues: ["HD-1", "HD-2", "StreamTape"],
+          values: ["HD-1", "HD-2", "StreamTape"],
+        ),
+      MultiSelectListPreference(
+        key: "type_selection_new",
+        title: "Enable/Disable Types",
+        summary: "",
+        entries: ["Sub", "Dub", "Raw"],
+        entryValues: ["sub", "dub"],
+        values: ["sub", "dub", "raw"],
+      ),
     ];
   }
 

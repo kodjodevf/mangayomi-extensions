@@ -7,13 +7,17 @@ const _datalifeengineSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/multisrc/datalifeengine/datalifeengine.dart";
 
 List<Source> get datalifeengineSourcesList => _datalifeengineSourcesList;
-List<Source> _datalifeengineSourcesList = [
-//French Anime (FR)
-  frenchanimeSource,
-//Wiflix (FR)
-  wiflixSource,
-]
-    .map((e) => e
-      ..sourceCodeUrl = _datalifeengineSourceCodeUrl
-      ..version = _datalifeengineVersion)
-    .toList();
+List<Source> _datalifeengineSourcesList =
+    [
+          //French Anime (FR)
+          frenchanimeSource,
+          //Wiflix (FR)
+          wiflixSource,
+        ]
+        .map(
+          (e) =>
+              e
+                ..sourceCodeUrl = _datalifeengineSourceCodeUrl
+                ..version = _datalifeengineVersion,
+        )
+        .toList();

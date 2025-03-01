@@ -10,20 +10,27 @@ class AnimeSaturn extends MProvider {
 
   @override
   Future<MPages> getPopular(int page) async {
-    final res = (await client
-            .get(Uri.parse("${source.baseUrl}/animeincorso?page=$page")))
-        .body;
+    final res =
+        (await client.get(
+          Uri.parse("${source.baseUrl}/animeincorso?page=$page"),
+        )).body;
 
     List<MManga> animeList = [];
 
-    final urls = xpath(res,
-        '//*[@class="sebox"]/div[@class="msebox"]/div[@class="headsebox"]/div[@class="tisebox"]/h2/a/@href');
+    final urls = xpath(
+      res,
+      '//*[@class="sebox"]/div[@class="msebox"]/div[@class="headsebox"]/div[@class="tisebox"]/h2/a/@href',
+    );
 
-    final names = xpath(res,
-        '//*[@class="sebox"]/div[@class="msebox"]/div[@class="headsebox"]/div[@class="tisebox"]/h2/a/text()');
+    final names = xpath(
+      res,
+      '//*[@class="sebox"]/div[@class="msebox"]/div[@class="headsebox"]/div[@class="tisebox"]/h2/a/text()',
+    );
 
-    final images = xpath(res,
-        '//*[@class="sebox"]/div[@class="msebox"]/div[@class="bigsebox"]/div/img[@class="attachment-post-thumbnail size-post-thumbnail wp-post-image"]/@src');
+    final images = xpath(
+      res,
+      '//*[@class="sebox"]/div[@class="msebox"]/div[@class="bigsebox"]/div/img[@class="attachment-post-thumbnail size-post-thumbnail wp-post-image"]/@src',
+    );
 
     for (var i = 0; i < names.length; i++) {
       MManga anime = MManga();
@@ -38,8 +45,9 @@ class AnimeSaturn extends MProvider {
   @override
   Future<MPages> getLatestUpdates(int page) async {
     final res =
-        (await client.get(Uri.parse("${source.baseUrl}/newest?page=$page")))
-            .body;
+        (await client.get(
+          Uri.parse("${source.baseUrl}/newest?page=$page"),
+        )).body;
 
     List<MManga> animeList = [];
 
@@ -47,8 +55,10 @@ class AnimeSaturn extends MProvider {
 
     final names = xpath(res, '//*[@class="card mb-4 shadow-sm"]/a/@title');
 
-    final images = xpath(res,
-        '//*[@class="card mb-4 shadow-sm"]/a/img[@class="new-anime"]/@src');
+    final images = xpath(
+      res,
+      '//*[@class="card mb-4 shadow-sm"]/a/img[@class="new-anime"]/@src',
+    );
 
     for (var i = 0; i < names.length; i++) {
       MManga anime = MManga();
@@ -114,21 +124,29 @@ class AnimeSaturn extends MProvider {
     List<String> names = [];
     List<String> images = [];
     if (query.isNotEmpty) {
-      urls = xpath(res,
-          '//*[@class="list-group"]/li[@class="list-group-item bg-dark-as-box-shadow"]/div[@class="item-archivio"]/div[@class="info-archivio"]/h3/a[@class="badge badge-archivio badge-light"]/@href');
+      urls = xpath(
+        res,
+        '//*[@class="list-group"]/li[@class="list-group-item bg-dark-as-box-shadow"]/div[@class="item-archivio"]/div[@class="info-archivio"]/h3/a[@class="badge badge-archivio badge-light"]/@href',
+      );
 
-      names = xpath(res,
-          '//*[@class="list-group"]/li[@class="list-group-item bg-dark-as-box-shadow"]/div[@class="item-archivio"]/div[@class="info-archivio"]/h3/a[@class="badge badge-archivio badge-light"]/text()');
+      names = xpath(
+        res,
+        '//*[@class="list-group"]/li[@class="list-group-item bg-dark-as-box-shadow"]/div[@class="item-archivio"]/div[@class="info-archivio"]/h3/a[@class="badge badge-archivio badge-light"]/text()',
+      );
 
-      images = xpath(res,
-          '//*[@class="list-group"]/li[@class="list-group-item bg-dark-as-box-shadow"]/div[@class="item-archivio"]/a/img/@src');
+      images = xpath(
+        res,
+        '//*[@class="list-group"]/li[@class="list-group-item bg-dark-as-box-shadow"]/div[@class="item-archivio"]/a/img/@src',
+      );
     } else {
       urls = xpath(res, '//*[@class="card mb-4 shadow-sm"]/a/@href');
 
       names = xpath(res, '//*[@class="card mb-4 shadow-sm"]/a/text()');
 
-      images = xpath(res,
-          '//*[@class="card mb-4 shadow-sm"]/a/img[@class="new-anime"]/@src');
+      images = xpath(
+        res,
+        '//*[@class="card mb-4 shadow-sm"]/a/img[@class="new-anime"]/@src',
+      );
     }
 
     for (var i = 0; i < names.length; i++) {
@@ -144,20 +162,25 @@ class AnimeSaturn extends MProvider {
   @override
   Future<MManga> getDetail(String url) async {
     final statusList = [
-      {"In corso": 0, "Finito": 1}
+      {"In corso": 0, "Finito": 1},
     ];
 
     final res = (await client.get(Uri.parse(url))).body;
     MManga anime = MManga();
-    final detailsList = xpath(res,
-        '//div[@class="container shadow rounded bg-dark-as-box mb-3 p-3 w-100 text-white"]/text()');
+    final detailsList = xpath(
+      res,
+      '//div[@class="container shadow rounded bg-dark-as-box mb-3 p-3 w-100 text-white"]/text()',
+    );
     if (detailsList.isNotEmpty) {
       final details = detailsList.first;
 
       anime.status = parseStatus(
-          details.substring(
-              details.indexOf("Stato:") + 6, details.indexOf("Data di uscita:")),
-          statusList);
+        details.substring(
+          details.indexOf("Stato:") + 6,
+          details.indexOf("Data di uscita:"),
+        ),
+        statusList,
+      );
       anime.author = details.substring(7, details.indexOf("Stato:"));
     }
 
@@ -174,14 +197,20 @@ class AnimeSaturn extends MProvider {
       }
     }
 
-    anime.genre = xpath(res,
-        '//*[@class="container shadow rounded bg-dark-as-box mb-3 p-3 w-100"]/a/text()');
+    anime.genre = xpath(
+      res,
+      '//*[@class="container shadow rounded bg-dark-as-box mb-3 p-3 w-100"]/a/text()',
+    );
 
-    final epUrls = xpath(res,
-        '//*[@class="btn-group episodes-button episodi-link-button"]/a/@href');
+    final epUrls = xpath(
+      res,
+      '//*[@class="btn-group episodes-button episodi-link-button"]/a/@href',
+    );
 
-    final titles = xpath(res,
-        '//*[@class="btn-group episodes-button episodi-link-button"]/a/text()');
+    final titles = xpath(
+      res,
+      '//*[@class="btn-group episodes-button episodi-link-button"]/a/text()',
+    );
 
     List<MChapter>? episodesList = [];
     for (var i = 0; i < epUrls.length; i++) {
@@ -211,8 +240,10 @@ class AnimeSaturn extends MProvider {
     List<MVideo> videos = [];
     if (masterUrl.endsWith("playlist.m3u8")) {
       final masterPlaylistRes = (await client.get(Uri.parse(masterUrl))).body;
-      for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
-          .split("#EXT-X-STREAM-INF:")) {
+      for (var it in substringAfter(
+        masterPlaylistRes,
+        "#EXT-X-STREAM-INF:",
+      ).split("#EXT-X-STREAM-INF:")) {
         final quality =
             "${substringBefore(substringBefore(substringAfter(substringAfter(it, "RESOLUTION="), "x"), ","), "\n")}p";
 
@@ -320,12 +351,13 @@ class AnimeSaturn extends MProvider {
   List<dynamic> getSourcePreferences() {
     return [
       ListPreference(
-          key: "preferred_quality",
-          title: "Qualità preferita",
-          summary: "",
-          valueIndex: 0,
-          entries: ["1080p", "720p", "480p", "360p", "240p", "144p"],
-          entryValues: ["1080", "720", "480", "360", "240", "144"]),
+        key: "preferred_quality",
+        title: "Qualità preferita",
+        summary: "",
+        valueIndex: 0,
+        entries: ["1080p", "720p", "480p", "360p", "240p", "144p"],
+        entryValues: ["1080", "720", "480", "360", "240", "144"],
+      ),
     ];
   }
 

@@ -27,9 +27,10 @@ class UHDMovies extends MProvider {
 
   @override
   Future<MPages> search(String query, int page, FilterList filterList) async {
-    final res = (await client.get(
-            Uri.parse("$baseUrl/page/$page/?s=${query.replaceAll(" ", "+")}")))
-        .body;
+    final res =
+        (await client.get(
+          Uri.parse("$baseUrl/page/$page/?s=${query.replaceAll(" ", "+")}"),
+        )).body;
     return animeFromElement(res);
   }
 
@@ -43,10 +44,14 @@ class UHDMovies extends MProvider {
       anime.description = description.first;
     }
     anime.status = MStatus.ongoing;
-    final episodesTitles = xpath(res,
-        '//*[contains(@style, "center") or contains(@class, "maxbutton")]/a[contains(@class, "maxbutton") or contains(@href, "?sid=")]/text()');
-    final episodesUrls = xpath(res,
-        '//*[contains(@style, "center") or contains(@class, "maxbutton")]/a[contains(@class, "maxbutton") or contains(@href, "?sid=")]/@href');
+    final episodesTitles = xpath(
+      res,
+      '//*[contains(@style, "center") or contains(@class, "maxbutton")]/a[contains(@class, "maxbutton") or contains(@href, "?sid=")]/text()',
+    );
+    final episodesUrls = xpath(
+      res,
+      '//*[contains(@style, "center") or contains(@class, "maxbutton")]/a[contains(@class, "maxbutton") or contains(@href, "?sid=")]/@href',
+    );
     bool isSeries = false;
     if (episodesTitles.first.contains("Episode") ||
         episodesTitles.first.contains("Zip") ||
@@ -56,8 +61,10 @@ class UHDMovies extends MProvider {
     List<MChapter>? episodesList = [];
     if (!isSeries) {
       List<String> moviesTitles = [];
-      moviesTitles = xpath(res,
-          '//*[contains(@style, "center") or contains(@class, "maxbutton")]/parent::p//preceding-sibling::p[contains(@style, "center")]/text()');
+      moviesTitles = xpath(
+        res,
+        '//*[contains(@style, "center") or contains(@class, "maxbutton")]/parent::p//preceding-sibling::p[contains(@style, "center")]/text()',
+      );
       List<String> titles = [];
       if (moviesTitles.isEmpty) {
         moviesTitles = xpath(res, '//p[contains(@style, "center")]/text()');
@@ -82,8 +89,10 @@ class UHDMovies extends MProvider {
       }
     } else {
       List<String> seasonTitles = [];
-      final episodeTitles = xpath(res,
-          '//*[contains(@style, "center") or contains(@class, "maxbutton")]/parent::p//preceding-sibling::p[contains(@style, "center") and not(text()^="Episode")]/text()');
+      final episodeTitles = xpath(
+        res,
+        '//*[contains(@style, "center") or contains(@class, "maxbutton")]/parent::p//preceding-sibling::p[contains(@style, "center") and not(text()^="Episode")]/text()',
+      );
       List<String> titles = [];
       for (var title in episodeTitles) {
         if (title.isNotEmpty) {
@@ -126,13 +135,14 @@ class UHDMovies extends MProvider {
   List<dynamic> getSourcePreferences() {
     return [
       EditTextPreference(
-          key: "pref_domain_new",
-          title: "Currently used domain",
-          summary: "",
-          value: "https://uhdmovies.fans",
-          dialogTitle: "Currently used domain",
-          dialogMessage: "",
-          text: "https://uhdmovies.fans"),
+        key: "pref_domain_new",
+        title: "Currently used domain",
+        summary: "",
+        value: "https://uhdmovies.fans",
+        dialogTitle: "Currently used domain",
+        dialogMessage: "",
+        text: "https://uhdmovies.fans",
+      ),
     ];
   }
 
@@ -146,8 +156,9 @@ class UHDMovies extends MProvider {
         final link = links[i];
         String decodedLink = link;
         if (!link.contains("workers.dev")) {
-          decodedLink = utf8
-              .decode(base64Url.decode(substringAfter(link, "download?url=")));
+          decodedLink = utf8.decode(
+            base64Url.decode(substringAfter(link, "download?url=")),
+          );
         }
         MVideo video = MVideo();
         video
@@ -184,18 +195,25 @@ class UHDMovies extends MProvider {
     final js = xpath(lastDoc, '//script[contains(text(), "/?go=")]/text()');
     if (js.isEmpty) return "";
     String script = js.first;
-    String nextUrl =
-        substringBefore(substringAfter(script, "\"href\",\""), '"');
+    String nextUrl = substringBefore(
+      substringAfter(script, "\"href\",\""),
+      '"',
+    );
     if (!nextUrl.contains("http")) return "";
     String cookieName = substringAfter(nextUrl, "go=");
-    String cookieValue =
-        substringBefore(substringAfter(script, "'$cookieName', '"), "'");
-    final response = (await client.get(Uri.parse(nextUrl),
-            headers: {"referer": url, "Cookie": "$cookieName=$cookieValue"}))
-        .body;
+    String cookieValue = substringBefore(
+      substringAfter(script, "'$cookieName', '"),
+      "'",
+    );
+    final response =
+        (await client.get(
+          Uri.parse(nextUrl),
+          headers: {"referer": url, "Cookie": "$cookieName=$cookieValue"},
+        )).body;
 
-    final lastRes =
-        parseHtml(response).selectFirst("meta[http-equiv]").attr("content");
+    final lastRes = parseHtml(
+      response,
+    ).selectFirst("meta[http-equiv]").attr("content");
     return substringAfter(lastRes, "url=");
   }
 
@@ -222,9 +240,12 @@ class UHDMovies extends MProvider {
     final name = xpath(html, '//input/@name').first;
     final value = xpath(html, '//input/@value').first;
     final body = {"$name": value};
-    final response = (await client.post(Uri.parse(urlR.first),
-            headers: {"referer": url}, body: body))
-        .body;
+    final response =
+        (await client.post(
+          Uri.parse(urlR.first),
+          headers: {"referer": url},
+          body: body,
+        )).body;
     return recursiveDoc(url, response);
   }
 }

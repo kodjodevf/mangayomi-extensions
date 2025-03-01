@@ -16,12 +16,18 @@ class AnimesUltra extends MProvider {
     final res = (await client.get(Uri.parse(baseUrl))).body;
 
     List<MManga> animeList = [];
-    final urls = xpath(res,
-        '//*[contains(@class,"swiper-slide item-qtip")]/div[@class="item"]/a/@href');
-    final names = xpath(res,
-        '//*[contains(@class,"swiper-slide item-qtip")]/div[@class="item"]/a/img/@title');
-    final images = xpath(res,
-        '//*[contains(@class,"swiper-slide item-qtip")]/div[@class="item"]/a/img/@data-src');
+    final urls = xpath(
+      res,
+      '//*[contains(@class,"swiper-slide item-qtip")]/div[@class="item"]/a/@href',
+    );
+    final names = xpath(
+      res,
+      '//*[contains(@class,"swiper-slide item-qtip")]/div[@class="item"]/a/img/@title',
+    );
+    final images = xpath(
+      res,
+      '//*[contains(@class,"swiper-slide item-qtip")]/div[@class="item"]/a/img/@data-src',
+    );
 
     for (var i = 0; i < names.length; i++) {
       MManga anime = MManga();
@@ -39,12 +45,18 @@ class AnimesUltra extends MProvider {
     final res = (await client.get(Uri.parse(baseUrl))).body;
 
     List<MManga> animeList = [];
-    final urls = xpath(res,
-        '//*[@class="block_area block_area_home"]/div[@class="tab-content"]/div[contains(@class,"block_area-content block_area-list")]/div[@class="film_list-wrap"]/div[@class="flw-item"]/div[@class="film-poster"]/a/@href');
-    final names = xpath(res,
-        '//*[@class="block_area block_area_home"]/div[@class="tab-content"]/div[contains(@class,"block_area-content block_area-list")]/div[@class="film_list-wrap"]/div[@class="flw-item"]/div[@class="film-poster"]/a/@title');
-    final images = xpath(res,
-        '//*[@class="block_area block_area_home"]/div[@class="tab-content"]/div[contains(@class,"block_area-content block_area-list")]/div[@class="film_list-wrap"]/div[@class="flw-item"]/div[@class="film-poster"]/img/@data-src');
+    final urls = xpath(
+      res,
+      '//*[@class="block_area block_area_home"]/div[@class="tab-content"]/div[contains(@class,"block_area-content block_area-list")]/div[@class="film_list-wrap"]/div[@class="flw-item"]/div[@class="film-poster"]/a/@href',
+    );
+    final names = xpath(
+      res,
+      '//*[@class="block_area block_area_home"]/div[@class="tab-content"]/div[contains(@class,"block_area-content block_area-list")]/div[@class="film_list-wrap"]/div[@class="flw-item"]/div[@class="film-poster"]/a/@title',
+    );
+    final images = xpath(
+      res,
+      '//*[@class="block_area block_area_home"]/div[@class="tab-content"]/div[contains(@class,"block_area-content block_area-list")]/div[@class="film_list-wrap"]/div[@class="flw-item"]/div[@class="film-poster"]/img/@data-src',
+    );
 
     for (var i = 0; i < names.length; i++) {
       MManga anime = MManga();
@@ -60,9 +72,12 @@ class AnimesUltra extends MProvider {
   @override
   Future<MPages> search(String query, int page, FilterList filterList) async {
     query = query.trim().replaceAll(" ", "+");
-    final res = (await client.get(Uri.parse(
-            "$baseUrl/index.php?do=search&subaction=search&story=$query")))
-        .body;
+    final res =
+        (await client.get(
+          Uri.parse(
+            "$baseUrl/index.php?do=search&subaction=search&story=$query",
+          ),
+        )).body;
 
     List<MManga> animeList = [];
     final urls = xpath(res, '//*[@class="film-poster"]/a/@href');
@@ -83,7 +98,7 @@ class AnimesUltra extends MProvider {
   @override
   Future<MManga> getDetail(String url) async {
     final statusList = [
-      {"En cours": 0, "Terminé": 1}
+      {"En cours": 0, "Terminé": 1},
     ];
 
     final res = (await client.get(Uri.parse(url))).body;
@@ -92,17 +107,25 @@ class AnimesUltra extends MProvider {
     anime.description =
         xpath(res, '//*[@class="film-description m-hide"]/text()').first;
 
-    final status = xpath(res,
-            '//*[@class="item item-title" and contains(text(),"Status:")]/span[2]/text()')
-        .first;
+    final status =
+        xpath(
+          res,
+          '//*[@class="item item-title" and contains(text(),"Status:")]/span[2]/text()',
+        ).first;
     anime.status = parseStatus(status, statusList);
-    anime.genre = xpath(res,
-        '//*[@class="item item-list" and contains(text(),"Genres:")]/a/text()');
+    anime.genre = xpath(
+      res,
+      '//*[@class="item item-list" and contains(text(),"Genres:")]/a/text()',
+    );
     anime.author = doc.xpathFirst(
-        '//*[@class="item item-title" and contains(text(),"Studio:")]/span[2]/text()');
-    final episodesLength = int.parse(substringBefore(
-            doc.xpathFirst('//*[@class="film-stats"]/span[7]/text()'), "/")
-        .replaceAll("Ep", ""));
+      '//*[@class="item item-title" and contains(text(),"Studio:")]/span[2]/text()',
+    );
+    final episodesLength = int.parse(
+      substringBefore(
+        doc.xpathFirst('//*[@class="film-stats"]/span[7]/text()'),
+        "/",
+      ).replaceAll("Ep", ""),
+    );
     List<MChapter>? episodesList = [];
 
     for (var i = 0; i < episodesLength; i++) {
@@ -119,18 +142,23 @@ class AnimesUltra extends MProvider {
   Future<List<MVideo>> getVideoList(String url) async {
     final resHtml = (await client.get(Uri.parse(url))).body;
     final id = url.split('/')[4].split('-')[0];
-    final resServer = (await client
-            .get(Uri.parse("$baseUrl/engine/ajax/full-story.php?newsId=$id")))
-        .body;
+    final resServer =
+        (await client.get(
+          Uri.parse("$baseUrl/engine/ajax/full-story.php?newsId=$id"),
+        )).body;
 
-    final serverIds =
-        xpath(resHtml, '//*[@class="ps__-list"]/div/@data-server-id');
+    final serverIds = xpath(
+      resHtml,
+      '//*[@class="ps__-list"]/div/@data-server-id',
+    );
     final serverNames = xpath(resHtml, '//*[@class="ps__-list"]/div/a/text()');
     List<String> serverUrls = [];
     for (var id in serverIds) {
-      final serversUrls = xpath(jsonDecode(resServer)["html"],
-              '//*[@id="content_player_${id}"]/text()')
-          .first;
+      final serversUrls =
+          xpath(
+            jsonDecode(resServer)["html"],
+            '//*[@id="content_player_${id}"]/text()',
+          ).first;
       serverUrls.add(serversUrls);
     }
     List<MVideo> videos = [];
@@ -140,10 +168,13 @@ class AnimesUltra extends MProvider {
       List<MVideo> a = [];
       if (name.contains("Sendvid")) {
         a = await sendVidExtractorr(
-            url.replaceAll("https:////", "https://"), "");
+          url.replaceAll("https:////", "https://"),
+          "",
+        );
       } else if (name.contains("Sibnet")) {
         a = await sibnetExtractor(
-            "https://video.sibnet.ru/shell.php?videoid=$url");
+          "https://video.sibnet.ru/shell.php?videoid=$url",
+        );
       } else if (name.contains("Mytv")) {
         a = await myTvExtractor("https://www.myvi.tv/embed/$url");
       } else if (name.contains("Fmoon")) {
@@ -170,8 +201,10 @@ class AnimesUltra extends MProvider {
     if (masterUrl.contains(".m3u8")) {
       final masterPlaylistRes = (await client.get(Uri.parse(masterUrl))).body;
 
-      for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
-          .split("#EXT-X-STREAM-INF:")) {
+      for (var it in substringAfter(
+        masterPlaylistRes,
+        "#EXT-X-STREAM-INF:",
+      ).split("#EXT-X-STREAM-INF:")) {
         final quality =
             "${substringBefore(substringBefore(substringAfter(substringAfter(it, "RESOLUTION="), "x"), ","), "\n")}p";
 

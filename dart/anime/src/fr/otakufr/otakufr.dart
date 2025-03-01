@@ -16,12 +16,18 @@ class OtakuFr extends MProvider {
     final res =
         (await client.get(Uri.parse("$baseUrl/en-cours/page/$page"))).body;
     List<MManga> animeList = [];
-    final urls =
-        xpath(res, '//*[@class="list"]/article/div/div/figure/a/@href');
-    final names =
-        xpath(res, '//*[@class="list"]/article/div/div/figure/a/img/@title');
-    final images =
-        xpath(res, '//*[@class="list"]/article/div/div/figure/a/img/@src');
+    final urls = xpath(
+      res,
+      '//*[@class="list"]/article/div/div/figure/a/@href',
+    );
+    final names = xpath(
+      res,
+      '//*[@class="list"]/article/div/div/figure/a/img/@title',
+    );
+    final images = xpath(
+      res,
+      '//*[@class="list"]/article/div/div/figure/a/img/@src',
+    );
 
     for (var i = 0; i < names.length; i++) {
       MManga anime = MManga();
@@ -43,22 +49,25 @@ class OtakuFr extends MProvider {
     final namess = xpath(res, '//*[@class="episode"]/div/a/text()');
     List<String> names = [];
     for (var name in namess) {
-      names.add(regExp(
+      names.add(
+        regExp(
               name,
               r'(?<=\bS\d\s*|)\d{2}\s*(?=\b(Vostfr|vostfr|VF|Vf|vf|\(VF\)|\(vf\)|\(Vf\)|\(Vostfr\)\b))?',
               '',
               0,
-              0)
-          .replaceAll(' vostfr', '')
-          .replaceAll(' Vostfr', '')
-          .replaceAll(' VF', '')
-          .replaceAll(' Vf', '')
-          .replaceAll(' vf', '')
-          .replaceAll(' (VF)', '')
-          .replaceAll(' (vf)', '')
-          .replaceAll(' (vf)', '')
-          .replaceAll(' (Vf)', '')
-          .replaceAll(' (Vostfr)', ''));
+              0,
+            )
+            .replaceAll(' vostfr', '')
+            .replaceAll(' Vostfr', '')
+            .replaceAll(' VF', '')
+            .replaceAll(' Vf', '')
+            .replaceAll(' vf', '')
+            .replaceAll(' (VF)', '')
+            .replaceAll(' (vf)', '')
+            .replaceAll(' (vf)', '')
+            .replaceAll(' (Vf)', '')
+            .replaceAll(' (Vostfr)', ''),
+      );
     }
     final images = xpath(res, '//*[@class="episode"]/div/figure/a/img/@src');
 
@@ -98,12 +107,18 @@ class OtakuFr extends MProvider {
     final res = (await client.get(Uri.parse(url))).body;
 
     List<MManga> animeList = [];
-    final urls =
-        xpath(res, '//*[@class="list"]/article/div/div/figure/a/@href');
-    final names =
-        xpath(res, '//*[@class="list"]/article/div/div/figure/a/img/@title');
-    final images =
-        xpath(res, '//*[@class="list"]/article/div/div/figure/a/img/@src');
+    final urls = xpath(
+      res,
+      '//*[@class="list"]/article/div/div/figure/a/@href',
+    );
+    final names = xpath(
+      res,
+      '//*[@class="list"]/article/div/div/figure/a/img/@title',
+    );
+    final images = xpath(
+      res,
+      '//*[@class="list"]/article/div/div/figure/a/img/@src',
+    );
 
     for (var i = 0; i < names.length; i++) {
       MManga anime = MManga();
@@ -119,35 +134,48 @@ class OtakuFr extends MProvider {
   @override
   Future<MManga> getDetail(String url) async {
     final statusList = [
-      {"En cours": 0, "Terminé": 1}
+      {"En cours": 0, "Terminé": 1},
     ];
     String res =
-        (await client.get(Uri.parse("$baseUrl${getUrlWithoutDomain(url)}")))
-            .body;
+        (await client.get(
+          Uri.parse("$baseUrl${getUrlWithoutDomain(url)}"),
+        )).body;
     MManga anime = MManga();
-    final originalUrl = xpath(res,
-        '//*[@class="breadcrumb"]/li[@class="breadcrumb-item"][2]/a/@href');
+    final originalUrl = xpath(
+      res,
+      '//*[@class="breadcrumb"]/li[@class="breadcrumb-item"][2]/a/@href',
+    );
     if (originalUrl.isNotEmpty) {
       res = (await client.get(Uri.parse(originalUrl.first))).body;
     }
-    final description =
-        xpath(res, '//*[@class="episode fz-sm synop"]/p/text()');
+    final description = xpath(
+      res,
+      '//*[@class="episode fz-sm synop"]/p/text()',
+    );
     if (description.isNotEmpty) {
       anime.description = description.first.replaceAll("Synopsis:", "");
     }
-    final status = xpath(res,
-        '//*[@class="list-unstyled"]/li[contains(text(),"Statut")]/text()');
+    final status = xpath(
+      res,
+      '//*[@class="list-unstyled"]/li[contains(text(),"Statut")]/text()',
+    );
     if (status.isNotEmpty) {
-      anime.status =
-          parseStatus(status.first.replaceAll("Statut: ", ""), statusList);
+      anime.status = parseStatus(
+        status.first.replaceAll("Statut: ", ""),
+        statusList,
+      );
     }
 
-    anime.genre = xpath(res,
-        '//*[@class="list-unstyled"]/li[contains(text(),"Genre")]/ul/li/a/text()');
+    anime.genre = xpath(
+      res,
+      '//*[@class="list-unstyled"]/li[contains(text(),"Genre")]/ul/li/a/text()',
+    );
 
     final epUrls = xpath(res, '//*[@class="list-episodes list-group"]/a/@href');
-    final dates =
-        xpath(res, '//*[@class="list-episodes list-group"]/a/span/text()');
+    final dates = xpath(
+      res,
+      '//*[@class="list-episodes list-group"]/a/span/text()',
+    );
     final names = xpath(res, '//*[@class="list-episodes list-group"]/a/text()');
     List<String> episodes = [];
 
@@ -155,7 +183,8 @@ class OtakuFr extends MProvider {
       final date = dates[i];
       final name = names[i];
       episodes.add(
-          "Episode ${regExp(name.replaceAll(date, ""), r".* (\d*) [VvfF]{1,1}", '', 1, 1)}");
+        "Episode ${regExp(name.replaceAll(date, ""), r".* (\d*) [VvfF]{1,1}", '', 1, 1)}",
+      );
     }
     final dateUploads = parseDates(dates, "dd MMMM yyyy", "fr");
 
@@ -175,19 +204,23 @@ class OtakuFr extends MProvider {
   @override
   Future<List<MVideo>> getVideoList(String url) async {
     final res =
-        (await client.get(Uri.parse("$baseUrl${getUrlWithoutDomain(url)}")))
-            .body;
+        (await client.get(
+          Uri.parse("$baseUrl${getUrlWithoutDomain(url)}"),
+        )).body;
 
     final servers = parseHtml(res).select("div.tab-content iframe[src]");
     List<MVideo> videos = [];
     final hosterSelection = preferenceHosterSelection(source.id);
     for (var url in servers) {
       final urll = url.getSrc != "about:blank" ? url.getSrc : url.getDataSrc;
-      final resServer = (await client.get(Uri.parse(fixUrl(urll)),
-              headers: {"X-Requested-With": "XMLHttpRequest"}))
-          .body;
-      final serverUrl =
-          fixUrl(regExp(resServer, r"data-url='([^']+)'", '', 1, 1));
+      final resServer =
+          (await client.get(
+            Uri.parse(fixUrl(urll)),
+            headers: {"X-Requested-With": "XMLHttpRequest"},
+          )).body;
+      final serverUrl = fixUrl(
+        regExp(resServer, r"data-url='([^']+)'", '', 1, 1),
+      );
       List<MVideo> a = [];
       if (serverUrl.contains("https://streamwish") &&
           hosterSelection.contains("Streamwish")) {
@@ -278,13 +311,13 @@ class OtakuFr extends MProvider {
         SelectFilterOption("Suspense", "/genre/suspense/"),
         SelectFilterOption("Thriller", "/genre/thriller/"),
         SelectFilterOption("Tranche de vie", "/genre/tranche-de-vie/"),
-        SelectFilterOption("Vampire", "/genre/vampire/")
+        SelectFilterOption("Vampire", "/genre/vampire/"),
       ]),
       SelectFilter("SubPageFilter", "Sous page", 0, [
         SelectFilterOption("<Selectionner>", ""),
         SelectFilterOption("Terminé", "/termine/"),
         SelectFilterOption("Film", "/film/"),
-      ])
+      ]),
     ];
   }
 
@@ -292,54 +325,57 @@ class OtakuFr extends MProvider {
   List<dynamic> getSourcePreferences() {
     return [
       EditTextPreference(
-          key: "overrideBaseUrl",
-          title: "Changer l'url de base",
-          summary: "",
-          value: "https://otakufr.cc",
-          dialogTitle: "Changer l'url de base",
-          dialogMessage: "",
-          text: "https://otakufr.cc"),
+        key: "overrideBaseUrl",
+        title: "Changer l'url de base",
+        summary: "",
+        value: "https://otakufr.cc",
+        dialogTitle: "Changer l'url de base",
+        dialogMessage: "",
+        text: "https://otakufr.cc",
+      ),
       ListPreference(
-          key: "preferred_quality",
-          title: "Qualité préférée",
-          summary: "",
-          valueIndex: 1,
-          entries: ["1080p", "720p", "480p", "360p"],
-          entryValues: ["1080", "720", "480", "360"]),
+        key: "preferred_quality",
+        title: "Qualité préférée",
+        summary: "",
+        valueIndex: 1,
+        entries: ["1080p", "720p", "480p", "360p"],
+        entryValues: ["1080", "720", "480", "360"],
+      ),
       MultiSelectListPreference(
-          key: "hoster_selection_",
-          title: "Enable/Disable Hosts",
-          summary: "",
-          entries: [
-            "Streamwish",
-            "Doodstream",
-            "Sendvid",
-            "VidBom",
-            "Okru",
-            "Voe",
-            "Sibnet",
-            "Upstream"
-          ],
-          entryValues: [
-            "Streamwish",
-            "Doodstream",
-            "Sendvid",
-            "VidBom",
-            "Okru",
-            "Voe",
-            "Sibnet",
-            "Upstream"
-          ],
-          values: [
-            "Streamwish",
-            "Doodstream",
-            "Sendvid",
-            "Vidbm",
-            "Okru",
-            "Voe",
-            "Sibnet",
-            "Upstream"
-          ]),
+        key: "hoster_selection_",
+        title: "Enable/Disable Hosts",
+        summary: "",
+        entries: [
+          "Streamwish",
+          "Doodstream",
+          "Sendvid",
+          "VidBom",
+          "Okru",
+          "Voe",
+          "Sibnet",
+          "Upstream",
+        ],
+        entryValues: [
+          "Streamwish",
+          "Doodstream",
+          "Sendvid",
+          "VidBom",
+          "Okru",
+          "Voe",
+          "Sibnet",
+          "Upstream",
+        ],
+        values: [
+          "Streamwish",
+          "Doodstream",
+          "Sendvid",
+          "Vidbm",
+          "Okru",
+          "Voe",
+          "Sibnet",
+          "Upstream",
+        ],
+      ),
     ];
   }
 
@@ -389,8 +425,10 @@ class OtakuFr extends MProvider {
     if (masterUrl.contains(".m3u8")) {
       final masterPlaylistRes = (await client.get(Uri.parse(masterUrl))).body;
 
-      for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
-          .split("#EXT-X-STREAM-INF:")) {
+      for (var it in substringAfter(
+        masterPlaylistRes,
+        "#EXT-X-STREAM-INF:",
+      ).split("#EXT-X-STREAM-INF:")) {
         final quality =
             "${substringBefore(substringBefore(substringAfter(substringAfter(it, "RESOLUTION="), "x"), ","), "\n")}p";
 
@@ -433,12 +471,16 @@ class OtakuFr extends MProvider {
     if (js.isEmpty) {
       return [];
     }
-    final masterUrl =
-        substringBefore(substringAfter(unpackJs(js.first), "{file:\""), "\"}");
+    final masterUrl = substringBefore(
+      substringAfter(unpackJs(js.first), "{file:\""),
+      "\"}",
+    );
     final masterPlaylistRes = (await client.get(Uri.parse(masterUrl))).body;
     List<MVideo> videos = [];
-    for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
-        .split("#EXT-X-STREAM-INF:")) {
+    for (var it in substringAfter(
+      masterPlaylistRes,
+      "#EXT-X-STREAM-INF:",
+    ).split("#EXT-X-STREAM-INF:")) {
       final quality =
           "${substringBefore(substringBefore(substringAfter(substringAfter(it, "RESOLUTION="), "x"), ","), "\n")}p";
 

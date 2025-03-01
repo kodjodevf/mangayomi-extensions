@@ -9,11 +9,14 @@ import 'model/source.dart';
 void main() {
   final jsSources = _searchJsSources(Directory("javascript"));
   genManga(
-      jsSources.where((element) => element.itemType!.name == "manga").toList());
+    jsSources.where((element) => element.itemType!.name == "manga").toList(),
+  );
   genAnime(
-      jsSources.where((element) => element.itemType!.name == "anime").toList());
+    jsSources.where((element) => element.itemType!.name == "anime").toList(),
+  );
   genNovel(
-      jsSources.where((element) => element.itemType!.name == "novel").toList());
+    jsSources.where((element) => element.itemType!.name == "novel").toList(),
+  );
 }
 
 void genManga(List<Source> jsMangasourceList) {
@@ -68,29 +71,35 @@ List<Source> _searchJsSources(Directory dir) {
         if (entity is Directory) {
           sourceList.addAll(_searchJsSources(entity));
         } else if (entity is File && entity.path.endsWith('.js')) {
-          final regex = RegExp(r'const\s+mangayomiSources\s*=\s*(\[.*?\]);',
-              dotAll: true);
+          final regex = RegExp(
+            r'const\s+mangayomiSources\s*=\s*(\[.*?\]);',
+            dotAll: true,
+          );
           final defaultSource = Source();
           final match = regex.firstMatch(entity.readAsStringSync());
           if (match != null) {
             for (var sourceJson in jsonDecode(match.group(1)!) as List) {
               final langs = sourceJson["langs"] as List?;
-              Source source = Source.fromJson(sourceJson)
-                ..sourceCodeLanguage = 1
-                ..appMinVerReq =
-                    sourceJson["appMinVerReq"] ?? defaultSource.appMinVerReq
-                ..sourceCodeUrl =
-                    "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/javascript/${sourceJson["pkgPath"] ?? sourceJson["pkgName"]}";
+              Source source =
+                  Source.fromJson(sourceJson)
+                    ..sourceCodeLanguage = 1
+                    ..appMinVerReq =
+                        sourceJson["appMinVerReq"] ?? defaultSource.appMinVerReq
+                    ..sourceCodeUrl =
+                        "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/javascript/${sourceJson["pkgPath"] ?? sourceJson["pkgName"]}";
               if (sourceJson["id"] != null) {
                 source = source..id = int.tryParse("${sourceJson["id"]}");
               }
               if (langs?.isNotEmpty ?? false) {
                 for (var lang in langs!) {
                   final id = sourceJson["ids"]?[lang] as int?;
-                  sourceList.add(Source.fromJson(source.toJson())
-                    ..lang = lang
-                    ..id =
-                        id ?? 'mangayomi-js-"$lang"."${source.name}"'.hashCode);
+                  sourceList.add(
+                    Source.fromJson(source.toJson())
+                      ..lang = lang
+                      ..id =
+                          id ??
+                          'mangayomi-js-"$lang"."${source.name}"'.hashCode,
+                  );
                 }
               } else {
                 sourceList.add(source);

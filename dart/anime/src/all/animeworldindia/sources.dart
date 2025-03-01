@@ -20,14 +20,18 @@ List<String> _languages = [
 ];
 
 List<Source> get animeworldindiaSourcesList => _animeworldindiaSourcesList;
-List<Source> _animeworldindiaSourcesList = _languages
-    .map((e) => Source(
-        name: 'AnimeWorld India',
-        baseUrl: "https://anime-world.in",
-        lang: e,
-        typeSource: "multiple",
-        iconUrl: _iconUrl,
-        version: _animeworldindiaVersion,
-        itemType: ItemType.anime,
-        sourceCodeUrl: _animeworldindiaSourceCodeUrl))
-    .toList();
+List<Source> _animeworldindiaSourcesList =
+    _languages
+        .map(
+          (e) => Source(
+            name: 'AnimeWorld India',
+            baseUrl: "https://anime-world.in",
+            lang: e,
+            typeSource: "multiple",
+            iconUrl: _iconUrl,
+            version: _animeworldindiaVersion,
+            itemType: ItemType.anime,
+            sourceCodeUrl: _animeworldindiaSourceCodeUrl,
+          ),
+        )
+        .toList();

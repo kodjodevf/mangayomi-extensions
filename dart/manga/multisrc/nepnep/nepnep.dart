@@ -35,10 +35,11 @@ class NepNep extends MProvider {
     final directory = directoryFromDocument(res);
     final resSort = sortMapList(json.decode(directory), "lt", 1);
     final datas = json.decode(resSort) as List;
-    queryRes = datas.where((e) {
-      String name = getMapValue(json.encode(e), 's');
-      return name.toLowerCase().contains(query.toLowerCase());
-    }).toList();
+    queryRes =
+        datas.where((e) {
+          String name = getMapValue(json.encode(e), 's');
+          return name.toLowerCase().contains(query.toLowerCase());
+        }).toList();
 
     for (var filter in filters) {
       if (filter.type == "SortFilter") {
@@ -57,78 +58,91 @@ class NepNep extends MProvider {
       }
       if (filter.type == "ScanStatusFilter") {
         if (filter.state != 0) {
-          queryRes = queryRes.where((e) {
-            final value = getMapValue(json.encode(e), 'ss');
-            return value.toLowerCase().contains(
-                (filter.values[filter.state].value as String).toLowerCase());
-          }).toList();
+          queryRes =
+              queryRes.where((e) {
+                final value = getMapValue(json.encode(e), 'ss');
+                return value.toLowerCase().contains(
+                  (filter.values[filter.state].value as String).toLowerCase(),
+                );
+              }).toList();
         }
       } else if (filter.type == "PublishStatusFilter") {
         if (filter.state != 0) {
-          queryRes = queryRes.where((e) {
-            final value = getMapValue(json.encode(e), 'ps');
-            return value.toLowerCase().contains(
-                (filter.values[filter.state].value as String).toLowerCase());
-          }).toList();
+          queryRes =
+              queryRes.where((e) {
+                final value = getMapValue(json.encode(e), 'ps');
+                return value.toLowerCase().contains(
+                  (filter.values[filter.state].value as String).toLowerCase(),
+                );
+              }).toList();
         }
       } else if (filter.type == "TypeFilter") {
         if (filter.state != 0) {
-          queryRes = queryRes.where((e) {
-            final value = getMapValue(json.encode(e), 't');
-            return value.toLowerCase().contains(
-                (filter.values[filter.state].value as String).toLowerCase());
-          }).toList();
+          queryRes =
+              queryRes.where((e) {
+                final value = getMapValue(json.encode(e), 't');
+                return value.toLowerCase().contains(
+                  (filter.values[filter.state].value as String).toLowerCase(),
+                );
+              }).toList();
         }
       } else if (filter.type == "TranslationFilter") {
         if (filter.state != 0) {
-          queryRes = queryRes.where((e) {
-            final value = getMapValue(json.encode(e), 'o');
-            return value.toLowerCase().contains("yes");
-          }).toList();
+          queryRes =
+              queryRes.where((e) {
+                final value = getMapValue(json.encode(e), 'o');
+                return value.toLowerCase().contains("yes");
+              }).toList();
         }
       } else if (filter.type == "YearFilter") {
         if (filter.state.isNotEmpty) {
-          queryRes = queryRes.where((e) {
-            final value = getMapValue(json.encode(e), 'y');
-            return value
-                .toLowerCase()
-                .contains((filter.name as String).toLowerCase());
-          }).toList();
+          queryRes =
+              queryRes.where((e) {
+                final value = getMapValue(json.encode(e), 'y');
+                return value.toLowerCase().contains(
+                  (filter.name as String).toLowerCase(),
+                );
+              }).toList();
         }
       } else if (filter.type == "AuthorFilter") {
         if (filter.state.isNotEmpty) {
-          queryRes = queryRes.where((e) {
-            final value = getMapValue(json.encode(e), 'a');
-            return value
-                .toLowerCase()
-                .contains((filter.name as String).toLowerCase());
-          }).toList();
+          queryRes =
+              queryRes.where((e) {
+                final value = getMapValue(json.encode(e), 'a');
+                return value.toLowerCase().contains(
+                  (filter.name as String).toLowerCase(),
+                );
+              }).toList();
         }
       } else if (filter.type == "GenresFilter") {
-        final included = (filter.state as List)
-            .where((e) => e.state == 1 ? true : false)
-            .toList();
-        final excluded = (filter.state as List)
-            .where((e) => e.state == 2 ? true : false)
-            .toList();
+        final included =
+            (filter.state as List)
+                .where((e) => e.state == 1 ? true : false)
+                .toList();
+        final excluded =
+            (filter.state as List)
+                .where((e) => e.state == 2 ? true : false)
+                .toList();
         if (included.isNotEmpty) {
           for (var val in included) {
-            queryRes = queryRes.where((e) {
-              final value = getMapValue(json.encode(e), 'g');
-              return value
-                  .toLowerCase()
-                  .contains((val.value as String).toLowerCase());
-            }).toList();
+            queryRes =
+                queryRes.where((e) {
+                  final value = getMapValue(json.encode(e), 'g');
+                  return value.toLowerCase().contains(
+                    (val.value as String).toLowerCase(),
+                  );
+                }).toList();
           }
         }
         if (excluded.isNotEmpty) {
           for (var val in excluded) {
-            queryRes = queryRes.where((e) {
-              final value = getMapValue(json.encode(e), 'g');
-              return !(value
-                  .toLowerCase()
-                  .contains((val.value as String).toLowerCase()));
-            }).toList();
+            queryRes =
+                queryRes.where((e) {
+                  final value = getMapValue(json.encode(e), 'g');
+                  return !(value.toLowerCase().contains(
+                    (val.value as String).toLowerCase(),
+                  ));
+                }).toList();
           }
         }
       }
@@ -140,31 +154,43 @@ class NepNep extends MProvider {
   @override
   Future<MManga> getDetail(String url) async {
     final statusList = [
-      {"Ongoing": 0, "Completed": 1, "Cancelled": 3, "Hiatus": 2}
+      {"Ongoing": 0, "Completed": 1, "Cancelled": 3, "Hiatus": 2},
     ];
     final headers = getHeader(source.baseUrl);
-    final res = (await client.get(Uri.parse('${source.baseUrl}/manga/$url'),
-            headers: headers))
-        .body;
+    final res =
+        (await client.get(
+          Uri.parse('${source.baseUrl}/manga/$url'),
+          headers: headers,
+        )).body;
     MManga manga = MManga();
-    manga.author = xpath(res,
-            '//li[contains(@class,"list-group-item") and contains(text(),"Author")]/a/text()')
-        .first;
-    manga.description = xpath(res,
-            '//li[contains(@class,"list-group-item") and contains(text(),"Description:")]/div/text()')
-        .first;
-    final status = xpath(res,
-            '//li[contains(@class,"list-group-item") and contains(text(),"Status")]/a/text()')
-        .first;
+    manga.author =
+        xpath(
+          res,
+          '//li[contains(@class,"list-group-item") and contains(text(),"Author")]/a/text()',
+        ).first;
+    manga.description =
+        xpath(
+          res,
+          '//li[contains(@class,"list-group-item") and contains(text(),"Description:")]/div/text()',
+        ).first;
+    final status =
+        xpath(
+          res,
+          '//li[contains(@class,"list-group-item") and contains(text(),"Status")]/a/text()',
+        ).first;
 
     manga.status = parseStatus(toStatus(status), statusList);
-    manga.genre = xpath(res,
-        '//li[contains(@class,"list-group-item") and contains(text(),"Genre(s)")]/a/text()');
+    manga.genre = xpath(
+      res,
+      '//li[contains(@class,"list-group-item") and contains(text(),"Genre(s)")]/a/text()',
+    );
 
     final script =
         xpath(res, '//script[contains(text(), "MainFunction")]/text()').first;
-    final vmChapters =
-        substringBefore(substringAfter(script, "vm.Chapters = "), ";");
+    final vmChapters = substringBefore(
+      substringAfter(script, "vm.Chapters = "),
+      ";",
+    );
     final chapters = json.decode(vmChapters) as List;
 
     List<MChapter> chaptersList = [];
@@ -180,9 +206,12 @@ class NepNep extends MProvider {
       chapter.name = name == "null" ? "" : name;
       chapter.url =
           '/read-online/${substringAfter(url, "/manga/")}${chapterURLEncode(getMapValue(c, 'Chapter'))}';
-      chapter.dateUpload = parseDates([getMapValue(c, 'Date')],
-              source.dateFormat, source.dateFormatLocale)
-          .first;
+      chapter.dateUpload =
+          parseDates(
+            [getMapValue(c, 'Date')],
+            source.dateFormat,
+            source.dateFormatLocale,
+          ).first;
       chaptersList.add(chapter);
     }
     manga.chapters = chaptersList;
@@ -194,22 +223,31 @@ class NepNep extends MProvider {
     final headers = getHeader(source.baseUrl);
     List<String> pages = [];
     final res =
-        (await client.get(Uri.parse('${source.baseUrl}$url'), headers: headers))
-            .body;
+        (await client.get(
+          Uri.parse('${source.baseUrl}$url'),
+          headers: headers,
+        )).body;
     final script =
         xpath(res, '//script[contains(text(), "MainFunction")]/text()').first;
-    final chapScript =
-        substringBefore(substringAfter(script, "vm.CurChapter = "), ";");
+    final chapScript = substringBefore(
+      substringAfter(script, "vm.CurChapter = "),
+      ";",
+    );
     final pathName = substringBefore(
-        substringAfter(script, "vm.CurPathName = \"", ""), "\"");
-    var directory = getMapValue(chapScript, 'Directory') == 'null'
-        ? ''
-        : getMapValue(chapScript, 'Directory');
+      substringAfter(script, "vm.CurPathName = \"", ""),
+      "\"",
+    );
+    var directory =
+        getMapValue(chapScript, 'Directory') == 'null'
+            ? ''
+            : getMapValue(chapScript, 'Directory');
     if (directory.length > 0) {
       directory += '/';
     }
-    final mangaName =
-        substringBefore(substringAfter(url, "/read-online/"), "-chapter");
+    final mangaName = substringBefore(
+      substringAfter(url, "/read-online/"),
+      "-chapter",
+    );
     var chNum = chapterImage(getMapValue(chapScript, 'Chapter'), false);
     var totalPages = int.parse(getMapValue(chapScript, 'Page'));
     for (int page = 1; page <= totalPages; page++) {
@@ -226,8 +264,9 @@ class NepNep extends MProvider {
     final script =
         xpath(res, '//script[contains(text(), "MainFunction")]/text()').first;
     return substringBefore(
-            substringAfter(script, "vm.Directory = "), "vm.GetIntValue")
-        .replaceAll(";", " ");
+      substringAfter(script, "vm.Directory = "),
+      "vm.GetIntValue",
+    ).replaceAll(";", " ");
   }
 
   MPages parseDirectory(String res) {
@@ -401,7 +440,7 @@ Map<String, String> getHeader(String url) {
   final headers = {
     'Referer': '$url/',
     "User-Agent":
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:71.0) Gecko/20100101 Firefox/77.0"
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:71.0) Gecko/20100101 Firefox/77.0",
   };
   return headers;
 }

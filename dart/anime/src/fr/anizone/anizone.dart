@@ -58,7 +58,7 @@ class AniZone extends MProvider {
       "status": [],
       "season": [],
       "lang": [],
-      "genre": []
+      "genre": [],
     };
 
     // Regroupement des filtres avec une logique générique
@@ -67,7 +67,7 @@ class AniZone extends MProvider {
       "LanguageFilter": "lang",
       "SaisonFilter": "season",
       "StatusFilter": "status",
-      "GenreFilter": "genre"
+      "GenreFilter": "genre",
     };
 
     for (var filter in filterList.filters) {
@@ -99,8 +99,10 @@ class AniZone extends MProvider {
       final description = xpath(doc, '//p[contains(@class,"short")]/text()');
       anime.description = description.isNotEmpty ? description.first : "";
 
-      final statusList = xpath(doc,
-          '//div[contains(@class,"col2")]//div[contains(@class,"item")]//div[contains(@class,"item-content")]/text()');
+      final statusList = xpath(
+        doc,
+        '//div[contains(@class,"col2")]//div[contains(@class,"item")]//div[contains(@class,"item-content")]/text()',
+      );
       if (statusList.isNotEmpty) {
         if (statusList[0] == "Terminer") {
           anime.status = MStatus.completed;
@@ -113,8 +115,10 @@ class AniZone extends MProvider {
         anime.status = MStatus.unknown;
       }
 
-      anime.genre = xpath(doc,
-          '//div[contains(@class,"item")]//div[contains(@class,"item-content")]//a[contains(@href,"genre")]/text()');
+      anime.genre = xpath(
+        doc,
+        '//div[contains(@class,"item")]//div[contains(@class,"item-content")]//a[contains(@href,"genre")]/text()',
+      );
 
       final regex = RegExp(r'(\d+)$');
       final match = regex.firstMatch(url);
@@ -123,14 +127,16 @@ class AniZone extends MProvider {
         throw Exception('Numéro de l\'épisode non trouvé dans l\'URL.');
       }
 
-      final res = (await client.get(Uri.parse(
-              "${source.baseUrl}/ajax/episode/list/${match.group(1)}")))
-          .body;
+      final res =
+          (await client.get(
+            Uri.parse("${source.baseUrl}/ajax/episode/list/${match.group(1)}"),
+          )).body;
 
       List<MChapter> episodesList = [];
 
-      final episodeElements =
-          parseHtml(json.decode(res)["html"]).select(".ep-item");
+      final episodeElements = parseHtml(
+        json.decode(res)["html"],
+      ).select(".ep-item");
 
       // Associer chaque titre à son URL et récupérer les vidéos
       for (var element in episodeElements) {
@@ -152,16 +158,24 @@ class AniZone extends MProvider {
 
   @override
   Future<List<MVideo>> getVideoList(String url) async {
-    final videoRes = (await client
-            .get(Uri.parse(url), headers: {"Referer": "${source.baseUrl}/"}))
-        .body;
+    final videoRes =
+        (await client.get(
+          Uri.parse(url),
+          headers: {"Referer": "${source.baseUrl}/"},
+        )).body;
 
-    final lang = xpath(videoRes.replaceAll(r'\', ''),
-        '//div[contains(@class,"item server-item")]/@data-type');
-    final links = xpath(videoRes.replaceAll(r'\', ''),
-        '//div[contains(@class,"item server-item")]/@data-id');
-    final playersNames = xpath(videoRes.replaceAll(r'\', ''),
-        '//div[contains(@class,"item server-item")]/text()');
+    final lang = xpath(
+      videoRes.replaceAll(r'\', ''),
+      '//div[contains(@class,"item server-item")]/@data-type',
+    );
+    final links = xpath(
+      videoRes.replaceAll(r'\', ''),
+      '//div[contains(@class,"item server-item")]/@data-id',
+    );
+    final playersNames = xpath(
+      videoRes.replaceAll(r'\', ''),
+      '//div[contains(@class,"item server-item")]/text()',
+    );
     List<Map<String, String>> players = [];
     for (int j = 0; j < links.length; j++) {
       // schema of players https://v1.animesz.xyz/ajax/episode/servers?episodeId=(id_episode)
@@ -214,15 +228,18 @@ class AniZone extends MProvider {
   Future<List<MVideo>> streamHideExtractor(String url, String prefix) async {
     final res = (await client.get(Uri.parse(url))).body;
     final masterUrl = substringBefore(
-        substringAfter(
-            substringAfter(
-                substringAfter(unpackJs(res), "sources:"), "file:\""),
-            "src:\""),
-        '"');
+      substringAfter(
+        substringAfter(substringAfter(unpackJs(res), "sources:"), "file:\""),
+        "src:\"",
+      ),
+      '"',
+    );
     final masterPlaylistRes = (await client.get(Uri.parse(masterUrl))).body;
     List<MVideo> videos = [];
-    for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
-        .split("#EXT-X-STREAM-INF:")) {
+    for (var it in substringAfter(
+      masterPlaylistRes,
+      "#EXT-X-STREAM-INF:",
+    ).split("#EXT-X-STREAM-INF:")) {
       final quality =
           "${substringBefore(substringBefore(substringAfter(substringAfter(it, "RESOLUTION="), "x"), ","), "\n")}p";
 
@@ -314,7 +331,7 @@ class AniZone extends MProvider {
         CheckBoxFilter("Vampire", "32"),
         CheckBoxFilter("Yaoi", "33"),
         CheckBoxFilter("Yuri", "34"),
-      ])
+      ]),
     ];
   }
 
@@ -322,19 +339,21 @@ class AniZone extends MProvider {
   List<dynamic> getSourcePreferences() {
     return [
       ListPreference(
-          key: "preferred_quality",
-          title: "Qualité préférée",
-          summary: "",
-          valueIndex: 0,
-          entries: ["1080p", "720p", "480p", "360p"],
-          entryValues: ["1080", "720", "480", "360"]),
+        key: "preferred_quality",
+        title: "Qualité préférée",
+        summary: "",
+        valueIndex: 0,
+        entries: ["1080p", "720p", "480p", "360p"],
+        entryValues: ["1080", "720", "480", "360"],
+      ),
       ListPreference(
-          key: "voices_preference",
-          title: "Préférence des voix",
-          summary: "",
-          valueIndex: 0,
-          entries: ["Préférer VOSTFR", "Préférer VF"],
-          entryValues: ["vostfr", "vf"]),
+        key: "voices_preference",
+        title: "Préférence des voix",
+        summary: "",
+        valueIndex: 0,
+        entries: ["Préférer VOSTFR", "Préférer VF"],
+        entryValues: ["vostfr", "vf"],
+      ),
     ];
   }
 
@@ -383,8 +402,10 @@ class AniZone extends MProvider {
     if (masterUrl.contains(".m3u8")) {
       final masterPlaylistRes = (await client.get(Uri.parse(masterUrl))).body;
 
-      for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
-          .split("#EXT-X-STREAM-INF:")) {
+      for (var it in substringAfter(
+        masterPlaylistRes,
+        "#EXT-X-STREAM-INF:",
+      ).split("#EXT-X-STREAM-INF:")) {
         final quality =
             "${substringBefore(substringBefore(substringAfter(substringAfter(it, "RESOLUTION="), "x"), ","), "\n")}p";
 
@@ -437,7 +458,8 @@ class AniZone extends MProvider {
     final masterPlaylistRes = await client.get(Uri.parse(masterUrl));
     if (masterPlaylistRes.statusCode != 200) {
       print(
-          "Error lors de la récupération de la playlist M3U8 : ${masterPlaylistRes.statusCode}");
+        "Error lors de la récupération de la playlist M3U8 : ${masterPlaylistRes.statusCode}",
+      );
       return [];
     }
 

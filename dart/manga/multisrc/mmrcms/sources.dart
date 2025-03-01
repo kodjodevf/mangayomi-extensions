@@ -13,26 +13,30 @@ const mmrcmsSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/manga/multisrc/mmrcms/mmrcms.dart";
 
 List<Source> get mmrcmsSourcesList => _mmrcmsSourcesList;
-List<Source> _mmrcmsSourcesList = [
-//Scan VF (FR)
-  scanvfSource,
-//Komikid (ID)
-  komikidSource,
-//MangaID (ID)
-  mangaidSource,
-//Jpmangas (FR)
-  jpmangasSource,
-//مانجا اون لاين (AR)
-  onmaSource,
-//Read Comics Online (EN)
-  readcomicsonlineSource,
-//Lelscan-VF (FR)
-  lelscanvfSource,
-//Manga-FR (FR)
-  mangafrSource,
-]
-    .map((e) => e
-      ..itemType = ItemType.manga
-      ..sourceCodeUrl = mmrcmsSourceCodeUrl
-      ..version = mmrcmsVersion)
-    .toList();
+List<Source> _mmrcmsSourcesList =
+    [
+          //Scan VF (FR)
+          scanvfSource,
+          //Komikid (ID)
+          komikidSource,
+          //MangaID (ID)
+          mangaidSource,
+          //Jpmangas (FR)
+          jpmangasSource,
+          //مانجا اون لاين (AR)
+          onmaSource,
+          //Read Comics Online (EN)
+          readcomicsonlineSource,
+          //Lelscan-VF (FR)
+          lelscanvfSource,
+          //Manga-FR (FR)
+          mangafrSource,
+        ]
+        .map(
+          (e) =>
+              e
+                ..itemType = ItemType.manga
+                ..sourceCodeUrl = mmrcmsSourceCodeUrl
+                ..version = mmrcmsVersion,
+        )
+        .toList();

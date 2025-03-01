@@ -13,9 +13,12 @@ class DopeFlix extends MProvider {
 
   @override
   Future<MPages> getPopular(int page) async {
-    final res = (await client.get(Uri.parse(
-            "$baseUrl/${getPreferenceValue(source.id, "preferred_popular_page")}?page=$page")))
-        .body;
+    final res =
+        (await client.get(
+          Uri.parse(
+            "$baseUrl/${getPreferenceValue(source.id, "preferred_popular_page")}?page=$page",
+          ),
+        )).body;
     return parseAnimeList(res);
   }
 
@@ -109,25 +112,32 @@ class DopeFlix extends MProvider {
       final resS =
           (await client.get(Uri.parse("$baseUrl/ajax/v2/tv/seasons/$id"))).body;
 
-      final seasonIds =
-          xpath(resS, '//a[@class="dropdown-item ss-item"]/@data-id');
-      final seasonNames =
-          xpath(resS, '//a[@class="dropdown-item ss-item"]/text()');
+      final seasonIds = xpath(
+        resS,
+        '//a[@class="dropdown-item ss-item"]/@data-id',
+      );
+      final seasonNames = xpath(
+        resS,
+        '//a[@class="dropdown-item ss-item"]/text()',
+      );
       for (int i = 0; i < seasonIds.length; i++) {
         final seasonId = seasonIds[i];
         final seasonName = seasonNames[i];
 
-        final html = (await client
-                .get(Uri.parse("$baseUrl/ajax/v2/season/episodes/$seasonId")))
-            .body;
+        final html =
+            (await client.get(
+              Uri.parse("$baseUrl/ajax/v2/season/episodes/$seasonId"),
+            )).body;
 
         final epsHtmls = parseHtml(html).select("div.eps-item");
 
         for (var epH in epsHtmls) {
           final epHtml = epH.outerHtml;
           final episodeId =
-              xpath(epHtml, '//div[contains(@class,"eps-item")]/@data-id')
-                  .first;
+              xpath(
+                epHtml,
+                '//div[contains(@class,"eps-item")]/@data-id',
+              ).first;
           final epNum =
               xpath(epHtml, '//div[@class="episode-number"]/text()').first;
           final epName = xpath(epHtml, '//h3[@class="film-name"]/text()').first;
@@ -157,8 +167,10 @@ class DopeFlix extends MProvider {
       final resSource =
           (await client.get(Uri.parse("$baseUrl/ajax/sources/$id"))).body;
 
-      final vidUrl =
-          substringBefore(substringAfter(resSource, "\"link\":\""), "\"");
+      final vidUrl = substringBefore(
+        substringAfter(resSource, "\"link\":\""),
+        "\"",
+      );
       List<MVideo> a = [];
       String masterUrl = "";
       String type = "";
@@ -168,10 +180,11 @@ class DopeFlix extends MProvider {
         final id = substringBefore(substringAfter(vidUrl, "/embed-4/"), "?");
         final serverUrl = substringBefore(vidUrl, "/embed");
 
-        final resServer = (await client.get(
-                Uri.parse("$serverUrl/ajax/embed-4/getSources?id=$id"),
-                headers: {"X-Requested-With": "XMLHttpRequest"}))
-            .body;
+        final resServer =
+            (await client.get(
+              Uri.parse("$serverUrl/ajax/embed-4/getSources?id=$id"),
+              headers: {"X-Requested-With": "XMLHttpRequest"},
+            )).body;
         final encrypted = getMapValue(resServer, "encrypted");
 
         String videoResJson = "";
@@ -192,11 +205,13 @@ class DopeFlix extends MProvider {
             index += item.last;
           }
           videoResJson = decryptAESCryptoJS(ciphertext, password);
-          masterUrl = ((json.decode(videoResJson) as List<Map<String, dynamic>>)
-              .first)['file'];
+          masterUrl =
+              ((json.decode(videoResJson) as List<Map<String, dynamic>>)
+                  .first)['file'];
 
-          type = ((json.decode(videoResJson) as List<Map<String, dynamic>>)
-              .first)['type'];
+          type =
+              ((json.decode(videoResJson) as List<Map<String, dynamic>>)
+                  .first)['type'];
         } else {
           masterUrl =
               ((json.decode(resServer)["sources"] as List<Map<String, dynamic>>)
@@ -207,9 +222,10 @@ class DopeFlix extends MProvider {
                   .first)['type'];
         }
 
-        final tracks = (json.decode(resServer)['tracks'] as List)
-            .where((e) => e['kind'] == 'captions' ? true : false)
-            .toList();
+        final tracks =
+            (json.decode(resServer)['tracks'] as List)
+                .where((e) => e['kind'] == 'captions' ? true : false)
+                .toList();
         List<MTrack> subtitles = [];
 
         for (var sub in tracks) {
@@ -227,8 +243,10 @@ class DopeFlix extends MProvider {
           final masterPlaylistRes =
               (await client.get(Uri.parse(masterUrl))).body;
 
-          for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
-              .split("#EXT-X-STREAM-INF:")) {
+          for (var it in substringAfter(
+            masterPlaylistRes,
+            "#EXT-X-STREAM-INF:",
+          ).split("#EXT-X-STREAM-INF:")) {
             final quality =
                 "${substringBefore(substringBefore(substringAfter(substringAfter(it, "RESOLUTION="), "x"), ","), "\n")}p";
 
@@ -264,28 +282,31 @@ class DopeFlix extends MProvider {
   }
 
   Future<List<List<int>>> generateIndexPairs() async {
-    final res = (await client.get(Uri.parse(
-            "https://rabbitstream.net/js/player/prod/e4-player.min.js")))
-        .body;
+    final res =
+        (await client.get(
+          Uri.parse("https://rabbitstream.net/js/player/prod/e4-player.min.js"),
+        )).body;
 
     String script = substringBefore(substringAfter(res, "const "), "()");
     script = script.substring(0, script.lastIndexOf(','));
-    final list = script
-        .split(",")
-        .map((String e) {
-          String value = substringAfter(e, "=");
-          if (value.contains("0x")) {
-            return int.parse(substringAfter(value, "0x"), radix: 16);
-          } else {
-            return int.parse(value);
-          }
-        })
-        .toList()
-        .skip(1)
-        .toList();
-    return chunked(list, 2)
-        .map((List<int> list) => list.reversed.toList())
-        .toList();
+    final list =
+        script
+            .split(",")
+            .map((String e) {
+              String value = substringAfter(e, "=");
+              if (value.contains("0x")) {
+                return int.parse(substringAfter(value, "0x"), radix: 16);
+              } else {
+                return int.parse(value);
+              }
+            })
+            .toList()
+            .skip(1)
+            .toList();
+    return chunked(
+      list,
+      2,
+    ).map((List<int> list) => list.reversed.toList()).toList();
   }
 
   List<List<int>> chunked(List<int> list, int size) {
@@ -316,7 +337,9 @@ class DopeFlix extends MProvider {
       animeList.add(anime);
     }
     final pages = xpath(
-        res, '//ul[contains(@class,"pagination")]/li/a[@title="Next"]/@title');
+      res,
+      '//ul[contains(@class,"pagination")]/li/a[@title="Next"]/@title',
+    );
     return MPages(animeList, pages.isNotEmpty);
   }
 
@@ -326,13 +349,13 @@ class DopeFlix extends MProvider {
       SelectFilter("TypeFilter", "Type", 0, [
         SelectFilterOption("All", "all"),
         SelectFilterOption("Movies", "movies"),
-        SelectFilterOption("TV Shows", "tv")
+        SelectFilterOption("TV Shows", "tv"),
       ]),
       SelectFilter("QualityFilter", "Quality", 0, [
         SelectFilterOption("All", "all"),
         SelectFilterOption("HD", "HD"),
         SelectFilterOption("SD", "SD"),
-        SelectFilterOption("CAM", "CAM")
+        SelectFilterOption("CAM", "CAM"),
       ]),
       SelectFilter("ReleaseYearFilter", "Released at", 0, [
         SelectFilterOption("All", "all"),
@@ -343,7 +366,7 @@ class DopeFlix extends MProvider {
         SelectFilterOption("2020", "2020"),
         SelectFilterOption("2019", "2019"),
         SelectFilterOption("2018", "2018"),
-        SelectFilterOption("Older", "older-2018")
+        SelectFilterOption("Older", "older-2018"),
       ]),
       SeparatorFilter(),
       GroupFilter("GenresFilter", "Genre", [
@@ -374,7 +397,7 @@ class DopeFlix extends MProvider {
         CheckBoxFilter("TV Movie", "8"),
         CheckBoxFilter("War", "17"),
         CheckBoxFilter("War & Politics", "28"),
-        CheckBoxFilter("Western", "6")
+        CheckBoxFilter("Western", "6"),
       ]),
       GroupFilter("CountriesFilter", "Countries", [
         CheckBoxFilter("Argentina", "11"),
@@ -412,7 +435,7 @@ class DopeFlix extends MProvider {
         CheckBoxFilter("Taiwan", "119"),
         CheckBoxFilter("Thailand", "57"),
         CheckBoxFilter("United Kingdom", "180"),
-        CheckBoxFilter("United States of America", "129")
+        CheckBoxFilter("United States of America", "129"),
       ]),
     ];
   }
@@ -422,72 +445,78 @@ class DopeFlix extends MProvider {
     return [
       if (source.name == "DopeBox")
         ListPreference(
-            key: "preferred_domain",
-            title: "Preferred domain",
-            summary: "",
-            valueIndex: 0,
-            entries: ["dopebox.to", "dopebox.se"],
-            entryValues: ["https://dopebox.to", "https://dopebox.se"]),
+          key: "preferred_domain",
+          title: "Preferred domain",
+          summary: "",
+          valueIndex: 0,
+          entries: ["dopebox.to", "dopebox.se"],
+          entryValues: ["https://dopebox.to", "https://dopebox.se"],
+        ),
       if (source.name == "SFlix")
         ListPreference(
-            key: "preferred_domain",
-            title: "Preferred domain",
-            summary: "",
-            valueIndex: 0,
-            entries: ["sflix.to", "sflix.se"],
-            entryValues: ["https://sflix.to", "https://sflix.se"]),
-      ListPreference(
-          key: "preferred_quality",
-          title: "Preferred Quality",
+          key: "preferred_domain",
+          title: "Preferred domain",
           summary: "",
           valueIndex: 0,
-          entries: ["1080p", "720p", "480p", "360p"],
-          entryValues: ["1080p", "720p", "480p", "360p"]),
+          entries: ["sflix.to", "sflix.se"],
+          entryValues: ["https://sflix.to", "https://sflix.se"],
+        ),
       ListPreference(
-          key: "preferred_subLang",
-          title: "Preferred sub language",
-          summary: "",
-          valueIndex: 1,
-          entries: [
-            "Arabic",
-            "English",
-            "French",
-            "German",
-            "Hungarian",
-            "Italian",
-            "Japanese",
-            "Portuguese",
-            "Romanian",
-            "Russian",
-            "Spanish"
-          ],
-          entryValues: [
-            "Arabic",
-            "English",
-            "French",
-            "German",
-            "Hungarian",
-            "Italian",
-            "Japanese",
-            "Portuguese",
-            "Romanian",
-            "Russian",
-            "Spanish"
-          ]),
+        key: "preferred_quality",
+        title: "Preferred Quality",
+        summary: "",
+        valueIndex: 0,
+        entries: ["1080p", "720p", "480p", "360p"],
+        entryValues: ["1080p", "720p", "480p", "360p"],
+      ),
       ListPreference(
-          key: "preferred_latest_page",
-          title: "Preferred latest page",
-          summary: "",
-          valueIndex: 0,
-          entries: ["Movies", "TV Shows"],
-          entryValues: ["Latest Movies", "Latest TV Shows"]),
+        key: "preferred_subLang",
+        title: "Preferred sub language",
+        summary: "",
+        valueIndex: 1,
+        entries: [
+          "Arabic",
+          "English",
+          "French",
+          "German",
+          "Hungarian",
+          "Italian",
+          "Japanese",
+          "Portuguese",
+          "Romanian",
+          "Russian",
+          "Spanish",
+        ],
+        entryValues: [
+          "Arabic",
+          "English",
+          "French",
+          "German",
+          "Hungarian",
+          "Italian",
+          "Japanese",
+          "Portuguese",
+          "Romanian",
+          "Russian",
+          "Spanish",
+        ],
+      ),
       ListPreference(
-          key: "preferred_popular_page",
-          title: "Preferred popular page",
-          summary: "",
-          valueIndex: 0,
-          entries: ["Movies", "TV Shows"],
-          entryValues: ["movie", "tv-show"]),
+        key: "preferred_latest_page",
+        title: "Preferred latest page",
+        summary: "",
+        valueIndex: 0,
+        entries: ["Movies", "TV Shows"],
+        entryValues: ["Latest Movies", "Latest TV Shows"],
+      ),
+      ListPreference(
+        key: "preferred_popular_page",
+        title: "Preferred popular page",
+        summary: "",
+        valueIndex: 0,
+        entries: ["Movies", "TV Shows"],
+        entryValues: ["movie", "tv-show"],
+      ),
     ];
   }
 

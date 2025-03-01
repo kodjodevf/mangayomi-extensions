@@ -12,5 +12,5 @@ List<Source> dartMangasourceList = [
   ...mmrcmsSourcesList,
   mangahereSource,
   ...nepnepSourcesList,
-  ...mangaboxSourcesList
+  ...mangaboxSourcesList,
 ];

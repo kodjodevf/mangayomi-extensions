@@ -50,5 +50,5 @@ List<Source> dartAnimesourceList = [
   animesvision,
   diziwatchSource,
   aniZoneSource,
-  animeonlineninjaSource
+  animeonlineninjaSource,
 ];

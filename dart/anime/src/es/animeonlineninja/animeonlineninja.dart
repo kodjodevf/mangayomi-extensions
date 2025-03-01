@@ -21,16 +21,23 @@ class AnimeOnlineNinja extends MProvider {
   @override
   Future<MPages> search(String query, int page, FilterList filterList) async {
     String pageStr = page == 1 ? "" : "page/$page/";
-    final res = (await client.get(Uri.parse(
-            "${source.baseUrl}/$pageStr?s=${query.replaceAll(" ", "+")}")))
-        .body;
-    return parseAnimeList(res,
-        selector: "div.result-item div.image a",
-        hasNextPage: parseHtml(res)
-                .selectFirst(
-                    "div.pagination > *:last-child:not(span):not(.current)")
-                ?.text !=
-            null);
+    final res =
+        (await client.get(
+          Uri.parse(
+            "${source.baseUrl}/$pageStr?s=${query.replaceAll(" ", "+")}",
+          ),
+        )).body;
+    return parseAnimeList(
+      res,
+      selector: "div.result-item div.image a",
+      hasNextPage:
+          parseHtml(res)
+              .selectFirst(
+                "div.pagination > *:last-child:not(span):not(.current)",
+              )
+              ?.text !=
+          null,
+    );
   }
 
   @override
@@ -39,11 +46,12 @@ class AnimeOnlineNinja extends MProvider {
     MManga anime = MManga();
     final document = parseHtml(res);
     anime.description = document.selectFirst("div#info").text;
-    anime.genre = document
-        .selectFirst("div.sheader")
-        .select("div.data > div.sgeneros > a")
-        .map((e) => e.text)
-        .toList();
+    anime.genre =
+        document
+            .selectFirst("div.sheader")
+            .select("div.data > div.sgeneros > a")
+            .map((e) => e.text)
+            .toList();
 
     List<MChapter>? episodesList = [];
     final seasonElements = document.select("div#seasons > div");
@@ -82,12 +90,16 @@ class AnimeOnlineNinja extends MProvider {
       final type = player.attr("data-type");
       final id = player.attr("data-post");
       final num = player.attr("data-nume");
-      final resUrl = (await client.get(Uri.parse(
-              "${source.baseUrl}/wp-json/dooplayer/v1/post/$id?type=$type&source=$num")))
-          .body;
-      final url =
-          substringBefore(substringAfter(resUrl, "\"embed_url\":\""), "\",")
-              .replaceAll("\\", "");
+      final resUrl =
+          (await client.get(
+            Uri.parse(
+              "${source.baseUrl}/wp-json/dooplayer/v1/post/$id?type=$type&source=$num",
+            ),
+          )).body;
+      final url = substringBefore(
+        substringAfter(resUrl, "\"embed_url\":\""),
+        "\",",
+      ).replaceAll("\\", "");
       videos.addAll(await extractVideos(url, name));
     }
     return sortVideos(videos, source.id);
@@ -100,8 +112,11 @@ class AnimeOnlineNinja extends MProvider {
       return await extractFromMulti(url);
     } else if (["filemoon", "moon", "filemooon"].any((a) => url.contains(a))) {
       a = await filemoonExtractor(url, "$lang Filemoon - ", "");
-    } else if (["https://dood", "https://ds2play", "https://d0"]
-        .any((a) => url.contains(a))) {
+    } else if ([
+      "https://dood",
+      "https://ds2play",
+      "https://d0",
+    ].any((a) => url.contains(a))) {
       a = await doodExtractor(url, "$lang DoodStream");
     } else if (["streamtape", "stp", "stape"].any((a) => url.contains(a))) {
       a = await streamTapeExtractor(url, "$lang StreamTape");
@@ -111,8 +126,10 @@ class AnimeOnlineNinja extends MProvider {
       final resUrl = (await client.get(Uri.parse(url))).body;
       final jsData =
           parseHtml(resUrl).selectFirst("script:contains(sources)").text;
-      final videoUrl =
-          substringBefore(substringAfter(jsData, "{file:\""), "\"");
+      final videoUrl = substringBefore(
+        substringAfter(jsData, "{file:\""),
+        "\"",
+      );
 
       MVideo video = MVideo();
       video
@@ -121,13 +138,20 @@ class AnimeOnlineNinja extends MProvider {
         ..quality = "$lang WolfStream";
 
       a = [video];
-    } else if (["wishembed", "streamwish", "strwish", "wish"]
-        .any((a) => url.contains(a))) {
+    } else if ([
+      "wishembed",
+      "streamwish",
+      "strwish",
+      "wish",
+    ].any((a) => url.contains(a))) {
       a = await streamWishExtractor(url, "$lang StreamWish");
     } else if (url.contains("mp4upload")) {
       a = await mp4UploadExtractor(url, null, "$lang", "");
-    } else if (["vidhide", "filelions.top", "vid."]
-        .any((a) => url.contains(a))) {
+    } else if ([
+      "vidhide",
+      "filelions.top",
+      "vid.",
+    ].any((a) => url.contains(a))) {
       a = await streamHideExtractor(url, lang);
     }
     videos.addAll(a);
@@ -138,15 +162,18 @@ class AnimeOnlineNinja extends MProvider {
   Future<List<MVideo>> streamHideExtractor(String url, String prefix) async {
     final res = (await client.get(Uri.parse(url))).body;
     final masterUrl = substringBefore(
-        substringAfter(
-            substringAfter(
-                substringAfter(unpackJs(res), "sources:"), "file:\""),
-            "src:\""),
-        '"');
+      substringAfter(
+        substringAfter(substringAfter(unpackJs(res), "sources:"), "file:\""),
+        "src:\"",
+      ),
+      '"',
+    );
     final masterPlaylistRes = (await client.get(Uri.parse(masterUrl))).body;
     List<MVideo> videos = [];
-    for (var it in substringAfter(masterPlaylistRes, "#EXT-X-STREAM-INF:")
-        .split("#EXT-X-STREAM-INF:")) {
+    for (var it in substringAfter(
+      masterPlaylistRes,
+      "#EXT-X-STREAM-INF:",
+    ).split("#EXT-X-STREAM-INF:")) {
       final quality =
           "${substringBefore(substringBefore(substringAfter(substringAfter(it, "RESOLUTION="), "x"), ","), "\n")}p";
 
@@ -168,16 +195,20 @@ class AnimeOnlineNinja extends MProvider {
   }
 
   Future<List<MVideo>> uqloadExtractor(String url, String lang) async {
-    final Client client =
-        Client(source, json.encode({"useDartHttpClient": true}));
+    final Client client = Client(
+      source,
+      json.encode({"useDartHttpClient": true}),
+    );
     final res = (await client.get(Uri.parse(url))).body;
     final js = xpath(res, '//script[contains(text(), "sources:")]/text()');
     if (js.isEmpty) {
       return [];
     }
 
-    final videoUrl =
-        substringBefore(substringAfter(js.first, "sources: [\""), '"');
+    final videoUrl = substringBefore(
+      substringAfter(js.first, "sources: [\""),
+      '"',
+    );
     MVideo video = MVideo();
     video
       ..url = videoUrl
@@ -200,12 +231,16 @@ class AnimeOnlineNinja extends MProvider {
     }
     List<MVideo> videos = [];
     for (var element in document.select("div.ODDIV $langSelector > li")) {
-      final hosterUrl =
-          substringBefore(substringAfter(element.attr("onclick"), "('"), "')");
+      final hosterUrl = substringBefore(
+        substringAfter(element.attr("onclick"), "('"),
+        "')",
+      );
       String lang = "";
       if (langSelector == "div") {
         lang = substringBefore(
-            substringAfter(element.parent?.attr("class"), "OD_", ""), " ");
+          substringAfter(element.parent?.attr("class"), "OD_", ""),
+          " ",
+        );
       } else {
         lang = prefLang;
       }
@@ -215,8 +250,11 @@ class AnimeOnlineNinja extends MProvider {
     return videos;
   }
 
-  MPages parseAnimeList(String res,
-      {String selector = "article.w_item_a > a", bool hasNextPage = false}) {
+  MPages parseAnimeList(
+    String res, {
+    String selector = "article.w_item_a > a",
+    bool hasNextPage = false,
+  }) {
     final elements = parseHtml(res).select(selector);
     List<MManga> animeList = [];
     for (var element in elements) {
@@ -225,7 +263,8 @@ class AnimeOnlineNinja extends MProvider {
         MManga anime = MManga();
         final img = element.selectFirst("img");
         anime.name = img.attr("alt");
-        anime.imageUrl = img?.attr("data-src") ??
+        anime.imageUrl =
+            img?.attr("data-src") ??
             img?.attr("data-lazy-src") ??
             img?.attr("srcset") ??
             img?.getSrc;
@@ -240,39 +279,41 @@ class AnimeOnlineNinja extends MProvider {
   List<dynamic> getSourcePreferences() {
     return [
       ListPreference(
-          key: "preferred_lang",
-          title: "Preferred language",
-          summary: "",
-          valueIndex: 0,
-          entries: ["SUB", "All", "ES", "LAT"],
-          entryValues: ["SUB", "", "ES", "LAT"]),
+        key: "preferred_lang",
+        title: "Preferred language",
+        summary: "",
+        valueIndex: 0,
+        entries: ["SUB", "All", "ES", "LAT"],
+        entryValues: ["SUB", "", "ES", "LAT"],
+      ),
       ListPreference(
-          key: "preferred_server1",
-          title: "Preferred server",
-          summary: "",
-          valueIndex: 0,
-          entries: [
-            "Filemoon",
-            "DoodStream",
-            "StreamTape",
-            "Uqload",
-            "WolfStream",
-            "saidochesto.top",
-            "VidHide",
-            "StreamWish",
-            "Mp4Upload"
-          ],
-          entryValues: [
-            "Filemoon",
-            "DoodStream",
-            "StreamTape",
-            "Uqload",
-            "WolfStream",
-            "saidochesto.top",
-            "VidHide",
-            "StreamWish",
-            "Mp4Upload"
-          ]),
+        key: "preferred_server1",
+        title: "Preferred server",
+        summary: "",
+        valueIndex: 0,
+        entries: [
+          "Filemoon",
+          "DoodStream",
+          "StreamTape",
+          "Uqload",
+          "WolfStream",
+          "saidochesto.top",
+          "VidHide",
+          "StreamWish",
+          "Mp4Upload",
+        ],
+        entryValues: [
+          "Filemoon",
+          "DoodStream",
+          "StreamTape",
+          "Uqload",
+          "WolfStream",
+          "saidochesto.top",
+          "VidHide",
+          "StreamWish",
+          "Mp4Upload",
+        ],
+      ),
     ];
   }
 

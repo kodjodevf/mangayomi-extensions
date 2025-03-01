@@ -15,8 +15,10 @@ class NimeGami extends MProvider {
     List<MManga> animeList = [];
     final urls = xpath(res, '//div[@class="wrapper-2-a"]/article/a/@href');
     final names = xpath(res, '//div[@class="wrapper-2-a"]/article/a/@title');
-    final images =
-        xpath(res, '//div[@class="wrapper-2-a"]/article/a/div/img/@src');
+    final images = xpath(
+      res,
+      '//div[@class="wrapper-2-a"]/article/a/div/img/@src',
+    );
 
     for (var i = 0; i < names.length; i++) {
       MManga anime = MManga();
@@ -34,10 +36,14 @@ class NimeGami extends MProvider {
         (await client.get(Uri.parse("${source.baseUrl}/page/$page"))).body;
     List<MManga> animeList = [];
     final urls = xpath(res, '//div[@class="post-article"]/article/div/a/@href');
-    final names =
-        xpath(res, '//div[@class="post-article"]/article/div/a/@title');
-    final images =
-        xpath(res, '//div[@class="post-article"]/article/div/a/img/@src');
+    final names = xpath(
+      res,
+      '//div[@class="post-article"]/article/div/a/@title',
+    );
+    final images = xpath(
+      res,
+      '//div[@class="post-article"]/article/div/a/img/@src',
+    );
 
     for (var i = 0; i < names.length; i++) {
       MManga anime = MManga();
@@ -51,14 +57,17 @@ class NimeGami extends MProvider {
 
   @override
   Future<MPages> search(String query, int page, FilterList filterList) async {
-    final res = (await client.get(
-            Uri.parse("${source.baseUrl}/page/$page/?s=$query&post_type=post")))
-        .body;
+    final res =
+        (await client.get(
+          Uri.parse("${source.baseUrl}/page/$page/?s=$query&post_type=post"),
+        )).body;
     List<MManga> animeList = [];
     final urls = xpath(res, '//div[@class="archive-a"]/article/div/a/@href');
     final names = xpath(res, '//div[@class="archive-a"]/article/h2/a/@title');
-    final images =
-        xpath(res, '//div[@class="archive-a"]/article/div/a/img/@src');
+    final images = xpath(
+      res,
+      '//div[@class="archive-a"]/article/div/a/img/@src',
+    );
 
     for (var i = 0; i < names.length; i++) {
       MManga anime = MManga();
@@ -84,21 +93,25 @@ class NimeGami extends MProvider {
       anime.author = author.first;
     }
     anime.genre = xpath(res, '//tr/td[@class="info_a"]/a/text()');
-    final epUrls = xpath(res, '//div[@class="list_eps_stream"]/li/@data')
-        .reversed
-        .toList();
+    final epUrls =
+        xpath(
+          res,
+          '//div[@class="list_eps_stream"]/li/@data',
+        ).reversed.toList();
     final epNums =
         xpath(res, '//div[@class="list_eps_stream"]/li/@id').reversed.toList();
-    final names = xpath(res, '//div[@class="list_eps_stream"]/li/text()')
-        .reversed
-        .toList();
+    final names =
+        xpath(
+          res,
+          '//div[@class="list_eps_stream"]/li/text()',
+        ).reversed.toList();
     List<MChapter>? episodesList = [];
     for (var i = 0; i < epUrls.length; i++) {
       MChapter episode = MChapter();
       episode.name = names[i];
       episode.url = json.encode({
         "episodeIndex": int.parse(substringAfterLast(epNums[i], '_')),
-        'urls': json.decode(utf8.decode(base64Url.decode(epUrls[i])))
+        'urls': json.decode(utf8.decode(base64Url.decode(epUrls[i]))),
       });
       episodesList.add(episode);
     }
@@ -126,7 +139,8 @@ class NimeGami extends MProvider {
     List<MVideo> videos = [];
     if (url.contains("video.nimegami.id")) {
       final realUrl = utf8.decode(
-          base64Url.decode(substringBefore(substringAfter(url, "url="), "&")));
+        base64Url.decode(substringBefore(substringAfter(url, "url="), "&")),
+      );
       final a = await extractHXFileVideos(realUrl, quality);
       videos.addAll(a);
     } else if (url.contains("berkasdrive") || url.contains("drive.nimegami")) {
@@ -148,15 +162,19 @@ class NimeGami extends MProvider {
       url = url.replaceAll(".co/", ".co/embed-") + ".html";
     }
     final res = (await client.get(Uri.parse(url))).body;
-    final script = xpath(res,
-        '//script[contains(text(), "eval") and contains(text(), "p,a,c,k,e,d")]/text()');
+    final script = xpath(
+      res,
+      '//script[contains(text(), "eval") and contains(text(), "p,a,c,k,e,d")]/text()',
+    );
     if (script.isNotEmpty) {
       final videoUrl = substringBefore(
-          substringAfter(
-              substringAfter(unpackJs(script.first), "sources:[", ""),
-              "file\":\"",
-              ""),
-          '"');
+        substringAfter(
+          substringAfter(unpackJs(script.first), "sources:[", ""),
+          "file\":\"",
+          "",
+        ),
+        '"',
+      );
       if (videoUrl.isNotEmpty) {
         return [toVideo(videoUrl, "HXFile - $quality")];
       }
