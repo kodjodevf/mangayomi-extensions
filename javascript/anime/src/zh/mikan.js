@@ -1,13 +1,13 @@
 const mangayomiSources = [{
   "name": "蜜柑计划",
   "lang": "zh",
-  "baseUrl": "https://mikanime.tv",
+  "baseUrl": "https://mikanani.me",
   "apiUrl": "",
   "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/zh.mikan.png",
   "typeSource": "torrent",
   "itemType": 1,
   "isNsfw": false,
-  "version": "0.0.2",
+  "version": "0.0.25",
   "dateFormat": "",
   "dateFormatLocale": "",
   "pkgPath": "anime/src/zh/mikan.js"
@@ -24,6 +24,15 @@ class DefaultExtension extends MProvider {
     return timestamp;
   }
 
+  baseURL () {
+    const preference = new SharedPreferences();
+    var base_url = preference.get("domain_url");
+    if (base_url.endsWith("/")) {
+      base_url = base_url.slice(0, -1);
+    }
+    return base_url;
+  }
+
   getHeaders(url) {
     throw new Error("getHeaders not implemented");
   }
@@ -32,11 +41,11 @@ class DefaultExtension extends MProvider {
     var res;
     const identity = new SharedPreferences().get("cookies");
     if ((cookies) && (identity.length > 0)) {
-      res = await new Client().get(this.source.baseUrl + url, {
+      res = await new Client().get(this.baseURL() + url, {
         Cookie: `.AspNetCore.Identity.Application=${identity}`
       });
     } else {
-      res = await new Client().get(this.source.baseUrl + url);
+      res = await new Client().get(this.baseURL() + url);
     }
     const doc = new Document(res.body);
     const items = [];
@@ -47,7 +56,7 @@ class DefaultExtension extends MProvider {
         continue;
       }
       const title = element.selectFirst("a").attr("title");
-      const cover = this.source.baseUrl + element.selectFirst("img").attr("data-src");
+      const cover = this.baseURL() + element.selectFirst("img").attr("data-src");
       items.push({
         name: title,
         imageUrl: cover,
@@ -69,13 +78,13 @@ class DefaultExtension extends MProvider {
   }
 
   async search(query, page, filters) {
-    const res = await new Client().get(this.source.baseUrl + `/Home/Search?searchstr=${query}`);
+    const res = await new Client().get(this.baseURL() + `/Home/Search?searchstr=${query}`);
     const doc = new Document(res.body);
     const items = [];
     const elements = doc.select("div.central-container ul.list-inline li");
     for (const element of elements) {
       const title = element.selectFirst("div.an-text").text;
-      const cover = this.source.baseUrl + element.selectFirst("span").attr("data-src");
+      const cover = this.baseURL() + element.selectFirst("span").attr("data-src");
       const url = element.selectFirst("a").attr("href");
       items.push({
         name: title,
@@ -90,9 +99,9 @@ class DefaultExtension extends MProvider {
   }
 
   async getDetail(url) {
-    const res = await new Client().get(this.source.baseUrl + url);
+    const res = await new Client().get(this.baseURL() + url);
     const doc = new Document(res.body);
-    const cover = this.source.baseUrl + doc.selectFirst("div.content img").attr("src");
+    const cover = this.baseURL() + doc.selectFirst("div.content img").attr("src");
     const title = doc.selectFirst("p.title").text;
     const desc = doc.selectFirst("div.info").text;
     const eps = [];
@@ -101,7 +110,7 @@ class DefaultExtension extends MProvider {
       //const header = list.selectFirst("span.title").text;
       for (const item of list.select("div.m-bangumi-item")) {
         const title = item.selectFirst("div.text").text;
-        const url = this.source.baseUrl + item.selectFirst("div.right a").attr("href");
+        const url = this.baseURL() + item.selectFirst("div.right a").attr("href");
         const date = this.dateStringToTimestamp(item.selectFirst("div.date").text.split(" ")[0]);
         eps.push({
           name: title,
@@ -110,7 +119,7 @@ class DefaultExtension extends MProvider {
         });
       }
     }
-    eps.reverse();
+    //eps.reverse();
     return {
       name: title,
       imageUrl: cover,
@@ -126,6 +135,15 @@ class DefaultExtension extends MProvider {
 
   getSourcePreferences() {
     return [{
+      "key": "domain_url",
+      "editTextPreference": {
+          "title": "Url",
+          "summary": "蜜柑计划网址",
+          "value": "https://mikanani.me",
+          "dialogTitle": "URL",
+          "dialogMessage": "",
+      }
+    },{
       "key": "cookies",
       "editTextPreference": {
         "title": "用户Cookies（在webview中登陆则可不设）",
