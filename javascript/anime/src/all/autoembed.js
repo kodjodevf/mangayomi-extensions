@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "multi",
     "isManga": false,
     "itemType": 1,
-    "version": "1.2.1",
+    "version": "1.2.4",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/all/autoembed.js"
@@ -156,14 +156,19 @@ class DefaultExtension extends MProvider {
 
     // Extracts the streams url for different resolutions from a hls stream.
     async extractStreams(url, lang = "", hdr = {}) {
-        const response = await new Client().get(url);
-        const body = response.body;
-        const lines = body.split('\n');
         var streams = [{
             url: url,
             originalUrl: url,
-            quality: "auto",
+            quality: `${lang} - Auto`,
         }];
+        
+        var pref = this.getPreference("autoembed_split_stream_quality");
+        if(!pref) return streams
+
+        
+        const response = await new Client().get(url);
+        const body = response.body;
+        const lines = body.split('\n');
 
         for (let i = 0; i < lines.length; i++) {
             if (lines[i].startsWith('#EXT-X-STREAM-INF:')) {
@@ -185,8 +190,18 @@ class DefaultExtension extends MProvider {
 
     // For some streams, we can form stream url using a default template.
     async splitStreams(url, lang = "", hdr = {}) {
-        var streams = [];
-        var quality = ["auto", "360", "480", "720", "1080"]
+        var streams = [{
+            url: url,
+            originalUrl: url,
+            quality: `${lang} - Auto`,
+            headers: hdr
+        }];
+        
+        var pref = this.getPreference("autoembed_split_stream_quality");
+        if(!pref) return streams
+        
+
+        var quality = ["360", "480", "720", "1080"]
         for (var q of quality) {
             var link = url
             if (q != "auto") {
@@ -253,7 +268,7 @@ class DefaultExtension extends MProvider {
 
     // For anime episode video list
     async getVideoList(url) {
-        var streamAPI = parseInt(this.getPreference("autoembed_stream_source"))
+        var streamAPI = parseInt(this.getPreference("autoembed_stream_source_2"))
 
         var parts = url.split("||");
         var media_type = parts[0];
@@ -278,7 +293,7 @@ class DefaultExtension extends MProvider {
                 var response = await new Client().get(api);
 
                 if (response.statusCode != 200) {
-                    throw new Error("Video unavailable");
+                    throw new Error("play2.123embed.net unavailable\nPlease choose a different server");
                 }
 
                 var body = JSON.parse(response.body);
@@ -300,14 +315,14 @@ class DefaultExtension extends MProvider {
                 var response = await new Client().get(api);
 
                 if (response.statusCode != 200) {
-                    throw new Error("Video unavailable");
+                    throw new Error("autoembed.cc unavailable\nPlease choose a different server");
                 }
                 var body = response.body
                 var sKey = '"file": '
                 var eKey = "]});"
                 var start = body.indexOf(sKey)
                 if (start < 0) {
-                    throw new Error("Video unavailable");
+                    throw new Error("autoembed.cc videos unavailable\nPlease choose a different server");
                 }
                 start += sKey.length
 
@@ -327,17 +342,17 @@ class DefaultExtension extends MProvider {
                     id = `${id}&season=${s}&episode=${e}`
                 }
                 var api = `https://flicky.host/player/desi.php?id=${id}`
-                var response = await new Client().get(api, { "Referer": "https://flicky.host/" ,"sec-fetch-dest":"iframe"});
+                var response = await new Client().get(api, { "Referer": "https://flicky.host/", "sec-fetch-dest": "iframe" });
 
                 if (response.statusCode != 200) {
-                    throw new Error("Video unavailable");
+                    throw new Error("flicky.host unavailable\nPlease choose a different server");
                 }
                 var body = response.body
                 var sKey = 'streams = '
                 var eKey = "];"
                 var start = body.indexOf(sKey)
                 if (start < 0) {
-                    throw new Error("Video unavailable");
+                    throw new Error("flicky.host videos unavailable\nPlease choose a different server");
                 }
                 start += sKey.length
 
@@ -361,7 +376,7 @@ class DefaultExtension extends MProvider {
                 var response = await new Client().get(api);
 
                 if (response.statusCode != 200) {
-                    throw new Error("Video unavailable");
+                    throw new Error("vidapi.click unavailable\nPlease choose a different server");
                 }
 
                 var body = JSON.parse(response.body);
@@ -378,18 +393,21 @@ class DefaultExtension extends MProvider {
                 var response = await new Client().get(api, hdr);
 
                 if (response.statusCode != 200) {
-                    throw new Error("Video unavailable");
+                    throw new Error("hexa.watch unavailable\nPlease choose a different server");
                 }
 
                 var body = JSON.parse(response.body);
                 var strms = body.streams
                 for (var strm of strms) {
-                    streams.push({
-                        url: strm.url,
-                        originalUrl: strm.url,
-                        quality: strm.quality,
-                        headers: strm.headers
-                    });
+                    var streamLink = strm.url;
+                    if (streamLink.length > 0) {
+                        streams.push({
+                            url: strm.url,
+                            originalUrl: strm.url,
+                            quality: `${strm.label} - Auto`,
+                            headers: strm.headers
+                        });
+                    }
                 }
                 break;
             }
@@ -397,24 +415,51 @@ class DefaultExtension extends MProvider {
                 if (media_type == "tv") {
                     id = `${id}/${s}/${e}`
                 }
-                var api = `https://febapi.bludclart.com/${media_type}/${id}`
+                var api = `https://vidsrc.su/embed/${media_type}/${id}`
                 var response = await new Client().get(api);
 
                 if (response.statusCode != 200) {
-                    throw new Error("Video unavailable");
+                    throw new Error("vidsrc.su unavailable\nPlease choose a different server");
+                }
+                var body = response.body
+                var sKey = 'fixedServers = '
+                var eKey = "];"
+                var start = body.indexOf(sKey)
+                if (start < 0) {
+                    throw new Error("vidsrc.su videos unavailable\nPlease choose a different server");
+                }
+                start += sKey.length
+
+                var end = body.substring(start,).indexOf(eKey) + start + 1
+                var strms = body.substring(start, end)
+
+                // Split the data into lines
+                var lines = strms.split('\n');
+
+                // Regex to match URLs in quotes that start with https://
+                var regex = /url:\s*'(https:\/\/[^']+)'/;
+                var availableStreams = [];
+
+                // Process each line
+                lines.forEach(line => {
+                    var match = line.match(regex);
+                    if (match && match[1]) {
+                        // Extract the label from the line
+                        var labelMatch = line.match(/label:\s*'([^']+)'/);
+                        var label = labelMatch ? labelMatch[1] : "Unknown";
+                        // Add to our results
+                        availableStreams.push({
+                            url: match[1],
+                            label: label,
+                        });
+                    }
+                });
+
+                for (var stream of availableStreams) {
+                    var streamSplit = await this.extractStreams(stream.url, stream.label);
+                    streams = [...streams, ...streamSplit]
                 }
 
-                var body = JSON.parse(response.body);
-                var strms = body.streams.qualities
-                for (var strm in strms) {
-                    var quality = strm === "ORG" ? "auto" : strm
-                    var url = strms[strm]
-                    streams.push({
-                        url: url,
-                        originalUrl: url,
-                        quality: quality,
-                    });
-                }
                 break;
             }
             default: {
@@ -425,7 +470,7 @@ class DefaultExtension extends MProvider {
                 var response = await new Client().get(api, this.getHeaders());
 
                 if (response.statusCode != 200) {
-                    throw new Error("Video unavailable");
+                    throw new Error("tom.autoembed.cc unavailable\nPlease choose a different server");
                 }
 
                 var body = JSON.parse(response.body);
@@ -436,7 +481,7 @@ class DefaultExtension extends MProvider {
 
         }
         if (streams.length < 1) {
-            throw new Error("Video unavailable");
+            throw new Error("No streams unavailable\nPlease choose a different server");
         }
 
 
@@ -483,12 +528,20 @@ class DefaultExtension extends MProvider {
             }
         },
         {
-            key: 'autoembed_stream_source',
+            key: 'autoembed_split_stream_quality',
+            "switchPreferenceCompat": {
+                'title': 'Split stream into different quality streams',
+                "summary": "Split stream Auto into 360p/720p/1080p",
+                "value": true
+            }
+        },
+        {
+            key: 'autoembed_stream_source_2',
             listPreference: {
                 title: 'Preferred stream source',
                 summary: '',
                 valueIndex: 0,
-                entries: ["tom.autoembed.cc", "123embed.net", "autoembed.cc - Indian languages", "flicky.host - Indian languages", "vidapi.click", "hexa.watch", "febapi (supports 4K)"],
+                entries: ["tom.autoembed.cc", "123embed.net", "autoembed.cc - Indian languages", "flicky.host - Indian languages", "vidapi.click", "hexa.watch", "vidsrc.su"],
                 entryValues: ["1", "2", "3", "4", "5", "6", "7"]
             }
         },
