@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "multi",
     "isManga": false,
     "itemType": 1,
-    "version": "1.2.3",
+    "version": "1.2.4",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/all/autoembed.js"
@@ -156,14 +156,19 @@ class DefaultExtension extends MProvider {
 
     // Extracts the streams url for different resolutions from a hls stream.
     async extractStreams(url, lang = "", hdr = {}) {
-        const response = await new Client().get(url);
-        const body = response.body;
-        const lines = body.split('\n');
         var streams = [{
             url: url,
             originalUrl: url,
-            quality: "auto",
+            quality: `${lang} - Auto`,
         }];
+        
+        var pref = this.getPreference("autoembed_split_stream_quality");
+        if(!pref) return streams
+
+        
+        const response = await new Client().get(url);
+        const body = response.body;
+        const lines = body.split('\n');
 
         for (let i = 0; i < lines.length; i++) {
             if (lines[i].startsWith('#EXT-X-STREAM-INF:')) {
@@ -185,8 +190,18 @@ class DefaultExtension extends MProvider {
 
     // For some streams, we can form stream url using a default template.
     async splitStreams(url, lang = "", hdr = {}) {
-        var streams = [];
-        var quality = ["auto", "360", "480", "720", "1080"]
+        var streams = [{
+            url: url,
+            originalUrl: url,
+            quality: `${lang} - Auto`,
+            headers: hdr
+        }];
+        
+        var pref = this.getPreference("autoembed_split_stream_quality");
+        if(!pref) return streams
+        
+
+        var quality = ["360", "480", "720", "1080"]
         for (var q of quality) {
             var link = url
             if (q != "auto") {
@@ -441,7 +456,7 @@ class DefaultExtension extends MProvider {
                 });
 
                 for (var stream of availableStreams) {
-                    var streamSplit = await this.splitStreams(stream.url, stream.label);
+                    var streamSplit = await this.extractStreams(stream.url, stream.label);
                     streams = [...streams, ...streamSplit]
                 }
 
@@ -510,6 +525,14 @@ class DefaultExtension extends MProvider {
                 valueIndex: 0,
                 entries: ["Movies", "Series"],
                 entryValues: ["movies", "series"]
+            }
+        },
+        {
+            key: 'autoembed_split_stream_quality',
+            "switchPreferenceCompat": {
+                'title': 'Split stream into different quality streams',
+                "summary": "Split stream Auto into 360p/720p/1080p",
+                "value": true
             }
         },
         {
