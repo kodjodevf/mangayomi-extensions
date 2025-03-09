@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "multi",
     "isManga": false,
     "itemType": 1,
-    "version": "1.2.2",
+    "version": "1.2.3",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/all/autoembed.js"
@@ -278,7 +278,7 @@ class DefaultExtension extends MProvider {
                 var response = await new Client().get(api);
 
                 if (response.statusCode != 200) {
-                    throw new Error("Video unavailable");
+                    throw new Error("play2.123embed.net unavailable\nPlease choose a different server");
                 }
 
                 var body = JSON.parse(response.body);
@@ -300,14 +300,14 @@ class DefaultExtension extends MProvider {
                 var response = await new Client().get(api);
 
                 if (response.statusCode != 200) {
-                    throw new Error("Video unavailable");
+                    throw new Error("autoembed.cc unavailable\nPlease choose a different server");
                 }
                 var body = response.body
                 var sKey = '"file": '
                 var eKey = "]});"
                 var start = body.indexOf(sKey)
                 if (start < 0) {
-                    throw new Error("Video unavailable");
+                    throw new Error("autoembed.cc videos unavailable\nPlease choose a different server");
                 }
                 start += sKey.length
 
@@ -330,14 +330,14 @@ class DefaultExtension extends MProvider {
                 var response = await new Client().get(api, { "Referer": "https://flicky.host/", "sec-fetch-dest": "iframe" });
 
                 if (response.statusCode != 200) {
-                    throw new Error("Video unavailable");
+                    throw new Error("flicky.host unavailable\nPlease choose a different server");
                 }
                 var body = response.body
                 var sKey = 'streams = '
                 var eKey = "];"
                 var start = body.indexOf(sKey)
                 if (start < 0) {
-                    throw new Error("Video unavailable");
+                    throw new Error("flicky.host videos unavailable\nPlease choose a different server");
                 }
                 start += sKey.length
 
@@ -361,7 +361,7 @@ class DefaultExtension extends MProvider {
                 var response = await new Client().get(api);
 
                 if (response.statusCode != 200) {
-                    throw new Error("Video unavailable");
+                    throw new Error("vidapi.click unavailable\nPlease choose a different server");
                 }
 
                 var body = JSON.parse(response.body);
@@ -378,7 +378,7 @@ class DefaultExtension extends MProvider {
                 var response = await new Client().get(api, hdr);
 
                 if (response.statusCode != 200) {
-                    throw new Error("Video unavailable");
+                    throw new Error("hexa.watch unavailable\nPlease choose a different server");
                 }
 
                 var body = JSON.parse(response.body);
@@ -404,14 +404,14 @@ class DefaultExtension extends MProvider {
                 var response = await new Client().get(api);
 
                 if (response.statusCode != 200) {
-                    throw new Error("vidsrc.su unavailable");
+                    throw new Error("vidsrc.su unavailable\nPlease choose a different server");
                 }
                 var body = response.body
                 var sKey = 'fixedServers = '
                 var eKey = "];"
                 var start = body.indexOf(sKey)
                 if (start < 0) {
-                    throw new Error("vidsrc.su unavailable");
+                    throw new Error("vidsrc.su videos unavailable\nPlease choose a different server");
                 }
                 start += sKey.length
 
@@ -455,7 +455,7 @@ class DefaultExtension extends MProvider {
                 var response = await new Client().get(api, this.getHeaders());
 
                 if (response.statusCode != 200) {
-                    throw new Error("Video unavailable");
+                    throw new Error("tom.autoembed.cc unavailable\nPlease choose a different server");
                 }
 
                 var body = JSON.parse(response.body);
@@ -466,7 +466,7 @@ class DefaultExtension extends MProvider {
 
         }
         if (streams.length < 1) {
-            throw new Error("Video unavailable");
+            throw new Error("No streams unavailable\nPlease choose a different server");
         }
 
 
