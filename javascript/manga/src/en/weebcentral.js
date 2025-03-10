@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://weebcentral.com",
     "typeSource": "single",
     "itemType": 0,
-    "version": "0.0.8",
+    "version": "0.0.9",
     "pkgPath": "manga/src/en/weebcentral.js"
 }];
 
@@ -17,7 +17,7 @@ class DefaultExtension extends MProvider {
         this.client = new Client();
     }
     getHeaders(url) {
-        return { "Referer": `${baseUrl}/` };
+        return { "Referer": `${this.source.baseUrl}/` };
     }
 
     async request(slug) {
@@ -131,8 +131,9 @@ class DefaultExtension extends MProvider {
 
         doc.select("section > img").forEach(page => urls.push(page.attr("src")))
 
-        return urls
+        return urls.map(x => ({ url: x, headers: { Referer: `${this.source.baseUrl}/`, Accept: "image/avif,image/webp,*/*", Host: `${x.match(/^(?:https?:\/\/)?([^\/:]+)(:\d+)?/)[1]}` } }));
     }
+
 
     getFilterList() {
         return [
