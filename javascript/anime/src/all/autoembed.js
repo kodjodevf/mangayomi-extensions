@@ -7,17 +7,32 @@ const mangayomiSources = [{
     "typeSource": "multi",
     "isManga": false,
     "itemType": 1,
-    "version": "1.2.4",
+    "version": "1.2.6",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/all/autoembed.js"
 }];
 
 class DefaultExtension extends MProvider {
-
-    getHeaders() {
+    decodeBase64 = function (f) {
+        var g = {},
+            b = 65,
+            d = 0,
+            a, c = 0,
+            h, e = "",
+            k = String.fromCharCode,
+            l = f.length;
+        for (a = ""; 91 > b;) a += k(b++);
+        a += a.toLowerCase() + "0123456789+/";
+        for (b = 0; 64 > b; b++) g[a.charAt(b)] = b;
+        for (a = 0; a < l; a++)
+            for (b = g[f.charAt(a)], d = (d << 6) + b, c += 6; 8 <= c;)((h = d >>> (c -= 8) & 255) || a < l - 2) && (e += k(h));
+        return e
+    };
+    getHeaders(url) {
         return {
-            Referer: this.source.apiUrl
+            Referer: url,
+            Origin: url
         }
     }
 
@@ -155,18 +170,19 @@ class DefaultExtension extends MProvider {
     }
 
     // Extracts the streams url for different resolutions from a hls stream.
-    async extractStreams(url, lang = "", hdr = {}) {
+    async extractStreams(url, lang = "", hdr = {}, host = "") {
         var streams = [{
             url: url,
             originalUrl: url,
-            quality: `${lang} - Auto`,
+            quality: `${lang} Auto`,
+            headers: hdr
         }];
-        
-        var pref = this.getPreference("autoembed_split_stream_quality");
-        if(!pref) return streams
 
-        
-        const response = await new Client().get(url);
+        var pref = this.getPreference("autoembed_split_stream_quality");
+        if (!pref) return streams
+
+
+        const response = await new Client().get(url, hdr);
         const body = response.body;
         const lines = body.split('\n');
 
@@ -176,6 +192,9 @@ class DefaultExtension extends MProvider {
                 resolution = `${lang} ${resolution}`
                 var m3u8Url = lines[i + 1].trim();
                 m3u8Url = m3u8Url.replace("./", `${url}/`)
+                if (host.length > 0) {
+                    m3u8Url = `${host}${m3u8Url}`
+                }
                 streams.push({
                     url: m3u8Url,
                     originalUrl: m3u8Url,
@@ -196,10 +215,10 @@ class DefaultExtension extends MProvider {
             quality: `${lang} - Auto`,
             headers: hdr
         }];
-        
+
         var pref = this.getPreference("autoembed_split_stream_quality");
-        if(!pref) return streams
-        
+        if (!pref) return streams
+
 
         var quality = ["360", "480", "720", "1080"]
         for (var q of quality) {
@@ -268,7 +287,8 @@ class DefaultExtension extends MProvider {
 
     // For anime episode video list
     async getVideoList(url) {
-        var streamAPI = parseInt(this.getPreference("autoembed_stream_source_2"))
+        var streamAPI = parseInt(this.getPreference("autoembed_stream_source_3"))
+        var nativeSubs = this.getPreference("autoembed_pref_navtive_subtitle")
 
         var parts = url.split("||");
         var media_type = parts[0];
@@ -381,6 +401,7 @@ class DefaultExtension extends MProvider {
 
                 var body = JSON.parse(response.body);
                 var link = body.sources[0].file
+                if(nativeSubs) subtitles = body.tracks
                 streams = await this.extractStreams(link);
                 break;
             }
@@ -460,14 +481,69 @@ class DefaultExtension extends MProvider {
                     streams = [...streams, ...streamSplit]
                 }
 
+                if (nativeSubs) {
+                    // subtitles
+                    sKey = 'const subtitles = '
+                    eKey = "];"
+                    start = body.indexOf(sKey)
+                    if (start < 0) {
+                        break; // no need for native subtitle if not found.
+                    }
+                    start += sKey.length
+
+                    end = body.substring(start,).indexOf(eKey) + start + 1
+                    var natSubs = JSON.parse(body.substring(start, end))
+                    natSubs.forEach(sub=>{
+                        subtitles.push({
+                            file: sub.url,
+                            label: sub.display
+                        })
+                    })
+                   
+                }
                 break;
+            }
+            case 8: {
+                function reverse(str) {
+                    return str.split("").reverse().join("")
+                }
+
+
+                if (media_type == "tv") {
+                    id = `${id}/${s}/${e}`
+                }
+                var baseUrl = "https://embed.su"
+                var embedUrl = `${baseUrl}/embed/${media_type}/${id}`
+                var response = await new Client().get(embedUrl, this.getHeaders(baseUrl));
+
+                var body = response.body
+                var sKey = "JSON.parse(atob(`";
+                var start = body.indexOf(sKey) + sKey.length;
+                var end = body.substring(start,).indexOf("`") + start
+                var configHash = body.substring(start, end)
+
+
+                var config = JSON.parse(this.decodeBase64(configHash));
+                var encodedHash = this.decodeBase64(config.hash);
+                var decodeHash = reverse(encodedHash.split(".").map((item) => reverse(item)).join(""))
+                encodedHash = JSON.parse(this.decodeBase64(decodeHash))
+                var serverHash = encodedHash[0].hash
+
+                var api = `${baseUrl}/api/e/${serverHash}`
+                response = await new Client().get(api, this.getHeaders(baseUrl));
+                var jsonRes = JSON.parse(response.body);
+
+                streams = await this.extractStreams(jsonRes.source, "", this.getHeaders(baseUrl), baseUrl);
+                if (nativeSubs) subtitles = jsonRes.subtitles
+                break;
+
             }
             default: {
                 if (media_type == "tv") {
                     id = `${id}/${s}/${e}`
                 }
                 var api = `${this.source.apiUrl}/api/getVideoSource?type=${media_type}&id=${id}`
-                var response = await new Client().get(api, this.getHeaders());
+                var response = await new Client().get(api, this.getHeaders(this.source.apiUrl));
 
                 if (response.statusCode != 200) {
                     throw new Error("tom.autoembed.cc unavailable\nPlease choose a different server");
@@ -475,6 +551,7 @@ class DefaultExtension extends MProvider {
 
                 var body = JSON.parse(response.body);
                 var link = body.videoSource
+                if (nativeSubs) subtitles = body.subtitles
                 streams = await this.extractStreams(link);
                 break;
             }
@@ -484,8 +561,8 @@ class DefaultExtension extends MProvider {
             throw new Error("No streams unavailable\nPlease choose a different server");
         }
 
-
-        streams[0].subtitles = await this.getSubtitleList(tmdb, s, e)
+        var apiSubs = await this.getSubtitleList(tmdb, s, e)
+        streams[0].subtitles = [...subtitles, ...apiSubs]
 
         return await this.sortStreams(streams)
     }
@@ -536,13 +613,21 @@ class DefaultExtension extends MProvider {
             }
         },
         {
-            key: 'autoembed_stream_source_2',
+            key: 'autoembed_stream_source_3',
             listPreference: {
                 title: 'Preferred stream source',
                 summary: '',
                 valueIndex: 0,
-                entries: ["tom.autoembed.cc", "123embed.net", "autoembed.cc - Indian languages", "flicky.host - Indian languages", "vidapi.click", "hexa.watch", "vidsrc.su"],
-                entryValues: ["1", "2", "3", "4", "5", "6", "7"]
+                entries: ["tom.autoembed.cc", "123embed.net", "autoembed.cc - Indian languages", "flicky.host - Indian languages", "vidapi.click", "hexa.watch", "vidsrc.su", "embed.su"],
+                entryValues: ["1", "2", "3", "4", "5", "6", "7", "8"]
+            }
+        },
+        {
+            key: 'autoembed_pref_navtive_subtitle',
+            "switchPreferenceCompat": {
+                'title': 'Use native subtitles as well',
+                "summary": "Use subtitles provided by the source along with subtitle API",
+                "value": true
             }
         },
         {
