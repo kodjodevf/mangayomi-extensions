@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://aniplaynow.live/",
     "typeSource": "single",
     "itemType": 1,
-    "version": "1.1.3",
+    "version": "1.2.0",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/en/aniplay.js"
@@ -161,7 +161,7 @@ class DefaultExtension extends MProvider {
                     return "";
             }
         })();
-        anime.imageUrl = media?.coverImage?.extraLarge || 
+        anime.imageUrl = media?.coverImage?.extraLarge ||
             media?.coverImage?.large || "";
         anime.description = (media?.description || "No Description")
             .replace(/<br><br>/g, "\n")
@@ -232,7 +232,7 @@ class DefaultExtension extends MProvider {
                             return "";
                     }
                 })();
-                anime.imageUrl = media?.coverImage?.extraLarge || 
+                anime.imageUrl = media?.coverImage?.extraLarge ||
                     media?.coverImage?.large || "";
 
                 return anime;
@@ -383,6 +383,30 @@ class DefaultExtension extends MProvider {
         return [...sortedStreams, ...copyStreams]
     }
 
+    // Adds proxy to streams
+    async streamProxy(providerId, streams) {
+        var proxyBaseUrl = this.getPreference("aniplay_stream_proxy");
+        var slug = "/fetch?url="
+        var ref = "&ref="
+        if (providerId == "yuki") {
+            slug = "/zoroprox?url="
+            ref = ""
+        } else if (providerId == "pahe") {
+            ref += "https://kwik.si"
+        } else if (providerId === "maze") {
+            ref += "https://animez.org"
+        } else if (providerId === "kuro") {
+            ref = ""
+        }
+
+        streams.forEach(stream => {
+            stream.url = proxyBaseUrl + slug + stream.url + ref;
+            stream.originalUrl = proxyBaseUrl + slug + stream.originalUrl + ref;
+        });
+
+        return streams
+    }
+
     // Extracts the streams url for different resolutions from a hls stream.
     async extractStreams(url, providerId, hdr = {}) {
         const response = await new Client().get(url, hdr);
@@ -394,7 +418,10 @@ class DefaultExtension extends MProvider {
             quality: `Auto - ${providerId}`,
             headers: hdr
         }];
-
+        // Pahe only has auto
+        if (providerId === "pahe") {
+          return streams;
+        }
         for (let i = 0; i < lines.length; i++) {
             if (lines[i].startsWith('#EXT-X-STREAM-INF:')) {
                 var resolution = lines[i].match(/RESOLUTION=(\d+x\d+)/)[1];
@@ -417,7 +444,7 @@ class DefaultExtension extends MProvider {
 
     async getAnyStreams(result) {
         var m3u8Url = result.sources[0].url
-        return await this.extractStreams(m3u8Url, "anya");
+        return await this.extractStreams(m3u8Url, "any");
     }
 
     async getYukiStreams(result) {
@@ -500,7 +527,8 @@ class DefaultExtension extends MProvider {
         } else {
             streams = await this.getAnyStreams(result) //If new provider found getAnyStreams will extract only the streams
         }
-
+     
+        streams = await this.streamProxy(providerId, streams)
         return await this.sortStreams(streams)
     }
 
@@ -560,7 +588,16 @@ class DefaultExtension extends MProvider {
                 entries: ["Auto", "1080p", "720p", "480p", "360p"],
                 entryValues: ["auto", "1080", "720", "480", "360"]
             }
-        },
+        }, {
+            key: "aniplay_stream_proxy",
+            editTextPreference: {
+                title: "Override stream proxy url",
+                summary: "https://prox.aniplaynow.live",
+                value: "https://prox.aniplaynow.live",
+                dialogTitle: "Override stream proxy url",
+                dialogMessage: "",
+            }
+        }
 
         ]
     }
