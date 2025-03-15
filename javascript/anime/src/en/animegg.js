@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=256&domain=https://www.animegg.org/",
     "typeSource": "single",
     "itemType": 1,
-    "version": "0.0.1",
+    "version": "0.0.2",
     "pkgPath": "anime/src/en/animegg.js"
 }];
 
@@ -100,7 +100,23 @@ class DefaultExtension extends MProvider {
 
     }
     async search(query, page, filters) {
-        throw new Error("search not implemented");
+        var slug = `/search?q=${query}`
+        var body = await this.request(slug)
+        var items = body.select(".moose.page > a")
+        var list = []
+            for (var item of items) {
+                var imageUrl = item.selectFirst('img').getSrc
+                var link = item.getHref
+                var name = item.selectFirst("h2").text
+                list.push({
+                    name,
+                    imageUrl,
+                    link
+                });
+
+            }
+       
+        return { list, hasNextPage:false }
     }
     async getDetail(url) {
         throw new Error("getDetail not implemented");
