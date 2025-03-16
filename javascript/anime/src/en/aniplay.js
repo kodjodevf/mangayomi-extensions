@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://aniplaynow.live/",
     "typeSource": "single",
     "itemType": 1,
-    "version": "1.2.0",
+    "version": "1.2.1",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/en/aniplay.js"
@@ -389,7 +389,7 @@ class DefaultExtension extends MProvider {
         var slug = "/fetch?url="
         var ref = "&ref="
         if (providerId == "yuki") {
-            slug = "/zoroprox?url="
+            slug = "/yukiprox?url="
             ref = ""
         } else if (providerId == "pahe") {
             ref += "https://kwik.si"
