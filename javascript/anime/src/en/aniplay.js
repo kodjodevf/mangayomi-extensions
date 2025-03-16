@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://aniplaynow.live/",
     "typeSource": "single",
     "itemType": 1,
-    "version": "1.2.2",
+    "version": "1.2.3",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/en/aniplay.js"
@@ -409,19 +409,22 @@ class DefaultExtension extends MProvider {
 
     // Extracts the streams url for different resolutions from a hls stream.
     async extractStreams(url, providerId, hdr = {}) {
-        const response = await new Client().get(url, hdr);
-        const body = response.body;
-        const lines = body.split('\n');
         var streams = [{
             url: url,
             originalUrl: url,
             quality: `Auto - ${providerId}`,
             headers: hdr
         }];
+        var doExtract = this.getPreference("aniplay_pref_extract_streams");
         // Pahe only has auto
-        if (providerId === "pahe") {
+        if (providerId === "pahe" || !doExtract) {
             return streams;
         }
+
+        const response = await new Client().get(url, hdr);
+        const body = response.body;
+        const lines = body.split('\n');
+
         for (let i = 0; i < lines.length; i++) {
             if (lines[i].startsWith('#EXT-X-STREAM-INF:')) {
                 var resolution = lines[i].match(/RESOLUTION=(\d+x\d+)/)[1];
@@ -582,7 +585,14 @@ class DefaultExtension extends MProvider {
                 "entries": ["Sub", "Dub"],
                 "entryValues": ["sub", "dub"],
             }
-        }, {
+        },  {
+            "key": "aniplay_pref_extract_streams",
+            "switchPreferenceCompat": {
+                'title': 'Split stream into different quality streams',
+                "summary": "Split stream Auto into 360p/720p/1080p",
+                "value": true
+            }
+        },{
             key: 'aniplay_pref_video_resolution',
             listPreference: {
                 title: 'Preferred video resolution',
