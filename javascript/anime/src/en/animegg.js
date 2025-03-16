@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=256&domain=https://www.animegg.org/",
     "typeSource": "single",
     "itemType": 1,
-    "version": "0.0.2",
+    "version": "0.0.3",
     "pkgPath": "anime/src/en/animegg.js"
 }];
 
@@ -118,8 +118,55 @@ class DefaultExtension extends MProvider {
        
         return { list, hasNextPage:false }
     }
+
+    statusCode(status) {
+        return {
+            "Ongoing": 0,
+            "Completed": 1,
+        }[status] ?? 5;
+    }
+
     async getDetail(url) {
-        throw new Error("getDetail not implemented");
+        var link = this.source.baseUrl + url;
+
+        var body = await this.request(url)
+
+        var media = body.selectFirst(".media")
+        var title = media.selectFirst("h1").text
+        var spans = media.selectFirst("p.infoami").select("span")
+        var statusText = spans[spans.length - 1].text.replace("Status: ",'')
+        var status = this.statusCode(statusText)
+
+
+        var tagscat = media.select(".tagscat > li")
+        var genre = []
+        tagscat.forEach(tag => genre.push(tag.text))
+        var description = body.selectFirst("p.ptext").text
+        var chapters = []
+
+        var episodesList = body.select(".newmanga > li")
+        episodesList.forEach(ep => {
+            var epTitle = ep.selectFirst('i.anititle').text
+            var epNumber = ep.selectFirst('strong').text.replace(title,"Episode")
+            var epName = epNumber == epTitle?epNumber:`${epNumber} - ${epTitle}`
+            var epUrl = ep.selectFirst("a").getHref
+
+            var scanlator = "";
+            var type = ep.select("span.btn-xs")
+            type.forEach(t => {
+                scanlator += t.text + ", ";
+
+            })
+            scanlator = scanlator.slice(0, -2);
+
+            chapters.push({ name: epName, url: epUrl,scanlator})
+        })
+
+
+        return { description, status,  genre, chapters, link }
+
+
+
     }
     // For novel html content
     async getHtmlContent(url) {
