@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://aniplaynow.live/",
     "typeSource": "single",
     "itemType": 1,
-    "version": "1.2.0",
+    "version": "1.2.3",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/en/aniplay.js"
@@ -389,7 +389,7 @@ class DefaultExtension extends MProvider {
         var slug = "/fetch?url="
         var ref = "&ref="
         if (providerId == "yuki") {
-            slug = "/zoroprox?url="
+            slug = "/yukiprox?url="
             ref = ""
         } else if (providerId == "pahe") {
             ref += "https://kwik.si"
@@ -409,19 +409,22 @@ class DefaultExtension extends MProvider {
 
     // Extracts the streams url for different resolutions from a hls stream.
     async extractStreams(url, providerId, hdr = {}) {
-        const response = await new Client().get(url, hdr);
-        const body = response.body;
-        const lines = body.split('\n');
         var streams = [{
             url: url,
             originalUrl: url,
             quality: `Auto - ${providerId}`,
             headers: hdr
         }];
+        var doExtract = this.getPreference("aniplay_pref_extract_streams");
         // Pahe only has auto
-        if (providerId === "pahe") {
-          return streams;
+        if (providerId === "pahe" || !doExtract) {
+            return streams;
         }
+
+        const response = await new Client().get(url, hdr);
+        const body = response.body;
+        const lines = body.split('\n');
+
         for (let i = 0; i < lines.length; i++) {
             if (lines[i].startsWith('#EXT-X-STREAM-INF:')) {
                 var resolution = lines[i].match(/RESOLUTION=(\d+x\d+)/)[1];
@@ -453,10 +456,13 @@ class DefaultExtension extends MProvider {
 
         var subtitles = []
         result.subtitles.forEach(sub => {
-            subtitles.push({
-                "label": sub.lang,
-                "file": sub.url,
-            });
+            var label = sub.label
+            if (label.indexOf("thumbnail") < 0) { // thumbnails shouldnt be included
+                subtitles.push({
+                    "label": label,
+                    "file": sub.url,
+                });
+            }
         })
         streams[0].subtitles = subtitles
 
@@ -527,7 +533,7 @@ class DefaultExtension extends MProvider {
         } else {
             streams = await this.getAnyStreams(result) //If new provider found getAnyStreams will extract only the streams
         }
-     
+
         streams = await this.streamProxy(providerId, streams)
         return await this.sortStreams(streams)
     }
@@ -579,7 +585,14 @@ class DefaultExtension extends MProvider {
                 "entries": ["Sub", "Dub"],
                 "entryValues": ["sub", "dub"],
             }
-        }, {
+        },  {
+            "key": "aniplay_pref_extract_streams",
+            "switchPreferenceCompat": {
+                'title': 'Split stream into different quality streams',
+                "summary": "Split stream Auto into 360p/720p/1080p",
+                "value": true
+            }
+        },{
             key: 'aniplay_pref_video_resolution',
             listPreference: {
                 title: 'Preferred video resolution',
