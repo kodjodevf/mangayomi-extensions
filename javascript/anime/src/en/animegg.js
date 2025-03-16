@@ -42,8 +42,9 @@ class DefaultExtension extends MProvider {
         if (items.length > 0) {
             for (var item of items) {
                 var imageUrl = item.selectFirst('img').getSrc
-                var link = item.selectFirst('a').getHref
-                var name = item.selectFirst(".rightpop").text
+                var linkSection = item.selectFirst('.rightpop').selectFirst('a')
+                var link =linkSection.getHref
+                var name = linkSection.text
                 list.push({
                     name,
                     imageUrl,
