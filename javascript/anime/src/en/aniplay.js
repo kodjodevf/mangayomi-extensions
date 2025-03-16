@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://aniplaynow.live/",
     "typeSource": "single",
     "itemType": 1,
-    "version": "1.2.1",
+    "version": "1.2.2",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/en/aniplay.js"
@@ -420,7 +420,7 @@ class DefaultExtension extends MProvider {
         }];
         // Pahe only has auto
         if (providerId === "pahe") {
-          return streams;
+            return streams;
         }
         for (let i = 0; i < lines.length; i++) {
             if (lines[i].startsWith('#EXT-X-STREAM-INF:')) {
@@ -453,10 +453,13 @@ class DefaultExtension extends MProvider {
 
         var subtitles = []
         result.subtitles.forEach(sub => {
-            subtitles.push({
-                "label": sub.lang,
-                "file": sub.url,
-            });
+            var label = sub.label
+            if (label.indexOf("thumbnail") < 0) { // thumbnails shouldnt be included
+                subtitles.push({
+                    "label": label,
+                    "file": sub.url,
+                });
+            }
         })
         streams[0].subtitles = subtitles
 
@@ -527,7 +530,7 @@ class DefaultExtension extends MProvider {
         } else {
             streams = await this.getAnyStreams(result) //If new provider found getAnyStreams will extract only the streams
         }
-     
+
         streams = await this.streamProxy(providerId, streams)
         return await this.sortStreams(streams)
     }
