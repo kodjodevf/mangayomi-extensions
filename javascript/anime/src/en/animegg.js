@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=256&domain=https://www.animegg.org/",
     "typeSource": "single",
     "itemType": 1,
-    "version": "0.0.3",
+    "version": "1.0.0",
     "pkgPath": "anime/src/en/animegg.js"
 }];
 
@@ -19,8 +19,8 @@ class DefaultExtension extends MProvider {
 
     getHeaders(url) {
         return {
-            Referer: this.getSourcePreferences.baseUrl,
-            Origin: this.getSourcePreferences.baseUrl
+            "Referer": this.source.baseUrl,
+            "Origin": this.source.baseUrl
         }
     }
 
@@ -28,12 +28,15 @@ class DefaultExtension extends MProvider {
         return new SharedPreferences().get(key);
     }
 
-    async request(slug) {
+    async requestText(slug) {
         var url = `${this.source.baseUrl}${slug}`
         var res = await this.client.get(url, this.getHeaders());
-        return new Document(res.body);
+        return res.body;
     }
-    
+    async request(slug) {
+        return new Document(await this.requestText(slug));
+    }
+
     async fetchPopularnLatest(slug) {
         var body = await this.request(slug)
         var items = body.select("li.fea")
@@ -43,7 +46,7 @@ class DefaultExtension extends MProvider {
             for (var item of items) {
                 var imageUrl = item.selectFirst('img').getSrc
                 var linkSection = item.selectFirst('.rightpop').selectFirst('a')
-                var link =linkSection.getHref
+                var link = linkSection.getHref
                 var name = linkSection.text
                 list.push({
                     name,
@@ -86,7 +89,7 @@ class DefaultExtension extends MProvider {
         }
         var slug = `/popular-series?${category}start=${start}&limit=${limit}`
         return await this.fetchPopularnLatest(slug)
-        
+
 
     }
     get supportsLatest() {
@@ -105,19 +108,19 @@ class DefaultExtension extends MProvider {
         var body = await this.request(slug)
         var items = body.select(".moose.page > a")
         var list = []
-            for (var item of items) {
-                var imageUrl = item.selectFirst('img').getSrc
-                var link = item.getHref
-                var name = item.selectFirst("h2").text
-                list.push({
-                    name,
-                    imageUrl,
-                    link
-                });
+        for (var item of items) {
+            var imageUrl = item.selectFirst('img').getSrc
+            var link = item.getHref
+            var name = item.selectFirst("h2").text
+            list.push({
+                name,
+                imageUrl,
+                link
+            });
 
-            }
-       
-        return { list, hasNextPage:false }
+        }
+
+        return { list, hasNextPage: false }
     }
 
     statusCode(status) {
@@ -135,7 +138,7 @@ class DefaultExtension extends MProvider {
         var media = body.selectFirst(".media")
         var title = media.selectFirst("h1").text
         var spans = media.selectFirst("p.infoami").select("span")
-        var statusText = spans[spans.length - 1].text.replace("Status: ",'')
+        var statusText = spans[spans.length - 1].text.replace("Status: ", '')
         var status = this.statusCode(statusText)
 
 
@@ -148,8 +151,8 @@ class DefaultExtension extends MProvider {
         var episodesList = body.select(".newmanga > li")
         episodesList.forEach(ep => {
             var epTitle = ep.selectFirst('i.anititle').text
-            var epNumber = ep.selectFirst('strong').text.replace(title,"Episode")
-            var epName = epNumber == epTitle?epNumber:`${epNumber} - ${epTitle}`
+            var epNumber = ep.selectFirst('strong').text.replace(title, "Episode")
+            var epName = epNumber == epTitle ? epNumber : `${epNumber} - ${epTitle}`
             var epUrl = ep.selectFirst("a").getHref
 
             var scanlator = "";
@@ -160,34 +163,46 @@ class DefaultExtension extends MProvider {
             })
             scanlator = scanlator.slice(0, -2);
 
-            chapters.push({ name: epName, url: epUrl,scanlator})
+            chapters.push({ name: epName, url: epUrl, scanlator })
         })
 
 
-        return { description, status,  genre, chapters, link }
+        return { description, status, genre, chapters, link }
 
 
 
     }
-    // For novel html content
-    async getHtmlContent(url) {
-        throw new Error("getHtmlContent not implemented");
-    }
-    // Clean html up for reader
-    async cleanHtmlContent(html) {
-        throw new Error("cleanHtmlContent not implemented");
-    }
+
     // For anime episode video list
     async getVideoList(url) {
-        throw new Error("getVideoList not implemented");
+        var body = await this.request(url)
+        var iframe = body.selectFirst("iframe")
+        var src = iframe.attr('src')
+
+        body = await this.requestText(src)
+        var sKey = "var videoSources = "
+        var eKey = "var httpProtocol"
+        var start = body.indexOf(sKey) + sKey.length
+        var end = body.indexOf(eKey) - 8
+        var videoSourcesStr = body.substring(start, end)
+        let videoSources = eval("(" + videoSourcesStr + ")");
+        var streams = []
+        var headers = this.getHeaders();
+        videoSources.forEach(videoSource => {
+            var url = this.source.baseUrl +videoSource.file
+            var quality = videoSource.label
+
+            streams.push({
+                url,
+                originalUrl: url,
+                quality,
+                headers
+            });
+        });
+        return streams.reverse();
+
     }
-    // For manga chapter pages
-    async getPageList(url) {
-        throw new Error("getPageList not implemented");
-    }
-    getFilterList() {
-        throw new Error("getFilterList not implemented");
-    }
+
     getSourcePreferences() {
         return [
             {
