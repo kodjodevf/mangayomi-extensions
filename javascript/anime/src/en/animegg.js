@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=256&domain=https://www.animegg.org/",
     "typeSource": "single",
     "itemType": 1,
-    "version": "1.0.1",
+    "version": "1.0.2",
     "pkgPath": "anime/src/en/animegg.js"
 }];
 
@@ -212,12 +212,19 @@ class DefaultExtension extends MProvider {
         var dub = body.selectFirst("#dubbed-Animegg")
         var dubStreams = await this.exxtractStreams(dub,"Dub")
 
-        var pref = this.getPreference("animegg_stream_type")
+        var raw = body.selectFirst("#raw-Animegg")
+        var rawStreams = await this.exxtractStreams(raw,"Raw")
+
+
+
+        var pref = this.getPreference("animegg_stream_type_1")
         var streams = [];
         if(pref == 0){
-            streams = [...subStreams,...dubStreams]
+            streams = [...subStreams,...dubStreams, ...rawStreams]
+        }else if(pref == 1){
+            streams = [...dubStreams,...subStreams, ...rawStreams]
         }else{
-            streams = [...dubStreams,...subStreams]
+            streams = [...rawStreams,...subStreams, ...dubStreams]
         }
        
         return streams
@@ -237,13 +244,13 @@ class DefaultExtension extends MProvider {
                 }
             },
             {
-                key: "animegg_stream_type",
+                key: "animegg_stream_type_1",
                 listPreference: {
                     title: 'Preferred stream type',
                     summary: '',
                     valueIndex: 0,
-                    entries: ["Sub","Dub"],
-                    entryValues: ["0", "1"]
+                    entries: ["Sub","Dub","Raw"],
+                    entryValues: ["0", "1", "2"]
                 }
             }
         ]
