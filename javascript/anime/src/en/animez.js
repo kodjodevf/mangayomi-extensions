@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=256&domain=https://animez.org/",
     "typeSource": "multi",
     "itemType": 1,
-    "version": "1.0.0",
+    "version": "1.0.1",
     "pkgPath": "anime/src/en/animez.js"
 }];
 
@@ -161,6 +161,7 @@ class DefaultExtension extends MProvider {
                     scanlator = "Dub"
 
                 }
+                title = title.indexOf("Movie") > -1? title : `Episode ${title}`
                 var epData = {
                     name:title,
                     url:epLink,
