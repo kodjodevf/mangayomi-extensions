@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "single",
     "itemType": 1,
     "isNsfw": false,
-    "version": "0.3.5",
+    "version": "0.3.6",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/de/aniworld.js"
@@ -199,7 +199,7 @@ class DefaultExtension extends MProvider {
         const languageValues = ['Deutscher', 'Englischer'];
         const types = ['Dub', 'Sub'];
         const resolutions = ['1080p', '720p', '480p'];
-        const hosts = ['Doodstream', 'Filemoon', 'Luluvdo', 'SpeedFiles', 'Streamtape', 'Vidoza', 'VOE'];
+        const hosts = ['Doodstream', 'Filemoon', 'Luluvdo', 'SpeedFiles', 'Streamtape', 'Vidmoly', 'Vidoza', 'VOE'];
         const languageFilters = [];
 
         for (const lang of languageValues) {
@@ -385,6 +385,15 @@ async function doodExtractor(url) {
     const videoUrl = `${response.body}${randomString}?token=${token}&expiry=${expiry}`;
     const headers = { "User-Agent": "Mangayomi", "Referer": doodhost };
     return [{ url: videoUrl, originalUrl: videoUrl, headers: headers, quality: '' }];
+}
+
+async function vidmolyExtractor(url) {
+    const res = await new Client({ 'useDartHttpClient': true, "followRedirects": true }).get(url);
+    const playlistUrl = res.body.match(/https:\/\/\S*\.m3u8/)[0];
+    return await m3u8Extractor(playlistUrl, {
+        'Referer': 'https://vidmoly.to',
+        'Origin': 'https://vidmoly.to'
+    });
 }
 
 async function vidozaExtractor(url) {
@@ -601,6 +610,7 @@ extractAny.methods = {
     'streamwish': vidHideExtractor,
     'vidguard': vidGuardExtractor,
     'vidhide': vidHideExtractor,
+    'vidmoly': vidmolyExtractor,
     'vidoza': vidozaExtractor,
     'voe': voeExtractor,
     'yourupload': yourUploadExtractor
