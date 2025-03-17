@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=256&domain=https://www.animegg.org/",
     "typeSource": "single",
     "itemType": 1,
-    "version": "1.0.0",
+    "version": "1.0.2",
     "pkgPath": "anime/src/en/animegg.js"
 }];
 
@@ -25,7 +25,7 @@ class DefaultExtension extends MProvider {
     }
 
     getPreference(key) {
-        return new SharedPreferences().get(key);
+        return parseInt(new SharedPreferences().get(key));
     }
 
     async requestText(slug) {
@@ -67,7 +67,7 @@ class DefaultExtension extends MProvider {
         var limit = start + 25;
 
         var category = ""
-        var pop = parseInt(this.getPreference("animegg_popular_category"))
+        var pop = this.getPreference("animegg_popular_category")
         switch (pop) {
             case 1: {
                 category = "sortBy=createdAt&sortDirection=DESC&";
@@ -173,24 +173,24 @@ class DefaultExtension extends MProvider {
 
     }
 
-    // For anime episode video list
-    async getVideoList(url) {
-        var body = await this.request(url)
-        var iframe = body.selectFirst("iframe")
-        var src = iframe.attr('src')
-
-        body = await this.requestText(src)
+    async exxtractStreams(div,audio){
+    
+        var slug = div.selectFirst("iframe").getSrc
+        var streams = []
+        if(slug.length < 1){
+            return streams;
+        }
+        var body = await this.requestText(slug)
         var sKey = "var videoSources = "
         var eKey = "var httpProtocol"
         var start = body.indexOf(sKey) + sKey.length
         var end = body.indexOf(eKey) - 8
         var videoSourcesStr = body.substring(start, end)
         let videoSources = eval("(" + videoSourcesStr + ")");
-        var streams = []
         var headers = this.getHeaders();
         videoSources.forEach(videoSource => {
             var url = this.source.baseUrl +videoSource.file
-            var quality = videoSource.label
+            var quality = `${videoSource.label} - ${audio}`
 
             streams.push({
                 url,
@@ -200,6 +200,34 @@ class DefaultExtension extends MProvider {
             });
         });
         return streams.reverse();
+    }
+
+    // For anime episode video list
+    async getVideoList(url) {
+        var body = await this.request(url)
+        
+        var sub = body.selectFirst("#subbed-Animegg")
+        var subStreams = await this.exxtractStreams(sub,"Sub")
+
+        var dub = body.selectFirst("#dubbed-Animegg")
+        var dubStreams = await this.exxtractStreams(dub,"Dub")
+
+        var raw = body.selectFirst("#raw-Animegg")
+        var rawStreams = await this.exxtractStreams(raw,"Raw")
+
+
+
+        var pref = this.getPreference("animegg_stream_type_1")
+        var streams = [];
+        if(pref == 0){
+            streams = [...subStreams,...dubStreams, ...rawStreams]
+        }else if(pref == 1){
+            streams = [...dubStreams,...subStreams, ...rawStreams]
+        }else{
+            streams = [...rawStreams,...subStreams, ...dubStreams]
+        }
+       
+        return streams
 
     }
 
@@ -213,6 +241,16 @@ class DefaultExtension extends MProvider {
                     valueIndex: 0,
                     entries: ["Popular", "Newest", "Ongoing", "Completed", "Alphabetical"],
                     entryValues: ["0", "1", "2", "3", "4"]
+                }
+            },
+            {
+                key: "animegg_stream_type_1",
+                listPreference: {
+                    title: 'Preferred stream type',
+                    summary: '',
+                    valueIndex: 0,
+                    entries: ["Sub","Dub","Raw"],
+                    entryValues: ["0", "1", "2"]
                 }
             }
         ]
