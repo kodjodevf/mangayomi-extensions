@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=256&domain=https://animez.org/",
     "typeSource": "multi",
     "itemType": 1,
-    "version": "0.0.2",
+    "version": "1.0.0",
     "pkgPath": "anime/src/en/animez.js"
 }];
 
@@ -171,7 +171,7 @@ class DefaultExtension extends MProvider {
                     var lastEntry = chapters[pos]
                     if(lastEntry.name == epData.name){ // if last entries name is same then append url and scanlator to last entry
                         chapters.pop() // remove the last entry
-                        epData.url = `${epData.url} || ${lastEntry.url}`
+                        epData.url = `${epData.url}||${lastEntry.url}`
                         epData.scanlator = `${lastEntry.scanlator}, ${epData.scanlator}`
                         chapLen = pos; // since the last entry is removed the chapLen will decrease
                     }
@@ -190,25 +190,49 @@ class DefaultExtension extends MProvider {
             genre,
         };
     }
-    // For novel html content
-    async getHtmlContent(url) {
-        throw new Error("getHtmlContent not implemented");
+
+     // Sorts streams based on user preference.
+     sortStreams(streams) {
+        var sortedStreams = [];
+
+        var copyStreams = streams.slice()
+        var pref = this.getPreference("animez_pref_stream_audio");
+        for (var stream of streams) {
+            if (stream.quality.indexOf(pref) > -1) {
+                sortedStreams.push(stream);
+                var index = copyStreams.indexOf(stream);
+                if (index > -1) {
+                    copyStreams.splice(index, 1);
+                }
+                break;
+            }
+        }
+        return [...sortedStreams, ...copyStreams]
     }
-    // Clean html up for reader
-    async cleanHtmlContent(html) {
-        throw new Error("cleanHtmlContent not implemented");
-    }
+   
     // For anime episode video list
     async getVideoList(url) {
-        throw new Error("getVideoList not implemented");
+        var linkSlugs = url.split("||")
+        var streams = [];
+        for(var slug of linkSlugs){
+            var body = await this.request(slug)
+            var iframeSrc = body.selectFirst("iframe").getSrc
+            var streamLink = iframeSrc.replace("/embed/","/anime/")
+            var audio = slug.indexOf("dub-") > -1 ? "Dub" : "Sub"
+
+            streams.push({
+                url: streamLink,
+                originalUrl: streamLink,
+                quality: audio,
+            })
+        }
+
+        
+        return sortStreams(streams);
+
+
     }
-    // For manga chapter pages
-    async getPageList(url) {
-        throw new Error("getPageList not implemented");
-    }
-    getFilterList() {
-        throw new Error("getFilterList not implemented");
-    }
+   
     getSourcePreferences() {
         return [{
             key: 'animez_pref_popular_section',
@@ -227,6 +251,15 @@ class DefaultExtension extends MProvider {
                 valueIndex: 0,
                 entries: ["Latest update", "Hot", "New releases", "Top all", "Top month", "Top week", "Top day", "Top follow", "Top comments", "Number of episodes"],
                 entryValues: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+            }
+        }, {
+            key: 'animez_pref_stream_audio',
+            listPreference: {
+                title: 'Preferred stream audio',
+                summary: '',
+                valueIndex: 0,
+                entries: ["Sub","Dub"],
+                entryValues: ["Sub","Dub"],
             }
         },]
     }
