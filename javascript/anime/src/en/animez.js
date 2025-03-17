@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=256&domain=https://animez.org/",
     "typeSource": "multi",
     "itemType": 1,
-    "version": "0.0.1",
+    "version": "0.0.2",
     "pkgPath": "anime/src/en/animez.js"
 }];
 
@@ -40,7 +40,7 @@ class DefaultExtension extends MProvider {
         animes.forEach(anime => {
             var link = anime.selectFirst("a").getHref
             var name = anime.selectFirst('h2.Title').text;
-            var imageUrl = this.source.baseUrl + anime.selectFirst('img').getSrc;
+            var imageUrl = this.source.baseUrl +"/"+ anime.selectFirst('img').getSrc;
 
             list.push({ name, link, imageUrl });
         });
@@ -51,46 +51,46 @@ class DefaultExtension extends MProvider {
         return { list, hasNextPage }
     }
 
-    sortByPref(key){
+    sortByPref(key) {
         var sort = parseInt(this.getPreference(key))
         var sortBy = "hot"
-        switch(sort){
-            case 1:{
+        switch (sort) {
+            case 1: {
                 sortBy = "lastest-chap"
                 break;
-            }case 2:{
+            } case 2: {
                 sortBy = "hot"
                 break;
             }
-            case 3:{
+            case 3: {
                 sortBy = "lastest-manga"
                 break;
             }
-            case 4:{
+            case 4: {
                 sortBy = "top-manga"
                 break;
             }
-            case 5:{
+            case 5: {
                 sortBy = "top-month"
                 break;
             }
-            case 6:{
+            case 6: {
                 sortBy = "top-week"
                 break;
             }
-            case 7:{
+            case 7: {
                 sortBy = "top-day"
                 break;
             }
-            case 8:{
+            case 8: {
                 sortBy = "follow"
                 break;
             }
-            case 9:{
+            case 9: {
                 sortBy = "comment"
                 break;
             }
-            case 10:{
+            case 10: {
                 sortBy = "num-chap"
                 break;
             }
@@ -118,7 +118,77 @@ class DefaultExtension extends MProvider {
         return await this.page(slug)
     }
     async getDetail(url) {
-        throw new Error("getDetail not implemented");
+        var link = this.source.baseUrl + url;
+       var body = await this.request(url);
+        var name = body.selectFirst("#title-detail-manga").text
+        var animeId = body.selectFirst("#title-detail-manga").attr("data-manga")
+        var genre = []
+        body.select("li.AAIco-adjust")[3].select("a").forEach(g => genre.push(g.text))
+        var description = body.selectFirst("#summary_shortened").text
+        
+        
+        var chapters = []
+        var chapLen = 0
+        var pageNum = 1
+        var hasNextPage = true;
+        while(hasNextPage) {
+            var pageSlug = `?act=ajax&code=load_list_chapter&manga_id=${animeId}&page_num=${pageNum}&chap_id=0&keyword=`
+            var pageBody = await this.request(pageSlug);
+            var parsedBody = JSON.parse(pageBody.html);
+            var nav = parsedBody.nav
+            if(nav==null){ // if "nav" doesnt exists there is no next page
+                hasNextPage = false;
+
+            }else{
+                var navLi = new Document(nav).select(".page-link.next").length
+                if(navLi>0){ // if "nav" exists and has li.next then there is next page
+                    pageNum++;
+                }else{// if "nav" exists and doesn't have li.next then there is no next page
+                    hasNextPage = false;
+                }
+            }
+            
+
+            var list_chap = new Document(parsedBody.list_chap).select('li.wp-manga-chapter')
+
+            list_chap.forEach(chapter => {
+                var a = chapter.selectFirst("a")
+                var title = a.text
+                var epLink = a.getHref
+                var scanlator = "Sub"
+                if(title.indexOf("Dub")>0){
+                    title = title.replace("-Dub","")
+                    scanlator = "Dub"
+
+                }
+                var epData = {
+                    name:title,
+                    url:epLink,
+                    scanlator
+                }
+                if(chapLen>0){
+                    var pos = chapLen -1
+                    var lastEntry = chapters[pos]
+                    if(lastEntry.name == epData.name){ // if last entries name is same then append url and scanlator to last entry
+                        chapters.pop() // remove the last entry
+                        epData.url = `${epData.url} || ${lastEntry.url}`
+                        epData.scanlator = `${lastEntry.scanlator}, ${epData.scanlator}`
+                        chapLen = pos; // since the last entry is removed the chapLen will decrease
+                    }
+                }
+
+                chapters.push(epData)
+                chapLen++;
+            })
+
+        }
+
+       return {
+            link,
+            description,
+            chapters,
+            genre,
+        };
     }
     // For novel html content
     async getHtmlContent(url) {
@@ -146,17 +216,17 @@ class DefaultExtension extends MProvider {
                 title: 'Preferred popular content',
                 summary: '',
                 valueIndex: 1,
-                entries: ["Latest update", "Hot", "New releases", "Top all","Top month","Top week","Top day","Top follow","Top comments","Number of episodes"],
-                entryValues: ["1", "2" ,"3", "4","5","6","7","8","9","10"]
+                entries: ["Latest update", "Hot", "New releases", "Top all", "Top month", "Top week", "Top day", "Top follow", "Top comments", "Number of episodes"],
+                entryValues: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
             }
-        },{
+        }, {
             key: 'animez_pref_latest_section',
             listPreference: {
                 title: 'Preferred latest content',
                 summary: '',
                 valueIndex: 0,
-                entries: ["Latest update", "Hot", "New releases", "Top all","Top month","Top week","Top day","Top follow","Top comments","Number of episodes"],
-                entryValues: ["1", "2" ,"3", "4","5","6","7","8","9","10"]
+                entries: ["Latest update", "Hot", "New releases", "Top all", "Top month", "Top week", "Top day", "Top follow", "Top comments", "Number of episodes"],
+                entryValues: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
             }
         },]
     }
