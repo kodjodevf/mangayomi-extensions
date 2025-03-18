@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://soaper.cc/",
     "typeSource": "multi",
     "isManga": false,
-    "version": "1.0.0",
+    "version": "1.0.1",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/all/soaper.js"
@@ -25,7 +25,7 @@ class DefaultExtension extends MProvider {
     }
 
     getBasueUrl(){
-        return this.getPreference("pref_override_base_url")
+        return this.getPreference("soaper_override_base_url")
     }
 
     async request(slug) {
@@ -44,7 +44,7 @@ class DefaultExtension extends MProvider {
     }
 
     async formatList(slug, page) {
-        const baseUrl = this.getPreference("pref_override_base_url")
+        const baseUrl = this.getPreference("soaper_override_base_url")
         slug = parseInt(page) > 1 ? `${slug}?page=${page}` : slug
         var doc = await this.request(slug);
         var list = [];
@@ -79,7 +79,7 @@ class DefaultExtension extends MProvider {
         var seriesList = await this.formatList(`tvlist${slug}`, page);
 
         var list = [];
-        var priority = this.getPreference("pref_content_priority");
+        var priority = this.getPreference("soaper_content_priority");
         if (priority === "series") {
             list = [...seriesList.list, ...movieList.list];
         } else {
@@ -118,7 +118,7 @@ class DefaultExtension extends MProvider {
             }
         }
 
-        var priority = this.getPreference("pref_content_priority");
+        var priority = this.getPreference("soaper_content_priority");
         if (priority === "series") {
             list = [...seriesList, ...movieList];
         } else {
@@ -131,7 +131,7 @@ class DefaultExtension extends MProvider {
     async getDetail(url) {
         var doc = await this.request(url);
 
-        const baseUrl = this.getPreference("pref_override_base_url")
+        const baseUrl = this.getPreference("soaper_override_base_url")
         var name = doc.selectFirst(".col-sm-12.col-lg-12.text-center").selectFirst("h4").text.trim()
         var poster = doc.selectFirst(".thumbnail.text-center").selectFirst("img").getSrc
         var imageUrl = `${baseUrl}${poster}`
@@ -220,15 +220,16 @@ class DefaultExtension extends MProvider {
 
     getSourcePreferences() {
         return [{
-            "key": "pref_override_base_url",
-            "editTextPreference": {
-                "title": "Override base url",
-                "summary": "",
-                "value": "https://soaper.cc",
-                "dialogTitle": "Default url: https://soaper.cc",
+            "key": "soaper_override_base_url",
+            editTextPreference: {
+                title: "Override base url",
+                summary: "Default: https://soaper.cc",
+                value: "https://soaper.cc",
+                dialogTitle: "Override base url",
+                dialogMessage: "",
             }
         }, {
-            key: 'pref_content_priority',
+            key: 'soaper_content_priority',
             listPreference: {
                 title: 'Preferred content priority',
                 summary: 'Choose which type of content to show first',
