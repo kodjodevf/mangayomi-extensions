@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://soaper.cc/",
     "typeSource": "multi",
     "isManga": false,
-    "version": "0.0.3",
+    "version": "1.0.0",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/all/soaper.js"
@@ -15,26 +15,36 @@ const mangayomiSources = [{
 class DefaultExtension extends MProvider {
     getHeaders(url) {
         return {
-            "Referer": this.source.baseUrl,
-            "Origin": this.source.baseUrl
+            "Referer": url,
+            "Origin": url
         }
     }
 
-    async getPreference(key) {
-        const preferences = new SharedPreferences();
-        return preferences.get(key);
+    getPreference(key) {
+        return new SharedPreferences().get(key);
+    }
+
+    getBasueUrl(){
+        return this.getPreference("pref_override_base_url")
     }
 
     async request(slug) {
-        const baseUrl = await this.getPreference("pref_override_base_url")
+        const baseUrl = this.getBasueUrl()
         var url = `${baseUrl}/${slug}`
-        var res = await new Client().get(url, this.getHeaders());
+        var res = await new Client().get(url, this.getHeaders(baseUrl));
         var doc = new Document(res.body);
         return doc
     }
 
+    async requestJSON(slug,data) {
+        const baseUrl = this.getBasueUrl()
+        var url = `${baseUrl}/${slug}`
+        var res = await new Client().post(url, this.getHeaders(baseUrl),data);
+        return JSON.parse(res.body);
+    }
+
     async formatList(slug, page) {
-        const baseUrl = await this.getPreference("pref_override_base_url")
+        const baseUrl = this.getPreference("pref_override_base_url")
         slug = parseInt(page) > 1 ? `${slug}?page=${page}` : slug
         var doc = await this.request(slug);
         var list = [];
@@ -45,7 +55,7 @@ class DefaultExtension extends MProvider {
             var link = linkSection.getHref.substring(1,);
             var poster = linkSection.selectFirst("img").getSrc
             var imageUrl = `${baseUrl}${poster}`
-            var name = movie.selectFirst("h5").text;
+            var name = movie.selectFirst("h5").selectFirst("a").text;
 
             list.push({ name, imageUrl, link });
         }
@@ -69,7 +79,7 @@ class DefaultExtension extends MProvider {
         var seriesList = await this.formatList(`tvlist${slug}`, page);
 
         var list = [];
-        var priority = await this.getPreference("pref_content_priority");
+        var priority = this.getPreference("pref_content_priority");
         if (priority === "series") {
             list = [...seriesList.list, ...movieList.list];
         } else {
@@ -108,7 +118,7 @@ class DefaultExtension extends MProvider {
             }
         }
 
-        var priority = await this.getPreference("pref_content_priority");
+        var priority = this.getPreference("pref_content_priority");
         if (priority === "series") {
             list = [...seriesList, ...movieList];
         } else {
@@ -121,7 +131,7 @@ class DefaultExtension extends MProvider {
     async getDetail(url) {
         var doc = await this.request(url);
 
-        const baseUrl = await this.getPreference("pref_override_base_url")
+        const baseUrl = this.getPreference("pref_override_base_url")
         var name = doc.selectFirst(".col-sm-12.col-lg-12.text-center").selectFirst("h4").text.trim()
         var poster = doc.selectFirst(".thumbnail.text-center").selectFirst("img").getSrc
         var imageUrl = `${baseUrl}${poster}`
@@ -137,7 +147,7 @@ class DefaultExtension extends MProvider {
                 var eps = season.select(".col-sm-12.col-md-6.col-lg-4.myp1")
                 for (var ep of eps) {
                     var epLinkSection = ep.selectFirst("a")
-                    var epLink = epLinkSection.getHref
+                    var epLink = epLinkSection.getHref.substring(1)
                     var epName = epLinkSection.text
 
                     chapters.push({
@@ -159,7 +169,46 @@ class DefaultExtension extends MProvider {
     }
     // For anime episode video list
     async getVideoList(url) {
-        throw new Error("getVideoList not implemented");
+        var body = await this.request(url)
+        var baseUrl = this.getBasueUrl()
+
+        var eId = body.selectFirst("#hId").attr('value')
+        var hIsW = body.selectFirst("#hIsW").attr('value')
+        var apiType = url[0].toUpperCase()
+
+        var streams = []
+        var servers = [0,1]
+        for(var serverNum of servers){
+            var serverName = body.selectFirst(`#server_button_${serverNum}`).text
+            if(serverName.length < 1) continue;
+            var data ={
+                pass:eId,
+                param:"",
+                extra:"1",
+                e2:hIsW,
+                server: ""+serverNum,
+            }
+            var res = await this.requestJSON(`home/index/Get${apiType}InfoAjax`,data)
+            
+            var streamUrl = baseUrl+res.val
+            var subs = []
+            for (var sub of res.subs) {
+                subs.push({
+                    file: baseUrl+sub.path,
+                    label: sub.name
+                })
+            }
+            streams.push({
+                url: streamUrl,
+                originalUrl: streamUrl,
+                quality: serverName,
+                subtitles:subs
+            });
+
+
+        }
+        return streams
+        
     }
     // For manga chapter pages
     async getPageList() {
