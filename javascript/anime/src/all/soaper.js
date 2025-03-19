@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://soaper.cc/",
     "typeSource": "multi",
     "isManga": false,
-    "version": "1.0.1",
+    "version": "1.0.2",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/all/soaper.js"
@@ -24,7 +24,7 @@ class DefaultExtension extends MProvider {
         return new SharedPreferences().get(key);
     }
 
-    getBasueUrl(){
+    getBasueUrl() {
         return this.getPreference("soaper_override_base_url")
     }
 
@@ -36,10 +36,10 @@ class DefaultExtension extends MProvider {
         return doc
     }
 
-    async requestJSON(slug,data) {
+    async requestJSON(slug, data) {
         const baseUrl = this.getBasueUrl()
         var url = `${baseUrl}/${slug}`
-        var res = await new Client().post(url, this.getHeaders(baseUrl),data);
+        var res = await new Client().post(url, this.getHeaders(baseUrl), data);
         return JSON.parse(res.body);
     }
 
@@ -171,30 +171,31 @@ class DefaultExtension extends MProvider {
     async getVideoList(url) {
         var body = await this.request(url)
         var baseUrl = this.getBasueUrl()
+        var streams = []
 
+        // Traditional servers
         var eId = body.selectFirst("#hId").attr('value')
         var hIsW = body.selectFirst("#hIsW").attr('value')
         var apiType = url[0].toUpperCase()
 
-        var streams = []
-        var servers = [0,1]
-        for(var serverNum of servers){
+        var servers = [0, 1]
+        for (var serverNum of servers) {
             var serverName = body.selectFirst(`#server_button_${serverNum}`).text
-            if(serverName.length < 1) continue;
-            var data ={
-                pass:eId,
-                param:"",
-                extra:"1",
-                e2:hIsW,
-                server: ""+serverNum,
+            if (serverName.length < 1) continue;
+            var data = {
+                pass: eId,
+                param: "",
+                extra: "1",
+                e2: hIsW,
+                server: "" + serverNum,
             }
-            var res = await this.requestJSON(`home/index/Get${apiType}InfoAjax`,data)
-            
-            var streamUrl = baseUrl+res.val
+            var res = await this.requestJSON(`home/index/Get${apiType}InfoAjax`, data)
+
+            var streamUrl = baseUrl + res.val
             var subs = []
             for (var sub of res.subs) {
                 subs.push({
-                    file: baseUrl+sub.path,
+                    file: baseUrl + sub.path,
                     label: sub.name
                 })
             }
@@ -202,13 +203,32 @@ class DefaultExtension extends MProvider {
                 url: streamUrl,
                 originalUrl: streamUrl,
                 quality: serverName,
-                subtitles:subs
+                subtitles: subs
             });
+        }
 
+        // Download servers
+        var modal_footer = body.select(".modal-footer > a")
+        if (modal_footer.length > 0) {
 
+            modal_footer.reverse()
+            for (var item of modal_footer) {
+                var dSlug = item.getHref
+                var dBody = await this.request(dSlug)
+
+                var res = dBody.selectFirst("#res").attr('value')
+                var mb = dBody.selectFirst("#mb").attr('value')
+                var streamLink = dBody.selectFirst("#link").attr('value')
+
+                streams.push({
+                    url: streamLink,
+                    originalUrl: streamLink,
+                    quality: `Download Server: ${res} [${mb}]`,
+                });
+            }
         }
         return streams
-        
+
     }
     // For manga chapter pages
     async getPageList() {
