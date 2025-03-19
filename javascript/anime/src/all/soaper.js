@@ -5,8 +5,8 @@ const mangayomiSources = [{
     "apiUrl": "",
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://soaper.cc/",
     "typeSource": "multi",
-    "isManga": false,
-    "version": "1.0.2",
+    "version": "1.0.3",
+    "itemType": 1,
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/all/soaper.js"
