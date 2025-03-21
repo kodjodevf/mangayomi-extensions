@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "single",
     "itemType": 0,
     "isNsfw": false,
-    "version": "0.0.3",
+    "version": "0.0.35",
     "apiUrl": "",
     "dateFormat": "",
     "dateFormatLocale": "",
@@ -62,6 +62,18 @@ const mangayomiSources = [{
       }
       return p
     }
+
+    getBaseUrl() {
+      const preference = new SharedPreferences();
+      var base_url = preference.get("domain_url");
+      if (base_url.length == 0) {
+        return this.source.baseUrl;
+      }
+      if (base_url.endsWith("/")) {
+        return base_url.slice(0, -1);
+      }
+      return base_url;
+    }
   
     async getIndex1(url) {
       const res = await new Client().get(url);
@@ -104,29 +116,34 @@ const mangayomiSources = [{
         list: mangas,
         hasNextPage: true
       };
-  
     }
     
     async getPopular(page) {
-      return await this.getIndex1(this.source.baseUrl + "/new_coc.html");
+      return await this.getIndex1(this.getBaseUrl() + "/new_coc.html");
     }
   
     async getLatestUpdates(page) {
-      return await this.getIndex1(`${this.source.baseUrl}/lianzai/index_${page - 1}.html`);
+      return await this.getIndex1(`${this.getBaseUrl()}/lianzai/index_${page - 1}.html`);
     }
   
     async search(query, page, filters) {
       var url;
       if (query == "") {
-        url = `${this.source.baseUrl}${filters[0]["values"][filters[0]["state"]]["value"]}/index_${page-1}.html`
+        if (filters.length == 0) {
+          return {
+            list: [],
+            hasNextPage: false
+          };
+        }
+        url = `${this.getBaseUrl()}${filters[0]["values"][filters[0]["state"]]["value"]}/index_${page-1}.html`
       } else {
-        url = `${this.source.baseUrl.replace("www","so")}/k.php?k=${query}&p=${page}`;
+        url = `${this.getBaseUrl().replace("www","so")}/k.php?k=${query}&p=${page}`;
       }
       return await this.getIndex2(url);
     }
   
     async getDetail(url) {
-      const res = await new Client().get(this.source.baseUrl + url);
+      const res = await new Client().get(this.getBaseUrl() + url);
       const doc = new Document(res.body);
       const info = doc.selectFirst("div.ar_list_coc");
       const cover = info.selectFirst("img").attr("src");
@@ -162,7 +179,7 @@ const mangayomiSources = [{
     async getPageList(url) {
       const preference = new SharedPreferences();
       const image_host = preference.get("imghost");
-      const res = await new Client().get(this.source.baseUrl + url);
+      const res = await new Client().get(this.getBaseUrl() + url);
       const strs = res.body.match(/return p}\('(.*?)'.split\('/)[1].split(',');
       var result;
       try {
@@ -245,12 +262,21 @@ const mangayomiSources = [{
   
     getSourcePreferences() {
       return [{
+        "key": "domain_url",
+        "editTextPreference": {
+          "title": "Url",
+          "summary": "网址",
+          "value": "http://www.77mh.xyz",
+          "dialogTitle": "URL",
+          "dialogMessage": "",
+        }
+      },{
         "key": "imghost",
         "listPreference": {
           "title": "图片服务器",
           "summary": "",
           "valueIndex": 0,
-          "entries": ["服务器1", "服务器2"],
+          "entries": ["服务器1", "服务器2", "服务器3"],
           "entryValues": ["https://picsh.77dm.top", "https://imgsh.dm365.top", "https://hws.gdbyhtl.net"],
         }
       }];
