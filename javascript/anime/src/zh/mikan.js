@@ -7,7 +7,7 @@ const mangayomiSources = [{
   "typeSource": "torrent",
   "itemType": 1,
   "isNsfw": false,
-  "version": "0.0.25",
+  "version": "0.0.3",
   "dateFormat": "",
   "dateFormatLocale": "",
   "pkgPath": "anime/src/zh/mikan.js"
@@ -39,11 +39,17 @@ class DefaultExtension extends MProvider {
 
   async getItems(url, cookies) {
     var res;
-    const identity = new SharedPreferences().get("cookies");
-    if ((cookies) && (identity.length > 0)) {
+    if (cookies) {
+      const identity = new SharedPreferences().get("cookies");
       res = await new Client().get(this.baseURL() + url, {
         Cookie: `.AspNetCore.Identity.Application=${identity}`
       });
+      if (res.body.search("退出登录") == -1) {
+        return {
+          list: [{name: "请设置Cookies", link: "", imageUrl: "https://mikan.tangbai.cc/images/mikan-pic.png"}],
+          hasNextPage: false
+        }
+      }
     } else {
       res = await new Client().get(this.baseURL() + url);
     }
