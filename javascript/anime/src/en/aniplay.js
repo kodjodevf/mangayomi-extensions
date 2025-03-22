@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://aniplaynow.live/",
     "typeSource": "single",
     "itemType": 1,
-    "version": "1.2.3",
+    "version": "1.2.4",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/en/aniplay.js"
@@ -389,12 +389,11 @@ class DefaultExtension extends MProvider {
         var slug = "/fetch?url="
         var ref = "&ref="
         if (providerId == "yuki") {
-            slug = "/yukiprox?url="
-            ref = ""
+            ref += "https://hianime.to"
         } else if (providerId == "pahe") {
             ref += "https://kwik.si"
         } else if (providerId === "maze") {
-            ref += "https://animez.org"
+            ref += ""
         } else if (providerId === "kuro") {
             ref = ""
         }
@@ -534,7 +533,7 @@ class DefaultExtension extends MProvider {
             streams = await this.getAnyStreams(result) //If new provider found getAnyStreams will extract only the streams
         }
 
-        streams = await this.streamProxy(providerId, streams)
+        if (this.getPreference("aniplay_proxy")) streams = await this.streamProxy(providerId, streams)
         return await this.sortStreams(streams)
     }
 
@@ -585,14 +584,14 @@ class DefaultExtension extends MProvider {
                 "entries": ["Sub", "Dub"],
                 "entryValues": ["sub", "dub"],
             }
-        },  {
+        }, {
             "key": "aniplay_pref_extract_streams",
             "switchPreferenceCompat": {
                 'title': 'Split stream into different quality streams',
                 "summary": "Split stream Auto into 360p/720p/1080p",
                 "value": true
             }
-        },{
+        }, {
             key: 'aniplay_pref_video_resolution',
             listPreference: {
                 title: 'Preferred video resolution',
@@ -600,6 +599,13 @@ class DefaultExtension extends MProvider {
                 valueIndex: 0,
                 entries: ["Auto", "1080p", "720p", "480p", "360p"],
                 entryValues: ["auto", "1080", "720", "480", "360"]
+            }
+        }, {
+            key: "aniplay_proxy",
+            switchPreferenceCompat: {
+                title: 'Enable stream proxy',
+                summary: "",
+                value: false
             }
         }, {
             key: "aniplay_stream_proxy",
