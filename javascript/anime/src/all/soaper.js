@@ -5,7 +5,7 @@ const mangayomiSources = [{
     "apiUrl": "",
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://soaper.cc/",
     "typeSource": "multi",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "itemType": 1,
     "dateFormat": "",
     "dateFormatLocale": "",
@@ -193,11 +193,14 @@ class DefaultExtension extends MProvider {
 
             var streamUrl = baseUrl + res.val
             var subs = []
-            for (var sub of res.subs) {
-                subs.push({
-                    file: baseUrl + sub.path,
-                    label: sub.name
-                })
+            var vidSubs = res.subs
+            if (vidSubs != null && vidSubs.length > 0) {
+                for (var sub of vidSubs) {
+                    subs.push({
+                        file: baseUrl + sub.path,
+                        label: sub.name
+                    })
+                }
             }
             streams.push({
                 url: streamUrl,
