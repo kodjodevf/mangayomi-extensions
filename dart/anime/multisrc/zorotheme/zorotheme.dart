@@ -234,6 +234,7 @@ class ZoroTheme extends MProvider {
   }
 
   Future<List<MVideo>> rapidCloudExtractor(String url, String name) async {
+    final headers = {'Referer': 'https://megacloud.club/'};
     final serverUrl = ['https://megacloud.tv', 'https://rapid-cloud.co'];
 
     final serverType =
@@ -316,7 +317,8 @@ class ZoroTheme extends MProvider {
     }
 
     if (type == "hls") {
-      final masterPlaylistRes = (await client.get(Uri.parse(masterUrl))).body;
+      final masterPlaylistRes =
+          (await client.get(Uri.parse(masterUrl), headers: headers)).body;
 
       for (var it in substringAfter(
         masterPlaylistRes,
@@ -337,7 +339,8 @@ class ZoroTheme extends MProvider {
           ..url = videoUrl
           ..originalUrl = videoUrl
           ..quality = "$name - $quality"
-          ..subtitles = subtitles;
+          ..subtitles = subtitles
+          ..headers = headers;
         videos.add(video);
       }
     } else {
@@ -346,7 +349,8 @@ class ZoroTheme extends MProvider {
         ..url = masterUrl
         ..originalUrl = masterUrl
         ..quality = "$name - Default"
-        ..subtitles = subtitles;
+        ..subtitles = subtitles
+        ..headers = headers;
       videos.add(video);
     }
     return videos;
