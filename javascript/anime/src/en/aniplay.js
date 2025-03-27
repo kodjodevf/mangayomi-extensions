@@ -286,9 +286,9 @@ class DefaultExtension extends MProvider {
         var next_action = ""
 
         if (slug.indexOf("info/") > -1) {
-            next_action = 'f3422af67c84852f5e63d50e1f51718f1c0225c4'
+            next_action = '7f39ceba984fb47350526469339d4fbaa3ec5caa99'
         } else if (slug.indexOf("watch/") > -1) {
-            next_action = '5dbcd21c7c276c4d15f8de29d9ef27aef5ea4a5e'
+            next_action = '7f1d4204bc38dac69a6a066b167c7b967bf022a03b'
         }
         var baseUrl = "https://" + this.getPreference("aniplay_override_base_url")
         var url = `${baseUrl}/anime/${slug}`
