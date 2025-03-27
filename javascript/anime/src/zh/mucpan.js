@@ -1,16 +1,16 @@
 const mangayomiSources = [{
-    "name": "玩偶哥哥",
+    "name": "小米UC资源站",
     "lang": "zh",
-    "baseUrl": "https://www.wogg.one",
+    "baseUrl": "http://www.mucpan.cc",
     "apiUrl": "",
-    "iconUrl": "https://imgsrc.baidu.com/forum/pic/item/4b90f603738da977d5da660af651f8198618e31f.jpg",
+    "iconUrl": "http://www.mucpan.cc/template/DYXS2/static/picture/index_logo.png",
     "typeSource": "single",
     "itemType": 1,
     "isNsfw": false,
     "version": "0.0.25",
     "dateFormat": "",
     "dateFormatLocale": "",
-    "pkgPath": "anime/src/zh/wogg.js"
+    "pkgPath": "anime/src/zh/mucpan.js"
 }];
 class DefaultExtension extends MProvider {
     patternQuark = /(https:\/\/pan\.quark\.cn\/s\/[^"]+)/;
@@ -37,7 +37,7 @@ class DefaultExtension extends MProvider {
     }
     async getLatestUpdates(page) {
         const baseUrl = new SharedPreferences().get("url");
-        const response = await new Client({ 'useDartHttpClient': true }).get(baseUrl + `/vodshow/1--------${page}---.html`, { "Referer": baseUrl });
+        const response = await new Client({ 'useDartHttpClient': true }).get(baseUrl + `/index.php/vod/show/id/20/page/${page}.html`, { "Referer": baseUrl });
         const elements = new Document(response.body).select("div.module-item");
         const list = [];
         for (const element of elements) {
@@ -61,7 +61,7 @@ class DefaultExtension extends MProvider {
                     categories = filter["values"][filter["state"]]["value"];
                 }
             }
-            const response = await new Client({ 'useDartHttpClient': true }).get(baseUrl + `/vodshow/${categories}--------${page}---.html`, { "Referer": baseUrl });
+            const response = await new Client({ 'useDartHttpClient': true }).get(baseUrl + `/index.php/vod/show/id/${categories}/page/${page}.html`, { "Referer": baseUrl });
             const elements = new Document(response.body).select("div.module-item");
             const list = [];
             for (const element of elements) {
@@ -76,7 +76,7 @@ class DefaultExtension extends MProvider {
                 hasNextPage: true
             }
         } else {
-            const response = await new Client({ 'useDartHttpClient': true }).get(baseUrl + `/vodsearch/${query}----------${page}---.html`, { "Referer": baseUrl });
+            const response = await new Client({ 'useDartHttpClient': true }).get(baseUrl + `/index.php/vod/search/page/${page}/wd/${query}.html`, { "Referer": baseUrl });
             const elements = new Document(response.body).select(".module-search-item");
             const list = [];
             for (const element of elements) {
@@ -159,13 +159,11 @@ class DefaultExtension extends MProvider {
             name: "影片類型",
             type_name: "SelectFilter",
             values: [
-                { type_name: "SelectOption", value: "1", name: "电影" },
-                { type_name: "SelectOption", value: "2", name: "剧集" },
-                { type_name: "SelectOption", value: "3", name: "动漫" },
-                { type_name: "SelectOption", value: "4", name: "综艺" },
-                { type_name: "SelectOption", value: "5", name: "音乐" },
-                { type_name: "SelectOption", value: "6", name: "短剧" },
-                { type_name: "SelectOption", value: "44", name: "臻彩视界" }
+                { type_name: "SelectOption", value: "20", name: "电影" },
+                { type_name: "SelectOption", value: "21", name: "剧集" },
+                { type_name: "SelectOption", value: "22", name: "动漫" },
+                { type_name: "SelectOption", value: "23", name: "综艺" },
+                { type_name: "SelectOption", value: "24", name: "少儿" }
             ]
         }];
     }
@@ -197,15 +195,13 @@ class DefaultExtension extends MProvider {
                     "title": "Website Url",
                     "summary": "",
                     "valueIndex": 0,
-                    "entries": [
-                        "wogg.one",
-                        "wogg.xxooo.cf",
-                        "wogg.333232.xyz"
+                    "entries": [                        
+                        "mucpan.cc",
+                        "54271.fun"
                     ],
-                    "entryValues": [
-                        "https://www.wogg.one",
-                        "https://wogg.xxooo.cf",
-                        "https://wogg.333232.xyz"
+                    "entryValues": [                        
+                        "http://www.mucpan.cc",
+                        "https://54271.fun"
                     ],
                 }
             }
