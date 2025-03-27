@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "single",
     "itemType": 1,
     "isNsfw": false,
-    "version": "0.0.2",
+    "version": "0.0.25",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/zh/ffzy.js"
