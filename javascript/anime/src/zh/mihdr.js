@@ -1,16 +1,16 @@
 const mangayomiSources = [{
-    "name": "玩偶哥哥",
+    "name": "至臻视觉",
     "lang": "zh",
-    "baseUrl": "https://www.wogg.one",
+    "baseUrl": "https://mihdr.top",
     "apiUrl": "",
-    "iconUrl": "https://imgsrc.baidu.com/forum/pic/item/4b90f603738da977d5da660af651f8198618e31f.jpg",
+    "iconUrl": "https://mihdr.top/upload/dycms/20240708-1/9150a85ec594c1e7b14619e6570d7ee4.png",
     "typeSource": "single",
     "itemType": 1,
     "isNsfw": false,
     "version": "0.0.25",
     "dateFormat": "",
     "dateFormatLocale": "",
-    "pkgPath": "anime/src/zh/wogg.js"
+    "pkgPath": "anime/src/zh/mihdr.js"
 }];
 class DefaultExtension extends MProvider {
     patternQuark = /(https:\/\/pan\.quark\.cn\/s\/[^"]+)/;
@@ -37,7 +37,7 @@ class DefaultExtension extends MProvider {
     }
     async getLatestUpdates(page) {
         const baseUrl = new SharedPreferences().get("url");
-        const response = await new Client({ 'useDartHttpClient': true }).get(baseUrl + `/vodshow/1--------${page}---.html`, { "Referer": baseUrl });
+        const response = await new Client({ 'useDartHttpClient': true }).get(baseUrl + `/index.php/vod/show/id/1/page/${page}.html`, { "Referer": baseUrl });
         const elements = new Document(response.body).select("div.module-item");
         const list = [];
         for (const element of elements) {
@@ -61,7 +61,7 @@ class DefaultExtension extends MProvider {
                     categories = filter["values"][filter["state"]]["value"];
                 }
             }
-            const response = await new Client({ 'useDartHttpClient': true }).get(baseUrl + `/vodshow/${categories}--------${page}---.html`, { "Referer": baseUrl });
+            const response = await new Client({ 'useDartHttpClient': true }).get(baseUrl + `/index.php/vod/show/id/${categories}/page/${page}.html`, { "Referer": baseUrl });
             const elements = new Document(response.body).select("div.module-item");
             const list = [];
             for (const element of elements) {
@@ -76,7 +76,7 @@ class DefaultExtension extends MProvider {
                 hasNextPage: true
             }
         } else {
-            const response = await new Client({ 'useDartHttpClient': true }).get(baseUrl + `/vodsearch/${query}----------${page}---.html`, { "Referer": baseUrl });
+            const response = await new Client({ 'useDartHttpClient': true }).get(baseUrl + `/index.php/vod/search/page/${page}/wd/${query}.html`, { "Referer": baseUrl });
             const elements = new Document(response.body).select(".module-search-item");
             const list = [];
             for (const element of elements) {
@@ -163,9 +163,8 @@ class DefaultExtension extends MProvider {
                 { type_name: "SelectOption", value: "2", name: "剧集" },
                 { type_name: "SelectOption", value: "3", name: "动漫" },
                 { type_name: "SelectOption", value: "4", name: "综艺" },
-                { type_name: "SelectOption", value: "5", name: "音乐" },
-                { type_name: "SelectOption", value: "6", name: "短剧" },
-                { type_name: "SelectOption", value: "44", name: "臻彩视界" }
+                { type_name: "SelectOption", value: "5", name: "短剧" },
+                { type_name: "SelectOption", value: "25", name: "臻彩视觉" }
             ]
         }];
     }
@@ -197,15 +196,13 @@ class DefaultExtension extends MProvider {
                     "title": "Website Url",
                     "summary": "",
                     "valueIndex": 0,
-                    "entries": [
-                        "wogg.one",
-                        "wogg.xxooo.cf",
-                        "wogg.333232.xyz"
+                    "entries": [                        
+                        "mihdr.top",
+                        "mpanso.com",
                     ],
-                    "entryValues": [
-                        "https://www.wogg.one",
-                        "https://wogg.xxooo.cf",
-                        "https://wogg.333232.xyz"
+                    "entryValues": [                        
+                        "https://mihdr.top",
+                        "http://mpanso.com",
                     ],
                 }
             }
