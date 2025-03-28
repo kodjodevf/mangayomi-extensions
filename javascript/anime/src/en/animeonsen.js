@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=256&domain=https://www.animeonsen.xyz",
     "typeSource": "single",
     "itemType": 1,
-    "version": "0.0.1",
+    "version": "0.0.2",
     "pkgPath": "anime/src/all/animeonsen.js"
 }];
 
@@ -19,7 +19,7 @@ class DefaultExtension extends MProvider {
     getPreference(key) {
         return new SharedPreferences().get(key);
     }
-    
+
     async getToken() {
         const preferences = new SharedPreferences();
         var token_ts = parseInt(preferences.getString("animeosen_token_expiry_at", "0"))
@@ -53,14 +53,34 @@ class DefaultExtension extends MProvider {
             brToken = await this.getToken()
         }
 
-        return { Authorization: `Bearer ${brToken}` }
+        return {
+            'Authorization': `Bearer ${brToken}`,
+            'content-type': "application/json"
+        }
     }
 
     async request(slug, body = {}) {
+
+        var headers = await this.getHeaders(slug)
+
+        if (slug.endsWith("/search")) {
+
+            var api = `https://search.animeonsen.xyz${slug}`
+            var res = await this.client.post(api, headers, body)
+            return JSON.parse(res.body)
+        }
         var api = `${this.source.apiUrl}${slug}`
-        var headers = await this.getHeaders(api)
-        var res = await this.client.get(api, headers, body)
+        var res = await this.client.get(api, headers)
         return JSON.parse(res.body)
+    }
+
+    animeContent(anime, pref_name, imgRes) {
+        var name_eng = anime.content_title_en
+        var name_jp = anime.content_title
+        var name = pref_name == "jpn" ? name_jp : name_eng;
+        var link = anime.content_id
+        var imageUrl = `${this.source.apiUrl}/v4/image/${imgRes}/${link}`
+        return { name, imageUrl, link };
     }
 
     async getHome(page) {
@@ -72,16 +92,11 @@ class DefaultExtension extends MProvider {
 
         var pref_name = this.getPreference("animeonsen__pref_title_lang")
         var imgRes = this.getPreference("animeonsen__pref_img_res")
-   
+
         var hasNextPage = res.cursor.next[0]
         var list = []
         for (var anime of res.content) {
-            var name_eng = anime.content_title_en
-            var name_jp = anime.content_title
-            var name = pref_name == "jpn" ? name_jp : name_eng;
-            var link = anime.content_id
-            var imageUrl = `${this.source.apiUrl}/v4/image/${imgRes}/${link}`
-            list.push({ name, imageUrl, link });
+            list.push(this.animeContent(anime, pref_name, imgRes));
         }
         return { list, hasNextPage }
     }
@@ -96,7 +111,32 @@ class DefaultExtension extends MProvider {
         return await this.getHome(page)
     }
     async search(query, page, filters) {
-        throw new Error("search not implemented");
+        var slug = "/indexes/content/search"
+
+        var limit = 30;
+        var offset = (page - 1) * limit;
+        var nextOffset = offset + limit;
+
+        var params = { limit, offset, q: query };
+
+        var res = await this.request(slug, params);
+
+        var estimatedTotalHits = res.estimatedTotalHits
+        var hasNextPage = estimatedTotalHits > nextOffset;
+
+        var list = []
+        var hits = res.hits
+        var pref_name = this.getPreference("animeonsen__pref_title_lang")
+        var imgRes = this.getPreference("animeonsen__pref_img_res")
+        if (hits.length > 0) {
+            for (var anime of hits) {
+                list.push(this.animeContent(anime, pref_name, imgRes));
+            }
+        }
+        return { list, hasNextPage }
+
+
+
     }
     async getDetail(url) {
         throw new Error("getDetail not implemented");
