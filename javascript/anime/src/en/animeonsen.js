@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=256&domain=https://www.animeonsen.xyz",
     "typeSource": "single",
     "itemType": 1,
-    "version": "0.0.2",
+    "version": "0.0.3",
     "pkgPath": "anime/src/all/animeonsen.js"
 }];
 
@@ -69,7 +69,7 @@ class DefaultExtension extends MProvider {
             var res = await this.client.post(api, headers, body)
             return JSON.parse(res.body)
         }
-        var api = `${this.source.apiUrl}${slug}`
+        var api = `${this.source.apiUrl}/v4/content${slug}`
         var res = await this.client.get(api, headers)
         return JSON.parse(res.body)
     }
@@ -87,11 +87,11 @@ class DefaultExtension extends MProvider {
         var limit = 20
         var start = (page - 1) * limit;
 
-        var slug = `/v4/content/index?start=${start}&limit=${limit}`
+        var slug = `/index?start=${start}&limit=${limit}`
         var res = await this.request(slug)
 
         var pref_name = this.getPreference("animeonsen__pref_title_lang")
-        var imgRes = this.getPreference("animeonsen__pref_img_res")
+        var imgRes = this.getPreference("animeonsen__pref_img_res_1")
 
         var hasNextPage = res.cursor.next[0]
         var list = []
@@ -127,19 +127,62 @@ class DefaultExtension extends MProvider {
         var list = []
         var hits = res.hits
         var pref_name = this.getPreference("animeonsen__pref_title_lang")
-        var imgRes = this.getPreference("animeonsen__pref_img_res")
+        var imgRes = this.getPreference("animeonsen__pref_img_res_1")
         if (hits.length > 0) {
             for (var anime of hits) {
                 list.push(this.animeContent(anime, pref_name, imgRes));
             }
         }
         return { list, hasNextPage }
-
-
-
     }
+
+    statusCode(status) {
+        return {
+            "currently_airing": 0,
+            "finished_airing": 1,
+        }[status] ?? 5;
+    }
+
     async getDetail(url) {
-        throw new Error("getDetail not implemented");
+        var link = `${this.source.baseUrl}/details/${url}`
+        var detailsApiSlug = `/${url}/extensive`
+        var animeDetails = await this.request(detailsApiSlug);
+        
+        var pref_name = this.getPreference("animeonsen_pref_ep_title_lang")
+        var imgRes = this.getPreference("animeonsen__pref_img_res_1")
+
+        var name_eng = animeDetails.content_title_en
+        var name_jp = animeDetails.content_title
+        var name = pref_name == "jpn" ? name_jp : name_eng;
+        var link = animeDetails.content_id
+        var imageUrl = `${this.source.apiUrl}/v4/image/${imgRes}/${link}`
+        var is_movie = animeDetails.is_movie
+
+        var mal_data = animeDetails.mal_data
+        var description = mal_data.synopsis
+        var genre = []
+        mal_data.genres.forEach(g => genre.push(g.name))
+        var status = this.statusCode(mal_data.status);
+
+        var chapters = [];
+        var episodeAPISlug = `/${url}/episodes`
+        var episodeDetails = await this.request(episodeAPISlug);
+        
+        Object.keys(episodeDetails).forEach(ep => {
+            var ep_data = episodeDetails[ep]
+
+            var ep_name_eng = ep_data.contentTitle_episode_en
+            var ep_name_jp = ep_data.contentTitle_episode_jp
+            var ep_name = pref_name == "jpn" ? ep_name_jp : ep_name_eng;
+
+            chapters.push({
+                name:`E${ep}: ${ep_name}`,
+                url: `/${url}/video/${ep}`,
+            })
+        })
+
+        chapters.reverse()
+        return { name, imageUrl, status, description, genre,link, chapters }
     }
     // For novel html content
     async getHtmlContent(url) {
@@ -171,13 +214,22 @@ class DefaultExtension extends MProvider {
                 entryValues: ["jpn", "en"]
             }
         }, {
-            key: 'animeonsen__pref_img_res',
+            key: 'animeonsen_pref_ep_title_lang',
+            listPreference: {
+                title: 'Preferred episode title language',
+                summary: '',
+                valueIndex: 1,
+                entries: ["Japenese", "English"],
+                entryValues: ["jpn", "en"]
+            }
+        },{
+            key: 'animeonsen__pref_img_res_1',
             listPreference: {
                 title: 'Preferred image resolution',
                 summary: '',
                 valueIndex: 1,
                 entries: ["Low", "Medium", "High"],
-                entryValues: ["240x300", "480x600", "960x1200"]
+                entryValues: ["210x300", "420x600", "840x1200"]
             }
         }];
     }
