@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=256&domain=https://www.animeonsen.xyz",
     "typeSource": "single",
     "itemType": 1,
-    "version": "0.0.3",
+    "version": "1.0.0",
     "pkgPath": "anime/src/all/animeonsen.js"
 }];
 
@@ -107,9 +107,8 @@ class DefaultExtension extends MProvider {
     get supportsLatest() {
         throw new Error("supportsLatest not implemented");
     }
-    async getLatestUpdates(page) {
-        return await this.getHome(page)
-    }
+
+    
     async search(query, page, filters) {
         var slug = "/indexes/content/search"
 
@@ -184,25 +183,34 @@ class DefaultExtension extends MProvider {
         chapters.reverse()
         return { name, imageUrl, status, description, genre,link, chapters }
     }
-    // For novel html content
-    async getHtmlContent(url) {
-        throw new Error("getHtmlContent not implemented");
-    }
-    // Clean html up for reader
-    async cleanHtmlContent(html) {
-        throw new Error("cleanHtmlContent not implemented");
-    }
+
     // For anime episode video list
     async getVideoList(url) {
-        throw new Error("getVideoList not implemented");
+        var streamDetails = await this.request(url);
+        var streamData = streamDetails.uri
+
+        var streams = [
+            {
+                quality:`Default (720p)`,
+                url: streamData.stream,
+                originalUrl: streamData.stream
+            }
+        ];
+
+        var subtitles = [];
+        var subData = streamDetails.subtitles;
+        Object.keys(subData).forEach(sub => {
+            subtitles.push({
+                label:sub,
+                file: subData[url]
+            })
+        });
+
+        streams[0].subtitles = subtitles
+
+        return streams
     }
-    // For manga chapter pages
-    async getPageList(url) {
-        throw new Error("getPageList not implemented");
-    }
-    getFilterList() {
-        throw new Error("getFilterList not implemented");
-    }
+   
     getSourcePreferences() {
         return [{
             key: 'animeonsen__pref_title_lang',
