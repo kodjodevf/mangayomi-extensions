@@ -4,7 +4,7 @@ Source get manganatoSource => _manganatoSource;
 
 Source _manganatoSource = Source(
   name: "Manganato",
-  baseUrl: "https://manganato.com",
+  baseUrl: "https://www.natomanga.com",
   lang: "en",
   typeSource: "mangabox",
   iconUrl:
