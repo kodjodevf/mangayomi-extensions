@@ -137,7 +137,7 @@ class DefaultExtension extends MProvider {
         const res = await new Client().get(url);
         const doc = new Document(res.body);
         const info = doc.selectFirst("div.cont_box");
-        const cover = info.selectFirst("div.detail_body")?.attr("style")?.substringAfter("url(")?.substringBeforeLast(")") ?? info.selectFirst("span.thmb img").attr('src');
+        const cover = info.selectFirst("div.detail_body")?.attr("style")?.match(/url\(['"]?(.*?)['"]?\)/)?.[1] ?? info.selectFirst("span.thmb img")?.attr("src");
         const title = info.selectFirst("h1.subj, h3.subj").text.trim();
         const genre = Array.from(info.select("p.genre")).map(el => el.text) != '' ? Array.from(info.select("p.genre")).map(el => el.text) : [info.selectFirst("div.info h2").text];
         const author = info.selectFirst("div.author_area").text.replace(/\s+/g, ' ').replace(/author info/g, '').trim() ?? info.selectFirst("a.author").text;
