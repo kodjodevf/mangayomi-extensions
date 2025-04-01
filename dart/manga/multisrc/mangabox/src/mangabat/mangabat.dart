@@ -4,7 +4,7 @@ Source get mangabatSource => _mangabatSource;
 
 Source _mangabatSource = Source(
   name: "Mangabat",
-  baseUrl: "https://m.mangabat.com",
+  baseUrl: "https://www.mangabats.com",
   lang: "en",
   typeSource: "mangabox",
   iconUrl:
