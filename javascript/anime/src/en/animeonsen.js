@@ -1,6 +1,6 @@
 const mangayomiSources = [{
     "name": "Animeonsen",
-    "lang": ["en", "ja"],
+    "langs": ["en", "ja"],
     "baseUrl": "https://www.animeonsen.xyz",
     "apiUrl": "https://api.animeonsen.xyz",
     "iconUrl": "https://www.google.com/s2/favicons?sz=256&domain=https://www.animeonsen.xyz",
