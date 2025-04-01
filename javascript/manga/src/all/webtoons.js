@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "single",
     "isManga": true,
     "isNsfw": false,
-    "version": "0.0.3",
+    "version": "0.0.35",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "manga/src/all/webtoons.js"
