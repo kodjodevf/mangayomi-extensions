@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/all.netflixmirror.png",
     "typeSource": "single",
     "itemType": 1,
-    "version": "0.2.0",
+    "version": "0.2.1",
     "pkgPath": "anime/src/all/netflixmirror.js"
 }];
 
@@ -118,7 +118,7 @@ class DefaultExtension extends MProvider {
     async getDetail(url) {
         var service = this.getServiceDetails();
         const cookie = await this.getCookie();
-        var name_pref = this.getPreference("netmirror_pref_display_name_1");
+
         const data = JSON.parse(await this.request(`/post.php?id=${url}`, cookie));
         const name = data.title;
         const genre = [data.ua, ...(data.genre || '').split(',').map(g => g.trim())];
@@ -153,7 +153,7 @@ class DefaultExtension extends MProvider {
         if (service === "pv") link = `https://www.primevideo.com/detail/${url}`
 
         return {
-            name: name_pref ? name : null, imageUrl: this.getPoster(url, service), link, description, status: 1, genre, episodes
+            name, imageUrl: this.getPoster(url, service), link, description, status: 1, genre, episodes
         };
     }
     async getEpisodes(name, eid, sid, page, cookie) {
@@ -201,19 +201,28 @@ class DefaultExtension extends MProvider {
     }
 
     async getVideoList(url) {
+        var slug = ""
         var src = this.getPreference("netmirror_pref_stream_extraction");
-        var baseUrl = src === 'tv' ? this.getTVBaseUrl() : this.getMobileBaseUrl()
         var service = this.getServiceDetails();
-        var slug = "/mobile"
-        if (service === "nf" && src === 'tv') slug = "/tv";
-        url = baseUrl + slug + `/playlist.php?id=${url}`
+
+        // prime extracton works only in mobile
+        if (service == "pv") {
+            slug = "/pv"
+            src = "mobile"
+        }
+
+        var device = "/mobile"
+        if (src == 'tv') device = "/tv";
+
+        var baseUrl = src === 'tv' ? this.getTVBaseUrl() : this.getMobileBaseUrl()
+        url = baseUrl + device + slug + `/playlist.php?id=${url}`
         const data = JSON.parse(await this.request(url));
         let videoList = [];
         let subtitles = [];
         let audios = [];
         for (const playlist of data) {
             var source = playlist.sources[0]
-            var link = baseUrl.replace(slug, "") + source.file;
+            var link = baseUrl + source.file;
             var headers =
             {
                 'Origin': baseUrl,
