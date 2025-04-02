@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://mangafire.to/assets/sites/mangafire/favicon.png?v3",
     "typeSource": "single",
     "itemType": 0,
-    "version": "0.1.23",
+    "version": "0.1.24",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "manga/src/all/mangafire.js"
@@ -173,8 +173,9 @@ class DefaultExtension extends MProvider {
         const res = await new Client().get(url);
         const data = JSON.parse(res.body);
         const pages = [];
+        var hdr = { "Referer": this.source.baseUrl }
         data.result.images.forEach(img => {
-            pages.push(img[0]);
+            pages.push({ url: img[0], headers: hdr });
         });
         return pages;
     }
