@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://aniplaynow.live/",
     "typeSource": "single",
     "itemType": 1,
-    "version": "1.2.4",
+    "version": "1.3.0",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/en/aniplay.js"
@@ -283,14 +283,24 @@ class DefaultExtension extends MProvider {
     }
 
     async aniplayRequest(slug, body) {
-        var next_action = ""
+        var next_action_1 = ""
+        var next_action_2 = ""
 
         if (slug.indexOf("info/") > -1) {
-            next_action = 'f3422af67c84852f5e63d50e1f51718f1c0225c4'
+            next_action_1 = '7f07777b5f74e3edb312e0b718a560f9d3ad21aeba'
+            next_action_2 = '7f57233b7a6486e8211b883c502fa0450775f0ee98'
         } else if (slug.indexOf("watch/") > -1) {
-            next_action = '5dbcd21c7c276c4d15f8de29d9ef27aef5ea4a5e'
+            next_action_1 = '7f11490e43dca1ed90fcb5b90bac1e5714a3e11232'
+            next_action_2 = '7f48c7ffeb25edece852102a65d794a1dffa37aaac'
         }
         var baseUrl = "https://" + this.getPreference("aniplay_override_base_url")
+        
+        // For aniplay.lol use next_action_2 header
+        var next_action = next_action_1
+        if (baseUrl.endsWith(".lol")) {
+            next_action = next_action_2
+        }
+
         var url = `${baseUrl}/anime/${slug}`
         var headers = {
             "referer": baseUrl,
@@ -306,6 +316,7 @@ class DefaultExtension extends MProvider {
         return JSON.parse(response.body.split('1:')[1])
 
     }
+
 
     async getDetail(url) {
         var anilistId = url
