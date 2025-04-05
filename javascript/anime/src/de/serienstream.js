@@ -158,9 +158,9 @@ class DefaultExtension extends MProvider {
         const baseUrl = this.source.baseUrl;
         const res = await this.client.get(baseUrl + url);
         const getLastSundayOfMonth = (year, month) => {
-            const lastDay = new Date(year, month, 0);
+            const lastDay = this.createDate(year, month, 0);
             const lastSunday = lastDay.getDate() - lastDay.getDay();
-            return new Date(year, month - 1, lastSunday);
+            return this.createDate(year, month - 1, lastSunday);
         };
         const document = new Document(res.body);
         const dateString = document.selectFirst('strong[style="color: white;"]').text;
@@ -175,14 +175,26 @@ class DefaultExtension extends MProvider {
         const minutesInt = parseInt(minutes);
         const lastSundayOfMarch = getLastSundayOfMonth(yearInt, 3);
         const lastSundayOfOctober = getLastSundayOfMonth(yearInt, 10);
-        const jsDate = new Date(yearInt, monthInt - 1, dayInt, hoursInt, minutesInt);
+        const jsDate = this.createDate(yearInt, monthInt - 1, dayInt, hoursInt, minutesInt);
         // If Date between lastSundayOfMarch & lastSundayOfOctober -> CEST (MESZ)
         const isInDST = jsDate >= lastSundayOfMarch && jsDate < lastSundayOfOctober;
         let timeZoneOffset = isInDST ? 0 : 1;
         // If it's in CEST, subtract 1 hour from UTC (to get local time in CEST)
-        const correctedTime = new Date(jsDate.getTime() + (timeZoneOffset - 1) * 60 * 60 * 1000);
+        const correctedTime = this.createDate(jsDate.getTime() + (timeZoneOffset - 1) * 60 * 60 * 1000);
         return String(correctedTime.valueOf()); // dateUpload is a string containing date expressed in millisecondsSinceEpoch.
     }
+
+    createDate(yearOrNum, month, day) {
+        if (yearOrNum && month && day) {
+            return day < 1 ? new Date(Math.max(new Date().getFullYear(), yearOrNum), Math.max(0, month)) : 
+                new Date(Math.max(new Date().getFullYear(), yearOrNum), Math.max(0, month), day);
+        } else if (yearOrNum) {
+            return new Date(yearOrNum);
+        } else {
+            return new Date();
+        }
+    }
+
     async getVideoList(url) {
         const baseUrl = this.source.baseUrl;
         const res = await this.client.get(baseUrl + url, {
