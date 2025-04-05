@@ -31,10 +31,11 @@ class DefaultExtension extends MProvider {
       {
         مستمرة: 0,
         مكتملة: 1,
+        مكتمل: 1,
         متوقف: 2,
         متروك: 3,
-        مكتمل: 4,
-      }[status] ?? 5
+        "قادم قريبًا": 4,
+      }[status] ?? 5 // 5 => unknown
     );
   }
   hasNextPage(doc) {
