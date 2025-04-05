@@ -4,8 +4,9 @@ const mangayomiSources = [
     lang: "ar",
     baseUrl: "https://olympustaff.com",
     apiUrl: "",
-    iconUrl:
-      "https://www.google.com/s2/favicons?sz=256&domain=https://olympustaff.com&size=256",
+    get iconUrl() {
+      return `https://www.google.com/s2/favicons?sz=256&domain=${this.baseUrl}`;
+    },
     typeSource: "single",
     itemType: 0,
     version: "1.0.0",
@@ -20,10 +21,10 @@ class DefaultExtension extends MProvider {
     this.baseUrl = new SharedPreferences().get("overrideBaseUrl1");
   }
 
+  //  Helper Methods
+
   getHeaders(url) {
-    return {
-      Referer: this.source.baseUrl,
-    };
+    return { Referer: this.source.baseUrl };
   }
 
   toStatus(status) {
@@ -38,16 +39,17 @@ class DefaultExtension extends MProvider {
       }[status] ?? 5 // 5 => unknown
     );
   }
+
   hasNextPage(doc) {
     return (
-      doc.selectFirst(".pagination li.page-item a[rel='next'] ").attr("href") !=
-      ""
+      doc
+        .selectFirst(".pagination li.page-item a[rel='next']")
+        ?.attr("href") !== ""
     );
   }
 
   parseChapterDate(date) {
-    // Format YYYY-MM-DD
-    return String(new Date(date).toISOString().split("T")[0]);
+    return new Date(date).toISOString().split("T")[0];
   }
 
   async request(slug) {
@@ -55,130 +57,114 @@ class DefaultExtension extends MProvider {
     return new Document(res.body);
   }
 
+  //  Chapters
   chapterFromElement(element) {
-    const chapter = {
-      name: "",
-      dateUpload: 0,
-      url: "",
+    const chpNum = element.selectFirst("div.epl-num")?.text.trim();
+    const chpTitle = element.selectFirst("div.epl-title")?.text.trim();
+
+    let name;
+    if (chpTitle?.includes(chpNum?.replace(/[^0-9]/g, ""))) {
+      name = chpTitle;
+    } else if (!chpNum) {
+      name = chpTitle;
+    } else if (!chpTitle) {
+      name = chpNum;
+    } else {
+      name = `${chpNum} - ${chpTitle}`;
+    }
+
+    return {
+      name,
+      dateUpload: this.parseChapterDate(
+        element.selectFirst("div.epl-date")?.text.trim(),
+      ),
+      url: element.getHref,
     };
-
-    const chpNum = element.selectFirst("div.epl-num").text.trim();
-    const chpTitle = element.selectFirst("div.epl-title").text.trim();
-
-    chapter.name = chpTitle.includes(chpNum.replace(/[^0-9]/g, ""))
-      ? chpTitle
-      : !chpNum
-        ? chpTitle
-        : !chpTitle
-          ? chpNum
-          : `${chpNum} - ${chpTitle}`;
-
-    chapter.dateUpload = this.parseChapterDate(
-      element.selectFirst("div.epl-date").text.trim(),
-    );
-    chapter.url = element.getHref;
-
-    return chapter;
   }
+
   async chapterListParse(response) {
     const allElements = [];
     let doc = response;
 
     while (true) {
       const pageChapters = doc.select("div.eplister ul a");
-      if (pageChapters.length === 0) {
-        break;
-      }
+      if (pageChapters.length === 0) break;
 
       allElements.push(...pageChapters);
       const nextPage = doc.select("a[rel=next]");
-      if (!nextPage.length > 0) {
-        break;
-      }
+      if (nextPage.length === 0) break;
 
-      const nextUrl = nextPage.at(0).attr("href");
-      const nextResponse = await new Client().get(nextUrl);
+      const nextUrl = nextPage[0].attr("href");
+      const nextResponse = await this.client.get(nextUrl);
       doc = new Document(nextResponse.body);
     }
 
     return allElements.map((element) => this.chapterFromElement(element));
   }
+
+  //  Manga Listing
   async getMangaList(slug) {
     const doc = await this.request(`/${slug}`);
-    const mangaElements = doc.select(".listupd .bsx");
+    const list = doc.select(".listupd .bsx").map((element) => ({
+      name: element.selectFirst("a")?.attr("title")?.trim(),
+      imageUrl: element.selectFirst("img")?.getSrc,
+      link: element.getHref,
+    }));
 
-    const list = [];
-    for (const element of mangaElements) {
-      const name = element.selectFirst("a").attr("title")?.trim();
-      const imageUrl = element.selectFirst("img").getSrc;
-      const link = element.getHref;
-      list.push({ name, imageUrl, link });
-    }
-    const hasNextPage = this.hasNextPage(doc);
-    return { list: list, hasNextPage };
+    return { list, hasNextPage: this.hasNextPage(doc) };
   }
 
   async getPopular(page) {
-    return await this.getMangaList(`series?page=${page}`);
+    return this.getMangaList(`series?page=${page}`);
   }
 
   async getLatestUpdates(page) {
     const doc = await this.request(`/?page=${page}`);
-    const mangaElements = doc.select(".post-body .box");
-    const list = [];
-    for (const element of mangaElements) {
-      const name = element.selectFirst(".info a h3").text;
-      const imageUrl = element.selectFirst(".imgu img").getSrc;
-      const link = element.selectFirst(".imgu a").getHref;
-      list.push({ name, imageUrl, link });
-    }
-    const hasNextPage = this.hasNextPage(doc);
-    return { list: list, hasNextPage };
+    const list = doc.select(".post-body .box").map((element) => ({
+      name: element.selectFirst(".info a h3")?.text,
+      imageUrl: element.selectFirst(".imgu img")?.getSrc,
+      link: element.selectFirst(".imgu a")?.getHref,
+    }));
+
+    return { list, hasNextPage: this.hasNextPage(doc) };
   }
 
-  get supportsLatest() {
-    throw new Error("supportsLatest not implemented");
-  }
-
+  //  Search
   async search(query, page, filters) {
     if (!query) {
-      const type = filters[0].values[filters[0].state].value;
-      const status = filters[1].values[filters[1].state].value;
-      const genre = filters[2].values[filters[2].state].value;
-      return await this.getMangaList(
+      const [type, status, genre] = filters.map(
+        (filter, i) => filter.values[filters[i].state]?.value,
+      );
+      return this.getMangaList(
         `series?page=${page}&genre=${genre}&type=${type}&status=${status}`,
       );
     }
 
-    const doc = await this.request(`/ajax/search?keyword="${query}`).select(
-      "li.list-group-item",
-    );
-
-    const list = [];
-    for (const element of doc) {
-      const name = element.selectFirst("div.ms-2 a").text;
-      const imageUrl = element.selectFirst("a img").getSrc;
-      const link = element.selectFirst("div.ms-2 a").getHref;
-      list.push({ name, imageUrl, link });
-    }
+    const doc = await this.request(`/ajax/search?keyword="${query}`);
+    const list = doc.select("li.list-group-item").map((element) => ({
+      name: element.selectFirst("div.ms-2 a")?.text,
+      imageUrl: element.selectFirst("a img")?.getSrc,
+      link: element.selectFirst("div.ms-2 a")?.getHref,
+    }));
 
     return { list, hasNextPage: false };
   }
 
+  //  Detail
   async getDetail(url) {
-    const baseUrl = new SharedPreferences().get("overrideBaseUrl1");
     const res = await this.client.get(url);
     const doc = new Document(res.body);
 
     const title = doc.selectFirst("div.author-info-title h1")?.text.trim();
     const imageUrl = doc.selectFirst("img.shadow-sm")?.getSrc;
     const description = doc.selectFirst(".review-content > p")?.text.trim();
-    const authorText = doc
+
+    const author = doc
       .selectFirst(
         ".full-list-info > small:first-child:contains(الرسام) + small",
       )
       ?.text?.trim();
-    const author = authorText !== "غير معروف" ? authorText : null;
+
     const status = this.toStatus(
       doc
         .selectFirst(
@@ -186,6 +172,7 @@ class DefaultExtension extends MProvider {
         )
         ?.text?.trim(),
     );
+
     const genre = doc
       .select("div.review-author-info a")
       .map((e) => e.text.trim());
@@ -196,27 +183,14 @@ class DefaultExtension extends MProvider {
       title,
       imageUrl,
       description,
-      author,
+      author: author && author !== "غير معروف" ? author : null,
       status,
       genre,
       chapters,
     };
   }
 
-  // For novel html content
-  async getHtmlContent(url) {
-    throw new Error("getHtmlContent not implemented");
-  }
-  // Clean html up for reader
-  async cleanHtmlContent(html) {
-    throw new Error("cleanHtmlContent not implemented");
-  }
-  // For anime episode video list
-  async getVideoList(url) {
-    throw new Error("getVideoList not implemented");
-  }
-
-  // For manga chapter pages
+  //  chapter pages
   async getPageList(url) {
     const res = await this.client.get(url);
     const doc = new Document(res.body);
@@ -226,6 +200,7 @@ class DefaultExtension extends MProvider {
     }));
   }
 
+  //  Filter
   getFilterList() {
     return [
       {
@@ -358,6 +333,7 @@ class DefaultExtension extends MProvider {
     ];
   }
 
+  //  Preferences
   getSourcePreferences() {
     return [
       {
@@ -371,5 +347,23 @@ class DefaultExtension extends MProvider {
         },
       },
     ];
+  }
+
+  //  Unimplemented Methods
+  get supportsLatest() {
+    throw new Error("Method not implemented: supportsLatest");
+  }
+
+  async getHtmlContent(url) {
+    throw new Error("Method not implemented: getHtmlContent");
+  }
+
+  async cleanHtmlContent(html) {
+    throw new Error("Method not implemented: cleanHtmlContent");
+  }
+
+  // For anime episode video list
+  async getVideoList(url) {
+    throw new Error("Method not implemented: getVideoList");
   }
 }
