@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://dramacool.com.tr",
     "typeSource": "multi",
     "itemType": 1,
-    "version": "0.0.2",
+    "version": "0.0.3",
     "pkgPath": "anime/src/all/dramacool.js"
 }];
 
@@ -84,22 +84,22 @@ class DefaultExtension extends MProvider {
 
         var mins = 0
         var mons = 0
-        if(unit.includes('minute')){
+        if (unit.includes('minute')) {
             mins = t;
-        }else if(unit.includes('hour')){
+        } else if (unit.includes('hour')) {
             mins = t * 60;
-        }else if(unit.includes('day')){
+        } else if (unit.includes('day')) {
             mins = t * 60 * 24;
-        }else if(unit.includes('week')){
+        } else if (unit.includes('week')) {
             mins = t * 60 * 24 * 7;
-        }else if(unit.includes('month')){
+        } else if (unit.includes('month')) {
             mons = t;
         }
         var now = new Date();
         now.setMinutes(now.getMinutes() - mins)
         now.setMinutes(now.getMonth() - mons)
         var pastDate = new Date(now);
-        return ""+pastDate.valueOf();
+        return "" + pastDate.valueOf();
     }
 
     async getDetail(url) {
@@ -149,9 +149,120 @@ class DefaultExtension extends MProvider {
     async cleanHtmlContent(html) {
         throw new Error("cleanHtmlContent not implemented");
     }
+
+    decodeBase64(f) {
+        var g = {},
+            b = 65,
+            d = 0,
+            a, c = 0,
+            h, e = "",
+            k = String.fromCharCode,
+            l = f.length;
+        for (a = ""; 91 > b;) a += k(b++);
+        a += a.toLowerCase() + "0123456789+/";
+        for (b = 0; 64 > b; b++) g[a.charAt(b)] = b;
+        for (a = 0; a < l; a++)
+            for (b = g[f.charAt(a)], d = (d << 6) + b, c += 6; 8 <= c;)((h = d >>> (c -= 8) & 255) || a < l - 2) && (e += k(h));
+        return e
+    };
+
+    extractDramacoolEmbed(doc) {
+        var streams = []
+        var script = doc.select('script').at(-2)
+        var unpack = unpackJs(script.text)
+
+        var skey = 'hls2":"'
+        var eKey = '"};jwplayer'
+        var start = unpack.indexOf(skey) + skey.length
+        var end = unpack.indexOf(eKey, start)
+        var track = unpack.substring(start, end)
+      
+         streams.push({
+            url: track,
+            originalUrl: track,
+            quality: "Dramacool - Auto",
+        });
+        
+        return streams
+    }
+
+    extractAsianLoadEmbed(doc) {
+        var streams = []
+        var script = doc.select('script').at(-2)
+        var unpack = script.text
+        
+        // tracks
+        var skey = '|image|'
+        var eKey = '|setup|'
+        var start = unpack.indexOf(skey) + skey.length
+        var end = unpack.indexOf(eKey, start)
+        var track = unpack.substring(start, end)
+        var streamUrl = this.decodeBase64(track)
+
+        // subs
+        eKey = "|default|"
+        var end = unpack.indexOf(eKey)
+        var subs = []
+        if(end != -1) {
+            skey = "|type|"
+            var start = unpack.indexOf(skey) + skey.length
+            var subTracks = unpack.substring(start, end).split("|")
+            subs.push({
+                file: this.decodeBase64(subTracks[1]),
+                label: subTracks[0]
+            })
+            
+        }
+
+        streams.push({
+            url: streamUrl,
+            originalUrl: streamUrl,
+            quality: "Asianload - Auto",
+            subtitles: subs
+        });
+
+        // Download url
+        skey = '|_blank|'
+        eKey = '|open|'
+        start = unpack.indexOf(skey) + skey.length
+        end = unpack.indexOf(eKey, start)
+        track = unpack.substring(start, end)
+        var downUrl = this.decodeBase64(track)
+        
+        streams.push({
+            url: downUrl,
+            originalUrl: downUrl,
+            quality: "Asianload - Direct Download",
+
+        });
+
+        return streams
+    }
+
     // For anime episode video list
     async getVideoList(url) {
-        throw new Error("getVideoList not implemented");
+        var res = await this.request(url)
+        var iframe = res.selectFirst("iframe").attr("src").trim()
+        if (iframe == "") {
+            throw new Error("No iframe found")
+        }
+
+        var streams = []
+        
+        res = await new Client().get(iframe)
+        var doc = new Document(res.body);
+
+        if (iframe.includes("//dramacool")) {
+
+            streams = this.extractDramacoolEmbed(doc)
+        } else if (iframe.includes("//asianload")) {
+
+            streams = this.extractAsianLoadEmbed(doc)
+           
+        }
+
+        return streams
+
     }
     // For manga chapter pages
     async getPageList(url) {
