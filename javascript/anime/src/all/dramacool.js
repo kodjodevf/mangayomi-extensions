@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://dramacool.com.tr",
     "typeSource": "multi",
     "itemType": 1,
-    "version": "0.0.4",
+    "version": "1.0.0",
     "pkgPath": "anime/src/all/dramacool.js"
 }];
 
@@ -142,13 +142,42 @@ class DefaultExtension extends MProvider {
 
         return { name, imageUrl, description, link, status, genre, chapters }
     }
-    // For novel html content
-    async getHtmlContent(url) {
-        throw new Error("getHtmlContent not implemented");
-    }
-    // Clean html up for reader
-    async cleanHtmlContent(html) {
-        throw new Error("cleanHtmlContent not implemented");
+
+    async splitStreams(streams, server) {
+        var pref = this.getPreference("dramacool_split_stream_quality");
+        if (!pref) return streams
+        var autoStream = streams[0]
+        var autoStreamUrl = autoStream.url
+        var hdr = autoStream.headers
+        var hostUrl = ""
+        if (server == "Asianload") {
+            hostUrl = autoStreamUrl.substring(0, autoStreamUrl.indexOf("/media"))
+        } else {
+            hostUrl = autoStreamUrl.substring(0, autoStreamUrl.indexOf("master.m3u8"))
+        }
+
+
+        var response = await new Client().get(autoStreamUrl, hdr)
+        var body = response.body;
+        var lines = body.split('\n');
+
+        for (let i = 0; i < lines.length; i++) {
+            if (lines[i].startsWith('#EXT-X-STREAM-INF:')) {
+                var resolution = lines[i].match(/RESOLUTION=(\d+x\d+)/)[1];
+                resolution = `${server} - ${resolution}`
+                var m3u8Url = lines[i + 1].trim();
+                m3u8Url = hostUrl + m3u8Url
+                streams.push({
+                    url: m3u8Url,
+                    originalUrl: m3u8Url,
+                    quality: resolution,
+                    headers: hdr
+                });
+            }
+        }
+
+
+        return streams
     }
 
     decodeBase64(f) {
@@ -167,7 +196,7 @@ class DefaultExtension extends MProvider {
         return e
     };
 
-    extractDramacoolEmbed(doc) {
+    async extractDramacoolEmbed(doc) {
         var streams = []
         var script = doc.select('script').at(-2)
         var unpack = unpackJs(script.text)
@@ -185,10 +214,12 @@ class DefaultExtension extends MProvider {
             headers: this.getHeaders("https://dramacool.men/")
         });
 
+        streams = await this.splitStreams(streams, "Dramacool")
+
         return streams
     }
 
-    extractAsianLoadEmbed(doc) {
+    async extractAsianLoadEmbed(doc) {
         var streams = []
         var script = doc.select('script').at(-2)
         var unpack = script.text
@@ -235,11 +266,34 @@ class DefaultExtension extends MProvider {
         streams.push({
             url: downUrl,
             originalUrl: downUrl,
-            quality: "Asianload - Direct Download",
+            quality: "Asianload - Direct download",
             headers: this.getHeaders("https://asianload.cfd/")
         });
 
+
+        streams = await this.splitStreams(streams, "Asianload")
+
         return streams
+    }
+
+    // Sorts streams based on user preference.
+    async sortStreams(streams) {
+        var sortedStreams = [];
+
+        var copyStreams = streams.slice()
+        var pref = this.getPreference("dramacool_video_resolution");
+        for (var i in streams) {
+            var stream = streams[i];
+            if (stream.quality.indexOf(pref) > -1) {
+                sortedStreams.push(stream);
+                var index = copyStreams.indexOf(stream);
+                if (index > -1) {
+                    copyStreams.splice(index, 1);
+                }
+                break;
+            }
+        }
+        return [...sortedStreams, ...copyStreams]
     }
 
     // For anime episode video list
@@ -256,24 +310,15 @@ class DefaultExtension extends MProvider {
         var doc = new Document(res.body);
 
         if (iframe.includes("//dramacool")) {
-
-            streams = this.extractDramacoolEmbed(doc)
+            streams = await this.extractDramacoolEmbed(doc)
         } else if (iframe.includes("//asianload")) {
-
-            streams = this.extractAsianLoadEmbed(doc)
-
+            streams = await this.extractAsianLoadEmbed(doc)
         }
 
-        return streams
+        return this.sortStreams(streams)
 
     }
-    // For manga chapter pages
-    async getPageList(url) {
-        throw new Error("getPageList not implemented");
-    }
-    getFilterList() {
-        throw new Error("getFilterList not implemented");
-    }
+
     getSourcePreferences() {
         return [
             {
@@ -285,7 +330,24 @@ class DefaultExtension extends MProvider {
                     entries: ["Drama", "Movie", "KShow"],
                     entryValues: ["recently-added-drama", "recently-added-movie", "recently-added-kshow"]
                 }
-            }
+            },
+            {
+                key: 'dramacool_split_stream_quality',
+                switchPreferenceCompat: {
+                    title: 'Split stream into different quality streams',
+                    summary: "Split stream Auto into 360p/720p/1080p",
+                    value: true
+                }
+            }, {
+                key: 'dramacool_video_resolution',
+                listPreference: {
+                    title: 'Preferred video resolution',
+                    summary: '',
+                    valueIndex: 0,
+                    entries: ["Auto", "Direct download", "720p", "480", "360p"],
+                    entryValues: ["Auto", "download", "720", "480", "360"]
+                }
+            },
         ]
     }
 }
