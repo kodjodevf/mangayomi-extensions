@@ -140,7 +140,7 @@ class DefaultExtension extends MProvider {
       );
     }
 
-    const doc = await this.request(`/ajax/search?keyword="${query}`);
+    const doc = await this.request(`/ajax/search?keyword=${query}`);
     const list = doc.select("li.list-group-item").map((element) => ({
       name: element.selectFirst("div.ms-2 a")?.text,
       imageUrl: element.selectFirst("a img")?.getSrc,
