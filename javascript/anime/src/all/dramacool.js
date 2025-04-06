@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://dramacool.com.tr",
     "typeSource": "multi",
     "itemType": 1,
-    "version": "0.0.3",
+    "version": "0.0.4",
     "pkgPath": "anime/src/all/dramacool.js"
 }];
 
@@ -14,7 +14,8 @@ class DefaultExtension extends MProvider {
 
     getHeaders(url) {
         return {
-            Referer: url
+            'Referer': url,
+            'User-Agent': "Mozilla/5.0 (Windows NT 10.0; WOW64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.6788.76 Safari/537.36"
         }
     }
 
@@ -176,13 +177,14 @@ class DefaultExtension extends MProvider {
         var start = unpack.indexOf(skey) + skey.length
         var end = unpack.indexOf(eKey, start)
         var track = unpack.substring(start, end)
-      
-         streams.push({
+
+        streams.push({
             url: track,
             originalUrl: track,
             quality: "Dramacool - Auto",
+            headers: this.getHeaders("https://dramacool.men/")
         });
-        
+
         return streams
     }
 
@@ -190,10 +192,10 @@ class DefaultExtension extends MProvider {
         var streams = []
         var script = doc.select('script').at(-2)
         var unpack = script.text
-        
+
         // tracks
         var skey = '|image|'
-        var eKey = '|setup|'
+        var eKey = '|'
         var start = unpack.indexOf(skey) + skey.length
         var end = unpack.indexOf(eKey, start)
         var track = unpack.substring(start, end)
@@ -203,7 +205,7 @@ class DefaultExtension extends MProvider {
         eKey = "|default|"
         var end = unpack.indexOf(eKey)
         var subs = []
-        if(end != -1) {
+        if (end != -1) {
             skey = "|type|"
             var start = unpack.indexOf(skey) + skey.length
             var subTracks = unpack.substring(start, end).split("|")
@@ -211,29 +213,30 @@ class DefaultExtension extends MProvider {
                 file: this.decodeBase64(subTracks[1]),
                 label: subTracks[0]
             })
-            
+
         }
 
         streams.push({
             url: streamUrl,
             originalUrl: streamUrl,
             quality: "Asianload - Auto",
-            subtitles: subs
+            subtitles: subs,
+            headers: this.getHeaders("https://asianload.cfd/")
         });
 
         // Download url
         skey = '|_blank|'
-        eKey = '|open|'
+        eKey = '|'
         start = unpack.indexOf(skey) + skey.length
         end = unpack.indexOf(eKey, start)
         track = unpack.substring(start, end)
         var downUrl = this.decodeBase64(track)
-        
+
         streams.push({
             url: downUrl,
             originalUrl: downUrl,
             quality: "Asianload - Direct Download",
-
+            headers: this.getHeaders("https://asianload.cfd/")
         });
 
         return streams
@@ -248,7 +251,7 @@ class DefaultExtension extends MProvider {
         }
 
         var streams = []
-        
+
         res = await new Client().get(iframe)
         var doc = new Document(res.body);
 
@@ -258,7 +261,7 @@ class DefaultExtension extends MProvider {
         } else if (iframe.includes("//asianload")) {
 
             streams = this.extractAsianLoadEmbed(doc)
-           
+
         }
 
         return streams
