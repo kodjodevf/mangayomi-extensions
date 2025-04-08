@@ -1,15 +1,15 @@
 const mangayomiSources = [
   {
-    name: "TeamX",
-    lang: "ar",
-    baseUrl: "https://olympustaff.com",
-    apiUrl: "",
-    iconUrl:
+    "name": "TeamX",
+    "lang": "ar",
+    "baseUrl": "https://olympustaff.com",
+    "apiUrl": "",
+    "iconUrl":
       "https://www.google.com/s2/favicons?sz=256&domain=https://olympustaff.com",
-    typeSource: "single",
-    itemType: 0,
-    version: "1.0.1",
-    pkgPath: "manga/src/ar/teamx.js",
+    "typeSource": "single",
+    "itemType": 0,
+    "version": "1.0.1",
+    "pkgPath": "manga/src/ar/teamx.js",
   },
 ];
 
