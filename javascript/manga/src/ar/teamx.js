@@ -9,8 +9,8 @@ const mangayomiSources = [
     "typeSource": "single",
     "itemType": 0,
     "version": "1.0.1",
-    "pkgPath": "manga/src/ar/teamx.js",
-  },
+    "pkgPath": "manga/src/ar/teamx.js"
+  }
 ];
 
 class DefaultExtension extends MProvider {
