@@ -237,11 +237,7 @@ class ZoroTheme extends MProvider {
     final headers = {'Referer': 'https://megacloud.club/'};
     final serverUrl = ['https://megacloud.tv', 'https://rapid-cloud.co'];
 
-    final serverType =
-        url.startsWith('https://megacloud.tv') ||
-                url.startsWith('https://megacloud.club')
-            ? 0
-            : 1;
+    final serverType = RegExp(r'https://megacloud\..*').hasMatch(url) ? 0 : 1;
     final sourceUrl = [
       '/embed-2/ajax/e-1/getSources?id=',
       '/ajax/embed-6-v2/getSources?id=',
