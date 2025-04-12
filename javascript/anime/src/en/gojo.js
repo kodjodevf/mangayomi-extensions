@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://gojo.wtf/",
     "typeSource": "multi",
     "itemType": 1,
-    "version": "0.0.1",
+    "version": "0.0.3",
     "pkgPath": "anime/src/en/gojo.js"
 }];
 
@@ -57,7 +57,7 @@ class DefaultExtension extends MProvider {
             } else {
                 imageUrl = image
             }
-            var link = ""+anime.id
+            var link = "" + anime.id
 
             list.push({ name, imageUrl, link });
         })
@@ -83,7 +83,7 @@ class DefaultExtension extends MProvider {
             list.push(...this.formatList(res))
         }
         var hasNextPage = true;
-        if(list.length < 30) hasNextPage = false;
+        if (list.length < 30) hasNextPage = false;
 
         return { list, hasNextPage }
     }
@@ -95,38 +95,121 @@ class DefaultExtension extends MProvider {
         var res = await this.gojoAPI(`/search?query=${query}&page=${page}&perPage=30`)
         if (res != null) {
             list.push(...this.formatList(res.results))
-            if(res.lastPage < page) hasNextPage = true;
+            if (res.lastPage < page) hasNextPage = true;
         }
-        
+
         return { list, hasNextPage }
     }
 
 
     async getDetail(url) {
-        throw new Error("getDetail not implemented");
+        var anilistId = url
+        var res = await this.gojoAPI(`/info/${anilistId}`)
+        if (res == null) {
+            throw new Error("Error on getDetail");
+        }
+        var name = this.getTitle(res.title)
+        var imageUrl = res.coverImage.large
+        var description = res.description;
+        var link = `${this.source.baseUrl}/watch/${anilistId}`
+        var genres = res.genres
+        var status = (() => {
+            switch (res.status) {
+                case "RELEASING":
+                    return 0;
+                case "FINISHED":
+                    return 1;
+                case "HIATUS":
+                    return 2;
+                case "NOT_YET_RELEASED":
+                    return 3;
+                default:
+                    return 5;
+            }
+        })();
+
+
+        var chapters = [];
+
+        var body = await this.gojoAPI(`/episodes/${anilistId}`)
+        if (body != null && body.length > 0) {
+
+            // Find the maximum episodes as some providers may not have all.
+            var maxEpisodes = 0
+            for (var prd of body) {
+                if (prd['episodes'].length > maxEpisodes) {
+                    maxEpisodes = prd['episodes'].length;
+                }
+            }
+
+            for (var i = 0; i < maxEpisodes; i++) {
+                var chapNum = -1
+                var chapName = ""
+                var chapLink = {}
+                var chapScan = "Sub"
+
+                for (var prd of body) {
+                    var chap = prd.episodes[i];
+
+                    // Check if the current provider episode is the same as the previous one.
+                    // If not, break out of the loop.
+                    var epNum = chap.number
+                    if (chapNum == -1) {
+                        chapNum = epNum
+                    }
+
+                    if (chapNum != epNum) continue;
+
+                    // Episode Name is stored only once.
+                    if (chapName.length == 0) {
+                        chapName = `E${epNum}`
+                        if (chap.hasOwnProperty("title")) {
+                            if (chap.title != null) chapName += ": " + chap.title;
+                        }
+                    }
+
+                    // If Dub is available, add it to the scanlator list.
+                    if (chap.hasOwnProperty("hasDub")) {
+                        if (!(chapScan.includes("Dub")) && chap.hasDub) {
+                            chapScan += ", Dub"
+                        }
+                    }
+
+                    // If isFiller is available, add it to the scanlator list.
+                    if (chap.hasOwnProperty("isFiller")) {
+                        if (!(chapScan.includes("Filler")) && chap.isFiller && this.getPreference("gojo_pref_mark_filler")) {
+                            chapScan = "Filler, " + chapScan
+                        }
+                    }
+
+                    // Delete unnecessary properties from the chapter object.
+                    delete chap.image
+                    delete chap.description
+                    delete chap.isFiller
+                    delete chap.title
+
+                    var prdName = prd.providerId
+                    chapLink[prdName] = chap
+
+                }
+
+                chapters.push({ name: chapName, url: `${anilistId}||` + JSON.stringify(chapLink), scanlator: chapScan })
+
+            }
+
+        }
+        chapters.reverse()
+
+
+        return { name, imageUrl, description, link, chapters, genres, status }
     }
-    // For novel html content
-    async getHtmlContent(url) {
-        throw new Error("getHtmlContent not implemented");
-    }
-    // Clean html up for reader
-    async cleanHtmlContent(html) {
-        throw new Error("cleanHtmlContent not implemented");
-    }
+
 
     // For anime episode video list
     async getVideoList(url) {
         throw new Error("getVideoList not implemented");
     }
 
-
-    // For manga chapter pages
-    async getPageList(url) {
-        throw new Error("getPageList not implemented");
-    }
-    getFilterList() {
-        throw new Error("getFilterList not implemented");
-    }
     getSourcePreferences() {
         return [
             {
@@ -137,6 +220,13 @@ class DefaultExtension extends MProvider {
                     valueIndex: 0,
                     entries: ["Romaji", "English", "Native"],
                     entryValues: ["romaji", "english", "native"],
+                }
+            }, {
+                key: "gojo_pref_mark_filler",
+                switchPreferenceCompat: {
+                    title: "Mark filler episodes",
+                    summary: "",
+                    value: true
                 }
             },
         ]
