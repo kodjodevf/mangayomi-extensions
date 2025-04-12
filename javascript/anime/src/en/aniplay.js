@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://aniplaynow.live/",
     "typeSource": "single",
     "itemType": 1,
-    "version": "1.3.0",
+    "version": "1.3.2",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/en/aniplay.js"
@@ -28,120 +28,120 @@ class DefaultExtension extends MProvider {
     // code from torrentioanime.js
     anilistQuery() {
         return `
-            query ($page: Int, $perPage: Int, $sort: [MediaSort], $search: String) {
-                Page(page: $page, perPage: $perPage) {
-                    pageInfo {
-                        currentPage
-                        hasNextPage
-                    }
-                    media(type: ANIME, sort: $sort, search: $search, status_in: [RELEASING, FINISHED, NOT_YET_RELEASED]) {
-                        id
-                        title {
-                            romaji
-                            english
-                            native
+                query ($page: Int, $perPage: Int, $sort: [MediaSort], $search: String) {
+                    Page(page: $page, perPage: $perPage) {
+                        pageInfo {
+                            currentPage
+                            hasNextPage
                         }
-                        coverImage {
-                            extraLarge
-                            large
-                        }
-                        description
-                        status
-                        tags {
-                            name
-                        }
-                        genres
-                        studios {
-                            nodes {
+                        media(type: ANIME, sort: $sort, search: $search, status_in: [RELEASING, FINISHED, NOT_YET_RELEASED]) {
+                            id
+                            title {
+                                romaji
+                                english
+                                native
+                            }
+                            coverImage {
+                                extraLarge
+                                large
+                            }
+                            description
+                            status
+                            tags {
                                 name
                             }
+                            genres
+                            studios {
+                                nodes {
+                                    name
+                                }
+                            }
+                            countryOfOrigin
+                            isAdult
                         }
-                        countryOfOrigin
-                        isAdult
                     }
                 }
-            }
-        `.trim();
+            `.trim();
     }
 
     // code from torrentioanime.js
     anilistLatestQuery() {
         const currentTimeInSeconds = Math.floor(Date.now() / 1000);
         return `
-            query ($page: Int, $perPage: Int, $sort: [AiringSort]) {
-              Page(page: $page, perPage: $perPage) {
-                pageInfo {
-                  currentPage
-                  hasNextPage
-                }
-                airingSchedules(
-                  airingAt_greater: 0
-                  airingAt_lesser: ${currentTimeInSeconds - 10000}
-                  sort: $sort
-                ) {
-                  media {
-                    id
-                    title {
-                      romaji
-                      english
-                      native
+                query ($page: Int, $perPage: Int, $sort: [AiringSort]) {
+                Page(page: $page, perPage: $perPage) {
+                    pageInfo {
+                    currentPage
+                    hasNextPage
                     }
-                    coverImage {
-                      extraLarge
-                      large
-                    }
-                    description
-                    status
-                    tags {
-                      name
-                    }
-                    genres
-                    studios {
-                      nodes {
+                    airingSchedules(
+                    airingAt_greater: 0
+                    airingAt_lesser: ${currentTimeInSeconds - 10000}
+                    sort: $sort
+                    ) {
+                    media {
+                        id
+                        title {
+                        romaji
+                        english
+                        native
+                        }
+                        coverImage {
+                        extraLarge
+                        large
+                        }
+                        description
+                        status
+                        tags {
                         name
-                      }
+                        }
+                        genres
+                        studios {
+                        nodes {
+                            name
+                        }
+                        }
+                        countryOfOrigin
+                        isAdult
                     }
-                    countryOfOrigin
-                    isAdult
-                  }
+                    }
                 }
-              }
-            }
-        `.trim();
+                }
+            `.trim();
     }
 
     // code from torrentioanime.js
     async getAnimeDetails(anilistId) {
         const query = `
-                query($id: Int){
-                    Media(id: $id){
-                        id
-                        title {
-                            romaji
-                            english
-                            native
-                        }
-                        coverImage {
-                            extraLarge
-                            large
-                        }
-                        description
-                        status
-                        tags {
-                            name
-                        }
-                        genres
-                        studios {
-                            nodes {
+                    query($id: Int){
+                        Media(id: $id){
+                            id
+                            title {
+                                romaji
+                                english
+                                native
+                            }
+                            coverImage {
+                                extraLarge
+                                large
+                            }
+                            description
+                            status
+                            tags {
                                 name
                             }
+                            genres
+                            studios {
+                                nodes {
+                                    name
+                                }
+                            }
+                            format    
+                            countryOfOrigin
+                            isAdult
                         }
-                        format    
-                        countryOfOrigin
-                        isAdult
                     }
-                }
-            `.trim();
+                `.trim();
 
         const variables = JSON.stringify({ id: anilistId });
 
@@ -283,23 +283,23 @@ class DefaultExtension extends MProvider {
     }
 
     async aniplayRequest(slug, body) {
-        var next_action_1 = ""
-        var next_action_2 = ""
-
-        if (slug.indexOf("info/") > -1) {
-            next_action_1 = '7f07777b5f74e3edb312e0b718a560f9d3ad21aeba'
-            next_action_2 = '7f57233b7a6486e8211b883c502fa0450775f0ee98'
-        } else if (slug.indexOf("watch/") > -1) {
-            next_action_1 = '7f11490e43dca1ed90fcb5b90bac1e5714a3e11232'
-            next_action_2 = '7f48c7ffeb25edece852102a65d794a1dffa37aaac'
-        }
         var baseUrl = "https://" + this.getPreference("aniplay_override_base_url")
-        
-        // For aniplay.lol use next_action_2 header
-        var next_action = next_action_1
+
+        var next_action_overrides = this.getPreference("aniplay_next_action_key").split("||")
+        var next_action_key = 0
         if (baseUrl.endsWith(".lol")) {
-            next_action = next_action_2
+            next_action_key = 1
         }
+        var next_action_values = next_action_overrides[next_action_key].split(":")
+
+
+        var next_action = ""
+        if (slug.indexOf("info/") > -1) {
+            next_action = next_action_values[0]
+        } else if (slug.indexOf("watch/") > -1) {
+            next_action = next_action_values[1]
+        }
+
 
         var url = `${baseUrl}/anime/${slug}`
         var headers = {
@@ -567,6 +567,15 @@ class DefaultExtension extends MProvider {
                 "valueIndex": 0,
                 "entries": ["Romaji", "English", "Native"],
                 "entryValues": ["romaji", "english", "native"],
+            }
+        }, {
+            key: "aniplay_next_action_key",
+            editTextPreference: {
+                title: "Override next_action key",
+                summary: "",
+                value: "7f328d44382d74f2942c42d0bc9915b2d510628a02:7f702090c0d779331a0b55e1ee0cfea85ff4cb963a||7fe26ef575b85a8a7166a411dba3a21263fe5b9306:7fbb025dd45b14410eb1a8ffcbb4615b0a5a1e5c3c",
+                dialogTitle: "Override next_action key",
+                dialogMessage: "",
             }
         },
         {
