@@ -50,7 +50,7 @@ const mangayomiSources = [
         "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/all.comick.png",
         "typeSource": "single",
         "itemType": 0,
-        "version": "0.0.9",
+        "version": "0.1.0",
         "pkgPath": "manga/src/all/comick.js"
     }];
 
