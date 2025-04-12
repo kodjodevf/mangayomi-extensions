@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://gojo.wtf/",
     "typeSource": "multi",
     "itemType": 1,
-    "version": "0.0.3",
+    "version": "0.0.5",
     "pkgPath": "anime/src/en/gojo.js"
 }];
 
@@ -205,11 +205,79 @@ class DefaultExtension extends MProvider {
     }
 
 
-    // For anime episode video list
-    async getVideoList(url) {
-        throw new Error("getVideoList not implemented");
+    strixNzazaExtractor(res, prvd, type) {
+        if(res == null) return {}
+
+        var src = res.sources[0]
+        var url = src.url
+        var quality = `${prvd} - ${src.quality} - ${type.toUpperCase()}`
+        return {
+            url: url,
+            quality,
+            originalUrl: url
+        }
     }
 
+    paheExtractor(res, type) {
+        var streams = []
+        if (res != null) {
+            var srcs = res.sources
+            var hdr = this.getHeaders()
+            for (var src of srcs) {
+                var url = src.url
+                var quality = `Pahe - ${src.quality} - ${type.toUpperCase()}`
+                streams.push({
+                    url: url,
+                    headers: hdr,
+                    quality,
+                    originalUrl: url
+                })
+            }
+        }
+        return streams
+    }
+
+
+    async getStream(prvd, anilistId, epNum, subType, id, dub_id) {
+        var slug = `/tiddies?provider=${prvd}&id=${anilistId}&num=${epNum}&subType=${subType}&watchId=${id}&dub_id=${dub_id}`
+        return await this.gojoAPI(slug)
+    }
+
+    // For anime episode video list
+    async getVideoList(url) {
+        var split = url.split('||')
+        var anilistId = split[0]
+        var info = JSON.parse(split[1])
+        var streams = []
+        var extractDubs = this.getPreference("gojo_extract_dub_streams")
+
+        for (var prvd in info) {
+            var prd = info[prvd]
+            var epNum = prd.number
+            var subType = "sub"
+            var id = prd.id
+            var dub_id = null
+
+            var res = await this.getStream(prvd, anilistId, epNum, subType, id, dub_id)
+            if (prvd != "pahe") {
+                streams.push(this.strixNzazaExtractor(res, prvd, subType))
+            } else {
+                streams.push(...this.paheExtractor(res, subType))
+            }
+
+            if(!extractDubs) continue
+            subType = "dub"
+            if (prd.hasOwnProperty("dub_id")) dub_id = prd.dub_id
+
+            var res = await this.getStream(prvd, anilistId, epNum, subType, id, dub_id)
+            if (prvd != "pahe") {
+                streams.push(this.strixNzazaExtractor(res, prvd, subType))
+            } else {
+                streams.push(...this.paheExtractor(res, subType))
+            }
+        }
+        return streams
+    }
     getSourcePreferences() {
         return [
             {
@@ -227,6 +295,13 @@ class DefaultExtension extends MProvider {
                     title: "Mark filler episodes",
                     summary: "",
                     value: true
+                }
+            }, {
+                key: "gojo_extract_dub_streams",
+                switchPreferenceCompat: {
+                    title: 'Extract dub streams',
+                    summary: "",
+                    value: false
                 }
             },
         ]
