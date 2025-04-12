@@ -146,7 +146,7 @@ class DefaultExtension extends MProvider {
                 title = chapter.title;
             }
 
-            if (chapter.group_name !== "null") {
+            if (chapter.group_name && chapter.group_name !== "null") {
                 scanlator = chapter.group_name
                     .toString()
                     .replace(/]/g, "")
