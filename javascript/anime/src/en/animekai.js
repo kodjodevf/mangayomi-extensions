@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=256&domain=https://animekai.to/",
     "typeSource": "single",
     "itemType": 1,
-    "version": "0.0.1",
+    "version": "0.0.2",
     "pkgPath": "anime/src/en/animekai.js"
 }];
 
@@ -40,7 +40,7 @@ class DefaultExtension extends MProvider {
         return new Document(res);
     }
 
-    async searchPage({ query = "", type = [], genre = [], status = [], sort = "", season = [], year = [], rating = [], country = [], subType = [], page = 1 } = {}) {
+    async searchPage({ query = "", type = [], genre = [], status = [], sort = "", season = [], year = [], rating = [], country = [], language = [], page = 1 } = {}) {
 
         function bundleSlug(category, items) {
             var rd = ""
@@ -64,14 +64,17 @@ class DefaultExtension extends MProvider {
         slug += bundleSlug("year", year);
         slug += bundleSlug("rating", rating);
         slug += bundleSlug("country", country);
-        slug += bundleSlug("subType", subType);
+        slug += bundleSlug("language", language);
         slug += `&page=${page}`;
+
+        var list = []
+        var hasNextPage = false
 
         var body = await this.getPage(slug);
 
         var paginations = body.select(".pagination > li")
+
         var hasNextPage = !paginations[paginations.length - 1].className.includes("active")
-        var list = []
 
         var titlePref = this.getPreference("animekai_title_lang")
         var animes = body.selectFirst(".aitem-wrapper").select(".aitem")
@@ -98,7 +101,27 @@ class DefaultExtension extends MProvider {
         return await this.searchPage({ sort: "updated_date", type: types, page: page });
     }
     async search(query, page, filters) {
-        throw new Error("search not implemented");
+        function getFilter(state) {
+            var rd = []
+            state.forEach(item => {
+                if (item.state) {
+                    rd.push(item.value)
+
+                }
+            })
+            return rd
+
+        }
+        var type = getFilter(filters[0].state)
+        var genre = getFilter(filters[1].state)
+        var status = getFilter(filters[2].state)
+        var sort = filters[3].values[filters[3].state].value
+        var season = getFilter(filters[4].state)
+        var year = getFilter(filters[5].state)
+        var rating = getFilter(filters[6].state)
+        var country = getFilter(filters[7].state)
+        var language = getFilter(filters[8].state)
+        return await this.searchPage({ query, type, genre, status, sort, season, year, rating, country, language, page });
     }
     async getDetail(url) {
         throw new Error("getDetail not implemented");
@@ -120,7 +143,127 @@ class DefaultExtension extends MProvider {
         throw new Error("getPageList not implemented");
     }
     getFilterList() {
-        throw new Error("getFilterList not implemented");
+        function formateState(type_name, items, values) {
+            var state = [];
+            for (var i = 0; i < items.length; i++) {
+                state.push({ type_name: type_name, name: items[i], value: values[i] })
+            }
+            return state;
+        }
+
+        var filters = [];
+
+        // Types
+        var items = ["TV", "Special", "OVA", "ONA", "Music", "Movie"]
+        var values = ["tv", "special", "ova", "ona", "music", "movie"]
+        filters.push({
+            type_name: "GroupFilter",
+            name: "Types",
+            state: formateState("CheckBox", items, values)
+        })
+
+        // Genre
+        items = [
+            "Action", "Adventure", "Avant Garde", "Boys Love", "Comedy", "Demons", "Drama", "Ecchi", "Fantasy",
+            "Girls Love", "Gourmet", "Harem", "Horror", "Isekai", "Iyashikei", "Josei", "Kids", "Magic",
+            "Mahou Shoujo", "Martial Arts", "Mecha", "Military", "Music", "Mystery", "Parody", "Psychological",
+            "Reverse Harem", "Romance", "School", "Sci-Fi", "Seinen", "Shoujo", "Shounen", "Slice of Life",
+            "Space", "Sports", "Super Power", "Supernatural", "Suspense", "Thriller", "Vampire"
+        ];
+
+        values = [
+            "47", "1", "235", "184", "7", "127", "66", "8", "34", "926", "436", "196", "421", "77", "225",
+            "555", "35", "78", "857", "92", "219", "134", "27", "48", "356", "240", "798", "145", "9", "36",
+            "189", "183", "37", "125", "220", "10", "350", "49", "322", "241", "126"
+        ];
+
+        filters.push({
+            type_name: "GroupFilter",
+            name: "Genres",
+            state: formateState("CheckBox", items, values)
+        })
+
+        // Status
+        items = ["Not Yet Aired", "Releasing", "Completed"]
+        values = ["info", "releasing", "completed"]
+        filters.push({
+            type_name: "GroupFilter",
+            name: "Status",
+            state: formateState("CheckBox", items, values)
+        })
+
+        // Sort
+        items = [
+            "All", "Updated date", "Released date", "End date", "Added date", "Trending",
+            "Name A-Z", "Average score", "MAL score", "Total views", "Total bookmarks", "Total episodes"
+        ];
+
+        values = [
+            "", "updated_date", "released_date", "end_date", "added_date", "trending",
+            "title_az", "avg_score", "mal_score", "total_views", "total_bookmarks", "total_episodes"
+        ];
+        filters.push({
+            type_name: "SelectFilter",
+            name: "Sort by",
+            state: 0,
+            values: formateState("SelectOption", items, values)
+        })
+
+        // Season
+        items = ["Fall", "Summer", "Spring", "Winter", "Unknown"];
+        values = ["fall", "summer", "spring", "winter", "unknown"];
+        filters.push({
+            type_name: "GroupFilter",
+            name: "Season",
+            state: formateState("CheckBox", items, values)
+        })
+
+        // Years
+        const currentYear = new Date().getFullYear();
+        var years = Array.from({ length: currentYear - 1999 }, (_, i) => (2000 + i).toString()).reverse()
+        items = [...years, "1990s", "1980s", "1970s", "1960s", "1950s", "1940s", "1930s", "1920s", "1910s", "1900s",]
+        filters.push({
+            type_name: "GroupFilter",
+            name: "Years",
+            state: formateState("CheckBox", items, items)
+        })
+
+        // Ratings
+        items = [
+            "G - All Ages",
+            "PG - Children",
+            "PG 13 - Teens 13 and Older",
+            "R - 17+, Violence & Profanity",
+            "R+ - Profanity & Mild Nudity",
+            "Rx - Hentai"
+        ];
+
+        values = ["g", "pg", "pg_13", "r", "r+", "rx"];
+        filters.push({
+            type_name: "GroupFilter",
+            name: "Ratings",
+            state: formateState("CheckBox", items, items)
+        })
+
+        // Country
+        items = ["Japan", "China"];
+        values = ["11", "2"];
+        filters.push({
+            type_name: "GroupFilter",
+            name: "Country",
+            state: formateState("CheckBox", items, items)
+        })
+
+        // Language
+        items = ["Hard Sub", "Soft Sub", "Dub", "Sub & Dub"];
+        values = ["sub", "softsub", "dub", "subdub"];
+        filters.push({
+            type_name: "GroupFilter",
+            name: "Language",
+            state: formateState("CheckBox", items, items)
+        })
+
+        return filters;
     }
     getSourcePreferences() {
         return [
