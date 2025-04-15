@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=256&domain=https://animekai.to/",
     "typeSource": "single",
     "itemType": 1,
-    "version": "0.0.2",
+    "version": "0.0.3",
     "pkgPath": "anime/src/en/animekai.js"
 }];
 
@@ -68,13 +68,11 @@ class DefaultExtension extends MProvider {
         slug += `&page=${page}`;
 
         var list = []
-        var hasNextPage = false
 
         var body = await this.getPage(slug);
 
         var paginations = body.select(".pagination > li")
-
-        var hasNextPage = !paginations[paginations.length - 1].className.includes("active")
+        var hasNextPage = paginations.length > 0 ? !paginations[paginations.length - 1].className.includes("active") : false
 
         var titlePref = this.getPreference("animekai_title_lang")
         var animes = body.selectFirst(".aitem-wrapper").select(".aitem")
@@ -106,7 +104,6 @@ class DefaultExtension extends MProvider {
             state.forEach(item => {
                 if (item.state) {
                     rd.push(item.value)
-
                 }
             })
             return rd
