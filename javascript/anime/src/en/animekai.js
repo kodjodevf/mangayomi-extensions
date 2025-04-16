@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=256&domain=https://animekai.to/",
     "typeSource": "single",
     "itemType": 1,
-    "version": "0.1.0",
+    "version": "0.1.1",
     "pkgPath": "anime/src/en/animekai.js"
 }];
 
@@ -58,14 +58,14 @@ class DefaultExtension extends MProvider {
         slug += bundleSlug("type", type);
         slug += bundleSlug("genre", genre);
         slug += bundleSlug("status", status);
-        slug += "&sort=" + sort;
-
         slug += bundleSlug("status", status);
         slug += bundleSlug("season", season);
         slug += bundleSlug("year", year);
         slug += bundleSlug("rating", rating);
         slug += bundleSlug("country", country);
         slug += bundleSlug("language", language);
+        sort = sort.length < 1 ? "most_relevance" : "" // default sort is most relevance
+        slug += "&sort=" + sort;
         slug += `&page=${page}`;
 
         var list = []
@@ -498,7 +498,7 @@ class DefaultExtension extends MProvider {
         let pattern = preferences.getString("anime_kai_decoder_pattern", "");
         var pattern_ts = parseInt(preferences.getString("anime_kai_decoder_pattern_ts", "0"));
         var now_ts = parseInt(new Date().getTime() / 1000);
-        
+
         // pattern is checked from API every 30 minutes
         if (now_ts - pattern_ts > 30 * 60) {
             var res = await this.client.get("https://raw.githubusercontent.com/amarullz/kaicodex/refs/heads/main/generated/kai_codex.json")
@@ -509,7 +509,7 @@ class DefaultExtension extends MProvider {
 
         return JSON.parse(pattern);
     }
-    
+
     async patternExecutor(key, type, id) {
         var result = id
         var pattern = await this.getDecoderPattern()
