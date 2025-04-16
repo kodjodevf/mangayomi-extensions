@@ -6,19 +6,20 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=256&domain=https://animekai.to/",
     "typeSource": "single",
     "itemType": 1,
-    "version": "0.0.3",
+    "version": "0.1.0",
     "pkgPath": "anime/src/en/animekai.js"
 }];
 
 class DefaultExtension extends MProvider {
-    getHeaders(url) {
-        throw new Error("getHeaders not implemented");
-    }
-
     constructor() {
         super();
         this.client = new Client();
     }
+
+    getHeaders(url) {
+        throw new Error("getHeaders not implemented");
+    }
+
 
     getPreference(key) {
         return new SharedPreferences().get(key);
@@ -120,8 +121,108 @@ class DefaultExtension extends MProvider {
         var language = getFilter(filters[8].state)
         return await this.searchPage({ query, type, genre, status, sort, season, year, rating, country, language, page });
     }
+
     async getDetail(url) {
-        throw new Error("getDetail not implemented");
+        function statusCode(status) {
+            return {
+                "Releasing": 0,
+                "Completed": 1,
+                "Not Yet Aired": 4,
+            }[status] ?? 5;
+        }
+
+        var slug = url
+        var link = this.getBaseUrl() + slug
+        var body = await this.getPage(slug)
+
+        var mainSection = body.selectFirst(".watch-section")
+
+        var imageUrl = mainSection.selectFirst("div.poster").selectFirst("img").getSrc
+
+        var namePref = this.getPreference("animekai_title_lang")
+        var nameSection = mainSection.selectFirst("div.title")
+        var name = namePref.includes("jp") ? nameSection.attr(namePref) : nameSection.text
+
+        var description = mainSection.selectFirst("div.desc").text
+
+        var detailSection = mainSection.select("div.detail > div")
+
+        var genre = []
+        var status = 5
+        detailSection.forEach(item => {
+            var itemText = item.text.trim()
+
+            if (itemText.includes("Genres")) {
+                genre = itemText.replace("Genres:  ", "").split(", ")
+            }
+            if (itemText.includes("Status")) {
+                var statusText = item.selectFirst("span").text
+                status = statusCode(statusText)
+            }
+        })
+
+        var chapters = []
+        var animeId = body.selectFirst("#anime-rating").attr("data-id")
+
+        var token = await this.generateToken(animeId)
+        var res = await this.request(`/ajax/episodes/list?ani_id=${animeId}&_=${token}`)
+        body = JSON.parse(res)
+        if (body.status == 200) {
+            var doc = new Document(body["result"])
+            var episodes = doc.selectFirst("div.eplist.titles").select("li")
+            var showUncenEp = this.getPreference("animekai_show_uncen_epsiodes")
+
+            for (var item of episodes) {
+                var aTag = item.selectFirst("a")
+
+                var num = parseInt(aTag.attr("num"))
+                var title = aTag.selectFirst("span").text
+                title = title.includes("Episode") ? "" : `: ${title}`
+                var epName = `Episode ${num}${title}`
+
+
+                var langs = aTag.attr("langs")
+                var scanlator = langs === "1" ? "SUB" : "SUB, DUB"
+
+                var token = aTag.attr("token")
+
+                var epData = {
+                    name: epName,
+                    url: token,
+                    scanlator
+                }
+
+                // Check if the episode is uncensored
+                var slug = aTag.attr("slug")
+                if (slug.includes("uncen")) {
+
+                    // if dont show uncensored episodes, skip this episode
+                    if (!showUncenEp) continue
+
+                    scanlator += ", UNCENSORED"
+                    epName = `Episode ${num}: (Uncensored)`
+                    // Build for uncensored episode
+                    epData = {
+                        name: epName,
+                        url: token,
+                        scanlator
+                    }
+
+                    // Check if the episode already exists as censored if so, add to existing data
+                    var exData = chapters[num - 1]
+                    if (exData) {
+                        exData.url += "||" + epData.url
+                        exData.scanlator += ", " + epData.scanlator
+                        chapters[num - 1] = exData
+                        continue
+
+                    }
+                }
+                chapters.push(epData)
+            }
+        }
+        chapters.reverse()
+        return { name, imageUrl, link, description, genre, status, chapters }
     }
     // For novel html content
     async getHtmlContent(url) {
@@ -291,7 +392,143 @@ class DefaultExtension extends MProvider {
                     entries: ["English", "Romaji"],
                     entryValues: ["title", "data-jp"]
                 }
-            }
+            },
+            {
+                key: "animekai_show_uncen_epsiodes",
+                switchPreferenceCompat: {
+                    title: 'Show uncensored episodes',
+                    summary: "",
+                    value: true
+                }
+            },
         ]
     }
+
+    //----------------AnimeKai Decoders----------------
+    // Credits :- https://github.com/amarullz/kaicodex/
+
+    base64Decoder(base64) {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+        let binary = '';
+
+        base64 = base64.replace(/=+$/, '');
+
+        for (let i = 0; i < base64.length; i++) {
+            const index = chars.indexOf(base64[i]);
+            if (index === -1) continue; // skip invalid characters
+            binary += index.toString(2).padStart(6, '0');
+        }
+
+        let decoded = '';
+        for (let i = 0; i < binary.length; i += 8) {
+            const byte = binary.substring(i, i + 8);
+            if (byte.length < 8) continue;
+            decoded += String.fromCharCode(parseInt(byte, 2));
+        }
+
+        return decoded;
+    }
+    base64Encoder(str) {
+        const base64EncodeChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+        var out, i, len;
+        var c1, c2, c3;
+        len = str.length;
+        i = 0;
+        out = "";
+        while (i < len) {
+            c1 = str.charCodeAt(i++) & 0xff;
+            if (i == len) {
+                out += base64EncodeChars.charAt(c1 >> 2);
+                out += base64EncodeChars.charAt((c1 & 0x3) << 4);
+                out += "==";
+                break;
+            }
+            c2 = str.charCodeAt(i++);
+            if (i == len) {
+                out += base64EncodeChars.charAt(c1 >> 2);
+                out += base64EncodeChars.charAt(((c1 & 0x3) << 4) | ((c2 & 0xF0) >> 4));
+                out += base64EncodeChars.charAt((c2 & 0xF) << 2);
+                out += "=";
+                break;
+            }
+            c3 = str.charCodeAt(i++);
+            out += base64EncodeChars.charAt(c1 >> 2);
+            out += base64EncodeChars.charAt(((c1 & 0x3) << 4) | ((c2 & 0xF0) >> 4));
+            out += base64EncodeChars.charAt(((c2 & 0xF) << 2) | ((c3 & 0xC0) >> 6));
+            out += base64EncodeChars.charAt(c3 & 0x3F);
+        }
+        return out;
+    }
+
+    transform(key, text) {
+        const v = Array.from({ length: 256 }, (_, i) => i);
+        let c = 0;
+        const f = [];
+
+        for (let w = 0; w < 256; w++) {
+            c = (c + v[w] + key.charCodeAt(w % key.length)) % 256;
+            [v[w], v[c]] = [v[c], v[w]];
+        }
+
+        let a = 0, w = 0, sum = 0;
+        while (a < text.length) {
+            w = (w + 1) % 256;
+            sum = (sum + v[w]) % 256;
+            [v[w], v[sum]] = [v[sum], v[w]];
+            f.push(String.fromCharCode(text.charCodeAt(a) ^ v[(v[w] + v[sum]) % 256]));
+            a++;
+        }
+        return f.join('');
+    }
+
+    reverseString(input) {
+        return input.split('').reverse().join('');
+    }
+
+    substitute(input, keys, values) {
+        const map = {};
+        for (let i = 0; i < keys.length; i++) {
+            map[keys[i]] = values[i] || keys[i];
+        }
+        return input.split('').map(char => map[char] || char).join('');
+    }
+
+    async getDecoderPattern() {
+        const preferences = new SharedPreferences();
+        let pattern = preferences.getString("anime_kai_decoder_pattern", "");
+        var pattern_ts = parseInt(preferences.getString("anime_kai_decoder_pattern_ts", "0"));
+        var now_ts = parseInt(new Date().getTime() / 1000);
+        
+        // pattern is checked from API every 30 minutes
+        if (now_ts - pattern_ts > 30 * 60) {
+            var res = await this.client.get("https://raw.githubusercontent.com/amarullz/kaicodex/refs/heads/main/generated/kai_codex.json")
+            pattern = res.body
+            preferences.setString("anime_kai_decoder_pattern", pattern);
+            preferences.setString("anime_kai_decoder_pattern_ts", `${now_ts}`);
+        }
+
+        return JSON.parse(pattern);
+    }
+    
+    async patternExecutor(key, type, id) {
+        var result = id
+        var pattern = await this.getDecoderPattern()
+        var logic = pattern[key][type]
+        logic.forEach(step => {
+            var method = step[0]
+            if (method == "urlencode") result = encodeURIComponent(result);
+            else if (method == "rc4") result = this.transform(step[1], result);
+            else if (method == "reverse") result = this.reverseString(result);
+            else if (method == "substitute") result = this.substitute(result, step[1], step[2]);
+            else if (method == "safeb64_decode") result = this.base64Decoder(result);
+            else if (method == "safeb64_encode") result = this.base64Encoder(result);
+        })
+        return result
+    }
+
+    async generateToken(id) {
+        var token = await this.patternExecutor("kai", "encrypt", id)
+        return token;
+    }
+
 }
