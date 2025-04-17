@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=256&domain=https://animekai.to/",
     "typeSource": "single",
     "itemType": 1,
-    "version": "0.2.1",
+    "version": "0.2.2",
     "pkgPath": "anime/src/en/animekai.js"
 }];
 
@@ -450,6 +450,13 @@ class DefaultExtension extends MProvider {
                     summary: "",
                     value: true
                 }
+            }, {
+                key: "animekai_pref_extract_streams",
+                switchPreferenceCompat: {
+                    title: 'Split stream into different quality streams',
+                    summary: "Split stream Auto into 360p/720p/1080p",
+                    value: true
+                }
             },
         ]
     }
@@ -467,6 +474,41 @@ class DefaultExtension extends MProvider {
         })
 
         return subs
+    }
+
+    async formatStreams(sUrl, serverName, dubType) {
+        function streamNamer(res) {
+            return `${res} - ${dubType} : ${serverName}`
+        }
+
+        var streams = [{
+            url: sUrl,
+            originalUrl: sUrl,
+            quality: streamNamer("Auto")
+        }]
+
+        var pref = this.getPreference("animekai_pref_extract_streams")
+        if (!pref) return streams
+
+        var baseUrl = sUrl.split("/list.m3u8")[0].split("/list,")[0]
+
+        const response = await new Client().get(sUrl);
+        const body = response.body;
+        const lines = body.split('\n');
+
+        for (let i = 0; i < lines.length; i++) {
+            if (lines[i].startsWith('#EXT-X-STREAM-INF:')) {
+                var resolution = lines[i].match(/RESOLUTION=(\d+x\d+)/)[1];
+                var qUrl = lines[i + 1].trim();
+                var m3u8Url = `${baseUrl}/${qUrl}`
+                streams.push({
+                    url: m3u8Url,
+                    originalUrl: m3u8Url,
+                    quality: streamNamer(resolution)
+                });
+            }
+        }
+        return streams
     }
 
     async getMegaUrl(vidId) {
@@ -489,11 +531,8 @@ class DefaultExtension extends MProvider {
         var outEnc = body.result
         var streamData = await this.megaDecrypt(outEnc)
         var url = streamData.sources[0].file
-        streams.push({
-            url: url,
-            originalUrl: url,
-            quality: `Auto - ${dubType} : ${serverName}`
-        })
+
+        var streams =await  this.formatStreams(url, serverName, dubType)
 
         var subtitles = streamData.tracks
         streams[0].subtitles = this.formatSubtitles(subtitles, dubType)
