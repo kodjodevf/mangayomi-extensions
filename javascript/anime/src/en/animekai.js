@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=256&domain=https://animekai.to/",
     "typeSource": "single",
     "itemType": 1,
-    "version": "0.1.1",
+    "version": "0.2.0",
     "pkgPath": "anime/src/en/animekai.js"
 }];
 
@@ -15,11 +15,6 @@ class DefaultExtension extends MProvider {
         super();
         this.client = new Client();
     }
-
-    getHeaders(url) {
-        throw new Error("getHeaders not implemented");
-    }
-
 
     getPreference(key) {
         return new SharedPreferences().get(key);
@@ -54,7 +49,6 @@ class DefaultExtension extends MProvider {
         var slug = "/browser?"
 
         slug += "keyword=" + query;
-
         slug += bundleSlug("type", type);
         slug += bundleSlug("genre", genre);
         slug += bundleSlug("status", status);
@@ -87,18 +81,16 @@ class DefaultExtension extends MProvider {
         return { list, hasNextPage }
     }
 
-
     async getPopular(page) {
         var types = this.getPreference("animekai_popular_latest_type")
         return await this.searchPage({ sort: "trending", type: types, page: page });
     }
-    get supportsLatest() {
-        throw new Error("supportsLatest not implemented");
-    }
+
     async getLatestUpdates(page) {
         var types = this.getPreference("animekai_popular_latest_type")
         return await this.searchPage({ sort: "updated_date", type: types, page: page });
     }
+
     async search(query, page, filters) {
         function getFilter(state) {
             var rd = []
@@ -164,7 +156,7 @@ class DefaultExtension extends MProvider {
         var chapters = []
         var animeId = body.selectFirst("#anime-rating").attr("data-id")
 
-        var token = await this.generateToken(animeId)
+        var token = await this.kaiEncrypt(animeId)
         var res = await this.request(`/ajax/episodes/list?ani_id=${animeId}&_=${token}`)
         body = JSON.parse(res)
         if (body.status == 200) {
@@ -224,22 +216,77 @@ class DefaultExtension extends MProvider {
         chapters.reverse()
         return { name, imageUrl, link, description, genre, status, chapters }
     }
-    // For novel html content
-    async getHtmlContent(url) {
-        throw new Error("getHtmlContent not implemented");
-    }
-    // Clean html up for reader
-    async cleanHtmlContent(html) {
-        throw new Error("cleanHtmlContent not implemented");
-    }
+
     // For anime episode video list
     async getVideoList(url) {
-        throw new Error("getVideoList not implemented");
+        var streams = []
+
+        var epSlug = url.split("||")
+        
+        // the 1st time the loop runs its for censored version
+        var isUncensoredVersion = false
+        for (var epId of epSlug) {
+
+            var token = await this.kaiEncrypt(epId)
+            var res = await this.request(`/ajax/links/list?token=${epId}&_=${token}`)
+            var body = JSON.parse(res)
+            if (body.status != 200) continue
+
+            var serverResult = new Document(body.result)
+
+            // [{"serverName":"Server 1","dataId":"","dubType":"sub"},{"serverName":"Server 2","dataId":"","dubType":"softsub"}]
+            var SERVERDATA = []
+            // Gives 2 server for each Sub, softsub, dub
+            var server_items = serverResult.select("div.server-items")
+
+            for (var dubSection of server_items) {
+                var dubType = dubSection.attr("data-id")
+                dubType = dubType == "sub" ? "hardsub" : dubType
+
+                dubSection.select("span.server").forEach(ser => {
+                    var serverName = ser.text
+                    var dataId = ser.attr("data-lid")
+                    SERVERDATA.push({
+                        serverName,
+                        dataId,
+                        dubType
+                    })
+                })
+
+            }
+
+
+            //SERVERDATA = [{ "serverName": "Server 1", "dataId": "", "dubType": "hardsub" }]...
+            for (var serverData of SERVERDATA) {
+                var serverName = serverData.serverName
+                var dataId = serverData.dataId
+                var dubType = serverData.dubType.toUpperCase()
+                var megaUrl = await this.getMegaUrl(dataId)
+
+                dubType = isUncensoredVersion ? `${dubType} [Uncensored]`:dubType
+
+                var serverStreams = await this.decryptMegaEmbed(megaUrl, serverName, dubType)
+                streams = [...streams, ...serverStreams]
+
+                // Dubs have subtitles separately, so we need to fetch them too
+                if (dubType.includes("DUB")) {
+                    if (!megaUrl.includes("sub.list=")) continue;
+                    var subList = megaUrl.split("sub.list=")[1]
+
+                    var subres = await this.client.get(subList)
+                    var subtitles = JSON.parse(subres.body)
+                    var subs = this.formatSubtitles(subtitles, dubType)
+                    streams[streams.length - 1].subtitles = subs;
+                }
+            }
+            // the 2nd time the loop runs its for uncensored version
+            isUncensoredVersion = true;
+            /// main for end
+        }
+
+        return streams
     }
-    // For manga chapter pages
-    async getPageList(url) {
-        throw new Error("getPageList not implemented");
-    }
+
     getFilterList() {
         function formateState(type_name, items, values) {
             var state = [];
@@ -363,6 +410,7 @@ class DefaultExtension extends MProvider {
 
         return filters;
     }
+
     getSourcePreferences() {
         return [
             {
@@ -404,60 +452,111 @@ class DefaultExtension extends MProvider {
         ]
     }
 
+    // -------------------------------
+    formatSubtitles(subtitles, dubType) {
+        var subs = []
+        subtitles.forEach(sub => {
+            if (!sub.kind.includes("thumbnail")) {
+                subs.push({
+                    file: sub.file,
+                    label: `${sub.label} - ${dubType}`
+                })
+            }
+        })
+
+        return subs
+    }
+
+    async getMegaUrl(vidId) {
+        var token = await this.kaiEncrypt(vidId)
+        var res = await this.request(`/ajax/links/view?id=${vidId}&_=${token}`)
+        var body = JSON.parse(res)
+        if (body.status != 200) return
+        var outEnc = body.result
+        var out = await this.kaiDecrypt(outEnc)
+        var o = JSON.parse(out)
+        return decodeURIComponent(o.url)
+    }
+
+    async decryptMegaEmbed(megaUrl, serverName, dubType) {
+        var streams = []
+        megaUrl = megaUrl.replace("/e/", "/media/")
+        var res = await this.client.get(megaUrl)
+        var body = JSON.parse(res.body)
+        if (body.status != 200) return
+        var outEnc = body.result
+        var streamData = await this.megaDecrypt(outEnc)
+        var url = streamData.sources[0].file
+        streams.push({
+            url: url,
+            originalUrl: url,
+            quality: `Auto - ${dubType} : ${serverName}`
+        })
+
+        var subtitles = streamData.tracks
+        streams[0].subtitles = this.formatSubtitles(subtitles, dubType)
+        return streams
+    }
+
     //----------------AnimeKai Decoders----------------
     // Credits :- https://github.com/amarullz/kaicodex/
 
-    base64Decoder(base64) {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-        let binary = '';
+    base64UrlDecode(input) {
+        let base64 = input
+            .replace(/-/g, "+")
+            .replace(/_/g, "/");
 
-        base64 = base64.replace(/=+$/, '');
-
-        for (let i = 0; i < base64.length; i++) {
-            const index = chars.indexOf(base64[i]);
-            if (index === -1) continue; // skip invalid characters
-            binary += index.toString(2).padStart(6, '0');
+        while (base64.length % 4 !== 0) {
+            base64 += "=";
         }
 
-        let decoded = '';
-        for (let i = 0; i < binary.length; i += 8) {
-            const byte = binary.substring(i, i + 8);
-            if (byte.length < 8) continue;
-            decoded += String.fromCharCode(parseInt(byte, 2));
+        const base64abc = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+        const outputBytes = [];
+
+        for (let i = 0; i < base64.length; i += 4) {
+            const c1 = base64abc.indexOf(base64[i]);
+            const c2 = base64abc.indexOf(base64[i + 1]);
+            const c3 = base64abc.indexOf(base64[i + 2]);
+            const c4 = base64abc.indexOf(base64[i + 3]);
+
+            const triplet = (c1 << 18) | (c2 << 12) | ((c3 & 63) << 6) | (c4 & 63);
+
+            outputBytes.push((triplet >> 16) & 0xFF);
+            if (base64[i + 2] !== "=") outputBytes.push((triplet >> 8) & 0xFF);
+            if (base64[i + 3] !== "=") outputBytes.push(triplet & 0xFF);
         }
 
-        return decoded;
+        // Convert bytes to ISO-8859-1 string
+        return String.fromCharCode(...outputBytes);
     }
-    base64Encoder(str) {
-        const base64EncodeChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-        var out, i, len;
-        var c1, c2, c3;
-        len = str.length;
-        i = 0;
-        out = "";
-        while (i < len) {
-            c1 = str.charCodeAt(i++) & 0xff;
-            if (i == len) {
-                out += base64EncodeChars.charAt(c1 >> 2);
-                out += base64EncodeChars.charAt((c1 & 0x3) << 4);
-                out += "==";
-                break;
-            }
-            c2 = str.charCodeAt(i++);
-            if (i == len) {
-                out += base64EncodeChars.charAt(c1 >> 2);
-                out += base64EncodeChars.charAt(((c1 & 0x3) << 4) | ((c2 & 0xF0) >> 4));
-                out += base64EncodeChars.charAt((c2 & 0xF) << 2);
-                out += "=";
-                break;
-            }
-            c3 = str.charCodeAt(i++);
-            out += base64EncodeChars.charAt(c1 >> 2);
-            out += base64EncodeChars.charAt(((c1 & 0x3) << 4) | ((c2 & 0xF0) >> 4));
-            out += base64EncodeChars.charAt(((c2 & 0xF) << 2) | ((c3 & 0xC0) >> 6));
-            out += base64EncodeChars.charAt(c3 & 0x3F);
+
+    base64UrlEncode(str) {
+        // Convert to ISO-8859-1 byte array
+        const bytes = [];
+        for (let i = 0; i < str.length; i++) {
+            bytes.push(str.charCodeAt(i) & 0xFF);
         }
-        return out;
+
+        // Base64 alphabet
+        const base64abc = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+        // Manual base64 encoding
+        let base64 = "";
+        for (let i = 0; i < bytes.length; i += 3) {
+            const b1 = bytes[i];
+            const b2 = bytes[i + 1] ?? 0;
+            const b3 = bytes[i + 2] ?? 0;
+
+            const triplet = (b1 << 16) | (b2 << 8) | b3;
+
+            base64 += base64abc[(triplet >> 18) & 0x3F];
+            base64 += base64abc[(triplet >> 12) & 0x3F];
+            base64 += i + 1 < bytes.length ? base64abc[(triplet >> 6) & 0x3F] : "=";
+            base64 += i + 2 < bytes.length ? base64abc[triplet & 0x3F] : "=";
+        }
+
+        // URL-safe Base64
+        return base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
     }
 
     transform(key, text) {
@@ -517,18 +616,30 @@ class DefaultExtension extends MProvider {
         logic.forEach(step => {
             var method = step[0]
             if (method == "urlencode") result = encodeURIComponent(result);
+            else if (method == "urldecode") result = decodeURIComponent(result);
             else if (method == "rc4") result = this.transform(step[1], result);
             else if (method == "reverse") result = this.reverseString(result);
             else if (method == "substitute") result = this.substitute(result, step[1], step[2]);
-            else if (method == "safeb64_decode") result = this.base64Decoder(result);
-            else if (method == "safeb64_encode") result = this.base64Encoder(result);
+            else if (method == "safeb64_decode") result = this.base64UrlDecode(result);
+            else if (method == "safeb64_encode") result = this.base64UrlEncode(result);
         })
         return result
     }
 
-    async generateToken(id) {
+    async kaiEncrypt(id) {
         var token = await this.patternExecutor("kai", "encrypt", id)
         return token;
     }
+
+    async kaiDecrypt(id) {
+        var token = await this.patternExecutor("kai", "decrypt", id)
+        return token;
+    }
+
+    async megaDecrypt(data) {
+        var streamData = await this.patternExecutor("megaup", "decrypt", data)
+        return JSON.parse(streamData);
+    }
+
 
 }
