@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=256&domain=https://animekai.to/",
     "typeSource": "single",
     "itemType": 1,
-    "version": "0.2.0",
+    "version": "0.2.1",
     "pkgPath": "anime/src/en/animekai.js"
 }];
 
@@ -26,7 +26,9 @@ class DefaultExtension extends MProvider {
     }
 
     async request(slug) {
-        var url = this.getBaseUrl() + slug;
+        var url = slug
+        var baseUrl = this.getBaseUrl()
+        if (!slug.includes(baseUrl)) url = baseUrl + slug;
         var res = await this.client.get(url);
         return res.body
     }
@@ -41,7 +43,7 @@ class DefaultExtension extends MProvider {
         function bundleSlug(category, items) {
             var rd = ""
             for (var item of items) {
-                rd += `&${category}[]=${item}`;
+                rd += `&${category}[]=${item.toLowerCase()}`;
             }
             return rd;
         }
@@ -58,7 +60,7 @@ class DefaultExtension extends MProvider {
         slug += bundleSlug("rating", rating);
         slug += bundleSlug("country", country);
         slug += bundleSlug("language", language);
-        sort = sort.length < 1 ? "most_relevance" : "" // default sort is most relevance
+        sort = sort.length < 1 ? "most_relevance" : sort// default sort is most relevance
         slug += "&sort=" + sort;
         slug += `&page=${page}`;
 
@@ -222,7 +224,7 @@ class DefaultExtension extends MProvider {
         var streams = []
 
         var epSlug = url.split("||")
-        
+
         // the 1st time the loop runs its for censored version
         var isUncensoredVersion = false
         for (var epId of epSlug) {
@@ -263,7 +265,7 @@ class DefaultExtension extends MProvider {
                 var dubType = serverData.dubType.toUpperCase()
                 var megaUrl = await this.getMegaUrl(dataId)
 
-                dubType = isUncensoredVersion ? `${dubType} [Uncensored]`:dubType
+                dubType = isUncensoredVersion ? `${dubType} [Uncensored]` : dubType
 
                 var serverStreams = await this.decryptMegaEmbed(megaUrl, serverName, dubType)
                 streams = [...streams, ...serverStreams]
