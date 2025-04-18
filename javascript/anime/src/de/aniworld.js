@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "single",
     "itemType": 1,
     "isNsfw": false,
-    "version": "0.3.6",
+    "version": "0.3.7",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/de/aniworld.js"
@@ -116,7 +116,7 @@ class DefaultExtension extends MProvider {
         const imageUrl = baseUrl +
             document.selectFirst("div.seriesCoverBox img").attr("data-src");
         const name = document.selectFirst("div.series-title h1 span").text;
-        const genre = document.select("div.genres ul li").map(e => e.text);
+        const genre = document.select("div.genres ul li").map(e => e.text).filter(text => !/^\+\s\d+$/.test(text));
         const description = this.cleanHtmlString(document.selectFirst("p.seri_des").attr("data-full-description"));
         const produzent = document.select("div.cast li")
             .filter(e => e.outerHtml.includes("Produzent:"));
