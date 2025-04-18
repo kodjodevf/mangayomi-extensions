@@ -60,7 +60,7 @@ class DefaultExtension extends MProvider {
         slug += bundleSlug("rating", rating);
         slug += bundleSlug("country", country);
         slug += bundleSlug("language", language);
-        sort = sort.length < 1 ? "most_relevance" : sort// default sort is most relevance
+        sort = sort.length < 1 ? "updated_date" : sort// default sort is updated date
         slug += "&sort=" + sort;
         slug += `&page=${page}`;
 
