@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=256&domain=https://animekai.to/",
     "typeSource": "single",
     "itemType": 1,
-    "version": "0.2.2",
+    "version": "0.2.3",
     "pkgPath": "anime/src/en/animekai.js"
 }];
 
@@ -222,10 +222,17 @@ class DefaultExtension extends MProvider {
     // For anime episode video list
     async getVideoList(url) {
         var streams = []
+        var prefServer = this.getPreference("animekai_pref_stream_server")
+        // If no server is chosen, use the default server 1
+        if (prefServer.length < 1) prefServer.push("1")
+
+        var prefDubType = this.getPreference("animekai_pref_stream_subdub_type")
+        // If no dubtype is chosen, use the default dubtype sub
+        if (prefDubType.length < 1) prefDubType.push("sub")
 
         var epSlug = url.split("||")
 
-        // the 1st time the loop runs its for censored version
+        // The 1st time the loop runs its for censored version
         var isUncensoredVersion = false
         for (var epId of epSlug) {
 
@@ -243,30 +250,33 @@ class DefaultExtension extends MProvider {
 
             for (var dubSection of server_items) {
                 var dubType = dubSection.attr("data-id")
-                dubType = dubType == "sub" ? "hardsub" : dubType
+                // If dubtype is not in preference dont include it
+                if (!prefDubType.includes(dubType)) continue
 
-                dubSection.select("span.server").forEach(ser => {
+                for (var ser of dubSection.select("span.server")) {
                     var serverName = ser.text
+                    // If servername is not in preference dont include it
+                    if (!prefServer.includes(serverName.replace("Server ", ""))) continue
+
                     var dataId = ser.attr("data-lid")
                     SERVERDATA.push({
                         serverName,
                         dataId,
                         dubType
                     })
-                })
+                }
 
             }
 
 
-            //SERVERDATA = [{ "serverName": "Server 1", "dataId": "", "dubType": "hardsub" }]...
             for (var serverData of SERVERDATA) {
                 var serverName = serverData.serverName
                 var dataId = serverData.dataId
                 var dubType = serverData.dubType.toUpperCase()
-                var megaUrl = await this.getMegaUrl(dataId)
-
+                dubType = dubType == "SUB" ? "HARDSUB" : dubType
                 dubType = isUncensoredVersion ? `${dubType} [Uncensored]` : dubType
 
+                var megaUrl = await this.getMegaUrl(dataId)
                 var serverStreams = await this.decryptMegaEmbed(megaUrl, serverName, dubType)
                 streams = [...streams, ...serverStreams]
 
@@ -281,9 +291,9 @@ class DefaultExtension extends MProvider {
                     streams[streams.length - 1].subtitles = subs;
                 }
             }
-            // the 2nd time the loop runs its for uncensored version
+            // The 2nd time the loop runs its for uncensored version
             isUncensoredVersion = true;
-            /// main for end
+            // Main for ends
         }
 
         return streams
@@ -451,6 +461,24 @@ class DefaultExtension extends MProvider {
                     value: true
                 }
             }, {
+                key: "animekai_pref_stream_server",
+                multiSelectListPreference: {
+                    title: 'Preferred server',
+                    summary: 'Choose the server/s you want to extract streams from',
+                    values: ["1"],
+                    entries: ["Server 1", "Server 2"],
+                    entryValues: ["1", "2"]
+                }
+            }, {
+                key: "animekai_pref_stream_subdub_type",
+                multiSelectListPreference: {
+                    title: 'Preferred stream sub/dub type',
+                    summary: '',
+                    values: ["sub", "softsub", "dub"],
+                    entries: ["Hard Sub", "Soft Sub", "Dub"],
+                    entryValues: ["sub", "softsub", "dub"]
+                }
+            }, {
                 key: "animekai_pref_extract_streams",
                 switchPreferenceCompat: {
                     title: 'Split stream into different quality streams',
@@ -532,7 +560,7 @@ class DefaultExtension extends MProvider {
         var streamData = await this.megaDecrypt(outEnc)
         var url = streamData.sources[0].file
 
-        var streams =await  this.formatStreams(url, serverName, dubType)
+        var streams = await this.formatStreams(url, serverName, dubType)
 
         var subtitles = streamData.tracks
         streams[0].subtitles = this.formatSubtitles(subtitles, dubType)
