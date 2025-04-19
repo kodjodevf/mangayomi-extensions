@@ -1,9 +1,9 @@
 const mangayomiSources = [{
     "name": "MangaWorld",
     "lang": "it",
-    "baseUrl": "https://www.mangaworld.ac",
+    "baseUrl": "https://www.mangaworld.nz",
     "apiUrl": "",
-    "iconUrl": "https://www.mangaworld.ac/public/assets/images/MangaWorldSquareLogo.png",
+    "iconUrl": "https://www.mangaworld.nz/public/assets/images/MangaWorldSquareLogo.png",
     "typeSource": "single",
     "isManga": true,
     "version": "0.0.1",
