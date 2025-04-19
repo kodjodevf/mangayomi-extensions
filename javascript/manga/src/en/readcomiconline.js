@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=256&domain=https://readcomiconline.li/",
     "typeSource": "single",
     "itemType": 0,
-    "version": "0.0.1",
+    "version": "0.0.2",
     "pkgPath": ""
 }];
 
@@ -43,7 +43,7 @@ class DefaultExtension extends MProvider {
             var name = item.selectFirst(".title").text;
             var link = item.selectFirst("a").getHref
             var imageSlug = item.selectFirst("img").getSrc
-            var imageUrl = `${baseUrl}${imageSlug}`;
+            var imageUrl = imageSlug.includes("http") ? imageSlug : `${baseUrl}${imageSlug}`;
             list.push({ name, link, imageUrl });
         });
 
@@ -87,7 +87,62 @@ class DefaultExtension extends MProvider {
     }
 
     async getDetail(url) {
-        throw new Error("getDetail not implemented");
+        function statusCode(status) {
+            return {
+                "Ongoing": 0,
+                "Completed": 1,
+            }[status] ?? 5;
+        }
+        var link = this.source.baseUrl + url
+        var doc = await this.request(url)
+
+        var detailsSection = doc.selectFirst(".barContent")
+        var name = detailsSection.selectFirst("a").text
+        var imageSlug = doc.selectFirst(".rightBox").selectFirst("img").getSrc
+        var imageUrl = imageSlug.includes("http") ? imageSlug : `${this.source.baseUrl}${imageSlug}`;
+        var pTag = detailsSection.select("p")
+
+        var description = pTag[pTag.length - 2].text
+
+        var status = 5
+        var genre = []
+        var author = ""
+        var artist = ""
+
+        pTag.forEach(p => {
+            var itemText = p.text.trim()
+
+            if (itemText.includes("Genres")) {
+                genre = itemText.replace("Genres:", "").trim().split(", ")
+            } else if (itemText.includes("Status")) {
+                var sts = itemText.replace("Status: ", "").trim().split("\n")[0]
+                status = statusCode(sts)
+            } else if (itemText.includes("Writer")) {
+                author = itemText.replace("Writer: ", "")
+            } else if (itemText.includes("Artist")) {
+                artist = itemText.replace("Artist: ", "")
+            }
+
+        })
+        var chapters = []
+        var tr = doc.selectFirst("table").select("tr")
+        tr.splice(0, 2) // 1st item in the table is headers & 2nd item is a line break
+        tr.forEach(item => {
+            var tds = item.select("td")
+            var aTag = tds[0].selectFirst("a")
+            var chapLink = aTag.getHref
+            var chapTitle = aTag.text.trim().replace(`${name} `, "")
+            var uploadDate = tds[1].text.trim()
+            var date = new Date(uploadDate);
+            var dateUpload = date.getTime().toString();
+
+
+            chapters.push({ url: chapLink, name: chapTitle, dateUpload })
+
+        })
+
+
+        return { name, link,imageUrl, description, genre, status, author, artist, chapters }
     }
     // For novel html content
     async getHtmlContent(url) {
