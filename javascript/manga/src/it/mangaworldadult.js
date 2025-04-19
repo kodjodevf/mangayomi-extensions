@@ -3,7 +3,7 @@ const mangayomiSources = [{
     "lang": "it",
     "baseUrl": "https://www.mangaworldadult.net",
     "apiUrl": "",
-    "iconUrl": "https://www.mangaworld.net/public/assets/images/MangaWorldAdultSquareLogo.png",
+    "iconUrl": "https://www.mangaworldadult.net/public/assets/images/MangaWorldAdultSquareLogo.png",
     "typeSource": "single",
     "isManga": true,
     "version": "0.0.1",
