@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=256&domain=https://readcomiconline.li/",
     "typeSource": "single",
     "itemType": 0,
-    "version": "0.0.2",
+    "version": "0.1.0",
     "pkgPath": ""
 }];
 
@@ -14,6 +14,10 @@ class DefaultExtension extends MProvider {
     constructor() {
         super();
         this.client = new Client();
+    }
+
+    getPreference(key) {
+        return new SharedPreferences().get(key);
     }
 
     getHeaders() {
@@ -142,23 +146,40 @@ class DefaultExtension extends MProvider {
         })
 
 
-        return { name, link,imageUrl, description, genre, status, author, artist, chapters }
+        return { name, link, imageUrl, description, genre, status, author, artist, chapters }
     }
-    // For novel html content
-    async getHtmlContent(url) {
-        throw new Error("getHtmlContent not implemented");
-    }
-    // Clean html up for reader
-    async cleanHtmlContent(html) {
-        throw new Error("cleanHtmlContent not implemented");
-    }
-    // For anime episode video list
-    async getVideoList(url) {
-        throw new Error("getVideoList not implemented");
-    }
+
     // For manga chapter pages
     async getPageList(url) {
-        throw new Error("getPageList not implemented");
+        var pages = [];
+        var hdr = this.getHeaders()
+        let match;
+        var imageQuality = this.getPreference("readcomiconline_page_quality");
+
+        var doc = await this.request(url)
+        var html = doc.html
+
+        // Find host url for images
+        var baseUrlOverride = ""
+        const hostRegex = /return\s+baeu\s*\(\s*l\s*,\s*'([^']+?)'\s*\);?/g;
+        match = hostRegex.exec(html)
+        if (match.length > 0) {
+            baseUrlOverride = match[1]
+            if (baseUrlOverride.slice(-1) != "/") baseUrlOverride += "/"
+        }
+
+
+        const pageRegex = /pht\s*=\s*'([^']+?)';?/g;
+        while ((match = pageRegex.exec(html)) !== null) {
+            var encodedImageUrl = match[1]
+            var decodedImageUrl = this.decodeImageUrl(encodedImageUrl, imageQuality, baseUrlOverride)
+            pages.push({
+                url: decodedImageUrl,
+                headers: hdr,
+            });
+
+        }
+        return pages;
     }
     getFilterList() {
         function formateState(type_name, items, values) {
@@ -222,6 +243,95 @@ class DefaultExtension extends MProvider {
         return filters;
     }
     getSourcePreferences() {
-        throw new Error("getSourcePreferences not implemented");
+        return [
+            {
+                key: "readcomiconline_page_quality",
+                listPreference: {
+                    title: 'Preferred image quality',
+                    summary: '',
+                    valueIndex: 2,
+                    entries: ["Low", "Medium", "High", "Highest"],
+                    entryValues: ["l", "m", "h", "vh"]
+                }
+            },
+        ]
+    }
+
+    // -------- ReadComicOnline Image Decoder --------
+    // Source:- https://readcomiconline.li/Scripts/rguard.min.js
+
+    base64UrlDecode(input) {
+        let base64 = input
+            .replace(/-/g, "+")
+            .replace(/_/g, "/");
+
+        while (base64.length % 4 !== 0) {
+            base64 += "=";
+        }
+
+        const base64abc = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+        const outputBytes = [];
+
+        for (let i = 0; i < base64.length; i += 4) {
+            const c1 = base64abc.indexOf(base64[i]);
+            const c2 = base64abc.indexOf(base64[i + 1]);
+            const c3 = base64abc.indexOf(base64[i + 2]);
+            const c4 = base64abc.indexOf(base64[i + 3]);
+
+            const triplet = (c1 << 18) | (c2 << 12) | ((c3 & 63) << 6) | (c4 & 63);
+
+            outputBytes.push((triplet >> 16) & 0xFF);
+            if (base64[i + 2] !== "=") outputBytes.push((triplet >> 8) & 0xFF);
+            if (base64[i + 3] !== "=") outputBytes.push(triplet & 0xFF);
+        }
+
+        // Convert bytes to ISO-8859-1 string
+        return String.fromCharCode(...outputBytes);
+    }
+
+
+    extractBeforeDecode(url) {
+        return url.substring(15, 33) + url.substring(50);
+    }
+
+
+    finalizeDecodedString(decoded) {
+        return decoded.substring(0, decoded.length - 11) + decoded[decoded.length - 2] + decoded[decoded.length - 1];
+    }
+
+    decoderFunction(encodedUrl) {
+        var decodedUrl = this.extractBeforeDecode(encodedUrl);
+        decodedUrl = this.finalizeDecodedString(decodedUrl);
+        decodedUrl = decodeURIComponent(this.base64UrlDecode(decodedUrl));
+        decodedUrl = decodedUrl.substring(0, 13) + decodedUrl.substring(17);
+        return decodedUrl.slice(0, -2) + "=s1600"
+    }
+
+    decodeImageUrl(encodedImageUrl, imageQuality, baseUrlOverride) {
+        // Default image qualities
+        var IMAGEQUALITY = [
+            { "l": "900", "m": "0", "h": "1600", "vh": "2041" },
+            { "l": "900", "m": "1600", "h": "2041", "vh": "0" }
+        ]
+
+        let finalUrl;
+        var qType = 0
+        // Check if the url starts with https, if not then decode the url
+        if (!encodedImageUrl.startsWith("https")) {
+            encodedImageUrl = encodedImageUrl
+                .replace(/6UUQS__ACd__/g, 'b')
+                .replace(/pw_.g28x/g, "b")
+
+            var encodedUrl = encodedImageUrl.split("=s")[0]
+            var decodedUrl = this.decoderFunction(encodedUrl);
+
+            var queryParams = encodedImageUrl.substring(encodedImageUrl.indexOf("?"));
+            finalUrl = baseUrlOverride + decodedUrl + queryParams
+        } else {
+            // If the url starts with https, then just override the base url
+            qType = 1
+            finalUrl = baseUrlOverride + encodedImageUrl.split(".com/")[1]
+        }
+        return finalUrl.replace("s1600", `s${IMAGEQUALITY[qType][imageQuality]}`)
     }
 }
