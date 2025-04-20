@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=256&domain=https://readcomiconline.li/",
     "typeSource": "single",
     "itemType": 0,
-    "version": "0.1.0",
+    "version": "0.1.1",
     "pkgPath": ""
 }];
 
@@ -135,7 +135,10 @@ class DefaultExtension extends MProvider {
             var tds = item.select("td")
             var aTag = tds[0].selectFirst("a")
             var chapLink = aTag.getHref
+
             var chapTitle = aTag.text.trim().replace(`${name} `, "")
+            chapTitle = chapTitle[0] == "_" ? chapTitle.substring(1,) : chapTitle
+
             var uploadDate = tds[1].text.trim()
             var date = new Date(uploadDate);
             var dateUpload = date.getTime().toString();
@@ -144,7 +147,6 @@ class DefaultExtension extends MProvider {
             chapters.push({ url: chapLink, name: chapTitle, dateUpload })
 
         })
-
 
         return { name, link, imageUrl, description, genre, status, author, artist, chapters }
     }
