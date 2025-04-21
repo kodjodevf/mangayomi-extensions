@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=256&domain=https://animekai.to/",
     "typeSource": "single",
     "itemType": 1,
-    "version": "0.2.3",
+    "version": "0.2.4",
     "pkgPath": "anime/src/en/animekai.js"
 }];
 
@@ -104,15 +104,16 @@ class DefaultExtension extends MProvider {
             return rd
 
         }
-        var type = getFilter(filters[0].state)
-        var genre = getFilter(filters[1].state)
-        var status = getFilter(filters[2].state)
-        var sort = filters[3].values[filters[3].state].value
-        var season = getFilter(filters[4].state)
-        var year = getFilter(filters[5].state)
-        var rating = getFilter(filters[6].state)
-        var country = getFilter(filters[7].state)
-        var language = getFilter(filters[8].state)
+        var isFiltersAvailable = !filters || filters.length != 0
+        var type = isFiltersAvailable ? getFilter(filters[0].state) : []
+        var genre = isFiltersAvailable ? getFilter(filters[1].state) : []
+        var status = isFiltersAvailable ? getFilter(filters[2].state) : []
+        var sort = isFiltersAvailable ? filters[3].values[filters[3].state].value : ""
+        var season = isFiltersAvailable ? getFilter(filters[4].state) : []
+        var year = isFiltersAvailable ? getFilter(filters[5].state) : []
+        var rating = isFiltersAvailable ? getFilter(filters[6].state) : []
+        var country = isFiltersAvailable ? getFilter(filters[7].state) : []
+        var language = isFiltersAvailable ? getFilter(filters[8].state) : []
         return await this.searchPage({ query, type, genre, status, sort, season, year, rating, country, language, page });
     }
 
