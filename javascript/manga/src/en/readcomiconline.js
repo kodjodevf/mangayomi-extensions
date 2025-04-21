@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=256&domain=https://readcomiconline.li/",
     "typeSource": "single",
     "itemType": 0,
-    "version": "0.1.1",
+    "version": "0.1.2",
     "pkgPath": ""
 }];
 
@@ -80,9 +80,10 @@ class DefaultExtension extends MProvider {
             return rd.slice(0, -1)
         }
 
-        var genre = getFilter(filters[0].state)
-        var status = filters[1].values[filters[1].state].value
-        var year = filters[2].values[filters[2].state].value
+        var isFiltersAvailable = !filters || filters.length != 0
+        var genre = isFiltersAvailable ? getFilter(filters[0].state): []
+        var status = isFiltersAvailable ? filters[1].values[filters[1].state].value: ""
+        var year = isFiltersAvailable ? filters[2].values[filters[2].state].value: ""
 
 
         var slug = `/AdvanceSearch?comicName=${query}&ig=${encodeURIComponent(genre)}&status=${status}&pubDate=${year}&`
