@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/all.kisskh.jpg",
     "typeSource": "multi",
     "itemType": 1,
-    "version": "0.0.1",
+    "version": "0.0.2",
     "pkgPath": "anime/src/all/kisskh.js"
 }];
 
@@ -67,38 +67,60 @@ class DefaultExtension extends MProvider {
         return { list, hasNextPage: false };
     }
 
-    get supportsLatest() {
-        throw new Error("supportsLatest not implemented");
-    }
-
     async getLatestUpdates(page) {
         return await this.formatpageList("/LastUpdate");
     }
+
     async search(query, page, filters) {
         return await this.formatpageList(`/Search?q=${query}&type=0`);
     }
+
     async getDetail(url) {
-        throw new Error("getDetail not implemented");
+        function statusCode(status) {
+            return {
+                "Ongoing": 0,
+                "Completed": 1,
+                "Upcoming": 4,
+            }[status] ?? 5;
+        }
+
+        var baseUrl = this.getBaseUrl()
+        // Check while refreshing the page
+        if (url.includes(baseUrl)) {
+            url = url.split("?id=")[1]
+        }
+
+        var res = await this.request(`/Drama/${url}`)
+        var id = res.id
+        var name = res.title
+        var slug = name.replace(/[^A-Z0-9]/gi, "-")
+        var link = baseUrl + `/Drama/${slug}?id=${id}`
+        var imageUrl = res.thumbnail
+        var status = statusCode(res.status)
+        var description = res.description
+        var genre = [res.type, res.country]
+
+        var chapters = []
+        var episodes = res.episodes
+        episodes.forEach(item => {
+            var epNum = item.number
+            var name = epNum == 0 ? "Movie" : `Epsiode: ${epNum}`
+
+            chapters.push({
+                name,
+                url: "" + item.id,
+            })
+        });
+
+        return { name, imageUrl, link, description, genre, status, chapters }
     }
-    // For novel html content
-    async getHtmlContent(url) {
-        throw new Error("getHtmlContent not implemented");
-    }
-    // Clean html up for reader
-    async cleanHtmlContent(html) {
-        throw new Error("cleanHtmlContent not implemented");
-    }
+
+
     // For anime episode video list
     async getVideoList(url) {
         throw new Error("getVideoList not implemented");
     }
-    // For manga chapter pages
-    async getPageList(url) {
-        throw new Error("getPageList not implemented");
-    }
-    getFilterList() {
-        throw new Error("getFilterList not implemented");
-    }
+
     getSourcePreferences() {
         return [
             {
