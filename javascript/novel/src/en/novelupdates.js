@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/en.novelupdates.png",
   "typeSource": "single",
   "itemType": 2,
-  "version": "0.0.3",
+  "version": "0.0.4",
   "dateFormat": "",
   "dateFormatLocale": "",
   "pkgPath": "novel/src/en/novelupdates.js",
