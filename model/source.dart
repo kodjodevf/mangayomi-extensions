@@ -37,6 +37,8 @@ class Source {
 
   int? sourceCodeLanguage;
 
+  String? notes;
+
   Source({
     this.id = null,
     this.name = "",
@@ -57,6 +59,7 @@ class Source {
     this.appMinVerReq = "0.5.0",
     this.additionalParams = "",
     this.sourceCodeLanguage = 0,
+    this.notes = "",
   });
   Source.fromJson(Map<String, dynamic> json) {
     final sourceCodeLang = json['sourceCodeLanguage'] ?? 0;
@@ -84,6 +87,7 @@ class Source {
     version = json['version'] ?? "";
     additionalParams = json['additionalParams'] ?? "";
     sourceCodeLanguage = sourceCodeLang;
+    notes = json['notes'] ?? "";
   }
 
   Map<String, dynamic> toJson() {
@@ -107,6 +111,7 @@ class Source {
       "appMinVerReq": appMinVerReq,
       "additionalParams": additionalParams,
       "sourceCodeLanguage": sourceCodeLanguage,
+      "notes": notes,
     };
   }
 }

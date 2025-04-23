@@ -12,7 +12,8 @@ const mangayomiSources = [{
   "dateFormatLocale": "",
   "pkgPath": "novel/src/en/novelupdates.js",
   "isNsfw": false,
-  "hasCloudflare": true
+  "hasCloudflare": true,
+  "notes": "This extension requires you to login to view the chapters!"
 }];
 
 class DefaultExtension extends MProvider {
