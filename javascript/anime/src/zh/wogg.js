@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "single",
     "itemType": 1,
     "isNsfw": false,
-    "version": "0.0.25",
+    "version": "0.0.3",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/zh/wogg.js"
@@ -198,14 +198,20 @@ class DefaultExtension extends MProvider {
                     "summary": "",
                     "valueIndex": 0,
                     "entries": [
-                        "wogg.one",
-                        "wogg.xxooo.cf",
-                        "wogg.333232.xyz"
+                        "https://wogg.xxooo.cf",
+                        "https://wogg.333232.xyz",
+                        "https://woggpan.333232.xyz",
+                        "https://wogg.heshiheng.top",
+                        "https://www.wogg.one",
+                        "https://www.wogg.lol"
                     ],
                     "entryValues": [
-                        "https://www.wogg.one",
                         "https://wogg.xxooo.cf",
-                        "https://wogg.333232.xyz"
+                        "https://wogg.333232.xyz",
+                        "https://woggpan.333232.xyz",
+                        "https://wogg.heshiheng.top",
+                        "https://www.wogg.one",
+                        "https://www.wogg.lol"
                     ],
                 }
             }
