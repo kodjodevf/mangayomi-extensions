@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "single",
     "itemType": 1,
     "isNsfw": false,
-    "version": "0.0.2",
+    "version": "0.0.3",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/zh/yydsys.js"
@@ -197,12 +197,14 @@ class DefaultExtension extends MProvider {
                     "summary": "",
                     "valueIndex": 0,
                     "entries": [
-                        "tv.yydsys.top",
-                        "tv.yydsys.cc",
+                        "https://tv.yydsys.top",
+                        "https://tv.yydsys.cc",
+                        "https://tv.214521.xyz"
                     ],
                     "entryValues": [
                         "https://tv.yydsys.top",
                         "https://tv.yydsys.cc",
+                        "https://tv.214521.xyz"
                     ],
                 }
             }

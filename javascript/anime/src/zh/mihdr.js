@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "single",
     "itemType": 1,
     "isNsfw": false,
-    "version": "0.0.25",
+    "version": "0.0.3",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/zh/mihdr.js"
@@ -164,7 +164,8 @@ class DefaultExtension extends MProvider {
                 { type_name: "SelectOption", value: "3", name: "动漫" },
                 { type_name: "SelectOption", value: "4", name: "综艺" },
                 { type_name: "SelectOption", value: "5", name: "短剧" },
-                { type_name: "SelectOption", value: "25", name: "臻彩视觉" }
+                { type_name: "SelectOption", value: "24", name: "老剧" },
+                { type_name: "SelectOption", value: "26", name: "臻彩" }
             ]
         }];
     }
@@ -196,13 +197,17 @@ class DefaultExtension extends MProvider {
                     "title": "Website Url",
                     "summary": "",
                     "valueIndex": 0,
-                    "entries": [                        
-                        "mihdr.top",
-                        "mpanso.com",
-                    ],
-                    "entryValues": [                        
+                    "entries": [
                         "https://mihdr.top",
-                        "http://mpanso.com",
+                        "http://xiaomi666.fun",
+                        "http://www.miqk.cc",
+                        "https://xiaomiai.site"
+                    ],
+                    "entryValues": [
+                        "https://mihdr.top",
+                        "http://xiaomi666.fun",
+                        "http://www.miqk.cc",
+                        "https://xiaomiai.site"
                     ],
                 }
             }
