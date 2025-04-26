@@ -7,13 +7,13 @@ const mangayomiSources = [{
     "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/all.netflixmirror.png",
     "typeSource": "single",
     "itemType": 1,
-    "version": "0.3.3",
+    "version": "0.3.4",
     "pkgPath": "anime/src/all/netflixmirror.js"
 }];
 
 class DefaultExtension extends MProvider {
 
-    constructor(){
+    constructor() {
         super();
         this.client = new Client();
     }
@@ -64,7 +64,7 @@ class DefaultExtension extends MProvider {
         return `ott=${service}; ${cookie}`;
     }
 
-    async request(slug, service=null, cookie = null) {
+    async request(slug, service = null, cookie = null) {
         var service = service ?? this.getServiceDetails();
         var cookie = cookie ?? await this.getCookie();
 
@@ -277,15 +277,17 @@ class DefaultExtension extends MProvider {
 
 
             if ("tracks" in playlist) {
-                playlist.tracks.filter(track => track.kind === 'captions').forEach(track => {
-                    var subUrl = track.file
-                    subUrl = subUrl.startsWith("//") ? `https:${subUrl}` : subUrl;
-
-                    subtitles.push({
-                        label: track.label,
-                        file: subUrl
-                    });
-                });
+                await Promise.all(playlist.tracks.map(async (track) => {
+                    if (track.kind == 'captions') {
+                        var subUrl = track.file
+                        subUrl = subUrl.startsWith("//") ? `https:${subUrl}` : subUrl;
+                        var subText = await this.client.get(subUrl)
+                        subtitles.push({
+                            label: track.label,
+                            file: subText.body
+                        });
+                    }
+                }));
             }
         }
 
