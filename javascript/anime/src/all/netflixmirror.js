@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/all.netflixmirror.png",
     "typeSource": "single",
     "itemType": 1,
-    "version": "0.3.1",
+    "version": "0.3.2",
     "pkgPath": "anime/src/all/netflixmirror.js"
 }];
 
@@ -16,10 +16,6 @@ class DefaultExtension extends MProvider {
     getPreference(key) {
         const preferences = new SharedPreferences();
         return preferences.get(key);
-    }
-
-    getMobileBaseUrl() {
-        return this.getPreference("netmirror_override_mobile_base_url");
     }
 
     getTVBaseUrl() {
@@ -45,13 +41,14 @@ class DefaultExtension extends MProvider {
 
         // Cookie lasts for 24hrs but still checking for 12hrs
         if (now_ts - cookie_ts > 60 * 60 * 12) {
-            const check = await new Client().get(this.getMobileBaseUrl() + `/mobile/home`, { "cookie": cookie });
+            var baseUrl = this.getTVBaseUrl()
+            const check = await new Client().get(baseUrl + `/mobile/home`, { "cookie": cookie });
             const hDocBody = new Document(check.body).selectFirst("body")
 
             const addhash = hDocBody.attr("data-addhash");
             const data_time = hDocBody.attr("data-time");
 
-            var res = await new Client().post(`${this.getTVBaseUrl()}/tv/p.php`, { "cookie": "" }, { "hash": addhash });
+            var res = await new Client().post(`${baseUrl}/tv/p.php`, { "cookie": "" }, { "hash": addhash });
             cookie = res.headers["set-cookie"];
             preferences.setString("cookie", cookie);
             preferences.setString("cookie_ts", data_time);
@@ -62,9 +59,9 @@ class DefaultExtension extends MProvider {
         return `ott=${service}; ${cookie}`;
     }
 
-    async request(slug, service, cookie = {}) {
+    async request(slug, service=null, cookie = null) {
         var service = service ?? this.getServiceDetails();
-        var cookie = cookie ?? this.getCookie();
+        var cookie = cookie ?? await this.getCookie();
 
         var srv = ""
         if (service === "pv") srv = "/" + service
@@ -179,7 +176,7 @@ class DefaultExtension extends MProvider {
 
                 data.episodes?.forEach(ep => {
                     var season = ep.s.replace('S', 'Season ')
-                    var epNum = ep.ep.replace("E","")
+                    var epNum = ep.ep.replace("E", "")
                     var epText = `Episode ${epNum}`
                     var title = ep.t
                     title = title == epNum ? title : `${epText}: ${title}`
@@ -221,83 +218,77 @@ class DefaultExtension extends MProvider {
     }
 
     async getVideoList(url) {
-        var slug = ""
-        var src = this.getPreference("netmirror_pref_stream_extraction");
-        var service = this.getServiceDetails();
 
-        // prime extracton works only in mobile
-        if (service == "pv") {
-            slug = "/pv"
-            src = "mobile"
-        }
-
-        var device = "/mobile"
-        if (src == 'tv') device = "/tv";
-
-        var baseUrl = src === 'tv' ? this.getTVBaseUrl() : this.getMobileBaseUrl()
-        url = baseUrl + device + slug + `/playlist.php?id=${url}`
+        var baseUrl = this.getTVBaseUrl()
+        var url = `/playlist.php?id=${url}`
         const data = JSON.parse(await this.request(url));
+
+
         let videoList = [];
         let subtitles = [];
         let audios = [];
-        for (const playlist of data) {
-            var source = playlist.sources[0]
-            var link = baseUrl + source.file;
-            var headers =
-            {
-                'Origin': baseUrl,
-                'Referer': `${baseUrl}/`
-            };
+        var playlist = data[0]
+        var source = playlist.sources[0]
 
-            var resp = await new Client().get(link, headers);
+        var link = baseUrl + source.file;
+        var headers =
+        {
+            'Origin': baseUrl,
+            'Referer': `${baseUrl}/`
+        };
 
-            if (resp.statusCode === 200) {
-                const masterPlaylist = resp.body;
+        // Auto
+        videoList.push({ url: link, quality: "Auto", "originalUrl": link, headers });
 
-                if (masterPlaylist.indexOf("#EXT-X-STREAM-INF:") > 1) {
+        var resp = await new Client().get(link, headers);
 
-                    masterPlaylist.substringAfter('#EXT-X-MEDIA:').split('#EXT-X-MEDIA:').forEach(it => {
-                        if (it.includes('TYPE=AUDIO')) {
-                            const audioInfo = it.substringAfter('TYPE=AUDIO').substringBefore('\n');
-                            const language = audioInfo.substringAfter('NAME="').substringBefore('"');
-                            const url = audioInfo.substringAfter('URI="').substringBefore('"');
-                            audios.push({ file: url, label: language });
-                        }
+        if (resp.statusCode === 200) {
+            const masterPlaylist = resp.body;
+
+            if (masterPlaylist.indexOf("#EXT-X-STREAM-INF:") > 1) {
+
+                masterPlaylist.substringAfter('#EXT-X-MEDIA:').split('#EXT-X-MEDIA:').forEach(it => {
+                    if (it.includes('TYPE=AUDIO')) {
+                        const audioInfo = it.substringAfter('TYPE=AUDIO').substringBefore('\n');
+                        const language = audioInfo.substringAfter('NAME="').substringBefore('"');
+                        const url = audioInfo.substringAfter('URI="').substringBefore('"');
+                        audios.push({ file: url, label: language });
+                    }
+                });
+
+
+                masterPlaylist.substringAfter('#EXT-X-STREAM-INF:').split('#EXT-X-STREAM-INF:').forEach(it => {
+                    var quality = `${it.substringAfter('RESOLUTION=').substringAfter('x').substringBefore(',')}p`;
+                    let videoUrl = it.substringAfter('\n').substringBefore('\n');
+
+                    if (!videoUrl.startsWith('http')) {
+                        videoUrl = resp.request.url.substringBeforeLast('/') + `/${videoUrl}`;
+                    }
+                    var headers =
+                    {
+                        'Host': videoUrl.match(/^(?:https?:\/\/)?(?:www\.)?([^\/]+)/)[1],
+                        'Origin': baseUrl,
+                        'Referer': `${baseUrl}/`
+                    };
+                    videoList.push({ url: videoUrl, quality, originalUrl: videoUrl, headers });
+
+                });
+            }
+
+
+            if ("tracks" in playlist) {
+                playlist.tracks.filter(track => track.kind === 'captions').forEach(track => {
+                    var subUrl = track.file
+                    subUrl = subUrl.startsWith("//") ? `https:${subUrl}` : subUrl;
+
+                    subtitles.push({
+                        label: track.label,
+                        file: subUrl
                     });
-
-
-                    masterPlaylist.substringAfter('#EXT-X-STREAM-INF:').split('#EXT-X-STREAM-INF:').forEach(it => {
-                        var quality = `${it.substringAfter('RESOLUTION=').substringAfter('x').substringBefore(',')}p (${source.label})`;
-                        let videoUrl = it.substringAfter('\n').substringBefore('\n');
-
-                        if (!videoUrl.startsWith('http')) {
-                            videoUrl = resp.request.url.substringBeforeLast('/') + `/${videoUrl}`;
-                        }
-                        var headers =
-                        {
-                            'Host': videoUrl.match(/^(?:https?:\/\/)?(?:www\.)?([^\/]+)/)[1],
-                            'Origin': baseUrl,
-                            'Referer': `${baseUrl}/`
-                        };
-                        videoList.push({ url: videoUrl, quality, originalUrl: videoUrl, headers });
-
-                    });
-                }
-
-
-                if ("tracks" in playlist) {
-                    playlist.tracks.filter(track => track.kind === 'captions').forEach(track => {
-                        var subUrl = track.file
-                        subUrl = subUrl.startsWith("//") ? `https:${subUrl}` : subUrl;
-
-                        subtitles.push({
-                            label: track.label,
-                            file: subUrl
-                        });
-                    });
-                }
+                });
             }
         }
+
 
 
         videoList[0].audios = audios;
@@ -306,60 +297,34 @@ class DefaultExtension extends MProvider {
     }
 
     getSourcePreferences() {
-        return [
-            {
-                key: "netmirror_override_mobile_base_url",
-                editTextPreference: {
-                    title: "Override mobile base url",
-                    summary: "",
-                    value: "https://netfree.cc",
-                    dialogTitle: "Override base url",
-                    dialogMessage: "",
-                }
-            }, {
-                key: "netmirror_override_tv_base_url",
-                editTextPreference: {
-                    title: "Override tv base url",
-                    summary: "",
-                    value: "https://pcmirror.cc",
-                    dialogTitle: "Override base url",
-                    dialogMessage: "",
-                }
-            }, {
-                key: 'netmirror_pref_video_resolution',
-                listPreference: {
-                    title: 'Preferred video resolution',
-                    summary: '',
-                    valueIndex: 0,
-                    entries: ["1080p", "720p", "480p"],
-                    entryValues: ["1080", "720", "480"]
-                }
-            }, {
-                "key": "netmirror_pref_display_name_1",
-                "switchPreferenceCompat": {
-                    "title": "Display media name on home page",
-                    "summary": "Homepage loads faster by not calling details API",
-                    "value": true
-                }
-            }, {
-                key: 'netmirror_pref_service',
-                listPreference: {
-                    title: 'Preferred OTT service',
-                    summary: '',
-                    valueIndex: 0,
-                    entries: ["Net mirror", "Prime mirror"],
-                    entryValues: ["nf", "pv",]
-                }
-            }, {
-                key: 'netmirror_pref_stream_extraction',
-                listPreference: {
-                    title: 'Preferred stream extraction source',
-                    summary: 'Extract stream from which source (if one source fails choose another)',
-                    valueIndex: 0,
-                    entries: ["TV", "Mobile"],
-                    entryValues: ["tv", "mobile"]
-                }
-            },
+        return [{
+            key: "netmirror_override_tv_base_url",
+            editTextPreference: {
+                title: "Override tv base url",
+                summary: "",
+                value: "https://pcmirror.cc",
+                dialogTitle: "Override base url",
+                dialogMessage: "",
+            }
+        }, {
+            key: 'netmirror_pref_service',
+            listPreference: {
+                title: 'Preferred OTT service',
+                summary: '',
+                valueIndex: 0,
+                entries: ["Net mirror", "Prime mirror"],
+                entryValues: ["nf", "pv",]
+            }
+        }, {
+            key: 'netmirror_pref_video_resolution',
+            listPreference: {
+                title: 'Preferred video resolution',
+                summary: '',
+                valueIndex: 0,
+                entries: ["1080p", "720p", "480p"],
+                entryValues: ["1080", "720", "480"]
+            }
+        }
         ];
     }
 
