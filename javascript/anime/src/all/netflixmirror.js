@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/all.netflixmirror.png",
     "typeSource": "single",
     "itemType": 1,
-    "version": "0.3.0",
+    "version": "0.3.1",
     "pkgPath": "anime/src/all/netflixmirror.js"
 }];
 
@@ -37,17 +37,39 @@ class DefaultExtension extends MProvider {
             return `https://imgcdn.media/pv/480/${id}.jpg`
     }
 
-    getCookie() {
+    async getCookie(service) {
+        const preferences = new SharedPreferences();
+        let cookie = preferences.getString("cookie", "");
+        var cookie_ts = parseInt(preferences.getString("cookie_ts", "0"));
+        var now_ts = parseInt(new Date().getTime() / 1000);
 
-        return `ott=${service};`;
+        // Cookie lasts for 24hrs but still checking for 12hrs
+        if (now_ts - cookie_ts > 60 * 60 * 12) {
+            const check = await new Client().get(this.getMobileBaseUrl() + `/mobile/home`, { "cookie": cookie });
+            const hDocBody = new Document(check.body).selectFirst("body")
+
+            const addhash = hDocBody.attr("data-addhash");
+            const data_time = hDocBody.attr("data-time");
+
+            var res = await new Client().post(`${this.getTVBaseUrl()}/tv/p.php`, { "cookie": "" }, { "hash": addhash });
+            cookie = res.headers["set-cookie"];
+            preferences.setString("cookie", cookie);
+            preferences.setString("cookie_ts", data_time);
+        }
+
+        service = service ?? this.getServiceDetails();
+
+        return `ott=${service}; ${cookie}`;
     }
 
-    async request(slug, service) {
+    async request(slug, service, cookie = {}) {
         var service = service ?? this.getServiceDetails();
+        var cookie = cookie ?? this.getCookie();
+
         var srv = ""
         if (service === "pv") srv = "/" + service
         var url = this.getTVBaseUrl() + "/tv" + srv + slug
-        return (await new Client().get(url)).body;
+        return (await new Client().get(url, { "cookie": cookie })).body;
     }
 
 
@@ -96,7 +118,7 @@ class DefaultExtension extends MProvider {
 
     async search(query, page, filters) {
         var service = this.getServiceDetails();
-        const data = JSON.parse(await this.request(`/search.php?s=${query}`,service));
+        const data = JSON.parse(await this.request(`/search.php?s=${query}`, service));
         const list = [];
         data.searchResult.map(async (res) => {
             const id = res.id;
@@ -108,57 +130,62 @@ class DefaultExtension extends MProvider {
             hasNextPage: false
         }
     }
+
     async getDetail(url) {
         var service = this.getServiceDetails();
-        const cookie = await this.getCookie();
+        var cookie = await this.getCookie(service);
+        var linkSlug = "https://netflix.com/title/"
+        if (service === "pv") linkSlug = `https://www.primevideo.com/detail/`
 
-        const data = JSON.parse(await this.request(`/post.php?id=${url}`, cookie));
+        // Check needed while refreshing existing data
+        var vidId = url
+        if (url.includes(linkSlug)) vidId = url.replaceAll(linkSlug, '')
+
+        const data = JSON.parse(await this.request(`/post.php?id=${vidId}`));
         const name = data.title;
         const genre = [data.ua, ...(data.genre || '').split(',').map(g => g.trim())];
         const description = data.desc;
         let episodes = [];
-        if (data.episodes[0] === null) {
-            episodes.push({ name, url: url });
-        } else {
-            episodes = data.episodes.map(ep => ({
-                name: `${ep.s.replace('S', 'Season ')} ${ep.ep.replace('E', 'Episode ')} : ${ep.t}`,
-                url: ep.id
-            }));
-        }
-        if (data.nextPageShow === 1) {
-            const eps = await this.getEpisodes(name, url, data.nextPageSeason, 2, cookie);
-            episodes.push(...eps);
-        }
-        episodes.reverse();
-        if (data.season && data.season.length > 1) {
+
+        var seasons = data.season
+        if (seasons) {
             let newEpisodes = [];
-            const seasonsToProcess = data.season.slice(0, -1);
-            await Promise.all(seasonsToProcess.map(async (season) => {
-                const eps = await this.getEpisodes(name, url, season.id, 1, cookie);
+            await Promise.all(seasons.map(async (season) => {
+                const eps = await this.getEpisodes(name, vidId, season.id, 1, service, cookie);
                 newEpisodes.push(...eps);
             }));
-            newEpisodes.reverse();
             episodes.push(...newEpisodes);
 
+        } else {
+            // For movies aka if there are no seasons and episodes
+            episodes.push({
+                name: `Movie`,
+                url: vidId
+            });
         }
-        var service = this.getServiceDetails();
-        var link = `https://netflix.com/title/${url}`
-        if (service === "pv") link = `https://www.primevideo.com/detail/${url}`
+        var link = `${linkSlug}${vidId}`
 
         return {
-            name, imageUrl: this.getPoster(url, service), link, description, status: 1, genre, episodes
+            name, imageUrl: this.getPoster(vidId, service), link, description, status: 1, genre, episodes
         };
     }
-    async getEpisodes(name, eid, sid, page, cookie) {
+
+    async getEpisodes(name, eid, sid, page, service, cookie) {
         const episodes = [];
         let pg = page;
         while (true) {
             try {
-                const data = JSON.parse(await this.request(`/episodes.php?s=${sid}&series=${eid}&page=${pg}`, cookie));
+                const data = JSON.parse(await this.request(`/episodes.php?s=${sid}&series=${eid}&page=${pg}`, service, cookie));
 
                 data.episodes?.forEach(ep => {
+                    var season = ep.s.replace('S', 'Season ')
+                    var epNum = ep.ep.replace("E","")
+                    var epText = `Episode ${epNum}`
+                    var title = ep.t
+                    title = title == epNum ? title : `${epText}: ${title}`
+
                     episodes.push({
-                        name: `${ep.s.replace('S', 'Season ')} ${ep.ep.replace('E', 'Episode ')} : ${ep.t}`,
+                        name: `${season} ${title}`,
                         url: ep.id
                     });
                 });
@@ -170,7 +197,7 @@ class DefaultExtension extends MProvider {
             }
         }
 
-        return episodes;
+        return episodes.reverse();
     }
 
     // Sorts streams based on user preference.
