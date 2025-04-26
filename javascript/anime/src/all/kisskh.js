@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/all.kisskh.jpg",
     "typeSource": "multi",
     "itemType": 1,
-    "version": "0.1.0",
+    "version": "0.1.1",
     "pkgPath": "anime/src/all/kisskh.js"
 }];
 
@@ -54,7 +54,15 @@ class DefaultExtension extends MProvider {
         var list = []
         var hasNextPage = false
 
-        for (var media of res) {
+        var mediaList = res
+        if("data" in mediaList){
+            mediaList = mediaList.data
+            var page = res.page
+            var totalCount = res.totalCount
+            hasNextPage = page * 20 < totalCount
+        }
+
+        for (var media of mediaList) {
             var name = media.title
             var imageUrl = media.thumbnail
             var link = "" + media.id
@@ -65,15 +73,11 @@ class DefaultExtension extends MProvider {
     }
 
     async getPopular(page) {
-        var mostViewed = await this.formatpageList("/MostView?c=1");
-        var topRated = await this.formatpageList("/TopRating");
-
-        var list = [...mostViewed.list, ...topRated.list]
-        return { list, hasNextPage: false };
+        return await this.formatpageList(`/List?type=0&sub=0&country=0&status=0&order=1&pageSize=20&page=${page}`);
     }
 
     async getLatestUpdates(page) {
-        return await this.formatpageList("/LastUpdate");
+        return await this.formatpageList(`/List?type=0&sub=0&country=0&status=0&order=2&pageSize=20&page=${page}`);
     }
 
     async search(query, page, filters) {
