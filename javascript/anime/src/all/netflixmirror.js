@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/all.netflixmirror.png",
     "typeSource": "single",
     "itemType": 1,
-    "version": "0.2.1",
+    "version": "0.3.0",
     "pkgPath": "anime/src/all/netflixmirror.js"
 }];
 
@@ -37,73 +37,66 @@ class DefaultExtension extends MProvider {
             return `https://imgcdn.media/pv/480/${id}.jpg`
     }
 
+    getCookie() {
 
-    async getCookie() {
-        const preferences = new SharedPreferences();
-        let cookie = preferences.getString("cookie", "");
-        var cookie_ts = parseInt(preferences.getString("cookie_ts", "0"));
-        var now_ts = parseInt(new Date().getTime() / 1000);
+        return `ott=${service};`;
+    }
 
-        // Cookie lasts for 24hrs but still checking for 12hrs
-        if (now_ts - cookie_ts > 60 * 60 * 12) {
-            const check = await new Client().get(this.getMobileBaseUrl() + `/mobile/home`, { "cookie": cookie });
-            const hDocBody = new Document(check.body).selectFirst("body")
+    async request(slug, service) {
+        var service = service ?? this.getServiceDetails();
+        var srv = ""
+        if (service === "pv") srv = "/" + service
+        var url = this.getTVBaseUrl() + "/tv" + srv + slug
+        return (await new Client().get(url)).body;
+    }
 
-            const addhash = hDocBody.attr("data-addhash");
-            const data_time = hDocBody.attr("data-time");
 
-            var res = await new Client().post(`${this.getTVBaseUrl()}/tv/p.php`, { "cookie": "" }, { "hash": addhash });
-            cookie = res.headers["set-cookie"];
-            preferences.setString("cookie", cookie);
-            preferences.setString("cookie_ts", data_time);
-        }
-
+    async getHome(body) {
         var service = this.getServiceDetails();
+        var list = []
+        if (service === "nf") {
+            var body = await this.request("/home", service)
+            var elements = new Document(body).select("a.slider-item.boxart-container.open-modal.focusme");
 
-        return `ott=${service}; ${cookie}`;
-    }
-    async request(url, cookie) {
-        cookie = cookie ?? await this.getCookie();
+            elements.forEach(item => {
+                var id = item.attr("data-post")
+                if (id.length > 0) {
+                    var imageUrl = this.getPoster(id, service)
+                    // Having no name breaks the script so having "id" as name 
+                    var name = `\n${id}`
+                    list.push({ name, imageUrl, link: id })
+                }
+            })
+        } else {
+            var body = await this.request("/homepage.php", service)
+            var elements = JSON.parse(body).post
 
-        var service = this.getServiceDetails();
-        var slug = "";
-        if (url == "/home") slug = "";
-        else if (service == "pv") slug = "/pv";
-        if (!(url.startsWith("https"))) {
-            url = this.getMobileBaseUrl() + "/mobile" + slug + url
-        }
-
-        return (await new Client().get(url, { "cookie": cookie })).body;
-    }
-    async getPopular(page) {
-        return await this.getPages(await this.request("/home"), ".tray-container, #top10")
-    }
-    async getLatestUpdates(page) {
-        return await this.getPages(await this.request("/home"), ".inner-mob-tray-container")
-    }
-    async getPages(body, selector) {
-        var name_pref = this.getPreference("netmirror_pref_display_name_1");
-        const elements = new Document(body).select(selector);
-        const cookie = await this.getCookie();
-        const list = [];
-        for (const element of elements) {
-            const linkElement = element.selectFirst("article, .top10-post");
-            const id = linkElement.selectFirst("a").attr("data-post");
-            if (id.length > 0) {
-                const imageUrl = linkElement.selectFirst(".card-img-container img, .top10-img img").attr("data-src");
-                var name = name_pref ? JSON.parse(await this.request(`/post.php?id=${id}`, cookie)).title : `\n${id}`
-
-                list.push({ name, imageUrl, link: id });
-            }
+            elements.forEach(item => {
+                var ids = item.ids
+                ids.split(",").forEach(id => {
+                    var imageUrl = this.getPoster(id, service)
+                    // Having no name breaks the script so having "id" as name 
+                    var name = `\n${id}`
+                    list.push({ name, imageUrl, link: id })
+                })
+            })
         }
         return {
             list: list,
             hasNextPage: false
         }
     }
+
+    async getPopular(page) {
+        return await this.getHome()
+    }
+    async getLatestUpdates(page) {
+        return await this.getHome()
+    }
+
     async search(query, page, filters) {
         var service = this.getServiceDetails();
-        const data = JSON.parse(await this.request(`/search.php?s=${query}`));
+        const data = JSON.parse(await this.request(`/search.php?s=${query}`,service));
         const list = [];
         data.searchResult.map(async (res) => {
             const id = res.id;
