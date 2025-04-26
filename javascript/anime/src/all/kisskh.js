@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/all.kisskh.jpg",
     "typeSource": "multi",
     "itemType": 1,
-    "version": "0.1.1",
+    "version": "0.1.2",
     "pkgPath": "anime/src/all/kisskh.js"
 }];
 
@@ -55,7 +55,7 @@ class DefaultExtension extends MProvider {
         var hasNextPage = false
 
         var mediaList = res
-        if("data" in mediaList){
+        if ("data" in mediaList) {
             mediaList = mediaList.data
             var page = res.page
             var totalCount = res.totalCount
@@ -144,9 +144,14 @@ class DefaultExtension extends MProvider {
             return vidData
         }
 
+        var streamUrl = vidData.Video
+        if (streamUrl.includes("/widget/countdown")) {
+            throw new Error("Episode yet to be released")
+        }
+
         var streams = [{
-            url: vidData.Video,
-            originalUrl: vidData.Video,
+            url: streamUrl,
+            originalUrl: streamUrl,
             quality: "Auto",
             headers,
         }]
@@ -215,9 +220,7 @@ class DefaultExtension extends MProvider {
             console.log(e)
         }
         return subText
-
     }
-
 
     // ----------------KissKh Decoders----------------
     // Source :- https://kisskh.ovh/common.js?v=9082123
@@ -238,7 +241,6 @@ class DefaultExtension extends MProvider {
             for (let i = 0; i < stringLength; i++) {
                 words[i >>> 2] |= (string.charCodeAt(i) & 255) << (24 - i % 4 * 8);
             }
-
             return [words, stringLength];
         }
 
@@ -266,7 +268,6 @@ class DefaultExtension extends MProvider {
             for (let i = 0; i < len; i++) {
                 hash = (hash << 5) - hash + str.charCodeAt(i);
             }
-
             return hash;
         }
 
@@ -277,7 +278,6 @@ class DefaultExtension extends MProvider {
             for (let i = 0; i < padLength; ++i) {
                 data += String.fromCharCode(padLength);
             }
-
             return data;
         }
 
@@ -318,7 +318,6 @@ class DefaultExtension extends MProvider {
                     x = xi = 1;
                 }
             }
-
             return [ROUND_CONSTANTS, SUB_MIX_0, SUB_MIX_1, SUB_MIX_2, SUB_MIX_3, SBOX];
         }
 
