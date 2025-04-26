@@ -2,16 +2,21 @@ const mangayomiSources = [{
     "name": "NetMirror",
     "id": 446414301,
     "lang": "all",
-    "baseUrl": "https://iosmirror.cc",
-    "apiUrl": "https://pcmirror.cc",
+    "baseUrl": "https://netfree2.cc",
+    "apiUrl": "https://netfree2.cc",
     "iconUrl": "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/all.netflixmirror.png",
     "typeSource": "single",
     "itemType": 1,
-    "version": "0.3.2",
+    "version": "0.3.3",
     "pkgPath": "anime/src/all/netflixmirror.js"
 }];
 
 class DefaultExtension extends MProvider {
+
+    constructor(){
+        super();
+        this.client = new Client();
+    }
 
     getPreference(key) {
         const preferences = new SharedPreferences();
@@ -42,13 +47,13 @@ class DefaultExtension extends MProvider {
         // Cookie lasts for 24hrs but still checking for 12hrs
         if (now_ts - cookie_ts > 60 * 60 * 12) {
             var baseUrl = this.getTVBaseUrl()
-            const check = await new Client().get(baseUrl + `/mobile/home`, { "cookie": cookie });
+            const check = await this.client.get(baseUrl + `/mobile/home`, { "cookie": cookie });
             const hDocBody = new Document(check.body).selectFirst("body")
 
             const addhash = hDocBody.attr("data-addhash");
             const data_time = hDocBody.attr("data-time");
 
-            var res = await new Client().post(`${baseUrl}/tv/p.php`, { "cookie": "" }, { "hash": addhash });
+            var res = await this.client.post(`${baseUrl}/tv/p.php`, { "cookie": "" }, { "hash": addhash });
             cookie = res.headers["set-cookie"];
             preferences.setString("cookie", cookie);
             preferences.setString("cookie_ts", data_time);
@@ -66,7 +71,7 @@ class DefaultExtension extends MProvider {
         var srv = ""
         if (service === "pv") srv = "/" + service
         var url = this.getTVBaseUrl() + "/tv" + srv + slug
-        return (await new Client().get(url, { "cookie": cookie })).body;
+        return (await this.client.get(url, { "cookie": cookie })).body;
     }
 
 
@@ -179,7 +184,7 @@ class DefaultExtension extends MProvider {
                     var epNum = ep.ep.replace("E", "")
                     var epText = `Episode ${epNum}`
                     var title = ep.t
-                    title = title == epNum ? title : `${epText}: ${title}`
+                    title = title == epText ? title : `${epText}: ${title}`
 
                     episodes.push({
                         name: `${season} ${title}`,
@@ -240,7 +245,7 @@ class DefaultExtension extends MProvider {
         // Auto
         videoList.push({ url: link, quality: "Auto", "originalUrl": link, headers });
 
-        var resp = await new Client().get(link, headers);
+        var resp = await this.client.get(link, headers);
 
         if (resp.statusCode === 200) {
             const masterPlaylist = resp.body;
@@ -264,12 +269,7 @@ class DefaultExtension extends MProvider {
                     if (!videoUrl.startsWith('http')) {
                         videoUrl = resp.request.url.substringBeforeLast('/') + `/${videoUrl}`;
                     }
-                    var headers =
-                    {
-                        'Host': videoUrl.match(/^(?:https?:\/\/)?(?:www\.)?([^\/]+)/)[1],
-                        'Origin': baseUrl,
-                        'Referer': `${baseUrl}/`
-                    };
+                    headers['Host'] = videoUrl.match(/^(?:https?:\/\/)?(?:www\.)?([^\/]+)/)[1]
                     videoList.push({ url: videoUrl, quality, originalUrl: videoUrl, headers });
 
                 });
@@ -302,7 +302,7 @@ class DefaultExtension extends MProvider {
             editTextPreference: {
                 title: "Override tv base url",
                 summary: "",
-                value: "https://pcmirror.cc",
+                value: "https://netfree2.cc",
                 dialogTitle: "Override base url",
                 dialogMessage: "",
             }
