@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://aniplaynow.live/",
     "typeSource": "single",
     "itemType": 1,
-    "version": "1.3.2",
+    "version": "1.4.0",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/en/aniplay.js"
@@ -22,6 +22,10 @@ class DefaultExtension extends MProvider {
     getPreference(key) {
         const preferences = new SharedPreferences();
         return preferences.get(key);
+    }
+
+    getBaseUrl() {
+        return "https://" + this.getPreference("aniplay_override_base_url")
     }
 
 
@@ -283,21 +287,16 @@ class DefaultExtension extends MProvider {
     }
 
     async aniplayRequest(slug, body) {
-        var baseUrl = "https://" + this.getPreference("aniplay_override_base_url")
+        var baseUrl = this.getBaseUrl()
 
-        var next_action_overrides = this.getPreference("aniplay_next_action_key").split("||")
-        var next_action_key = 0
-        if (baseUrl.endsWith(".lol")) {
-            next_action_key = 1
-        }
-        var next_action_values = next_action_overrides[next_action_key].split(":")
+        var next_action_overrides = await this.extractKeys(baseUrl)
 
 
         var next_action = ""
         if (slug.indexOf("info/") > -1) {
-            next_action = next_action_values[0]
+            next_action = next_action_overrides["getEpisodes"]
         } else if (slug.indexOf("watch/") > -1) {
-            next_action = next_action_values[1]
+            next_action = next_action_overrides["getSources"]
         }
 
 
@@ -367,7 +366,7 @@ class DefaultExtension extends MProvider {
         var format = animeData.format
         if (format === "MOVIE") chapters[0].name = "Movie"
 
-        var baseUrl = "https://" + this.getPreference("aniplay_override_base_url")
+        var baseUrl = this.getBaseUrl()
         animeData.link = `${baseUrl}/anime/${slug}`
         animeData.chapters = chapters.reverse()
         return animeData
@@ -568,15 +567,6 @@ class DefaultExtension extends MProvider {
                 "entries": ["Romaji", "English", "Native"],
                 "entryValues": ["romaji", "english", "native"],
             }
-        }, {
-            key: "aniplay_next_action_key",
-            editTextPreference: {
-                title: "Override next_action key",
-                summary: "",
-                value: "7f328d44382d74f2942c42d0bc9915b2d510628a02:7f702090c0d779331a0b55e1ee0cfea85ff4cb963a||7fe26ef575b85a8a7166a411dba3a21263fe5b9306:7fbb025dd45b14410eb1a8ffcbb4615b0a5a1e5c3c",
-                dialogTitle: "Override next_action key",
-                dialogMessage: "",
-            }
         },
         {
             "key": "aniplay_pref_provider_3",
@@ -640,4 +630,46 @@ class DefaultExtension extends MProvider {
 
         ]
     }
+
+    //------------ Extract keys ---------------
+
+    async extractKeys(baseUrl) {
+        const preferences = new SharedPreferences();
+        let KEYS = preferences.getString("aniplay_keys", "");
+        var KEYS_TS = parseInt(preferences.getString("aniplay_keys_ts", "0"));
+        var now_ts = parseInt(new Date().getTime() / 1000);
+
+        // Checks for keys every 60 minutes and baseUrl is present in the map
+        if (now_ts - KEYS_TS < 60 * 60 && KEYS.includes(baseUrl)) {
+            return JSON.parse(KEYS)
+        }
+
+        var randomAnimeUrl = baseUrl + "/anime/watch/1"
+        var res = (await this.client.get(randomAnimeUrl)).body
+        var sKey = "/_next/static/chunks/app/(user)/(media)/"
+        var eKey = '"'
+        var start = res.indexOf(sKey) + sKey.length
+        var end = res.indexOf(eKey, start)
+        var jsSlug = res.substring(start, end)
+
+        var jsUrl = baseUrl + sKey + jsSlug
+        res = (await this.client.get(jsUrl)).body
+        var regex = /\(0,\w+\.createServerReference\)\("([a-f0-9]+)",\w+\.callServer,void 0,\w+\.findSourceMapURL,"(getSources|getEpisodes)"\)/g;
+        var matches = [...res.matchAll(regex)];
+        var keysMap = {};
+        matches.forEach(match => {
+            var hashId = match[1];
+            var functionName = match[2];
+            keysMap[functionName] = hashId;
+        });
+        keysMap["baseUrl"] = baseUrl;
+
+        preferences.setString("aniplay_keys", JSON.stringify(keysMap));
+        preferences.setString("aniplay_keys_ts", now_ts.toString());
+
+        return keysMap;
+
+    }
+
+    // End
 }
