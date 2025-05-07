@@ -14,7 +14,7 @@ const mangayomiSources = [
     "pkgPath": "novel/src/all/annasarchive.js",
     "isNsfw": false,
     "hasCloudflare": true,
-    "notes": "EPUBs need to be downloaded to view chapters! Downloads from Libgen might be slow!",
+    "notes": "EPUBs are automatically downloaded to view chapters! Downloads from Libgen might be slow!",
   },
 ];
 
@@ -151,12 +151,12 @@ class DefaultExtension extends MProvider {
     return null;
   }
 
-  async getHtmlContent(chapterName, url) {
+  async getHtmlContent(name, url) {
     const urls = url.split(";;;");
     const client = await new Client();
     const bookLink = await this._getMirrorLink(client, urls[0]);
 
-    return await parseEpubChapter(chapterName, bookLink, {
+    return await parseEpubChapter(name, bookLink, {
       Connection: "Keep-Alive",
       ...this.headers,
     }, urls[1]);

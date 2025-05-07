@@ -181,7 +181,7 @@ class DefaultExtension extends MProvider {
     };
   }
 
-  async getHtmlContent(url) {
+  async getHtmlContent(name, url) {
     const client = await new Client();
     const res = await client.get(url, {
       Priority: "u=0, i",
