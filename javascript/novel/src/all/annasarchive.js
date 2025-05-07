@@ -14,7 +14,7 @@ const mangayomiSources = [
     "pkgPath": "novel/src/all/annasarchive.js",
     "isNsfw": false,
     "hasCloudflare": true,
-    "notes": "EPUBs need to be downloaded to view chapters!",
+    "notes": "EPUBs need to be downloaded to view chapters! Downloads from Libgen might be slow!",
   },
 ];
 
@@ -34,7 +34,7 @@ class DefaultExtension extends MProvider {
     const mangaElements = doc.select("a");
     const list = [];
     for (const element of mangaElements) {
-      const name = element.selectFirst("h3").text;
+      const name = element.selectFirst("h3")?.text.replaceAll("🔍", "").trim();
       const imageUrl = element.selectFirst("img").getSrc;
       const link = element.getHref;
       if (link.includes("/md5/")) {
@@ -46,32 +46,28 @@ class DefaultExtension extends MProvider {
   }
 
   async getPopular(page) {
-    const lang = this.source.lang != "all" ? `&lang=${this.source.lang}` : "";
-    let url = `${this.source.baseUrl}/search?index=&page=${page}&q=&display=&ext=epub&src=zlib&sort=`;
-    if (lang !== "") {
-      url += `&lang=${lang}`;
+    let url = `${this.source.baseUrl}/search?index=&page=${page}&q=&display=&ext=epub&src=lgli&sort=`;
+    if (this.source.lang != "all") {
+      url += `&lang=${this.source.lang}`;
     }
     const res = await new Client().get(url, this.headers);
     return this.mangaListFromPage(res);
   }
 
   async getLatestUpdates(page) {
-    const lang = this.source.lang != "all" ? `&lang=${this.source.lang}` : "";
-    let url = `${this.source.baseUrl}/search?index=&page=${page}&q=&display=&ext=epub&src=zlib&sort=newest`;
-    if (lang !== "") {
-      url += `&lang=${lang}`;
+    let url = `${this.source.baseUrl}/search?index=&page=${page}&q=&display=&ext=epub&src=lgli&sort=newest`;
+    if (this.source.lang != "all") {
+      url += `&lang=${this.source.lang}`;
     }
     const res = await new Client().get(url, this.headers);
     return this.mangaListFromPage(res);
   }
 
   async search(query, page, filters) {
-    const lang = this.source.lang != "all" ? `&lang=${this.source.lang}` : "";
-    let url = `${this.source.baseUrl}/search?index=&page=${page}&q=${query}&display=&ext=epub&src=zlib&sort=`;
-    if (lang !== "") {
-      url += `&lang=${lang}`;
+    let url = `${this.source.baseUrl}/search?index=&page=${page}&q=${query}&display=&ext=epub&src=lgli&sort=`;
+    if (this.source.lang != "all") {
+      url += `&lang=${this.source.lang}`;
     }
-
     const res = await new Client().get(url, this.headers);
     return this.mangaListFromPage(res);
   }
@@ -82,97 +78,54 @@ class DefaultExtension extends MProvider {
     const doc = new Document(res.body);
     const main = doc.selectFirst('main[class="main"]');
 
+    const name = doc.selectFirst('div.text-3xl.font-bold')?.text.trim();
     const description = doc
       .selectFirst('div[class="mb-1"]')
       ?.text.trim()
       .replace("description", "");
-    const author = doc.selectFirst('div[class="italic"]')?.text.trim();
+    const author = doc.selectFirst('div[class="italic"]')?.text.replaceAll("🔍", "").trim();
     const status = 1;
     const genre = [];
-    console.log(description);
 
     const mirrorLink = main
       .selectFirst('ul[class="list-inside mb-4 ml-1 js-show-external hidden"]')
       .select("li > a")
-      .find((el) => el.getHref?.includes("z-lib.fm")).getHref;
+      .find((el) => el.getHref?.includes("libgen.is")).getHref;
 
     const bookLink = await this._getMirrorLink(client, mirrorLink);
 
-    const bytes = await client.getBytes("https://z-lib.fm" + bookLink, {
+    if (!bookLink) {
+      return {
+        description,
+        genre,
+        author,
+        status,
+        chapters: [],
+      };
+    }
+
+    const book = await parseEpub(name, bookLink, {
       Connection: "Keep-Alive",
       ...this.headers,
     });
 
-    const book = await parseEpub(this.Utf8ArrayToStr(bytes));
-
     const chapters = [];
-    for (const chapterTitle in book.chapters) {
+    for (const chapterTitle of book.chapters) {
       chapters.push({
         name: chapterTitle,
         url: mirrorLink + ";;;" + chapterTitle,
-        dateUpload: Date.now(),
+        dateUpload: String(Date.now()),
         scanlator: null,
       });
     }
-    chapters.reverse();
 
     return {
       description,
       genre,
       author,
-      artist,
       status,
       chapters,
     };
-  }
-
-  // http://www.onicos.com/staff/iz/amuse/javascript/expert/utf.txt
-  /* utf.js - UTF-8 <=> UTF-16 convertion
-   *
-   * Copyright (C) 1999 Masanao Izumo <iz@onicos.co.jp>
-   * Version: 1.0
-   * LastModified: Dec 25 1999
-   * This library is free.  You can redistribute it and/or modify it.
-   */
-  Utf8ArrayToStr(array) {
-    var out, i, len, c;
-    var char2, char3;
-
-    out = "";
-    len = array.length;
-    i = 0;
-    while (i < len) {
-      c = array[i++];
-      switch (c >> 4) {
-        case 0:
-        case 1:
-        case 2:
-        case 3:
-        case 4:
-        case 5:
-        case 6:
-        case 7:
-          // 0xxxxxxx
-          out += String.fromCharCode(c);
-          break;
-        case 12:
-        case 13:
-          // 110x xxxx   10xx xxxx
-          char2 = array[i++];
-          out += String.fromCharCode(((c & 0x1f) << 6) | (char2 & 0x3f));
-          break;
-        case 14:
-          // 1110 xxxx  10xx xxxx  10xx xxxx
-          char2 = array[i++];
-          char3 = array[i++];
-          out += String.fromCharCode(
-            ((c & 0x0f) << 12) | ((char2 & 0x3f) << 6) | ((char3 & 0x3f) << 0)
-          );
-          break;
-      }
-    }
-
-    return out;
   }
 
   async _getMirrorLink(client, mirrorLink) {
@@ -181,41 +134,32 @@ class DefaultExtension extends MProvider {
       ...this.headers,
     });
     const doc = new Document(res.body);
-    return doc.selectFirst(
-      "div.book-details-button > div.btn-group > a.addDownloadedBook"
-    ).getHref;
-    /*const res = await client.get(mirrorLink, {
-      "Host": "annas-archive.org",
-      "Origin": this.source.baseUrl,
-      "Sec-Fetch-Dest": "document",
-      "Sec-Fetch-Mode": "navigate",
-      "Sec-Fetch-Site": "none",
-      ...this.headers
-    });
-    const doc = new Document(res.body);
-    const links = doc.select('ul[class="mb-4"] > li > a').map((el) => el.getHref).filter((el) => el);
-    for (var url in links) {
-      try {
-        const response = await client.head(url, this.headers);
-        if (response.statusCode == 200) {
-          return url;
-        }
-      } catch (e) {}
+    const links = doc.select(
+      "a"
+    );
+    const libgenRs = links.find((el) => el.getHref?.includes("books.ms"))?.getHref;
+    const libgenLi = links.find((el) => el.getHref?.includes("libgen.li"))?.getHref;
+    if (libgenRs && (await client.head(libgenRs, this.headers)).statusCode === 200) {
+      const response = await client.get(libgenRs, this.headers);
+      const document = new Document(response.body);
+      return document.selectFirst('div#download > h2 > a')?.getHref;
+    } else if (libgenLi && (await client.head(libgenLi, this.headers)).statusCode === 200) {
+      const response = await client.get(libgenLi, this.headers);
+      const document = new Document(response.body);
+      return "https://libgen.li/" + document.selectFirst('tbody > tr > td > a')?.getHref;
     }
-    return null;*/
+    return null;
   }
 
-  async getHtmlContent(url) {
+  async getHtmlContent(chapterName, url) {
     const urls = url.split(";;;");
     const client = await new Client();
     const bookLink = await this._getMirrorLink(client, urls[0]);
 
-    const bytes = await client.getBytes("https://z-lib.fm" + bookLink, {
+    return await parseEpubChapter(chapterName, bookLink, {
       Connection: "Keep-Alive",
       ...this.headers,
-    });
-
-    return await parseEpubChapter(this.Utf8ArrayToStr(bytes), urls[1]);
+    }, urls[1]);
   }
 
   async cleanHtmlContent(html) {
