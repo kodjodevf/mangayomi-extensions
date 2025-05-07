@@ -9,6 +9,7 @@ const mangayomiSources = [
     "typeSource": "single",
     "itemType": 2,
     "version": "0.0.1",
+    "appMinVerReq": "0.6.1",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "novel/src/all/annasarchive.js",
