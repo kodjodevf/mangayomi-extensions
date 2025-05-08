@@ -53,15 +53,6 @@ class AniZone extends MProvider {
   Future<MPages> search(String query, int page, FilterList filterList) async {
     String baseUrl = "${source.baseUrl}/filter?keyword=$query";
 
-    Map<String, List<String>> filterMap = {
-      "type": [],
-      "status": [],
-      "season": [],
-      "lang": [],
-      "genre": [],
-    };
-
-    // Regroupement des filtres avec une logique générique
     final filterHandlers = {
       "TypeFilter": "type",
       "LanguageFilter": "lang",
@@ -70,23 +61,30 @@ class AniZone extends MProvider {
       "GenreFilter": "genre",
     };
 
+    final activeFilterParams = <String, String>{};
+
     for (var filter in filterList.filters) {
-      if (filterHandlers.containsKey(filter.type)) {
-        var key = filterHandlers[filter.type]!;
-        for (var stateItem in filter.state as List) {
-          if (stateItem.state == true) {
-            filterMap[key]?.add(stateItem.value as String);
-          }
+      final paramKey = filterHandlers[filter.type];
+      if (paramKey != null && filter.state is List) {
+        final selectedValues =
+            (filter.state as List)
+                .where((item) {
+                  return item.state == true && item.value != null;
+                })
+                .map((item) => item.value as String)
+                .toList();
+
+        if (selectedValues.isNotEmpty) {
+          activeFilterParams[paramKey] = selectedValues.join("%2C");
         }
       }
     }
 
-    //add filters to the url dynamically
-    for (var entry in filterMap.entries) {
-      List<String> values = entry.value;
-      if (values.isNotEmpty) {
-        baseUrl += '&${entry.key}=${values.join("%2C")}';
-      }
+    if (activeFilterParams.isNotEmpty) {
+      final queryString = activeFilterParams.entries
+          .map((entry) => '${Uri.encodeComponent(entry.key)}=${entry.value}')
+          .join('&');
+      baseUrl += '&$queryString';
     }
 
     return _getMangaList("$baseUrl&page=$page");
