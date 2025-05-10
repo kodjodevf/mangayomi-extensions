@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "single",
     "itemType": 1,
     "isNsfw": false,
-    "version": "0.3.7",
+    "version": "0.3.8",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/de/aniworld.js"
@@ -122,7 +122,11 @@ class DefaultExtension extends MProvider {
             .filter(e => e.outerHtml.includes("Produzent:"));
         let author = "";
         if (produzent.length > 0) {
-            author = produzent[0].select("li").map(e => e.text).join(", ");
+          author = produzent[0]
+            .select("li")
+            .map((e) => e.text)
+            .filter((text) => !/^\s\&\s\d+\sweitere$/.test(text))
+            .join(", ");
         }
         const seasonsElements = document.select("#stream > ul:nth-child(1) > li > a");
         // Use asyncPool to limit concurrency while processing seasons
