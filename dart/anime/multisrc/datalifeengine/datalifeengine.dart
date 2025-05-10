@@ -6,10 +6,7 @@ class DataLifeEngine extends MProvider {
 
   MSource source;
 
-  final Client client = Client(
-    source,
-    json.encode({"useDartHttpClient": true}),
-  );
+  final Client client = Client();
 
   @override
   bool get supportsLatest => false;

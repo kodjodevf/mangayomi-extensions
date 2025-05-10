@@ -6,16 +6,12 @@ class Filma24 extends MProvider {
 
   MSource source;
 
-  final Client client = Client(
-    source,
-    json.encode({"useDartHttpClient": true}),
-  );
-
   @override
   String get baseUrl => getPreferenceValue(source.id, "pref_domain_new");
 
   @override
   Future<MPages> getPopular(int page) async {
+    final client = Client(source, json.encode({"useDartHttpClient": true}));
     String pageNu = page == 1 ? "" : "/page/$page/";
     final res = (await client.get(Uri.parse("$baseUrl$pageNu"))).body;
     return animeFromRes(res);
@@ -23,6 +19,7 @@ class Filma24 extends MProvider {
 
   @override
   Future<MPages> getLatestUpdates(int page) async {
+    final client = Client(source, json.encode({"useDartHttpClient": true}));
     String pageNu = page == 1 ? "" : "page/$page/";
     final res =
         (await client.get(Uri.parse("$baseUrl/$pageNu?sort=trendy"))).body;
@@ -31,6 +28,7 @@ class Filma24 extends MProvider {
 
   @override
   Future<MPages> search(String query, int page, FilterList filterList) async {
+    final client = Client(source, json.encode({"useDartHttpClient": true}));
     final filters = filterList.filters;
     String url = "";
     String pageNu = page == 1 ? "" : "page/$page/";
@@ -61,6 +59,7 @@ class Filma24 extends MProvider {
 
   @override
   Future<MManga> getDetail(String url) async {
+    final client = Client(source, json.encode({"useDartHttpClient": true}));
     List<MChapter>? episodesList = [];
     if (!url.contains("seriale")) {
       MChapter episode = MChapter();
@@ -91,6 +90,7 @@ class Filma24 extends MProvider {
 
   @override
   Future<List<MVideo>> getVideoList(String url) async {
+    final client = Client(source, json.encode({"useDartHttpClient": true}));
     final res = (await client.get(Uri.parse(url))).body;
     List<MVideo> videos = [];
     final serverUrls = xpath(res, '//*[@class="player"]/div[1]/a/@href');
@@ -195,6 +195,7 @@ class Filma24 extends MProvider {
   }
 
   Future<List<MVideo>> vidmolyExtractor(String url) async {
+    final client = Client(source, json.encode({"useDartHttpClient": true}));
     final headers = {'Referer': 'https://vidmoly.to'};
     List<MVideo> videos = [];
     final playListUrlResponse = (await client.get(Uri.parse(url))).body;
@@ -231,6 +232,7 @@ class Filma24 extends MProvider {
   }
 
   Future<List<MVideo>> oneuploadExtractor(String url) async {
+    final client = Client(source, json.encode({"useDartHttpClient": true}));
     List<MVideo> videos = [];
     final playListUrlResponse = (await client.get(Uri.parse(url))).body;
     final playlistUrl =
@@ -258,6 +260,7 @@ class Filma24 extends MProvider {
   }
 
   Future<List<MVideo>> uqloadExtractor(String url) async {
+    final client = Client(source, json.encode({"useDartHttpClient": true}));
     final res = (await client.get(Uri.parse(url))).body;
     final js = xpath(res, '//script[contains(text(), "sources:")]/text()');
     if (js.isEmpty) {
