@@ -15,8 +15,8 @@ const mangayomiSources = [
     "pkgPath": "novel/src/all/annasarchive.js",
     "isNsfw": false,
     "hasCloudflare": true,
-    "notes": "EPUBs are automatically downloaded to view chapters! Downloads from Libgen might be slow!",
-  },
+    "notes": "EPUBs are automatically downloaded to view chapters! Downloads from Libgen might be slow!"
+  }
 ];
 
 class DefaultExtension extends MProvider {
