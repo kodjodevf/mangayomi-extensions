@@ -1,6 +1,6 @@
 import '../../../../../model/source.dart';
 
-const _animeworldindiaVersion = "0.0.3";
+const _animeworldindiaVersion = "0.0.35";
 const _animeworldindiaSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/src/all/animeworldindia/animeworldindia.dart";
 
