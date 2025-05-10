@@ -1,7 +1,7 @@
 import '../../../../../model/source.dart';
 
 Source get animetoast => _animetoast;
-const _animetoastVersion = "0.0.2";
+const _animetoastVersion = "0.0.25";
 const _animetoastCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/src/de/animetoast/animetoast.dart";
 Source _animetoast = Source(

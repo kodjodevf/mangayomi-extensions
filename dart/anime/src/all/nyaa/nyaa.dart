@@ -5,7 +5,7 @@ class Nyaa extends MProvider {
 
   MSource source;
 
-  final Client client = Client(source);
+  final Client client = Client();
 
   @override
   Future<MPages> getPopular(int page) async {
