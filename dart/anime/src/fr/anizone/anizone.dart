@@ -5,7 +5,7 @@ class AniZone extends MProvider {
   AniZone({required this.source});
 
   final MSource source;
-  final Client client = Client(source);
+  final Client client = Client();
 
   // Constants for the xpath
   static const String urlXpath =
