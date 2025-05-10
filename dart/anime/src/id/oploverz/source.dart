@@ -1,7 +1,7 @@
 import '../../../../../model/source.dart';
 
 Source get oploverz => _oploverz;
-const _oploverzVersion = "0.0.5";
+const _oploverzVersion = "0.0.55";
 const _oploverzCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/src/id/oploverz/oploverz.dart";
 Source _oploverz = Source(

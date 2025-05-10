@@ -6,7 +6,7 @@ class MangaReader extends MProvider {
 
   MSource source;
 
-  final Client client = Client(source);
+  final Client client = Client();
 
   @override
   String get baseUrl => getPreferenceValue(source.id, "override_baseurl");
