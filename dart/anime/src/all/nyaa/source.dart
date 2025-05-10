@@ -1,6 +1,6 @@
 import '../../../../../model/source.dart';
 
-const _nyaaVersion = "0.0.25";
+const _nyaaVersion = "0.0.3";
 const _nyaaSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/src/all/nyaa/nyaa.dart";
 
