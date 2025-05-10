@@ -7,12 +7,13 @@ const mangayomiSources = [{
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/en.novelupdates.png",
   "typeSource": "single",
   "itemType": 2,
-  "version": "0.0.3",
+  "version": "0.0.4",
   "dateFormat": "",
   "dateFormatLocale": "",
   "pkgPath": "novel/src/en/novelupdates.js",
   "isNsfw": false,
-  "hasCloudflare": true
+  "hasCloudflare": true,
+  "notes": "This extension requires you to login to view the chapters!"
 }];
 
 class DefaultExtension extends MProvider {
@@ -180,7 +181,7 @@ class DefaultExtension extends MProvider {
     };
   }
 
-  async getHtmlContent(url) {
+  async getHtmlContent(name, url) {
     const client = await new Client();
     const res = await client.get(url, {
       Priority: "u=0, i",

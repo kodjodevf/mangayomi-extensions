@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/main/javascript/icon/en.wordrain69.png",
   "typeSource": "single",
   "itemType": 2,
-  "version": "0.0.3",
+  "version": "0.0.4",
   "dateFormat": "",
   "dateFormatLocale": "",
   "pkgPath": "novel/src/en/wordrain69.js",
@@ -115,7 +115,7 @@ class DefaultExtension extends MProvider {
     };
   }
 
-  async getHtmlContent(url) {
+  async getHtmlContent(name, url) {
     const client = await new Client();
     const res = await client.get(url);
     return await this.cleanHtmlContent(res.body);
