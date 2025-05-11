@@ -92,66 +92,62 @@ class AniZone extends MProvider {
 
   Future<MManga> getDetail(String url) async {
     MManga anime = MManga();
-    try {
-      final doc = (await client.get(Uri.parse(url))).body;
-      final description = xpath(doc, '//p[contains(@class,"short")]/text()');
-      anime.description = description.isNotEmpty ? description.first : "";
+    final doc = (await client.get(Uri.parse(url))).body;
+    final description = xpath(doc, '//p[contains(@class,"short")]/text()');
+    anime.description = description.isNotEmpty ? description.first : "";
 
-      final statusList = xpath(
-        doc,
-        '//div[contains(@class,"col2")]//div[contains(@class,"item")]//div[contains(@class,"item-content")]/text()',
-      );
-      if (statusList.isNotEmpty) {
-        if (statusList[0] == "Terminer") {
-          anime.status = MStatus.completed;
-        } else if (statusList[0] == "En cours") {
-          anime.status = MStatus.ongoing;
-        } else {
-          anime.status = MStatus.unknown;
-        }
+    final statusList = xpath(
+      doc,
+      '//div[contains(@class,"col2")]//div[contains(@class,"item")]//div[contains(@class,"item-content")]/text()',
+    );
+    if (statusList.isNotEmpty) {
+      if (statusList[0] == "Terminer") {
+        anime.status = MStatus.completed;
+      } else if (statusList[0] == "En cours") {
+        anime.status = MStatus.ongoing;
       } else {
         anime.status = MStatus.unknown;
       }
-
-      anime.genre = xpath(
-        doc,
-        '//div[contains(@class,"item")]//div[contains(@class,"item-content")]//a[contains(@href,"genre")]/text()',
-      );
-
-      final regex = RegExp(r'(\d+)$');
-      final match = regex.firstMatch(url);
-
-      if (match == null) {
-        throw Exception('Numéro de l\'épisode non trouvé dans l\'URL.');
-      }
-
-      final res =
-          (await client.get(
-            Uri.parse("${source.baseUrl}/ajax/episode/list/${match.group(1)}"),
-          )).body;
-
-      List<MChapter> episodesList = [];
-
-      final episodeElements = parseHtml(
-        json.decode(res)["html"],
-      ).select(".ep-item");
-
-      // Associer chaque titre à son URL et récupérer les vidéos
-      for (var element in episodeElements) {
-        MChapter episode = MChapter();
-        episode.name = element.attr("title");
-
-        String id = substringAfterLast(element.attr("href"), "=");
-        episode.url = "${source.baseUrl}/ajax/episode/servers?episodeId=$id";
-        episodesList.add(episode);
-      }
-
-      anime.chapters = episodesList.reversed.toList();
-
-      return anime;
-    } catch (e) {
-      throw Exception('Erreur lors de la récupération des détails: $e');
+    } else {
+      anime.status = MStatus.unknown;
     }
+
+    anime.genre = xpath(
+      doc,
+      '//div[contains(@class,"item")]//div[contains(@class,"item-content")]//a[contains(@href,"genre")]/text()',
+    );
+
+    final regex = RegExp(r'(\d+)$');
+    final match = regex.firstMatch(url);
+
+    if (match == null) {
+      throw Exception('Numéro de l\'épisode non trouvé dans l\'URL.');
+    }
+
+    final res =
+        (await client.get(
+          Uri.parse("${source.baseUrl}/ajax/episode/list/${match.group(1)}"),
+        )).body;
+
+    List<MChapter> episodesList = [];
+
+    final episodeElements = parseHtml(
+      json.decode(res)["html"],
+    ).select(".ep-item");
+
+    // Associer chaque titre à son URL et récupérer les vidéos
+    for (var element in episodeElements) {
+      MChapter episode = MChapter();
+      episode.name = element.attr("title");
+
+      String id = substringAfterLast(element.attr("href"), "=");
+      episode.url = "${source.baseUrl}/ajax/episode/servers?episodeId=$id";
+      episodesList.add(episode);
+    }
+
+    anime.chapters = episodesList.reversed.toList();
+
+    return anime;
   }
 
   @override
