@@ -65,7 +65,8 @@ class AnimePahe extends MProvider {
     ];
     MManga anime = MManga();
     final id = substringBefore(substringAfterLast(url, "?anime_id="), "&name=");
-    final session = await getSession(id);
+    final name = substringAfterLast(url, "&name=");
+    final session = await getSession(name, id);
     final res = (await client.get(
       Uri.parse("$baseUrl/anime/$session?anime_id=$id"),
       headers: headers,
@@ -137,7 +138,7 @@ class AnimePahe extends MProvider {
     return animeList;
   }
 
-  Future<String> getSession(String animeId) async {
+  Future<String> getSession(String title, String animeId) async {
     final noRedirect = Client(
       source,
       json.encode({"followRedirects": false, "useDartHttpClient": true}),
@@ -147,6 +148,19 @@ class AnimePahe extends MProvider {
       Uri.parse("$baseUrl/a/$animeId"),
       headers: headers,
     );
+    if (res.statusCode == 302) {
+      final res = (await client.get(
+        Uri.parse("$baseUrl/api?m=search&q=$title"),
+        headers: headers,
+      )).body;
+      return substringBefore(
+        substringAfter(
+          substringAfter(res, "\"id\":$animeId"),
+          "\"session\":\"",
+        ),
+        "\"",
+      );
+    }
     final location =
         "https://${substringAfterLast(res.headers["location"], "https://")}";
     final uri = Uri.parse(location);
