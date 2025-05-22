@@ -22,11 +22,10 @@ class AnimePahe extends MProvider {
 
   @override
   Future<MPages> getLatestUpdates(int page) async {
-    final res =
-        (await client.get(
-          Uri.parse("$baseUrl/api?m=airing&page=$page"),
-          headers: headers,
-        )).body;
+    final res = (await client.get(
+      Uri.parse("$baseUrl/api?m=airing&page=$page"),
+      headers: headers,
+    )).body;
     final jsonResult = json.decode(res);
     final hasNextPage = jsonResult["current_page"] < jsonResult["last_page"];
     List<MManga> animeList = [];
@@ -43,11 +42,10 @@ class AnimePahe extends MProvider {
 
   @override
   Future<MPages> search(String query, int page, FilterList filterList) async {
-    final res =
-        (await client.get(
-          Uri.parse("$baseUrl/api?m=search&l=8&q=$query"),
-          headers: headers,
-        )).body;
+    final res = (await client.get(
+      Uri.parse("$baseUrl/api?m=search&l=8&q=$query"),
+      headers: headers,
+    )).body;
     final jsonResult = json.decode(res);
     List<MManga> animeList = [];
     for (var item in jsonResult["data"]) {
@@ -67,13 +65,11 @@ class AnimePahe extends MProvider {
     ];
     MManga anime = MManga();
     final id = substringBefore(substringAfterLast(url, "?anime_id="), "&name=");
-    final name = substringAfterLast(url, "&name=");
-    final session = await getSession(name, id);
-    final res =
-        (await client.get(
-          Uri.parse("$baseUrl/anime/$session?anime_id=$id"),
-          headers: headers,
-        )).body;
+    final session = await getSession(id);
+    final res = (await client.get(
+      Uri.parse("$baseUrl/anime/$session?anime_id=$id"),
+      headers: headers,
+    )).body;
     final document = parseHtml(res);
     final status =
         (document.xpathFirst('//div/p[contains(text(),"Status:")]/text()') ??
@@ -123,29 +119,38 @@ class AnimePahe extends MProvider {
       MChapter episode = MChapter();
       episode.name = "Episode ${item["episode"]}";
       episode.url = "/play/$session/${item["session"]}";
-      episode.dateUpload =
-          parseDates([item["created_at"]], "yyyy-MM-dd HH:mm:ss", "en")[0];
+      episode.dateUpload = parseDates(
+        [item["created_at"]],
+        "yyyy-MM-dd HH:mm:ss",
+        "en",
+      )[0];
       animeList.add(episode);
     }
     if (hasNextPage) {
       final newUrl = "${substringBeforeLast(url, "&page=")}&page=${page + 1}";
-      final newRes =
-          (await client.get(Uri.parse(newUrl), headers: headers)).body;
+      final newRes = (await client.get(
+        Uri.parse(newUrl),
+        headers: headers,
+      )).body;
       animeList.addAll(await recursivePages(newUrl, newRes, session));
     }
     return animeList;
   }
 
-  Future<String> getSession(String title, String animeId) async {
-    final res =
-        (await client.get(
-          Uri.parse("$baseUrl/api?m=search&q=$title"),
-          headers: headers,
-        )).body;
-    return substringBefore(
-      substringAfter(substringAfter(res, "\"id\":$animeId"), "\"session\":\""),
-      "\"",
+  Future<String> getSession(String animeId) async {
+    final noRedirect = Client(
+      source,
+      json.encode({"followRedirects": false, "useDartHttpClient": true}),
     );
+
+    final res = await noRedirect.get(
+      Uri.parse("$baseUrl/a/$animeId"),
+      headers: headers,
+    );
+    final location =
+        "https://${substringAfterLast(res.headers["location"], "https://")}";
+    final uri = Uri.parse(location);
+    return uri.pathSegments.last;
   }
 
   @override
@@ -173,8 +178,9 @@ class AnimePahe extends MProvider {
           source,
           json.encode({"followRedirects": false, "useDartHttpClient": true}),
         );
-        final kwikHeaders =
-            (await noRedirectClient.get(Uri.parse("${paheWinLink}/i"))).headers;
+        final kwikHeaders = (await noRedirectClient.get(
+          Uri.parse("${paheWinLink}/i"),
+        )).headers;
         final kwikUrl =
             "https://${substringAfterLast(getMapValue(json.encode(kwikHeaders), "location"), "https://")}";
         final reskwik = (await client.get(
@@ -203,21 +209,25 @@ class AnimePahe extends MProvider {
           );
           cookie +=
               "; ${getMapValue(json.encode(reskwik.headers), "set-cookie").replaceAll("path=/;", "")}";
-          final resNo = await Client(
-            source,
-            json.encode({"followRedirects": false, "useDartHttpClient": true}),
-          ).post(
-            Uri.parse(url),
-            headers: {
-              "referer": reskwik.request.url.toString(),
-              "cookie": cookie,
-              "user-agent": getMapValue(
-                json.encode(res.request.headers),
-                "user-agent",
-              ),
-            },
-            body: {"_token": tok},
-          );
+          final resNo =
+              await Client(
+                source,
+                json.encode({
+                  "followRedirects": false,
+                  "useDartHttpClient": true,
+                }),
+              ).post(
+                Uri.parse(url),
+                headers: {
+                  "referer": reskwik.request.url.toString(),
+                  "cookie": cookie,
+                  "user-agent": getMapValue(
+                    json.encode(res.request.headers),
+                    "user-agent",
+                  ),
+                },
+                body: {"_token": tok},
+              );
           code = resNo.statusCode;
           tries++;
           location = getMapValue(json.encode(resNo.headers), "location");
