@@ -148,7 +148,11 @@ class AnimePahe extends MProvider {
       Uri.parse("$baseUrl/a/$animeId"),
       headers: headers,
     );
-    if (res.statusCode == 302) {
+
+    final location =
+        "https://${substringAfterLast(res.headers["location"], "https://")}";
+
+    if (location == '$baseUrl/anime') {
       final res = (await client.get(
         Uri.parse("$baseUrl/api?m=search&q=$title"),
         headers: headers,
@@ -161,8 +165,6 @@ class AnimePahe extends MProvider {
         "\"",
       );
     }
-    final location =
-        "https://${substringAfterLast(res.headers["location"], "https://")}";
     final uri = Uri.parse(location);
     return uri.pathSegments.last;
   }
