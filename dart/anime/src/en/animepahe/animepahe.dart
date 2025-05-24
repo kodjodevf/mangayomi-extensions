@@ -150,7 +150,7 @@ class AnimePahe extends MProvider {
     );
 
     final location =
-        "https://${substringAfterLast(res.headers["location"], "https://")}";
+        "https://${substringAfterLast(getMapValue(json.encode(res.headers), "location"), "https://")}";
 
     if (location == '$baseUrl/anime') {
       final res = (await client.get(
@@ -165,8 +165,7 @@ class AnimePahe extends MProvider {
         "\"",
       );
     }
-    final uri = Uri.parse(location);
-    return uri.pathSegments.last;
+    return substringAfterLast(location, '/');
   }
 
   @override
