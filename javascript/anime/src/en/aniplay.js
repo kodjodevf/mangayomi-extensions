@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://aniplaynow.live/",
     "typeSource": "single",
     "itemType": 1,
-    "version": "1.3.2",
+    "version": "1.4.5",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/en/aniplay.js"
@@ -22,6 +22,10 @@ class DefaultExtension extends MProvider {
     getPreference(key) {
         const preferences = new SharedPreferences();
         return preferences.get(key);
+    }
+
+    getBaseUrl() {
+        return "https://" + this.getPreference("aniplay_override_base_url")
     }
 
 
@@ -283,21 +287,16 @@ class DefaultExtension extends MProvider {
     }
 
     async aniplayRequest(slug, body) {
-        var baseUrl = "https://" + this.getPreference("aniplay_override_base_url")
+        var baseUrl = this.getBaseUrl()
 
-        var next_action_overrides = this.getPreference("aniplay_next_action_key").split("||")
-        var next_action_key = 0
-        if (baseUrl.endsWith(".lol")) {
-            next_action_key = 1
-        }
-        var next_action_values = next_action_overrides[next_action_key].split(":")
+        var next_action_overrides = await this.extractKeys(baseUrl)
 
 
         var next_action = ""
         if (slug.indexOf("info/") > -1) {
-            next_action = next_action_values[0]
+            next_action = next_action_overrides["getEpisodes"]
         } else if (slug.indexOf("watch/") > -1) {
-            next_action = next_action_values[1]
+            next_action = next_action_overrides["getSources"]
         }
 
 
@@ -308,7 +307,7 @@ class DefaultExtension extends MProvider {
             "Content-Type": "application/json",
         }
 
-        var response = await new Client().post(url, headers, body);
+        var response = await this.client.post(url, headers, body);
 
         if (response.statusCode != 200) {
             throw new Error("Error: " + response.statusText);
@@ -320,6 +319,9 @@ class DefaultExtension extends MProvider {
 
     async getDetail(url) {
         var anilistId = url
+        if (url.includes("info/")) {
+            anilistId = url.substring(url.lastIndexOf("info/") + 5)
+        }
         var animeData = await this.getAnimeDetails(anilistId)
 
 
@@ -330,222 +332,145 @@ class DefaultExtension extends MProvider {
             throw new Error("Error: No data found for the given URL");
         }
 
-        var user_provider = this.getPreference("aniplay_pref_provider_3");
-        var choices = result
-        if (user_provider !== "all") {
-            for (var ch of result) {
-                if (ch["providerId"] == user_provider) {
-                    choices = [ch]
-                    break;
-                }
+        var chapters = []
+        var chaps = {}
+        for (var item of result) {
+            var providerId = item["providerId"]
+            //  Hika has bunch of embeds, not stream url, so avoiding it for now
+            if (providerId == "hika") continue
+            var episodes = item['episodes']
+
+            for (var episode of episodes) {
+                var id = episode.id
+                var number = episode.number.toString()
+
+                var chap = chaps.hasOwnProperty(number) ? chaps[number] : {}
+
+                var updatedAt = episode.hasOwnProperty("updatedAt") ? episode.updatedAt.toString() : null
+                var title = episode.hasOwnProperty("title") ? episode.title : ""
+                var isFiller = episode.hasOwnProperty("isFiller") ? episode.isFiller : false
+                var hasDub = episode.hasOwnProperty("hasDub") ? episode.hasDub : false
+
+                chap.title = title == "" ? chap.title : title
+                chap.isFiller = isFiller || chap.isFiller
+                chap.hasDub = hasDub || chap.hasDub
+                chap.updatedAt = updatedAt ?? chap.updatedAt
+
+
+                var prvds = chap.hasOwnProperty("prvds") ? chap["prvds"] : {}
+                prvds[providerId] = { anilistId, providerId, id, number, hasDub }
+                chap["prvds"] = prvds
+
+                chaps[number] = chap
             }
+
         }
+        var markFillers = this.getPreference("aniplay_pref_mark_filler")
 
-        for (const choice of choices) {
-            var user_mark_filler_ep = this.getPreference("aniplay_pref_mark_filler");
-            var chapters = []
-            var epList = choice.episodes
-            for (var ep of epList) {
-                var title = ep.title
-                var num = ep.number
-                var isFiller = ep.isFiller
-
-                var scanlator = isFiller && user_mark_filler_ep ? `Filler` : null;
-
-                var dateUpload = "createdAt" in ep ? new Date(ep.createdAt) : Date.now()
-                dateUpload = dateUpload.valueOf().toString();
-                delete ep.img
-                delete ep.title
-                delete ep.description
-                delete ep.isFiller
-                var epUrl = `${anilistId}||${JSON.stringify(ep)}||${choice.providerId}`
-                chapters.push({ name: `E${num}: ${title}`, url: epUrl, dateUpload, scanlator })
+        for (var episodeNum in chaps) {
+            var chap = chaps[episodeNum]
+            var title = chap.title
+            var dateUpload = chap.updatedAt
+            var scanlator = "SUB"
+            if (chap.hasDub) {
+                scanlator += ", DUB"
             }
-        }
+            var isFillers = chap.isFiller
+            if (markFillers && isFillers) {
+                scanlator = "FILLER, " + scanlator
+            }
+            var epData = JSON.stringify(chap["prvds"])
 
+            chapters.push({ name: `E${episodeNum}: ${title}`, url: epData, dateUpload, scanlator })
+        }
 
         var format = animeData.format
         if (format === "MOVIE") chapters[0].name = "Movie"
 
-        var baseUrl = "https://" + this.getPreference("aniplay_override_base_url")
+        var baseUrl = this.getBaseUrl()
         animeData.link = `${baseUrl}/anime/${slug}`
         animeData.chapters = chapters.reverse()
         return animeData
     }
 
-
-    // Sorts streams based on user preference.
-    async sortStreams(streams) {
-        var sortedStreams = [];
-        var copyStreams = streams.slice()
-
-        var pref = await this.getPreference("aniplay_pref_video_resolution");
-        for (var stream of streams) {
-
-            if (stream.quality.indexOf(pref) > -1) {
-                sortedStreams.push(stream);
-                var index = copyStreams.indexOf(stream);
-                if (index > -1) {
-                    copyStreams.splice(index, 1);
-                }
-                break;
-            }
-        }
-        return [...sortedStreams, ...copyStreams]
-    }
-
-    // Adds proxy to streams
-    async streamProxy(providerId, streams) {
-        var proxyBaseUrl = this.getPreference("aniplay_stream_proxy");
-        var slug = "/fetch?url="
-        var ref = "&ref="
-        if (providerId == "yuki") {
-            ref += "https://hianime.to"
-        } else if (providerId == "pahe") {
-            ref += "https://kwik.si"
-        } else if (providerId === "maze") {
-            ref += ""
-        } else if (providerId === "kuro") {
-            ref = ""
-        }
-
-        streams.forEach(stream => {
-            stream.url = proxyBaseUrl + slug + stream.url + ref;
-            stream.originalUrl = proxyBaseUrl + slug + stream.originalUrl + ref;
-        });
-
-        return streams
-    }
-
-    // Extracts the streams url for different resolutions from a hls stream.
-    async extractStreams(url, providerId, hdr = {}) {
-        var streams = [{
-            url: url,
-            originalUrl: url,
-            quality: `Auto - ${providerId}`,
-            headers: hdr
-        }];
-        var doExtract = this.getPreference("aniplay_pref_extract_streams");
-        // Pahe only has auto
-        if (providerId === "pahe" || !doExtract) {
-            return streams;
-        }
-
-        const response = await new Client().get(url, hdr);
-        const body = response.body;
-        const lines = body.split('\n');
-
-        for (let i = 0; i < lines.length; i++) {
-            if (lines[i].startsWith('#EXT-X-STREAM-INF:')) {
-                var resolution = lines[i].match(/RESOLUTION=(\d+x\d+)/)[1];
-                var m3u8Url = lines[i + 1].trim();
-                if (providerId === "yuki") {
-                    var orginalUrl = url
-                    m3u8Url = orginalUrl.replace("master.m3u8", m3u8Url)
-                }
-                streams.push({
-                    url: m3u8Url,
-                    originalUrl: m3u8Url,
-                    quality: `${resolution} - ${providerId}`,
-                    headers: hdr
-                });
-            }
-        }
-        return streams
-
-    }
-
-    async getAnyStreams(result) {
-        var m3u8Url = result.sources[0].url
-        return await this.extractStreams(m3u8Url, "any");
-    }
-
-    async getYukiStreams(result) {
-        var m3u8Url = result.sources[0].url
-        var streams = await this.extractStreams(m3u8Url, "yuki");
-
-        var subtitles = []
-        result.subtitles.forEach(sub => {
-            var label = sub.label
-            if (label.indexOf("thumbnail") < 0) { // thumbnails shouldnt be included
-                subtitles.push({
-                    "label": label,
-                    "file": sub.url,
-                });
-            }
-        })
-        streams[0].subtitles = subtitles
-
-        return streams
-    }
-
-    async getPaheStreams(result) {
-        var m3u8Url = result.sources[0].url
-        var hdr = result.headers;
-        return await this.extractStreams(m3u8Url, "pahe", hdr);
-    }
-
-    async getMazeStreams(result) {
-        var m3u8Url = result.sources[0].url
-        var hdr = result.headers;
-        return await this.extractStreams(m3u8Url, "maze", hdr);
-    }
-
-    async getKuroStreams(result) {
-        var links = result.sources
-        var hdr = result.headers;
-        var streams = [];
-        for (var stream of links) {
-            var quality = stream.quality
-            quality = quality == "default" ? "auto" : quality
-            streams.push({
-                url: stream.url,
-                originalUrl: stream.url,
-                quality: `${quality} - kuro`,
-                headers: hdr
-            });
-        }
-        return streams
-    }
-
     // For anime episode video list
     async getVideoList(url) {
-        var urlSplits = url.split("||")
-        var anilistId = urlSplits[0]
-        var epData = JSON.parse(urlSplits[1])
-        var providerId = urlSplits[2]
+        var providerInfos = JSON.parse(url)
 
-        var user_audio_type = this.getPreference("aniplay_pref_audio_type");
-        var subOrDub = epData.hasDub && user_audio_type === "dub" ? "dub" : "sub"
+        var pref_provider = this.getPreference("aniplay_pref_provider_4")
+        var providers = Object.keys(providerInfos)
 
-        var slug = `watch/${anilistId}`
-        var body = [
-            anilistId,
-            providerId,
-            epData.id,
-            epData.number.toString(),
-            subOrDub
-        ]
-        var result = await this.aniplayRequest(slug, body)
-        if (result === null) {
+        if (pref_provider == "any") {
+            //any = randomly choose one
+            var randomIndex = Math.floor(Math.random() * providers.length);
+            providers = [providers[randomIndex]]
+
+        } else if (pref_provider == "pahe") {
+            //pahe = if "pahe" is available then chose it
+            if (providerInfos.hasOwnProperty("pahe")) {
+                providers = ["pahe"]
+            }
+        } else if (pref_provider == "yuki") {
+            //yuki = if "yuki" is available then chose it
+            if (providerInfos.hasOwnProperty("yuki")) {
+                providers = ["yuki"]
+            }
+        }
+
+        var finalStreams = []
+        var user_audio_type = this.getPreference("aniplay_pref_audio_type_1")
+
+        for (var provider of providers) {
+            var streams = []
+            var providerInfo = providerInfos[provider]
+
+            var anilistId = providerInfo.anilistId
+            var providerId = providerInfo.providerId
+            var id = providerInfo.id
+            var number = providerInfo.number
+            var hasDub = providerInfo.hasDub
+            var audios = []
+
+            // if there "sub" is prefered or there are no preference then add sub
+            if (user_audio_type.includes("sub") || user_audio_type.length < 1) audios.push("sub")
+            if (hasDub && user_audio_type.includes("dub")) audios.push("dub")
+            var slug = `watch/${anilistId}`
+
+            for (var audio of audios) {
+                var body = [
+                    anilistId,
+                    providerId,
+                    id,
+                    number,
+                    audio
+                ]
+
+
+                var result = await this.aniplayRequest(slug, body)
+                if (result === null) {
+                    continue
+                }
+
+                if (providerId == "yuki") {
+                    // Yuki always has softsubs aka subtitles are seperate.
+                    streams = await this.getYukiStreams(result, "soft" + audio)
+                } else if (providerId == "pahe") {
+                    // Pahe always has hardsubs aka subtitles printed on video.
+                    streams = await this.getPaheStreams(result, "hard" + audio)
+                } else {
+                    continue
+                }
+
+                if (this.getPreference("aniplay_proxy")) streams = this.streamProxy(providerId, streams)
+                var sortedStreams = this.sortStreams(streams)
+                finalStreams = [...sortedStreams, ...finalStreams]
+            }
+        }
+
+        if (finalStreams.length < 1) {
             throw new Error("Error: No data found for the given URL");
         }
-
-        var streams = []
-        if (providerId == "yuki") {
-            streams = await this.getYukiStreams(result)
-        } else if (providerId == "pahe") {
-            streams = await this.getPaheStreams(result)
-        } else if (providerId === "maze") {
-            streams = await this.getMazeStreams(result)
-        } else if (providerId === "kuro") {
-            streams = await this.getKuroStreams(result)
-        } else {
-            streams = await this.getAnyStreams(result) //If new provider found getAnyStreams will extract only the streams
-        }
-
-        if (this.getPreference("aniplay_proxy")) streams = await this.streamProxy(providerId, streams)
-        return await this.sortStreams(streams)
+        return finalStreams
     }
 
     getSourcePreferences() {
@@ -560,56 +485,47 @@ class DefaultExtension extends MProvider {
             }
         },
         {
-            "key": "aniplay_pref_title",
-            "listPreference": {
-                "title": "Preferred Title",
-                "summary": "",
-                "valueIndex": 0,
-                "entries": ["Romaji", "English", "Native"],
-                "entryValues": ["romaji", "english", "native"],
-            }
-        }, {
-            key: "aniplay_next_action_key",
-            editTextPreference: {
-                title: "Override next_action key",
+            key: "aniplay_pref_title",
+            listPreference: {
+                title: "Preferred Title",
                 summary: "",
-                value: "7f328d44382d74f2942c42d0bc9915b2d510628a02:7f702090c0d779331a0b55e1ee0cfea85ff4cb963a||7fe26ef575b85a8a7166a411dba3a21263fe5b9306:7fbb025dd45b14410eb1a8ffcbb4615b0a5a1e5c3c",
-                dialogTitle: "Override next_action key",
-                dialogMessage: "",
+                valueIndex: 0,
+                entries: ["Romaji", "English", "Native"],
+                entryValues: ["romaji", "english", "native"],
             }
         },
         {
-            "key": "aniplay_pref_provider_3",
-            "listPreference": {
-                "title": "Preferred provider",
-                "summary": "",
-                "valueIndex": 0,
-                "entries": ["Any", "Yuki", "Pahe", "Maze", "Kuro"],
-                "entryValues": ["any", "yuki", "pahe", "maze", "kuro"],
+            key: "aniplay_pref_provider_4",
+            listPreference: {
+                title: "Preferred provider",
+                summary: "",
+                valueIndex: 1,
+                entries: ["Any", "All", "Yuki", "Pahe"],
+                entryValues: ["any", "all", "yuki", "pahe"],
             }
         }, {
-            "key": "aniplay_pref_mark_filler",
-            "switchPreferenceCompat": {
-                "title": "Mark filler episodes",
-                "summary": "Filler episodes will be marked with (F)",
-                "value": false
+            key: "aniplay_pref_mark_filler",
+            switchPreferenceCompat: {
+                title: "Mark filler episodes",
+                summary: "Filler episodes will be marked with (F)",
+                value: false
             }
         },
         {
-            "key": "aniplay_pref_audio_type",
-            "listPreference": {
-                "title": "Preferred audio type",
-                "summary": "Sub/Dub",
-                "valueIndex": 0,
-                "entries": ["Sub", "Dub"],
-                "entryValues": ["sub", "dub"],
+            key: "aniplay_pref_audio_type_1",
+            multiSelectListPreference: {
+                title: 'Preferred stream sub/dub type',
+                summary: '',
+                values: ["sub"],
+                entries: ["Sub", "Dub"],
+                entryValues: ["sub", "dub"]
             }
         }, {
-            "key": "aniplay_pref_extract_streams",
-            "switchPreferenceCompat": {
+            key: "aniplay_pref_extract_streams",
+            switchPreferenceCompat: {
                 'title': 'Split stream into different quality streams',
-                "summary": "Split stream Auto into 360p/720p/1080p",
-                "value": true
+                summary: "Split stream Auto into 360p/720p/1080p",
+                value: true
             }
         }, {
             key: 'aniplay_pref_video_resolution',
@@ -640,4 +556,150 @@ class DefaultExtension extends MProvider {
 
         ]
     }
+
+    // ----------- Stream manipulations -------
+    // Sorts streams based on user preference.
+    sortStreams(streams) {
+        var sortedStreams = [];
+        var copyStreams = streams.slice()
+
+        var pref = this.getPreference("aniplay_pref_video_resolution");
+        for (var stream of streams) {
+
+            if (stream.quality.indexOf(pref) > -1) {
+                sortedStreams.push(stream);
+                var index = copyStreams.indexOf(stream);
+                if (index > -1) {
+                    copyStreams.splice(index, 1);
+                }
+                break;
+            }
+        }
+        return [...sortedStreams, ...copyStreams]
+    }
+
+    // Adds proxy to streams
+    streamProxy(providerId, streams) {
+        var proxyBaseUrl = this.getPreference("aniplay_stream_proxy");
+        var slug = "/fetch?url="
+        var ref = "&ref="
+        if (providerId == "yuki") {
+            ref += "https://hianime.to"
+        } else if (providerId == "pahe") {
+            ref += "https://kwik.si"
+        }
+
+        streams.forEach(stream => {
+            stream.url = proxyBaseUrl + slug + stream.url + ref;
+            stream.originalUrl = proxyBaseUrl + slug + stream.originalUrl + ref;
+        });
+
+        return streams
+    }
+
+    // Extracts the streams url for different resolutions from a hls stream.
+    async extractStreams(url, audio, providerId, hdr = {}) {
+        audio = audio.toUpperCase()
+        var streams = [{
+            url: url,
+            originalUrl: url,
+            quality: `Auto - ${providerId} : ${audio}`,
+            headers: hdr
+        }];
+        var doExtract = this.getPreference("aniplay_pref_extract_streams");
+        // Pahe only has auto
+        if (providerId === "pahe" || !doExtract) {
+            return streams;
+        }
+
+        const response = await this.client.get(url, hdr);
+        const body = response.body;
+        const lines = body.split('\n');
+
+        for (let i = 0; i < lines.length; i++) {
+            if (lines[i].startsWith('#EXT-X-STREAM-INF:')) {
+                var resolution = lines[i].match(/RESOLUTION=(\d+x\d+)/)[1];
+                var m3u8Url = lines[i + 1].trim();
+                if (providerId === "yuki") {
+                    var orginalUrl = url
+                    m3u8Url = orginalUrl.replace("master.m3u8", m3u8Url)
+                }
+                streams.push({
+                    url: m3u8Url,
+                    originalUrl: m3u8Url,
+                    quality: `${resolution} - ${providerId} : ${audio}`,
+                    headers: hdr
+                });
+            }
+        }
+        return streams
+
+    }
+
+    async getYukiStreams(result, audio) {
+        var m3u8Url = result.sources[0].url
+        var streams = await this.extractStreams(m3u8Url, audio, "yuki");
+
+        var subtitles = []
+        result.subtitles.forEach(sub => {
+            var label = sub.label
+            if (label.indexOf("thumbnail") < 0) { // thumbnails shouldnt be included
+                subtitles.push({
+                    "label": sub.lang,
+                    "file": sub.url,
+                });
+            }
+        })
+        streams[0].subtitles = subtitles
+
+        return streams
+    }
+
+    async getPaheStreams(result, audio) {
+        var m3u8Url = result.sources[0].url
+        var hdr = result.headers;
+        return await this.extractStreams(m3u8Url, audio, "pahe", hdr);
+    }
+
+
+    //------------ Extract keys ---------------
+    async extractKeys(baseUrl) {
+        const preferences = new SharedPreferences();
+        let KEYS = preferences.getString("aniplay_keys", "");
+        var KEYS_TS = parseInt(preferences.getString("aniplay_keys_ts", "0"));
+        var now_ts = parseInt(new Date().getTime() / 1000);
+
+        // Checks for keys every 60 minutes and baseUrl is present in the map
+        if (now_ts - KEYS_TS < 60 * 60 && KEYS.includes(baseUrl)) {
+            return JSON.parse(KEYS)
+        }
+
+        var randomAnimeUrl = baseUrl + "/anime/watch/1"
+        var res = (await this.client.get(randomAnimeUrl)).body
+        var sKey = "/_next/static/chunks/app/(user)/(media)/"
+        var eKey = '"'
+        var start = res.indexOf(sKey) + sKey.length
+        var end = res.indexOf(eKey, start)
+        var jsSlug = res.substring(start, end)
+
+        var jsUrl = baseUrl + sKey + jsSlug
+        res = (await this.client.get(jsUrl)).body
+        var regex = /\(0,\w+\.createServerReference\)\("([a-f0-9]+)",\w+\.callServer,void 0,\w+\.findSourceMapURL,"(getSources|getEpisodes)"\)/g;
+        var matches = [...res.matchAll(regex)];
+        var keysMap = {};
+        matches.forEach(match => {
+            var hashId = match[1];
+            var functionName = match[2];
+            keysMap[functionName] = hashId;
+        });
+        keysMap["baseUrl"] = baseUrl;
+
+        preferences.setString("aniplay_keys", JSON.stringify(keysMap));
+        preferences.setString("aniplay_keys_ts", now_ts.toString());
+
+        return keysMap;
+
+    }
+
+    // End
 }

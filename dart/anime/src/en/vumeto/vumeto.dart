@@ -6,7 +6,7 @@ class Vumeto extends MProvider {
 
   MSource source;
 
-  final Client client = Client(source);
+  final Client client = Client();
 
   @override
   bool get supportsLatest => true;
@@ -99,21 +99,30 @@ class Vumeto extends MProvider {
     final resp = await client.get(uri, headers);
     final document = parseHtml(resp.body);
 
-    final description = document.selectFirst("meta[name='description']").attr("content") ?? '';
+    final description =
+        document.selectFirst("meta[name='description']").attr("content") ?? '';
 
     MStatus status = MStatus.unknown;
-    final statusStart = resp.body.indexOf(":", resp.body.indexOf("\\\"status\\\""));
+    final statusStart = resp.body.indexOf(
+      ":",
+      resp.body.indexOf("\\\"status\\\""),
+    );
     final statusEnd = resp.body.indexOf("\\\",", statusStart);
     if (statusStart != -1 && statusEnd != -1) {
       final rawStatus = resp.body.substring(statusStart + 1, statusEnd);
       status = parseStatus(rawStatus.replaceAll("\\\"", ""), statusList);
     }
 
-    final genresStart = resp.body.indexOf("[", resp.body.indexOf("\\\"genres\\\":"));
+    final genresStart = resp.body.indexOf(
+      "[",
+      resp.body.indexOf("\\\"genres\\\":"),
+    );
     final genresEnd = resp.body.indexOf("]", genresStart);
     var genres = [];
     if (genresStart != -1 && genresEnd != -1) {
-      final genreLinks = resp.body.substring(genresStart + 1, genresEnd).split(",");
+      final genreLinks = resp.body
+          .substring(genresStart + 1, genresEnd)
+          .split(",");
       genres = genreLinks.map((String e) => e.replaceAll("\\\"", "")).toList();
     }
 

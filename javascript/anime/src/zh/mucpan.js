@@ -7,7 +7,7 @@ const mangayomiSources = [{
     "typeSource": "single",
     "itemType": 1,
     "isNsfw": false,
-    "version": "0.0.25",
+    "version": "0.0.3",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "anime/src/zh/mucpan.js"
@@ -195,13 +195,17 @@ class DefaultExtension extends MProvider {
                     "title": "Website Url",
                     "summary": "",
                     "valueIndex": 0,
-                    "entries": [                        
-                        "mucpan.cc",
-                        "54271.fun"
+                    "entries": [
+                        "https://www.milvdou.fun",
+                        "https://www.mucpan.cc",
+                        "https://mucpan.cc",
+                        "http://milvdou.fun"
                     ],
-                    "entryValues": [                        
-                        "http://www.mucpan.cc",
-                        "https://54271.fun"
+                    "entryValues": [
+                        "https://www.milvdou.fun",
+                        "https://www.mucpan.cc",
+                        "https://mucpan.cc",
+                        "http://milvdou.fun"
                     ],
                 }
             }

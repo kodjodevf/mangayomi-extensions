@@ -5,7 +5,7 @@ class AniZone extends MProvider {
   AniZone({required this.source});
 
   final MSource source;
-  final Client client = Client(source);
+  final Client client = Client();
 
   // Constants for the xpath
   static const String urlXpath =
@@ -53,15 +53,6 @@ class AniZone extends MProvider {
   Future<MPages> search(String query, int page, FilterList filterList) async {
     String baseUrl = "${source.baseUrl}/filter?keyword=$query";
 
-    Map<String, List<String>> filterMap = {
-      "type": [],
-      "status": [],
-      "season": [],
-      "lang": [],
-      "genre": [],
-    };
-
-    // Regroupement des filtres avec une logique générique
     final filterHandlers = {
       "TypeFilter": "type",
       "LanguageFilter": "lang",
@@ -70,23 +61,30 @@ class AniZone extends MProvider {
       "GenreFilter": "genre",
     };
 
+    final activeFilterParams = <String, String>{};
+
     for (var filter in filterList.filters) {
-      if (filterHandlers.containsKey(filter.type)) {
-        var key = filterHandlers[filter.type]!;
-        for (var stateItem in filter.state as List) {
-          if (stateItem.state == true) {
-            filterMap[key]?.add(stateItem.value as String);
-          }
+      final paramKey = filterHandlers[filter.type];
+      if (paramKey != null && filter.state is List) {
+        final selectedValues =
+            (filter.state as List)
+                .where((item) {
+                  return item.state == true && item.value != null;
+                })
+                .map((item) => item.value as String)
+                .toList();
+
+        if (selectedValues.isNotEmpty) {
+          activeFilterParams[paramKey] = selectedValues.join("%2C");
         }
       }
     }
 
-    //add filters to the url dynamically
-    for (var entry in filterMap.entries) {
-      List<String> values = entry.value;
-      if (values.isNotEmpty) {
-        baseUrl += '&${entry.key}=${values.join("%2C")}';
-      }
+    if (activeFilterParams.isNotEmpty) {
+      final queryString = activeFilterParams.entries
+          .map((entry) => '${Uri.encodeComponent(entry.key)}=${entry.value}')
+          .join('&');
+      baseUrl += '&$queryString';
     }
 
     return _getMangaList("$baseUrl&page=$page");
@@ -94,66 +92,62 @@ class AniZone extends MProvider {
 
   Future<MManga> getDetail(String url) async {
     MManga anime = MManga();
-    try {
-      final doc = (await client.get(Uri.parse(url))).body;
-      final description = xpath(doc, '//p[contains(@class,"short")]/text()');
-      anime.description = description.isNotEmpty ? description.first : "";
+    final doc = (await client.get(Uri.parse(url))).body;
+    final description = xpath(doc, '//p[contains(@class,"short")]/text()');
+    anime.description = description.isNotEmpty ? description.first : "";
 
-      final statusList = xpath(
-        doc,
-        '//div[contains(@class,"col2")]//div[contains(@class,"item")]//div[contains(@class,"item-content")]/text()',
-      );
-      if (statusList.isNotEmpty) {
-        if (statusList[0] == "Terminer") {
-          anime.status = MStatus.completed;
-        } else if (statusList[0] == "En cours") {
-          anime.status = MStatus.ongoing;
-        } else {
-          anime.status = MStatus.unknown;
-        }
+    final statusList = xpath(
+      doc,
+      '//div[contains(@class,"col2")]//div[contains(@class,"item")]//div[contains(@class,"item-content")]/text()',
+    );
+    if (statusList.isNotEmpty) {
+      if (statusList[0] == "Terminer") {
+        anime.status = MStatus.completed;
+      } else if (statusList[0] == "En cours") {
+        anime.status = MStatus.ongoing;
       } else {
         anime.status = MStatus.unknown;
       }
-
-      anime.genre = xpath(
-        doc,
-        '//div[contains(@class,"item")]//div[contains(@class,"item-content")]//a[contains(@href,"genre")]/text()',
-      );
-
-      final regex = RegExp(r'(\d+)$');
-      final match = regex.firstMatch(url);
-
-      if (match == null) {
-        throw Exception('Numéro de l\'épisode non trouvé dans l\'URL.');
-      }
-
-      final res =
-          (await client.get(
-            Uri.parse("${source.baseUrl}/ajax/episode/list/${match.group(1)}"),
-          )).body;
-
-      List<MChapter> episodesList = [];
-
-      final episodeElements = parseHtml(
-        json.decode(res)["html"],
-      ).select(".ep-item");
-
-      // Associer chaque titre à son URL et récupérer les vidéos
-      for (var element in episodeElements) {
-        MChapter episode = MChapter();
-        episode.name = element.attr("title");
-
-        String id = substringAfterLast(element.attr("href"), "=");
-        episode.url = "${source.baseUrl}/ajax/episode/servers?episodeId=$id";
-        episodesList.add(episode);
-      }
-
-      anime.chapters = episodesList.reversed.toList();
-
-      return anime;
-    } catch (e) {
-      throw Exception('Erreur lors de la récupération des détails: $e');
+    } else {
+      anime.status = MStatus.unknown;
     }
+
+    anime.genre = xpath(
+      doc,
+      '//div[contains(@class,"item")]//div[contains(@class,"item-content")]//a[contains(@href,"genre")]/text()',
+    );
+
+    final regex = RegExp(r'(\d+)$');
+    final match = regex.firstMatch(url);
+
+    if (match == null) {
+      throw Exception('Numéro de l\'épisode non trouvé dans l\'URL.');
+    }
+
+    final res =
+        (await client.get(
+          Uri.parse("${source.baseUrl}/ajax/episode/list/${match.group(1)}"),
+        )).body;
+
+    List<MChapter> episodesList = [];
+
+    final episodeElements = parseHtml(
+      json.decode(res)["html"],
+    ).select(".ep-item");
+
+    // Associer chaque titre à son URL et récupérer les vidéos
+    for (var element in episodeElements) {
+      MChapter episode = MChapter();
+      episode.name = element.attr("title");
+
+      String id = substringAfterLast(element.attr("href"), "=");
+      episode.url = "${source.baseUrl}/ajax/episode/servers?episodeId=$id";
+      episodesList.add(episode);
+    }
+
+    anime.chapters = episodesList.reversed.toList();
+
+    return anime;
   }
 
   @override

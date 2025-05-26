@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=128&domain=https://gojo.wtf/",
     "typeSource": "multi",
     "itemType": 1,
-    "version": "0.0.5",
+    "version": "0.0.6",
     "pkgPath": "anime/src/en/gojo.js"
 }];
 
@@ -103,6 +103,9 @@ class DefaultExtension extends MProvider {
 
 
     async getDetail(url) {
+        var linkSlug = `${this.source.baseUrl}/watch/`
+        if (url.includes(linkSlug)) url = url.replace(linkSlug, "");
+
         var anilistId = url
         var res = await this.gojoAPI(`/info/${anilistId}`)
         if (res == null) {
@@ -111,7 +114,7 @@ class DefaultExtension extends MProvider {
         var name = this.getTitle(res.title)
         var imageUrl = res.coverImage.large
         var description = res.description;
-        var link = `${this.source.baseUrl}/watch/${anilistId}`
+        var link = `${linkSlug}${anilistId}`
         var genres = res.genres
         var status = (() => {
             switch (res.status) {

@@ -1,7 +1,7 @@
 import '../../../../../model/source.dart';
 
 Source get aniZoneSource => _aniZoneSource;
-const _aniZoneVersion = "0.0.2";
+const _aniZoneVersion = "0.0.35";
 const _aniZoneSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/src/fr/anizone/anizone.dart";
 Source _aniZoneSource = Source(

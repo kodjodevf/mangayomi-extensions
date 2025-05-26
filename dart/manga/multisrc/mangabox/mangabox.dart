@@ -1,12 +1,11 @@
 import 'package:mangayomi/bridge_lib.dart';
 
-
 class MangaBox extends MProvider {
   MangaBox({required this.source});
 
   MSource source;
 
-  final Client client = Client(source);
+  final Client client = Client();
 
   @override
   Future<MPages> getPopular(int page) async {
@@ -34,11 +33,8 @@ class MangaBox extends MProvider {
 
     String url = "";
     if (query.isNotEmpty) {
-
       url = "${source.baseUrl}/${simpleQueryPath(source.name, page, query)}";
-
     } else {
-
       String genre = "all";
       String sort = "latest";
       String status = "all";
@@ -52,11 +48,15 @@ class MangaBox extends MProvider {
           status = filter.values[filter.state].value;
         }
       }
-      url = "${source.baseUrl}/genre/$genre?type=$sort&state=$status&page=$page";
-
+      url =
+          "${source.baseUrl}/genre/$genre?type=$sort&state=$status&page=$page";
     }
 
-    final res = (await client.get(Uri.parse(url), headers: getHeader(source.baseUrl),)).body;
+    final res =
+        (await client.get(
+          Uri.parse(url),
+          headers: getHeader(source.baseUrl),
+        )).body;
 
     List<MManga> mangaList = [];
     List<String> urls = [];
@@ -110,10 +110,11 @@ class MangaBox extends MProvider {
       {"Ongoing": 0, "Completed": 1},
     ];
     MManga manga = MManga();
-    final res = (await client.get(
-      Uri.parse(url),
-      headers: getHeader(source.baseUrl),
-    )).body;
+    final res =
+        (await client.get(
+          Uri.parse(url),
+          headers: getHeader(source.baseUrl),
+        )).body;
     final document = parseHtml(res);
     manga.author =
         document.xpathFirst(
@@ -189,7 +190,11 @@ class MangaBox extends MProvider {
 
   @override
   Future<List<String>> getPageList(String url) async {
-    final res = (await client.get(Uri.parse(url), headers: getHeader(source.baseUrl),)).body;
+    final res =
+        (await client.get(
+          Uri.parse(url),
+          headers: getHeader(source.baseUrl),
+        )).body;
     List<String> pageUrls = [];
     final urls = xpath(
       res,
@@ -361,9 +366,10 @@ class MangaBox extends MProvider {
 
 Map<String, String> getHeader(String url) {
   final Map<String, String> headers = {
-      "Referer": "$url/",
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36",
-    };
+    "Referer": "$url/",
+    "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36",
+  };
   return headers;
 }
 

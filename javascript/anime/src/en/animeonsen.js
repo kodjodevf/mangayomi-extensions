@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=256&domain=https://www.animeonsen.xyz",
     "typeSource": "single",
     "itemType": 1,
-    "version": "1.0.0",
+    "version": "1.0.1",
     "pkgPath": "anime/src/all/animeonsen.js"
 }];
 
@@ -143,7 +143,9 @@ class DefaultExtension extends MProvider {
     }
 
     async getDetail(url) {
-        var link = `${this.source.baseUrl}/details/${url}`
+        var linkSlug = `${this.source.baseUrl}/details/`
+        url = url.replace(linkSlug, "")
+        var link = `${linkSlug}${url}`
         var detailsApiSlug = `/${url}/extensive`
         var animeDetails = await this.request(detailsApiSlug);
         
