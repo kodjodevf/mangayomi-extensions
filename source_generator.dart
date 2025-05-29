@@ -86,7 +86,7 @@ List<Source> _searchJsSources(Directory dir) {
                     ..appMinVerReq =
                         sourceJson["appMinVerReq"] ?? defaultSource.appMinVerReq
                     ..sourceCodeUrl =
-                        "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/javascript/${sourceJson["pkgPath"] ?? sourceJson["pkgName"]}";
+                        "https://raw.githubusercontent.com/miraienoki/anymex-extensions/$branchName/javascript/${sourceJson["pkgPath"] ?? sourceJson["pkgName"]}";
               if (sourceJson["id"] != null) {
                 source = source..id = int.tryParse("${sourceJson["id"]}");
               }
