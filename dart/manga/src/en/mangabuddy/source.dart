@@ -10,7 +10,7 @@ Source _mangabuddySource = Source(
   lang: "en",
   typeSource: "single",
   isNsfw: true,
-  iconUrl: "https://mangabuddy.com/static/sites/mangabuddy/icons/favicon.ico",
+  iconUrl: "https://github.com/KptnFishy/mangayomi-extensions/blob/patch-1/dart/manga/src/en/mangabuddy/icon.png",
   sourceCodeUrl: _mangabuddySourceCodeUrl,
   itemType: ItemType.manga,
   version: _mangabuddyVersion,
