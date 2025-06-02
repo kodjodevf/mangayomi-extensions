@@ -6,114 +6,151 @@ class MangaBuddy extends MProvider {
 
   MSource source;
 
-  final Client client = Client(source);
+  final Client client = Client();
 
   @override
   bool get supportsLatest => true;
 
   @override
   Map<String, String> get headers => {};
-  
-  @override
+
   MPages mangaFromElements(List<MElement> elements, bool hasNextPage) {
     List<MManga> mangaList = [];
 
     for (var i = 0; i < elements.length; i++) {
       final title = elements[i].selectFirst("div.meta > div.title > h3 > a");
       final imageElement = elements[i].selectFirst("div.thumb > a > img");
-      final image = imageElement?.attr("data-src") ??
-             imageElement?.getSrc ??
-             "";
+      final image =
+          imageElement?.attr("data-src") ?? imageElement?.getSrc ?? "";
 
       MManga manga = MManga();
       manga.name = title.text ?? title.attr("title");
       manga.imageUrl = image;
-      manga.link = title.attr("href").contains(source.baseUrl) ? title.attr("href") : "${source.baseUrl}${title.attr("href")}";
+      manga.link = title.attr("href").contains(source.baseUrl)
+          ? title.attr("href")
+          : "${source.baseUrl}${title.attr("href")}";
       mangaList.add(manga);
     }
 
-
     return MPages(mangaList, hasNextPage);
   }
-  
+
   @override
   Future<MPages> getPopular(int page) async {
-      final res = await client.get(Uri.parse("${source.baseUrl}/popular?page=$page"));
-      final doc = parseHtml(res.body);
-      
-      final nextElement = doc.selectFirst("a.page-link[title='Next']");
-      bool hasNext = nextElement.text != null;
-      
-      return mangaFromElements(doc.select("div.list.manga-list > div.book-item > div.book-detailed-item"), true);
+    final res = await client.get(
+      Uri.parse("${source.baseUrl}/popular?page=$page"),
+    );
+    final doc = parseHtml(res.body);
+
+    final nextElement = doc.selectFirst("a.page-link[title='Next']");
+    bool hasNext = nextElement.text != null;
+
+    return mangaFromElements(
+      doc.select(
+        "div.list.manga-list > div.book-item > div.book-detailed-item",
+      ),
+      true,
+    );
   }
 
   @override
   Future<MPages> getLatestUpdates(int page) async {
-      final res = await client.get(Uri.parse("${source.baseUrl}/latest?page=$page"));
-      final doc = parseHtml(res.body);
-      
-      final nextElement = doc.selectFirst("a.page-link[title='Next']");
-      bool hasNext = nextElement.text != null;
-      
-      return mangaFromElements(doc.select("div.list.manga-list > div.book-item > div.book-detailed-item"), true);
+    final res = await client.get(
+      Uri.parse("${source.baseUrl}/latest?page=$page"),
+    );
+    final doc = parseHtml(res.body);
+
+    final nextElement = doc.selectFirst("a.page-link[title='Next']");
+    bool hasNext = nextElement.text != null;
+
+    return mangaFromElements(
+      doc.select(
+        "div.list.manga-list > div.book-item > div.book-detailed-item",
+      ),
+      true,
+    );
   }
 
   @override
-  Future<MPages> search(String initialQuery, int page, FilterList filterList) async {
+  Future<MPages> search(
+    String initialQuery,
+    int page,
+    FilterList filterList,
+  ) async {
     final filters = filterList.filters;
-    final filterString = "";
-    final query = initialQuery;
+    String filterString = "";
+    String query = initialQuery;
     for (var filter in filters) {
-    
-      if (filter.type == "SearchFilter"){
+      if (filter.type == "SearchFilter") {
         query = filter.state.toString();
       } else if (filter.type == "GenresFilter") {
         for (var genre in filter.state) {
           if (genre.state == true) {
             filterString += ("&genre[]=${genre.value.toString()}");
-          } 
+          }
         }
       } else if (filter.type == "StatusFilter") {
-        filterString += ("&status=${filter.values[filter.state].value.toString()}");
+        filterString +=
+            ("&status=${filter.values[filter.state].value.toString()}");
       } else if (filter.type == "OrderFilter") {
-        filterString += ("&sort=${filter.values[filter.state].value.toString()}");
+        filterString +=
+            ("&sort=${filter.values[filter.state].value.toString()}");
       }
     }
 
-
-    final res = await client.get(Uri.parse("${source.baseUrl}/search?$filterString&q=$query&page=$page"));
+    final res = await client.get(
+      Uri.parse("${source.baseUrl}/search?$filterString&q=$query&page=$page"),
+    );
     final doc = parseHtml(res.body);
 
-    return mangaFromElements(doc.select("div.list.manga-list > div.book-item > div.book-detailed-item"), true);
+    return mangaFromElements(
+      doc.select(
+        "div.list.manga-list > div.book-item > div.book-detailed-item",
+      ),
+      true,
+    );
   }
 
   @override
   Future<MManga> getDetail(String url) async {
-    final statusList = [{
-      "Ongoing": 0,
-      "Completed": 1,
-    }];
+    final statusList = [
+      {"Ongoing": 0, "Completed": 1},
+    ];
     final res = await client.get(Uri.parse(url));
     final doc = parseHtml(res.body);
-    
+
     MManga manga = MManga();
-    
+
     final chapterIdElement = doc.selectFirst("div.layout > script");
     final idRegex = RegExp(r"var\s+bookId\s*=\s*(\d+);");
 
-    final imageElement = doc.selectFirst("div.book-info div.img-cover > img");  
-    final statusElement = doc.selectFirst("div.book-info div.detail > div.meta.box.mt-1.p-10 > p > a[href^='/status/'] > span");
-    final authorElements = doc.select("div.book-info div.detail > div.meta.box.mt-1.p-10 > p > a[href^='/authors/'] > span");
-    final genreList = doc.select("div.book-info div.detail > div.meta.box.mt-1.p-10 > p > a[href^='/genres/']");
-    final descriptionElement = doc.selectFirst("div.section-body.summary > p.content");
+    final imageElement = doc.selectFirst("div.book-info div.img-cover > img");
+    final statusElement = doc.selectFirst(
+      "div.book-info div.detail > div.meta.box.mt-1.p-10 > p > a[href^='/status/'] > span",
+    );
+    final authorElements = doc.select(
+      "div.book-info div.detail > div.meta.box.mt-1.p-10 > p > a[href^='/authors/'] > span",
+    );
+    final genreList = doc.select(
+      "div.book-info div.detail > div.meta.box.mt-1.p-10 > p > a[href^='/genres/']",
+    );
+    final descriptionElement = doc.selectFirst(
+      "div.section-body.summary > p.content",
+    );
 
     final chapterIdMatch = idRegex.firstMatch(chapterIdElement?.text);
-    final chapterId = chapterIdMatch != null ? chapterIdMatch.group(1) ?? "" : "";
+    final chapterId = chapterIdMatch != null
+        ? chapterIdMatch.group(1) ?? ""
+        : "";
 
     final image = imageElement?.attr("data-src") ?? imageElement?.getSrc ?? "";
     final status = statusElement.text ?? "Ongoing";
-    final author = authorElements.isNotEmpty ? authorElements.map((e) => e.text).join(" | ") : "unknown";
-    final genres = genreList.map((e) => (e.text as String).replaceAll(",", "").trim()).toList();
+    final author = authorElements.isNotEmpty
+        ? authorElements.map((e) => e.text).join(" | ")
+        : "unknown";
+    final genres = genreList
+        .map((e) => (e.text as String).replaceAll(",", "").trim())
+        .toList();
 
     final description = descriptionElement?.text ?? "";
 
@@ -123,15 +160,19 @@ class MangaBuddy extends MProvider {
     manga.genre = genres;
 
     manga.chapters = await getChapters(chapterId);
-   	manga.status = parseStatus(status, statusList);
+    manga.status = parseStatus(status, statusList);
     return manga;
   }
-  
+
   @override
   Future<List<MChapter>> getChapters(String chapterId) async {
     List<MChapter> chapters = [];
 
-    final res = await client.get(Uri.parse("${source.baseUrl}/api/manga/$chapterId/chapters?source=detail"));
+    final res = await client.get(
+      Uri.parse(
+        "${source.baseUrl}/api/manga/$chapterId/chapters?source=detail",
+      ),
+    );
     MDocument doc = parseHtml(res.body);
 
     MElement chapterList = doc.selectFirst("ul.chapter-list");
@@ -141,7 +182,9 @@ class MangaBuddy extends MProvider {
 
       final name = chapterElement.selectFirst("strong.chapter-title")?.text;
       final url = chapterElement.selectFirst("a")?.attr("href");
-      final uploadDate = chapterElement.selectFirst("time.chapter-update")?.text;
+      final uploadDate = chapterElement
+          .selectFirst("time.chapter-update")
+          ?.text;
 
       chapter.name = name;
       chapter.url = url;
@@ -153,15 +196,21 @@ class MangaBuddy extends MProvider {
     return chapters;
   }
 
-  @override
   int parseDateToUnix(String dateStr) {
-
     const monthMap = {
-      'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4,
-      'May': 5, 'Jun': 6, 'Jul': 7, 'Aug': 8,
-      'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec': 12,
+      'Jan': 1,
+      'Feb': 2,
+      'Mar': 3,
+      'Apr': 4,
+      'May': 5,
+      'Jun': 6,
+      'Jul': 7,
+      'Aug': 8,
+      'Sep': 9,
+      'Oct': 10,
+      'Nov': 11,
+      'Dec': 12,
     };
-
 
     final parts = dateStr.split(' ');
     if (parts.length != 3) return DateTime.now().millisecondsSinceEpoch;
@@ -185,25 +234,27 @@ class MangaBuddy extends MProvider {
     final res = await client.get(Uri.parse("${source.baseUrl}$url"));
     final doc = parseHtml(res.body);
 
-    final imageScript = doc.select("div#viewer-page.main-container.viewer > script");
+    final imageScript = doc.select(
+      "div#viewer-page.main-container.viewer > script",
+    );
 
-    final rawImageText = imageScript[imageScript.length-1]?.text ?? "";
+    final rawImageText = imageScript[imageScript.length - 1]?.text ?? "";
 
-    final imageList = rawImageText.replaceAll("var chapImages =", "").replaceAll("'", "").trim().split(",");
+    final imageList = rawImageText
+        .replaceAll("var chapImages =", "")
+        .replaceAll("'", "")
+        .trim()
+        .split(",");
 
     for (final image in imageList) {
       images.add({
         "url": image.trim(),
-        "headers": {
-          "Referer": source.baseUrl,
-        }
+        "headers": {"Referer": source.baseUrl},
       });
     }
 
     return images;
   }
-
-
 
   @override
   List<dynamic> getFilterList() {
@@ -305,5 +356,5 @@ class MangaBuddy extends MProvider {
 }
 
 MangaBuddy main(MSource source) {
-  return MangaBuddy(source:source);
+  return MangaBuddy(source: source);
 }

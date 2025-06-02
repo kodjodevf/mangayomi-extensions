@@ -4,6 +4,7 @@ import 'multisrc/mangabox/sources.dart';
 import 'multisrc/mangareader/sources.dart';
 import 'multisrc/mmrcms/sources.dart';
 import 'multisrc/nepnep/sources.dart';
+import 'src/en/mangabuddy/source.dart';
 import 'src/en/mangahere/source.dart';
 
 List<Source> dartMangasourceList = [
@@ -13,4 +14,5 @@ List<Source> dartMangasourceList = [
   mangahereSource,
   ...nepnepSourcesList,
   ...mangaboxSourcesList,
+  mangabuddySource,
 ];
