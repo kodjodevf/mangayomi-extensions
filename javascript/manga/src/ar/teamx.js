@@ -36,7 +36,7 @@ class DefaultExtension extends MProvider {
   }
 
   parseChapterDate(date) {
-    return new Date(date).toISOString().split("T")[0];
+    return new Date(date).getTime().toString();
   }
 
   getBaseUrl() {
@@ -58,50 +58,6 @@ class DefaultExtension extends MProvider {
     }
     const res = await this.client.get(url);
     return new Document(res.body);
-  }
-
-  //  Chapters
-  chapterFromElement(element) {
-    const chpNum = element.selectFirst("div.epl-num")?.text.trim();
-    const chpTitle = element.selectFirst("div.epl-title")?.text.trim();
-
-    let name;
-    if (chpTitle?.includes(chpNum?.replace(/[^0-9]/g, ""))) {
-      name = chpTitle;
-    } else if (!chpNum) {
-      name = chpTitle;
-    } else if (!chpTitle) {
-      name = chpNum;
-    } else {
-      name = `${chpNum} - ${chpTitle}`;
-    }
-
-    return {
-      name,
-      dateUpload: this.parseChapterDate(
-        element.selectFirst("div.epl-date")?.text.trim(),
-      ),
-      url: element.getHref,
-    };
-  }
-
-  async chapterListParse(response) {
-    const allElements = [];
-    let doc = response;
-
-    while (true) {
-      const pageChapters = doc.select("div.eplister ul a");
-      if (pageChapters.length === 0) break;
-
-      allElements.push(...pageChapters);
-      const nextPage = doc.select("a[rel=next]");
-      if (nextPage.length === 0) break;
-
-      const nextUrl = nextPage[0].attr("href");
-      doc = await this.request(nextUrl, false);
-    }
-
-    return allElements.map((element) => this.chapterFromElement(element));
   }
 
   //  Manga Listing
@@ -152,9 +108,34 @@ class DefaultExtension extends MProvider {
     return { list, hasNextPage: false };
   }
 
+  //  Chapters
+  chapterFromElement(element) {
+    const chpNum = element.selectFirst("div.epl-num")?.text.trim();
+    const chpTitle = element.selectFirst("div.epl-title")?.text.trim();
+
+    let name;
+    if (chpTitle?.includes(chpNum?.replace(/[^0-9]/g, ""))) {
+      name = chpTitle;
+    } else if (!chpNum) {
+      name = chpTitle;
+    } else if (!chpTitle) {
+      name = chpNum;
+    } else {
+      name = `${chpNum} - ${chpTitle}`;
+    }
+
+    return {
+      name,
+      dateUpload: this.parseChapterDate(
+        element.selectFirst("div.epl-date")?.text.trim(),
+      ),
+      url: element.getHref,
+    };
+  }
+
   //  Detail
   async getDetail(url) {
-    const doc = await this.request(url, false);
+    let doc = await this.request(url, false);
 
     const title = doc.selectFirst("div.author-info-title h1")?.text.trim();
     const imageUrl = doc.selectFirst("img.shadow-sm")?.getSrc;
@@ -178,7 +159,24 @@ class DefaultExtension extends MProvider {
       .select("div.review-author-info a")
       .map((e) => e.text.trim());
 
-    const chapters = await this.chapterListParse(doc);
+    const allElements = [];
+    for (;;) {
+      const pageChapters = doc.select("div.eplister ul a");
+      if (!pageChapters || pageChapters.length === 0) break;
+      allElements.push(...pageChapters);
+
+      const nextPage = doc.select("a[rel=next]");
+      if (!nextPage || nextPage.length === 0) break;
+
+      const nextUrl = nextPage[0].attr("href");
+      if (!nextUrl) break;
+
+      doc = await this.request(nextUrl, false);
+    }
+
+    const chapters = allElements.map((element) =>
+      this.chapterFromElement(element),
+    );
 
     return {
       title,
