@@ -14,6 +14,12 @@ const mangayomiSources = [{
 }];
 
 class DefaultExtension extends MProvider {
+  async request(slug) {
+    this.client ??= new Client();
+    const res = await this.client.get(slug);
+    return new Document(res.body);
+  }
+
   getPopular(_) {
     return {
       list: [
@@ -29,5 +35,52 @@ class DefaultExtension extends MProvider {
   }
   getLatestUpdates(_) {
     return this.getPopular();
+  }
+
+  //  Chapters
+  chapterFromElement(element) {
+    const anchor = element.selectFirst("div.iPostInfoWrap > h3 > a");
+    const timeElement = element.selectFirst("div.iPostInfoWrap time");
+    if (!anchor || !timeElement) return {};
+
+    const name = anchor.text?.trim();
+    const url = anchor.getHref;
+    const rawDate = timeElement.attr("datetime")?.trim();
+    const dateUpload = rawDate ? new Date(rawDate).getTime().toString() : null;
+
+    return { name, dateUpload, url };
+  }
+
+  //  Detail
+  async getDetail(url) {
+    let doc = await this.request(url);
+    const allElements = [];
+
+    for (;;) {
+      const pageChapters = doc.select("#Blog1 article.blog-post.index-post");
+      if (!pageChapters || pageChapters.length === 0) break;
+      allElements.push(...pageChapters);
+
+      const nextUrl = doc
+        .selectFirst("#Blog1 > div.iPostsNavigation > button[data-load]")
+        .attr("data-load");
+      if (!nextUrl || nextUrl.length === 0) break;
+      doc = await this.request(nextUrl);
+    }
+
+    const chapters = allElements.map((element) =>
+      this.chapterFromElement(element),
+    );
+
+    return {
+      title: "BORUTO: Two Blue Vortex",
+      imageUrl:
+        "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEggWB9vWPMqjEvIoDsJSO29OmW-srULDQD3cS9HJ8cDk0vq2jLwDerUX-i61CqmZf62eBVmWZwU5CgXi0p2lxhKrh2_nZum3p-k3q9QJ2uozove0QAbOKtbd1QPjytjrJc9UsL65X4BbFdgcicLDYubD9LgY1Kco8wyhDGm4YEOim8u1TL42gOFe16NaaEP/s3464/4D55C3C5-9168-4103-B45C-99B52B58B6A5.jpeg",
+      author: "Masashi Kishimoto",
+      description: "Artist: Mikio Ikemoto",
+      status: 0,
+      genre: ["شونين", "دراما", "خيال", "أكشن", "نينجا"],
+      chapters,
+    };
   }
 }
