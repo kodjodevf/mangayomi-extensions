@@ -1,18 +1,16 @@
 // prettier-ignore
-const mangayomiSources = [
-  {
+const mangayomiSources = [{
     "name": "TeamX",
     "lang": "ar",
     "baseUrl": "https://olympustaff.com",
     "apiUrl": "",
-    "iconUrl":
-      "https://www.google.com/s2/favicons?sz=256&domain=https://olympustaff.com",
+    "iconUrl": "https://www.google.com/s2/favicons?sz=256&domain=https://olympustaff.com",
     "typeSource": "single",
     "itemType": 0,
-    "version": "1.0.1",
+    "version": "0.0.3",
+    "isNsfw": false,
     "pkgPath": "manga/src/ar/teamx.js"
-  }
-];
+}];
 
 class DefaultExtension extends MProvider {
   //  Helper Methods
