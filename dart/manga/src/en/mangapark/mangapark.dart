@@ -7,12 +7,6 @@ class MangaPark extends MProvider {
   MSource source;
 
   final Client client = Client(source);
-
-  @override
-  bool get supportsLatest => true;
-
-  @override
-  Map<String, String> get headers => {};
   
   @override
   Future<MPages> getMangaItems(int page, final method) async {
@@ -178,8 +172,9 @@ class MangaPark extends MProvider {
     "Pending": 0,
     "Ongoing": 0,
     "Completed": 1,
-    "Hiatus": 1,
+    "Hiatus": 2,
     "Cancelled": 3,
+    "Unknown": 5,
   }];
 
   final res = await client.get(Uri.parse("$url"), 
@@ -199,7 +194,7 @@ class MangaPark extends MProvider {
   final author = authorElements.isNotEmpty ? authorElements.map((e) => e.text).join(" | ") : "Anonymous";
   final genres = genreList.map((e) => (e.text as String).replaceAll(",", "").trim()).toList() ?? [];
 
-  final status = statusElement?.text ?? "Pending";
+  final status = statusElement?.text ?? "Unknown";
   final description = descriptionElement.text ?? "no Description...";
   final chapters = getChapters(doc);
 
@@ -512,7 +507,7 @@ class MangaPark extends MProvider {
   List<dynamic> getSourcePreferences() {
     return [
       ListPreference(
-        key: "NsfwFilter1",
+        key: "NsfwFilter",
         title: "Display NSFW content",
         summary: "",
         valueIndex: 0,
@@ -531,7 +526,7 @@ class MangaPark extends MProvider {
   }
 
   int preferenceNsfwContent() {
-    return getPreferenceValue(source.id, "NsfwFilter1");
+    return getPreferenceValue(source.id, "NsfwFilter");
   } 
 
   String preferenceImgServer() {
