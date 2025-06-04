@@ -1,31 +1,19 @@
-const mangayomiSources = [
-  {
+// prettier-ignore
+const mangayomiSources = [{
     "name": "TeamX",
     "lang": "ar",
     "baseUrl": "https://olympustaff.com",
     "apiUrl": "",
-    "iconUrl":
-      "https://www.google.com/s2/favicons?sz=256&domain=https://olympustaff.com",
+    "iconUrl": "https://www.google.com/s2/favicons?sz=256&domain=https://olympustaff.com",
     "typeSource": "single",
     "itemType": 0,
-    "version": "1.0.1",
+    "version": "0.0.3",
+    "isNsfw": false,
     "pkgPath": "manga/src/ar/teamx.js"
-  }
-];
+}];
 
 class DefaultExtension extends MProvider {
-  constructor() {
-    super();
-    this.client = new Client();
-    this.baseUrl = new SharedPreferences().get("overrideBaseUrl1");
-  }
-
   //  Helper Methods
-
-  getHeaders(url) {
-    return { Referer: this.source.baseUrl };
-  }
-
   toStatus(status) {
     return (
       {
@@ -48,57 +36,28 @@ class DefaultExtension extends MProvider {
   }
 
   parseChapterDate(date) {
-    return new Date(date).toISOString().split("T")[0];
+    return new Date(date).getTime().toString();
   }
 
-  async request(slug) {
-    const res = await this.client.get(`${this.baseUrl}${slug}`);
+  getBaseUrl() {
+    const preference = new SharedPreferences();
+    var base_url = preference.get("domain_url");
+    if (base_url.length == 0) {
+      return this.source.baseUrl;
+    }
+    if (base_url.endsWith("/")) {
+      return base_url.slice(0, -1);
+    }
+    return base_url;
+  }
+
+  async request(slug, useBaseUrl = true) {
+    const url = useBaseUrl ? `${this.getBaseUrl()}${slug}` : slug;
+    if (!this.client) {
+      this.client = new Client();
+    }
+    const res = await this.client.get(url);
     return new Document(res.body);
-  }
-
-  //  Chapters
-  chapterFromElement(element) {
-    const chpNum = element.selectFirst("div.epl-num")?.text.trim();
-    const chpTitle = element.selectFirst("div.epl-title")?.text.trim();
-
-    let name;
-    if (chpTitle?.includes(chpNum?.replace(/[^0-9]/g, ""))) {
-      name = chpTitle;
-    } else if (!chpNum) {
-      name = chpTitle;
-    } else if (!chpTitle) {
-      name = chpNum;
-    } else {
-      name = `${chpNum} - ${chpTitle}`;
-    }
-
-    return {
-      name,
-      dateUpload: this.parseChapterDate(
-        element.selectFirst("div.epl-date")?.text.trim(),
-      ),
-      url: element.getHref,
-    };
-  }
-
-  async chapterListParse(response) {
-    const allElements = [];
-    let doc = response;
-
-    while (true) {
-      const pageChapters = doc.select("div.eplister ul a");
-      if (pageChapters.length === 0) break;
-
-      allElements.push(...pageChapters);
-      const nextPage = doc.select("a[rel=next]");
-      if (nextPage.length === 0) break;
-
-      const nextUrl = nextPage[0].attr("href");
-      const nextResponse = await this.client.get(nextUrl);
-      doc = new Document(nextResponse.body);
-    }
-
-    return allElements.map((element) => this.chapterFromElement(element));
   }
 
   //  Manga Listing
@@ -149,10 +108,34 @@ class DefaultExtension extends MProvider {
     return { list, hasNextPage: false };
   }
 
+  //  Chapters
+  chapterFromElement(element) {
+    const chpNum = element.selectFirst("div.epl-num")?.text.trim();
+    const chpTitle = element.selectFirst("div.epl-title")?.text.trim();
+
+    let name;
+    if (chpTitle?.includes(chpNum?.replace(/[^0-9]/g, ""))) {
+      name = chpTitle;
+    } else if (!chpNum) {
+      name = chpTitle;
+    } else if (!chpTitle) {
+      name = chpNum;
+    } else {
+      name = `${chpNum} - ${chpTitle}`;
+    }
+
+    return {
+      name,
+      dateUpload: this.parseChapterDate(
+        element.selectFirst("div.epl-date")?.text.trim(),
+      ),
+      url: element.getHref,
+    };
+  }
+
   //  Detail
   async getDetail(url) {
-    const res = await this.client.get(url);
-    const doc = new Document(res.body);
+    let doc = await this.request(url, false);
 
     const title = doc.selectFirst("div.author-info-title h1")?.text.trim();
     const imageUrl = doc.selectFirst("img.shadow-sm")?.getSrc;
@@ -176,7 +159,24 @@ class DefaultExtension extends MProvider {
       .select("div.review-author-info a")
       .map((e) => e.text.trim());
 
-    const chapters = await this.chapterListParse(doc);
+    const allElements = [];
+    for (;;) {
+      const pageChapters = doc.select("div.eplister ul a");
+      if (!pageChapters || pageChapters.length === 0) break;
+      allElements.push(...pageChapters);
+
+      const nextPage = doc.select("a[rel=next]");
+      if (!nextPage || nextPage.length === 0) break;
+
+      const nextUrl = nextPage[0].attr("href");
+      if (!nextUrl) break;
+
+      doc = await this.request(nextUrl, false);
+    }
+
+    const chapters = allElements.map((element) =>
+      this.chapterFromElement(element),
+    );
 
     return {
       title,
@@ -191,8 +191,7 @@ class DefaultExtension extends MProvider {
 
   //  chapter pages
   async getPageList(url) {
-    const res = await this.client.get(url);
-    const doc = new Document(res.body);
+    const doc = await this.request(url, false);
 
     return doc.select("div.image_list img[src]").map((x) => ({
       url: x.attr("src"),
@@ -336,33 +335,15 @@ class DefaultExtension extends MProvider {
   getSourcePreferences() {
     return [
       {
-        key: "overrideBaseUrl1",
+        key: "domain_url",
         editTextPreference: {
           title: "Override BaseUrl",
-          summary: "https://olympustaff.com",
+          summary: "",
           value: "https://olympustaff.com",
-          dialogTitle: "Override BaseUrl",
+          dialogTitle: "URL",
           dialogMessage: "",
         },
       },
     ];
-  }
-
-  //  Unimplemented Methods
-  get supportsLatest() {
-    throw new Error("Method not implemented: supportsLatest");
-  }
-
-  async getHtmlContent(url) {
-    throw new Error("Method not implemented: getHtmlContent");
-  }
-
-  async cleanHtmlContent(html) {
-    throw new Error("Method not implemented: cleanHtmlContent");
-  }
-
-  // For anime episode video list
-  async getVideoList(url) {
-    throw new Error("Method not implemented: getVideoList");
   }
 }
