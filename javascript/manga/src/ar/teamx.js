@@ -1,3 +1,4 @@
+// prettier-ignore
 const mangayomiSources = [
   {
     "name": "TeamX",
@@ -14,12 +15,6 @@ const mangayomiSources = [
 ];
 
 class DefaultExtension extends MProvider {
-  constructor() {
-    super();
-    this.client = new Client();
-    this.baseUrl = new SharedPreferences().get("overrideBaseUrl1");
-  }
-
   //  Helper Methods
 
   getHeaders(url) {
@@ -51,8 +46,24 @@ class DefaultExtension extends MProvider {
     return new Date(date).toISOString().split("T")[0];
   }
 
-  async request(slug) {
-    const res = await this.client.get(`${this.baseUrl}${slug}`);
+  getBaseUrl() {
+    const preference = new SharedPreferences();
+    var base_url = preference.get("domain_url");
+    if (base_url.length == 0) {
+      return this.source.baseUrl;
+    }
+    if (base_url.endsWith("/")) {
+      return base_url.slice(0, -1);
+    }
+    return base_url;
+  }
+
+  async request(slug, useBaseUrl = true) {
+    const url = useBaseUrl ? `${this.getBaseUrl()}${slug}` : slug;
+    if (!this.client) {
+      this.client = new Client();
+    }
+    const res = await this.client.get(url);
     return new Document(res.body);
   }
 
@@ -94,8 +105,7 @@ class DefaultExtension extends MProvider {
       if (nextPage.length === 0) break;
 
       const nextUrl = nextPage[0].attr("href");
-      const nextResponse = await this.client.get(nextUrl);
-      doc = new Document(nextResponse.body);
+      doc = await this.request(nextUrl, false);
     }
 
     return allElements.map((element) => this.chapterFromElement(element));
@@ -151,8 +161,7 @@ class DefaultExtension extends MProvider {
 
   //  Detail
   async getDetail(url) {
-    const res = await this.client.get(url);
-    const doc = new Document(res.body);
+    const doc = await this.request(url, false);
 
     const title = doc.selectFirst("div.author-info-title h1")?.text.trim();
     const imageUrl = doc.selectFirst("img.shadow-sm")?.getSrc;
@@ -191,8 +200,7 @@ class DefaultExtension extends MProvider {
 
   //  chapter pages
   async getPageList(url) {
-    const res = await this.client.get(url);
-    const doc = new Document(res.body);
+    const doc = await this.request(url, false);
 
     return doc.select("div.image_list img[src]").map((x) => ({
       url: x.attr("src"),
@@ -336,12 +344,12 @@ class DefaultExtension extends MProvider {
   getSourcePreferences() {
     return [
       {
-        key: "overrideBaseUrl1",
+        key: "domain_url",
         editTextPreference: {
           title: "Override BaseUrl",
-          summary: "https://olympustaff.com",
+          summary: "",
           value: "https://olympustaff.com",
-          dialogTitle: "Override BaseUrl",
+          dialogTitle: "URL",
           dialogMessage: "",
         },
       },
