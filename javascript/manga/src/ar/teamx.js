@@ -16,11 +16,6 @@ const mangayomiSources = [
 
 class DefaultExtension extends MProvider {
   //  Helper Methods
-
-  getHeaders(url) {
-    return { Referer: this.source.baseUrl };
-  }
-
   toStatus(status) {
     return (
       {
@@ -354,23 +349,5 @@ class DefaultExtension extends MProvider {
         },
       },
     ];
-  }
-
-  //  Unimplemented Methods
-  get supportsLatest() {
-    throw new Error("Method not implemented: supportsLatest");
-  }
-
-  async getHtmlContent(url) {
-    throw new Error("Method not implemented: getHtmlContent");
-  }
-
-  async cleanHtmlContent(html) {
-    throw new Error("Method not implemented: cleanHtmlContent");
-  }
-
-  // For anime episode video list
-  async getVideoList(url) {
-    throw new Error("Method not implemented: getVideoList");
   }
 }
