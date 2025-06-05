@@ -83,4 +83,12 @@ class DefaultExtension extends MProvider {
       chapters,
     };
   }
+
+  //  chapter pages
+  async getPageList(url) {
+    const doc = await this.request(url);
+    return doc.select("div.#post-body img[src]").map((x) => ({
+      url: x.attr("src"),
+    }));
+  }
 }
