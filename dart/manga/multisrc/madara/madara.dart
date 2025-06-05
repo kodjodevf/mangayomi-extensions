@@ -48,11 +48,9 @@ class Madara extends MProvider {
           url += "${ll(url)}release=${Uri.encodeComponent(filter.state)}";
         }
       } else if (filter.type == "StatusFilter") {
-        final status = (filter.state as List).where((e) => e.state).toList();
+        List<String> status = filter.state.where((item) => item.state).map((item) => item.value.toString()).toList();
         if (status.isNotEmpty) {
-          for (var st in status) {
-            url += "${ll(url)}status[]=${st.value},";
-          }
+            url += "${ll(url)}status[]=${status.join('&status[]=')}";
         }
       } else if (filter.type == "OrderByFilter") {
         if (filter.state != 0) {
