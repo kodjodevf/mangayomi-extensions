@@ -93,17 +93,13 @@ import 'src/wickedwitchscan/wickedwitchscan.dart';
 import 'src/winterscan/winterscan.dart';
 import 'src/wonderlandscan/wonderlandscan.dart';
 import 'src/yuriverso/yuriverso.dart';
-import 'src/falconmanga/falconmanga.dart';
 import 'src/manga3asq/manga3asq.dart';
 import 'src/grabberzone/grabberzone.dart';
-import 'src/gatemanga/gatemanga.dart';
-import 'src/gmangasite/gmangasite.dart';
 import 'src/mangalink/mangalink.dart';
 import 'src/mangalionz/mangalionz.dart';
 import 'src/mangarose/mangarose.dart';
 import 'src/mangaspark/mangaspark.dart';
 import 'src/mangastarz/mangastarz.dart';
-import 'src/mangatime/mangatime.dart';
 import 'src/olaoe/olaoe.dart';
 import 'src/rocksmanga/rocksmanga.dart';
 import 'src/dragontea/dragontea.dart';
@@ -380,16 +376,10 @@ List<Source> _madaraSourcesList =
           wonderlandscanSource,
           //Yuri Verso (PT-BR)
           yuriversoSource,
-          //فالكون مانجا (AR)
-          falconmangaSource,
           //مانجا العاشق (AR)
           manga3asqSource,
           //Grabber Zone (ALL)
           grabberzoneSource,
-          //Gatemanga (AR)
-          gatemangaSource,
-          //GMANGA (unoriginal) (AR)
-          gmangasiteSource,
           //مانجا لينك (AR)
           mangalinkSource,
           //MangaLionz (AR)
@@ -400,8 +390,6 @@ List<Source> _madaraSourcesList =
           mangasparkSource,
           //Manga Starz (AR)
           mangastarzSource,
-          //Manga Time (AR)
-          mangatimeSource,
           //Olaoe (AR)
           olaoeSource,
           //Rocks Manga (AR)
