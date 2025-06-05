@@ -11,7 +11,6 @@ import 'src/katakomik/katakomik.dart';
 import 'src/komikstation/komikstation.dart';
 import 'src/komikmama/komikmama.dart';
 import 'src/komikucom/komikucom.dart';
-import 'src/magusmanga/magusmanga.dart';
 import 'src/mangaindome/mangaindome.dart';
 import 'src/mangacim/mangacim.dart';
 import 'src/mangatale/mangatale.dart';
@@ -120,8 +119,6 @@ List<Source> _mangareaderSourcesList =
           komikmamaSource,
           //Komiku.com (ID)
           komikucomSource,
-          //Magus Manga (AR)
-          magusmangaSource,
           //Manga Indo.me (ID)
           mangaindomeSource,
           //Mangacim (TR)
