@@ -96,7 +96,6 @@ import 'src/yuriverso/yuriverso.dart';
 import 'src/falconmanga/falconmanga.dart';
 import 'src/manga3asq/manga3asq.dart';
 import 'src/grabberzone/grabberzone.dart';
-import 'src/gatemanga/gatemanga.dart';
 import 'src/mangalink/mangalink.dart';
 import 'src/mangalionz/mangalionz.dart';
 import 'src/mangarose/mangarose.dart';
@@ -385,8 +384,6 @@ List<Source> _madaraSourcesList =
           manga3asqSource,
           //Grabber Zone (ALL)
           grabberzoneSource,
-          //Gatemanga (AR)
-          gatemangaSource,
           //مانجا لينك (AR)
           mangalinkSource,
           //MangaLionz (AR)
