@@ -38,7 +38,6 @@ import 'src/aresnov/aresnov.dart';
 import 'src/mangaflame/mangaflame.dart';
 import 'src/manganoon/manganoon.dart';
 import 'src/mangaswat/mangaswat.dart';
-import 'src/mangatak/mangatak.dart';
 import 'src/potatomanga/potatomanga.dart';
 import 'src/stellarsaber/stellarsaber.dart';
 import 'src/rizzcomic/rizzcomic.dart';
@@ -175,8 +174,6 @@ List<Source> _mangareaderSourcesList =
           manganoonSource,
           //MangaSwat (AR)
           mangaswatSource,
-          //MangaTak (AR)
-          mangatakSource,
           //PotatoManga (AR)
           potatomangaSource,
           //StellarSaber (AR)
