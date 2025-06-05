@@ -1,5 +1,4 @@
 import '../../../../model/source.dart';
-import 'src/beastscans/beastscans.dart';
 import 'src/lelmanga/lelmanga.dart';
 import 'src/komiklab/komiklab.dart';
 import 'src/azurescans/azurescans.dart';
@@ -98,8 +97,6 @@ const mangareaderSourceCodeUrl =
 List<Source> get mangareaderSourcesList => _mangareaderSourcesList;
 List<Source> _mangareaderSourcesList =
     [
-          //Beast Scans (AR)
-          beastscansSource,
           //Lelmanga (FR)
           lelmangaSource,
           //KomikLab Scans (EN)
