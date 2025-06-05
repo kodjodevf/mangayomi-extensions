@@ -3,7 +3,7 @@ import '../../../../../../model/source.dart';
 Source get mangaswatSource => _mangaswatSource;
 Source _mangaswatSource = Source(
   name: "MangaSwat",
-  baseUrl: "https://normoyun.com",
+  baseUrl: "https://swatscans.com",
   lang: "ar",
   isNsfw: false,
   typeSource: "mangareader",
