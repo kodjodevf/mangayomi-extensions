@@ -41,7 +41,6 @@ import 'src/crowscans/crowscans.dart';
 import 'src/iimanga/iimanga.dart';
 import 'src/mangaflame/mangaflame.dart';
 import 'src/manganoon/manganoon.dart';
-import 'src/mangapro/mangapro.dart';
 import 'src/mangaswat/mangaswat.dart';
 import 'src/mangatak/mangatak.dart';
 import 'src/potatomanga/potatomanga.dart';
@@ -186,8 +185,6 @@ List<Source> _mangareaderSourcesList =
           mangaflameSource,
           //مانجا نون (AR)
           manganoonSource,
-          //Manga Pro (AR)
-          mangaproSource,
           //MangaSwat (AR)
           mangaswatSource,
           //MangaTak (AR)
