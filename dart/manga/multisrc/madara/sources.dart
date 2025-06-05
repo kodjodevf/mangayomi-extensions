@@ -93,7 +93,6 @@ import 'src/wickedwitchscan/wickedwitchscan.dart';
 import 'src/winterscan/winterscan.dart';
 import 'src/wonderlandscan/wonderlandscan.dart';
 import 'src/yuriverso/yuriverso.dart';
-import 'src/falconmanga/falconmanga.dart';
 import 'src/manga3asq/manga3asq.dart';
 import 'src/grabberzone/grabberzone.dart';
 import 'src/mangalink/mangalink.dart';
@@ -377,8 +376,6 @@ List<Source> _madaraSourcesList =
           wonderlandscanSource,
           //Yuri Verso (PT-BR)
           yuriversoSource,
-          //فالكون مانجا (AR)
-          falconmangaSource,
           //مانجا العاشق (AR)
           manga3asqSource,
           //Grabber Zone (ALL)
