@@ -512,7 +512,7 @@ class MangaPark extends MProvider {
         summary: "",
         valueIndex: 0,
         entries: ["False", "True"],
-        entryValues: [0, 2],
+        entryValues: ["0", "2"],
       ),
       ListPreference(
         key: "ImgServer",
