@@ -10,11 +10,10 @@ class MangaHere extends MProvider {
 
   @override
   Future<MPages> getPopular(int page) async {
-    final res =
-        (await client.get(
-          Uri.parse("${source.baseUrl}/directory/$page.htm"),
-          headers: getHeader(source.baseUrl),
-        )).body;
+    final res = (await client.get(
+      Uri.parse("${source.baseUrl}/directory/$page.htm"),
+      headers: getHeader(source.baseUrl),
+    )).body;
 
     List<MManga> mangaList = [];
     final names = xpath(
@@ -43,11 +42,10 @@ class MangaHere extends MProvider {
 
   @override
   Future<MPages> getLatestUpdates(int page) async {
-    final res =
-        (await client.get(
-          Uri.parse("${source.baseUrl}/directory/$page.htm?latest"),
-          headers: getHeader(source.baseUrl),
-        )).body;
+    final res = (await client.get(
+      Uri.parse("${source.baseUrl}/directory/$page.htm?latest"),
+      headers: getHeader(source.baseUrl),
+    )).body;
 
     List<MManga> mangaList = [];
     final names = xpath(
@@ -91,14 +89,12 @@ class MangaHere extends MProvider {
         final rt = filter.values[filter.state].value;
         url += "${ll(url)}rating=$rt";
       } else if (filter.type == "GenreList") {
-        final included =
-            (filter.state as List)
-                .where((e) => e.state == 1 ? true : false)
-                .toList();
-        final excluded =
-            (filter.state as List)
-                .where((e) => e.state == 2 ? true : false)
-                .toList();
+        final included = (filter.state as List)
+            .where((e) => e.state == 1 ? true : false)
+            .toList();
+        final excluded = (filter.state as List)
+            .where((e) => e.state == 2 ? true : false)
+            .toList();
         if (included.isNotEmpty) {
           url += "${ll(url)}genres=";
           for (var val in included) {
@@ -123,11 +119,10 @@ class MangaHere extends MProvider {
       }
     }
     url += "${ll(url)}title=$query&page=$page";
-    final res =
-        (await client.get(
-          Uri.parse(url),
-          headers: getHeader(source.baseUrl),
-        )).body;
+    final res = (await client.get(
+      Uri.parse(url),
+      headers: getHeader(source.baseUrl),
+    )).body;
 
     List<MManga> mangaList = [];
     final names = xpath(
@@ -159,17 +154,20 @@ class MangaHere extends MProvider {
     final statusList = [
       {"Ongoing": 0, "Completed": 1},
     ];
-    final res =
-        (await client.get(
-          Uri.parse("${source.baseUrl}/$url"),
-          headers: getHeader(source.baseUrl),
-        )).body;
+    final res = (await client.get(
+      Uri.parse("${source.baseUrl}/$url"),
+      headers: getHeader(source.baseUrl),
+    )).body;
     MManga manga = MManga();
-    manga.author =
-        xpath(res, '//*[@class="detail-info-right-say"]/a/text()').first;
+    manga.author = xpath(
+      res,
+      '//*[@class="detail-info-right-say"]/a/text()',
+    ).first;
     manga.description = xpath(res, '//*[@class="fullcontent"]/text()').first;
-    final status =
-        xpath(res, '//*[@class="detail-info-right-title-tip"]/text()').first;
+    final status = xpath(
+      res,
+      '//*[@class="detail-info-right-title-tip"]/text()',
+    ).first;
     manga.status = parseStatus(status, statusList);
     manga.genre = xpath(
       res,
@@ -251,26 +249,23 @@ class MangaHere extends MProvider {
         String pageLink =
             "$pageBase/chapterfun.ashx?cid=$chapterId&page=$i&key=$secretKey";
         String responseText = "".toString();
-        for (int tr = 1; tr <= 3; tr++) {
-          if (responseText.isEmpty) {
-            final headers = {
-              "Referer": urll,
-              "Accept": "*/*",
-              "Accept-Language": "en-US,en;q=0.9",
-              "Connection": "keep-alive",
-              "Host": "www.mangahere.cc",
-              "X-Requested-With": "XMLHttpRequest",
-            };
+        final headers = {
+          "Referer": urll,
+          "Accept": "*/*",
+          "Accept-Language": "en-US,en;q=0.9",
+          "Connection": "keep-alive",
+          "Host": "www.mangahere.cc",
+          "X-Requested-With": "XMLHttpRequest",
+        };
 
-            final ress =
-                (await client.get(Uri.parse(pageLink), headers: headers)).body;
+        final ress = (await client.get(
+          Uri.parse(pageLink),
+          headers: headers,
+        )).body;
+        responseText = ress.isNotEmpty ? ress : "";
 
-            responseText = ress;
-
-            if (responseText.isEmpty) {
-              secretKey = "";
-            }
-          }
+        if (responseText.isEmpty) {
+          secretKey = "";
         }
         String deobfuscatedScript = unpackJs(
           responseText.replaceAll("eval", ""),
