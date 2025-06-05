@@ -178,7 +178,7 @@ class Madara extends MProvider {
     manga.imageUrl =
         imageElement?.attr("data-src") ??
         imageElement?.attr("data-lazy-src") ??
-        imageElement?.attr("srcset") ??
+        imageElement?.attr("srcset")?.split(" ")?.first ??
         imageElement?.getSrc;
 
     final id =
