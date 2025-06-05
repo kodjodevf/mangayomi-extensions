@@ -3,7 +3,7 @@ import '../../../../../../model/source.dart';
 Source get areamangaSource => _areamangaSource;
 Source _areamangaSource = Source(
   name: "أريا مانجا",
-  baseUrl: "https://www.areascans.net",
+  baseUrl: "https://ar.kenmanga.com",
   lang: "ar",
   isNsfw: false,
   typeSource: "mangareader",

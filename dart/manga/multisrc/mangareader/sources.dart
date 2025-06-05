@@ -1,5 +1,4 @@
 import '../../../../model/source.dart';
-import 'src/beastscans/beastscans.dart';
 import 'src/lelmanga/lelmanga.dart';
 import 'src/komiklab/komiklab.dart';
 import 'src/azurescans/azurescans.dart';
@@ -12,7 +11,6 @@ import 'src/katakomik/katakomik.dart';
 import 'src/komikstation/komikstation.dart';
 import 'src/komikmama/komikmama.dart';
 import 'src/komikucom/komikucom.dart';
-import 'src/magusmanga/magusmanga.dart';
 import 'src/mangaindome/mangaindome.dart';
 import 'src/mangacim/mangacim.dart';
 import 'src/mangatale/mangatale.dart';
@@ -37,14 +35,9 @@ import 'src/thunderscans/thunderscans.dart';
 import 'src/areamanga/areamanga.dart';
 import 'src/areascans/areascans.dart';
 import 'src/aresnov/aresnov.dart';
-import 'src/crowscans/crowscans.dart';
-import 'src/iimanga/iimanga.dart';
 import 'src/mangaflame/mangaflame.dart';
 import 'src/manganoon/manganoon.dart';
-import 'src/mangapro/mangapro.dart';
 import 'src/mangaswat/mangaswat.dart';
-import 'src/mangatak/mangatak.dart';
-import 'src/potatomanga/potatomanga.dart';
 import 'src/stellarsaber/stellarsaber.dart';
 import 'src/rizzcomic/rizzcomic.dart';
 import 'src/berserkerscan/berserkerscan.dart';
@@ -100,8 +93,6 @@ const mangareaderSourceCodeUrl =
 List<Source> get mangareaderSourcesList => _mangareaderSourcesList;
 List<Source> _mangareaderSourcesList =
     [
-          //Beast Scans (AR)
-          beastscansSource,
           //Lelmanga (FR)
           lelmangaSource,
           //KomikLab Scans (EN)
@@ -126,8 +117,6 @@ List<Source> _mangareaderSourcesList =
           komikmamaSource,
           //Komiku.com (ID)
           komikucomSource,
-          //Magus Manga (AR)
-          magusmangaSource,
           //Manga Indo.me (ID)
           mangaindomeSource,
           //Mangacim (TR)
@@ -178,22 +167,12 @@ List<Source> _mangareaderSourcesList =
           aresnovSource,
           //Umi Manga (AR)
           beastscansSource,
-          //Crow Scans (AR)
-          crowscansSource,
-          //ARESManga (AR)
-          iimangaSource,
           //Manga Flame (AR)
           mangaflameSource,
           //مانجا نون (AR)
           manganoonSource,
-          //Manga Pro (AR)
-          mangaproSource,
           //MangaSwat (AR)
           mangaswatSource,
-          //MangaTak (AR)
-          mangatakSource,
-          //PotatoManga (AR)
-          potatomangaSource,
           //StellarSaber (AR)
           stellarsaberSource,
           //Rizz Comic (EN)
