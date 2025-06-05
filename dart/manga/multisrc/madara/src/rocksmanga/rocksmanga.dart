@@ -3,7 +3,7 @@ import '../../../../../../model/source.dart';
 Source get rocksmangaSource => _rocksmangaSource;
 Source _rocksmangaSource = Source(
   name: "Rocks Manga",
-  baseUrl: "https://rocks-manga.com",
+  baseUrl: "https://rocksmanga.com",
   lang: "ar",
   isNsfw: false,
   typeSource: "madara",
