@@ -38,7 +38,6 @@ import 'src/areamanga/areamanga.dart';
 import 'src/areascans/areascans.dart';
 import 'src/aresnov/aresnov.dart';
 import 'src/crowscans/crowscans.dart';
-import 'src/iimanga/iimanga.dart';
 import 'src/mangaflame/mangaflame.dart';
 import 'src/manganoon/manganoon.dart';
 import 'src/mangaswat/mangaswat.dart';
@@ -179,8 +178,6 @@ List<Source> _mangareaderSourcesList =
           beastscansSource,
           //Crow Scans (AR)
           crowscansSource,
-          //ARESManga (AR)
-          iimangaSource,
           //Manga Flame (AR)
           mangaflameSource,
           //مانجا نون (AR)
