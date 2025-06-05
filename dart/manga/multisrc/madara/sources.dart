@@ -101,7 +101,6 @@ import 'src/mangalionz/mangalionz.dart';
 import 'src/mangarose/mangarose.dart';
 import 'src/mangaspark/mangaspark.dart';
 import 'src/mangastarz/mangastarz.dart';
-import 'src/mangatime/mangatime.dart';
 import 'src/olaoe/olaoe.dart';
 import 'src/rocksmanga/rocksmanga.dart';
 import 'src/dragontea/dragontea.dart';
@@ -394,8 +393,6 @@ List<Source> _madaraSourcesList =
           mangasparkSource,
           //Manga Starz (AR)
           mangastarzSource,
-          //Manga Time (AR)
-          mangatimeSource,
           //Olaoe (AR)
           olaoeSource,
           //Rocks Manga (AR)
