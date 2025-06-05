@@ -165,8 +165,6 @@ List<Source> _mangareaderSourcesList =
           areascansSource,
           //SCARManga (AR)
           aresnovSource,
-          //Umi Manga (AR)
-          beastscansSource,
           //Manga Flame (AR)
           mangaflameSource,
           //مانجا نون (AR)
@@ -269,10 +267,9 @@ List<Source> _mangareaderSourcesList =
           zenithscansSource,
         ]
         .map(
-          (e) =>
-              e
-                ..itemType = ItemType.manga
-                ..sourceCodeUrl = mangareaderSourceCodeUrl
-                ..version = mangareaderVersion,
+          (e) => e
+            ..itemType = ItemType.manga
+            ..sourceCodeUrl = mangareaderSourceCodeUrl
+            ..version = mangareaderVersion,
         )
         .toList();
