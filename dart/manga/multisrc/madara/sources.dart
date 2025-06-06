@@ -182,7 +182,7 @@ import 'src/ruyamanga/ruyamanga.dart';
 import 'src/turkcemangaoku/turkcemangaoku.dart';
 import 'src/webtoonhatti/webtoonhatti.dart';
 
-const madaraVersion = "0.1.15";
+const madaraVersion = "0.1.2";
 const madaraSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/manga/multisrc/madara/madara.dart";
 
