@@ -3,7 +3,6 @@ import 'src/scanvf/scanvf.dart';
 import 'src/mangaid/mangaid.dart';
 import 'src/onma/onma.dart';
 import 'src/readcomicsonline/readcomicsonline.dart';
-import 'src/lelscanvf/lelscanvf.dart';
 import 'src/mangafr/mangafr.dart';
 
 const mmrcmsVersion = "0.0.7";
@@ -21,8 +20,6 @@ List<Source> _mmrcmsSourcesList =
           onmaSource,
           //Read Comics Online (EN)
           readcomicsonlineSource,
-          //Lelscan-VF (FR)
-          lelscanvfSource,
           //Manga-FR (FR)
           mangafrSource,
         ]
