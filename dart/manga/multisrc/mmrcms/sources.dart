@@ -1,6 +1,5 @@
 import '../../../../model/source.dart';
 import 'src/scanvf/scanvf.dart';
-import 'src/komikid/komikid.dart';
 import 'src/mangaid/mangaid.dart';
 import 'src/onma/onma.dart';
 import 'src/readcomicsonline/readcomicsonline.dart';
@@ -16,8 +15,6 @@ List<Source> _mmrcmsSourcesList =
     [
           //Scan VF (FR)
           scanvfSource,
-          //Komikid (ID)
-          komikidSource,
           //MangaID (ID)
           mangaidSource,
           //مانجا اون لاين (AR)
