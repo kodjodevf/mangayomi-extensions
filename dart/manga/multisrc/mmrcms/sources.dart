@@ -3,7 +3,6 @@ import 'src/scanvf/scanvf.dart';
 import 'src/mangaid/mangaid.dart';
 import 'src/onma/onma.dart';
 import 'src/readcomicsonline/readcomicsonline.dart';
-import 'src/mangafr/mangafr.dart';
 
 const mmrcmsVersion = "0.0.7";
 const mmrcmsSourceCodeUrl =
@@ -20,8 +19,6 @@ List<Source> _mmrcmsSourcesList =
           onmaSource,
           //Read Comics Online (EN)
           readcomicsonlineSource,
-          //Manga-FR (FR)
-          mangafrSource,
         ]
         .map(
           (e) =>
