@@ -10,12 +10,11 @@ class MMRCMS extends MProvider {
 
   @override
   Future<MPages> getPopular(int page) async {
-    final res =
-        (await client.get(
-          Uri.parse(
-            "${source.baseUrl}/filterList?page=$page&sortBy=views&asc=false",
-          ),
-        )).body;
+    final res = (await client.get(
+      Uri.parse(
+        "${source.baseUrl}/filterList?page=$page&sortBy=views&asc=false",
+      ),
+    )).body;
 
     List<MManga> mangaList = [];
     final urls = xpath(res, '//*[ @class="chart-title"]/@href');
@@ -23,13 +22,9 @@ class MMRCMS extends MProvider {
     List<String> images = [];
     for (var url in urls) {
       String slug = substringAfterLast(url, '/');
-      if (source.name == "Manga-FR") {
-        images.add("${source.baseUrl}/uploads/manga/${slug}.jpg");
-      } else {
-        images.add(
-          "${source.baseUrl}/uploads/manga/${slug}/cover/cover_250x350.jpg",
-        );
-      }
+      images.add(
+        "${source.baseUrl}/uploads/manga/${slug}/cover/cover_250x350.jpg",
+      );
     }
 
     for (var i = 0; i < names.length; i++) {
@@ -45,10 +40,9 @@ class MMRCMS extends MProvider {
 
   @override
   Future<MPages> getLatestUpdates(int page) async {
-    final res =
-        (await client.get(
-          Uri.parse("${source.baseUrl}/latest-release?page=$page"),
-        )).body;
+    final res = (await client.get(
+      Uri.parse("${source.baseUrl}/latest-release?page=$page"),
+    )).body;
 
     List<MManga> mangaList = [];
     final urls = xpath(res, '//*[@class="manga-item"]/h3/a/@href');
@@ -56,13 +50,9 @@ class MMRCMS extends MProvider {
     List<String> images = [];
     for (var url in urls) {
       String slug = substringAfterLast(url, '/');
-      if (source.name == "Manga-FR") {
-        images.add("${source.baseUrl}/uploads/manga/${slug}.jpg");
-      } else {
-        images.add(
-          "${source.baseUrl}/uploads/manga/${slug}/cover/cover_250x350.jpg",
-        );
-      }
+      images.add(
+        "${source.baseUrl}/uploads/manga/${slug}/cover/cover_250x350.jpg",
+      );
     }
 
     for (var i = 0; i < names.length; i++) {
@@ -120,32 +110,22 @@ class MMRCMS extends MProvider {
         String data = da["data"];
         if (source.name == 'Scan VF') {
           urls.add('${source.baseUrl}/$data');
-        } else if (source.name == 'Manga-FR') {
-          urls.add('${source.baseUrl}/lecture-en-ligne/$data');
         } else {
           urls.add('${source.baseUrl}/manga/$data');
         }
         names.add(value);
-        if (source.name == "Manga-FR") {
-          images.add("${source.baseUrl}/uploads/manga/$data.jpg");
-        } else {
-          images.add(
-            "${source.baseUrl}/uploads/manga/$data/cover/cover_250x350.jpg",
-          );
-        }
+        images.add(
+          "${source.baseUrl}/uploads/manga/$data/cover/cover_250x350.jpg",
+        );
       }
     } else {
       urls = xpath(res, '//div/div/div/a/@href');
       names = xpath(res, '//div/div/div/a/text()');
       for (var url in urls) {
         String slug = substringAfterLast(url, '/');
-        if (source.name == "Manga-FR") {
-          images.add("${source.baseUrl}/uploads/manga/${slug}.jpg");
-        } else {
-          images.add(
-            "${source.baseUrl}/uploads/manga/${slug}/cover/cover_250x350.jpg",
-          );
-        }
+        images.add(
+          "${source.baseUrl}/uploads/manga/${slug}/cover/cover_250x350.jpg",
+        );
       }
     }
 
