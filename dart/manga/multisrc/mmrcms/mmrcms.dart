@@ -20,11 +20,8 @@ class MMRCMS extends MProvider {
     final urls = xpath(res, '//*[ @class="chart-title"]/@href');
     final names = xpath(res, '//*[ @class="chart-title"]/text()');
     List<String> images = [];
-    for (var url in urls) {
-      String slug = substringAfterLast(url, '/');
-      images.add(
-        "${source.baseUrl}/uploads/manga/${slug}/cover/cover_250x350.jpg",
-      );
+    for (var mangaUrl in urls) {
+      images.add(guessCover(mangaUrl));
     }
 
     for (var i = 0; i < names.length; i++) {
@@ -48,11 +45,8 @@ class MMRCMS extends MProvider {
     final urls = xpath(res, '//*[@class="manga-item"]/h3/a/@href');
     final names = xpath(res, '//*[@class="manga-item"]/h3/a/text()');
     List<String> images = [];
-    for (var url in urls) {
-      String slug = substringAfterLast(url, '/');
-      images.add(
-        "${source.baseUrl}/uploads/manga/${slug}/cover/cover_250x350.jpg",
-      );
+    for (var mangaurl in urls) {
+      images.add(guessCover(mangaUrl));
     }
 
     for (var i = 0; i < names.length; i++) {
@@ -121,14 +115,10 @@ class MMRCMS extends MProvider {
     } else {
       urls = xpath(res, '//div/div/div/a/@href');
       names = xpath(res, '//div/div/div/a/text()');
-      for (var url in urls) {
-        String slug = substringAfterLast(url, '/');
-        images.add(
-          "${source.baseUrl}/uploads/manga/${slug}/cover/cover_250x350.jpg",
-        );
+      for (var mangaUrl in urls) {
+        images.add(guessCover(mangaUrl));
       }
     }
-
     for (var i = 0; i < names.length; i++) {
       MManga manga = MManga();
       manga.name = names[i];
@@ -318,6 +308,15 @@ class MMRCMS extends MProvider {
       return "&";
     }
     return "?";
+  }
+
+  String guessCover(String mangaUrl, {String? url}) {
+    if (url == null || url?.endsWith("no-image.png")) {
+      String slug = substringAfterLast(mangaUrl, '/');
+      return "${source.baseUrl}/uploads/manga/${slug}/cover/cover_250x350.jpg";
+    } else {
+      return url;
+    }
   }
 }
 
