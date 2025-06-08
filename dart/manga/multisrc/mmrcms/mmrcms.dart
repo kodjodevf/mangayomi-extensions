@@ -5,8 +5,18 @@ class MMRCMS extends MProvider {
   MMRCMS({required this.source});
 
   MSource source;
-
+  static final Set<String> latestTitles = <String>{};
   final Client client = Client();
+
+  MManga mangaFromElement(MElement element) {
+    final anchor = element.selectFirst(".media-heading a, .manga-heading a");
+    final link = anchor?.getHref;
+
+    return MManga()
+      ..name = anchor?.text
+      ..imageUrl = guessCover(link, url: element.selectFirst("img")?.getSrc)
+      ..link = link;
+  }
 
   @override
   Future<MPages> getPopular(int page) async {
@@ -37,24 +47,22 @@ class MMRCMS extends MProvider {
 
   @override
   Future<MPages> getLatestUpdates(int page) async {
+    if (page == 1) latestTitles.clear();
+
     final res = (await client.get(
       Uri.parse("${source.baseUrl}/latest-release?page=$page"),
     )).body;
 
-    List<MManga> mangaList = [];
-    final urls = xpath(res, '//*[@class="manga-item"]/h3/a/@href');
-    final names = xpath(res, '//*[@class="manga-item"]/h3/a/text()');
-    List<String> images = [];
-    for (var mangaurl in urls) {
-      images.add(guessCover(mangaUrl));
-    }
+    final document = parseHtml(res);
+    final mangaList = <MManga>[];
 
-    for (var i = 0; i < names.length; i++) {
-      MManga manga = MManga();
-      manga.name = names[i];
-      manga.imageUrl = images[i];
-      manga.link = urls[i];
-      mangaList.add(manga);
+    for (var el in document.select("div.mangalist div.manga-item")) {
+      final manga = mangaFromElement(el);
+      final link = manga.link;
+
+      if (link != null && latestTitles.add(link)) {
+        mangaList.add(manga);
+      }
     }
 
     return MPages(mangaList, true);
@@ -314,8 +322,10 @@ class MMRCMS extends MProvider {
     if (url == null || url?.endsWith("no-image.png")) {
       String slug = substringAfterLast(mangaUrl, '/');
       return "${source.baseUrl}/uploads/manga/${slug}/cover/cover_250x350.jpg";
-    } else {
+    } else if (url?.startsWith(source.baseUrl)) {
       return url;
+    } else {
+      return Uri.parse(source.baseUrl).resolve(url).toString();
     }
   }
 }
