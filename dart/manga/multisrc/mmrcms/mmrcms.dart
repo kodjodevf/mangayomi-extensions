@@ -25,20 +25,10 @@ class MMRCMS extends MProvider {
         "${source.baseUrl}/filterList?page=$page&sortBy=views&asc=false",
       ),
     )).body;
-
-    List<MManga> mangaList = [];
-    final urls = xpath(res, '//*[ @class="chart-title"]/@href');
-    final names = xpath(res, '//*[ @class="chart-title"]/text()');
-    List<String> images = [];
-    for (var mangaUrl in urls) {
-      images.add(guessCover(mangaUrl));
-    }
-
-    for (var i = 0; i < names.length; i++) {
-      MManga manga = MManga();
-      manga.name = names[i];
-      manga.imageUrl = images[i];
-      manga.link = urls[i];
+    final document = parseHtml(res);
+    final mangaList = <MManga>[];
+    for (final el in document.select("div.chapter-container, div.media")) {
+      final manga = mangaFromElement(el);
       mangaList.add(manga);
     }
 
