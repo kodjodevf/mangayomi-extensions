@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://www.google.com/s2/favicons?sz=256&domain=https://animekai.to/",
     "typeSource": "single",
     "itemType": 1,
-    "version": "0.2.5",
+    "version": "0.2.4",
     "pkgPath": "anime/src/en/animekai.js"
 }];
 
@@ -117,76 +117,108 @@ class DefaultExtension extends MProvider {
         return await this.searchPage({ query, type, genre, status, sort, season, year, rating, country, language, page });
     }
 
-async getDetail(url) {
-    function statusCode(status) {
-        return {
-            "Releasing": 0,
-            "Completed": 1,
-            "Not Yet Aired": 4,
-        }[status] ?? 5;
+    async getDetail(url) {
+        function statusCode(status) {
+            return {
+                "Releasing": 0,
+                "Completed": 1,
+                "Not Yet Aired": 4,
+            }[status] ?? 5;
+        }
+
+        var slug = url
+        var link = this.getBaseUrl() + slug
+        var body = await this.getPage(slug)
+
+        var mainSection = body.selectFirst(".watch-section")
+
+        var imageUrl = mainSection.selectFirst("div.poster").selectFirst("img").getSrc
+
+        var namePref = this.getPreference("animekai_title_lang")
+        var nameSection = mainSection.selectFirst("div.title")
+        var name = namePref.includes("jp") ? nameSection.attr(namePref) : nameSection.text
+
+        var description = mainSection.selectFirst("div.desc").text
+
+        var detailSection = mainSection.select("div.detail > div")
+
+        var genre = []
+        var status = 5
+        detailSection.forEach(item => {
+            var itemText = item.text.trim()
+
+            if (itemText.includes("Genres")) {
+                genre = itemText.replace("Genres:  ", "").split(", ")
+            }
+            if (itemText.includes("Status")) {
+                var statusText = item.selectFirst("span").text
+                status = statusCode(statusText)
+            }
+        })
+
+        var chapters = []
+        var animeId = body.selectFirst("#anime-rating").attr("data-id")
+
+        var token = await this.kaiEncrypt(animeId)
+        var res = await this.request(`/ajax/episodes/list?ani_id=${animeId}&_=${token}`)
+        body = JSON.parse(res)
+        if (body.status == 200) {
+            var doc = new Document(body["result"])
+            var episodes = doc.selectFirst("div.eplist.titles").select("li")
+            var showUncenEp = this.getPreference("animekai_show_uncen_epsiodes")
+
+            for (var item of episodes) {
+                var aTag = item.selectFirst("a")
+
+                var num = parseInt(aTag.attr("num"))
+                var title = aTag.selectFirst("span").text
+                title = title.includes("Episode") ? "" : `: ${title}`
+                var epName = `Episode ${num}${title}`
+
+
+                var langs = aTag.attr("langs")
+                var scanlator = langs === "1" ? "SUB" : "SUB, DUB"
+
+                var token = aTag.attr("token")
+
+                var epData = {
+                    name: epName,
+                    url: token,
+                    scanlator
+                }
+
+                // Check if the episode is uncensored
+                var slug = aTag.attr("slug")
+                if (slug.includes("uncen")) {
+
+                    // if dont show uncensored episodes, skip this episode
+                    if (!showUncenEp) continue
+
+                    scanlator += ", UNCENSORED"
+                    epName = `Episode ${num}: (Uncensored)`
+                    // Build for uncensored episode
+                    epData = {
+                        name: epName,
+                        url: token,
+                        scanlator
+                    }
+
+                    // Check if the episode already exists as censored if so, add to existing data
+                    var exData = chapters[num - 1]
+                    if (exData) {
+                        exData.url += "||" + epData.url
+                        exData.scanlator += ", " + epData.scanlator
+                        chapters[num - 1] = exData
+                        continue
+
+                    }
+                }
+                chapters.push(epData)
+            }
+        }
+        chapters.reverse()
+        return { name, imageUrl, link, description, genre, status, chapters }
     }
-    
-    var slug = url
-    var link = this.getBaseUrl() + slug
-    var body = await this.getPage(slug)
-    var mainSection = body.selectFirst(".watch-section")
-    var imageUrl = mainSection.selectFirst("div.poster").selectFirst("img").getSrc
-    var namePref = this.getPreference("animekai_title_lang")
-    var nameSection = mainSection.selectFirst("div.title")
-    var name = namePref.includes("jp") ? nameSection.attr(namePref) : nameSection.text
-    var description = mainSection.selectFirst("div.desc").text
-    var detailSection = mainSection.select("div.detail > div")
-    var genre = []
-    var status = 5
-    
-    detailSection.forEach(item => {
-        var itemText = item.text.trim()
-        if (itemText.includes("Genres")) {
-            genre = itemText.replace("Genres:  ", "").split(", ")
-        }
-        if (itemText.includes("Status")) {
-            var statusText = item.selectFirst("span").text
-            status = statusCode(statusText)
-        }
-    })
-    
-    var chapters = []
-    
-    // Extract total episodes from the span element
-    var totalEpisodes = 1
-    var subSpan = body.selectFirst("span.sub")
-    
-    if (subSpan) {
-        var episodeText = subSpan.text.trim()
-        // Extract the number from the text (e.g., "1130" from the span content)
-        var episodeMatch = episodeText.match(/\d+/)
-        if (episodeMatch) {
-            totalEpisodes = parseInt(episodeMatch[0])
-        }
-    }
-    
-    // Generate episodes list based on total episodes found
-    var showUncenEp = this.getPreference("animekai_show_uncen_epsiodes")
-    
-    for (var i = 1; i <= totalEpisodes; i++) {
-        var epName = `Episode ${i}`
-        var epUrl = this.getBaseUrl() + url + `#ep=${i}`
-        var scanlator = "SUB" // Default scanlator info
-        
-        var epData = {
-            name: epName,
-            url: epUrl,
-            scanlator: scanlator
-        }
-        
-        chapters.push(epData)
-    }
-    
-    // Reverse to show latest episodes first (if that's the desired behavior)
-    chapters.reverse()
-    
-    return { name, imageUrl, link, description, genre, status, chapters }
-}
 
     // For anime episode video list
     async getVideoList(url) {

@@ -93,17 +93,14 @@ import 'src/wickedwitchscan/wickedwitchscan.dart';
 import 'src/winterscan/winterscan.dart';
 import 'src/wonderlandscan/wonderlandscan.dart';
 import 'src/yuriverso/yuriverso.dart';
-import 'src/falconmanga/falconmanga.dart';
 import 'src/manga3asq/manga3asq.dart';
 import 'src/grabberzone/grabberzone.dart';
-import 'src/gatemanga/gatemanga.dart';
-import 'src/gmangasite/gmangasite.dart';
 import 'src/mangalink/mangalink.dart';
+import 'src/mangalek/mangalek.dart';
 import 'src/mangalionz/mangalionz.dart';
 import 'src/mangarose/mangarose.dart';
 import 'src/mangaspark/mangaspark.dart';
 import 'src/mangastarz/mangastarz.dart';
-import 'src/mangatime/mangatime.dart';
 import 'src/olaoe/olaoe.dart';
 import 'src/rocksmanga/rocksmanga.dart';
 import 'src/dragontea/dragontea.dart';
@@ -185,7 +182,7 @@ import 'src/ruyamanga/ruyamanga.dart';
 import 'src/turkcemangaoku/turkcemangaoku.dart';
 import 'src/webtoonhatti/webtoonhatti.dart';
 
-const madaraVersion = "0.1.15";
+const madaraVersion = "0.1.2";
 const madaraSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/manga/multisrc/madara/madara.dart";
 
@@ -380,18 +377,14 @@ List<Source> _madaraSourcesList =
           wonderlandscanSource,
           //Yuri Verso (PT-BR)
           yuriversoSource,
-          //فالكون مانجا (AR)
-          falconmangaSource,
           //مانجا العاشق (AR)
           manga3asqSource,
           //Grabber Zone (ALL)
           grabberzoneSource,
-          //Gatemanga (AR)
-          gatemangaSource,
-          //GMANGA (unoriginal) (AR)
-          gmangasiteSource,
           //مانجا لينك (AR)
           mangalinkSource,
+          //مانجا ليك (AR)
+          mangalekSource,
           //MangaLionz (AR)
           mangalionzSource,
           //Manga Rose (AR)
@@ -400,8 +393,6 @@ List<Source> _madaraSourcesList =
           mangasparkSource,
           //Manga Starz (AR)
           mangastarzSource,
-          //Manga Time (AR)
-          mangatimeSource,
           //Olaoe (AR)
           olaoeSource,
           //Rocks Manga (AR)

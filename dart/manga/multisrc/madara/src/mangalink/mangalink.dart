@@ -3,7 +3,7 @@ import '../../../../../../model/source.dart';
 Source get mangalinkSource => _mangalinkSource;
 Source _mangalinkSource = Source(
   name: "مانجا لينك",
-  baseUrl: "https://manga-link.com",
+  baseUrl: "https://link-manga.com",
   lang: "ar",
   isNsfw: false,
   typeSource: "madara",
