@@ -6,7 +6,7 @@ const mangayomiSources = [{
     "iconUrl": "https://mangafire.to/assets/sites/mangafire/favicon.png?v3",
     "typeSource": "single",
     "itemType": 0,
-    "version": "0.1.24",
+    "version": "0.1.25",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "manga/src/all/mangafire.js"
@@ -109,6 +109,7 @@ class DefaultExtension extends MProvider {
     }
 
     async getDetail(url) {
+        url = url.replace(this.source.baseUrl,"")
         const viewType = this.getPreference("mangafire_pref_content_view")
         const id = url.split(".").pop();
         const detail = {};
@@ -170,7 +171,11 @@ class DefaultExtension extends MProvider {
 
     // For manga chapter pages
     async getPageList(url) {
-        const res = await new Client().get(url);
+        var res = await new Client().get(url);
+        if(res.statusCode !=200){
+            url = url.replace("/volume/","/chapter/")
+            res = await new Client().get(url);
+        }
         const data = JSON.parse(res.body);
         const pages = [];
         var hdr = { "Referer": this.source.baseUrl }
