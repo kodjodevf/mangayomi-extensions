@@ -201,18 +201,16 @@ class MMRCMS extends MProvider {
 
   @override
   Future<List<String>> getPageList(String url) async {
-    final res = (await client.get(Uri.parse(url))).body;
+    final response = await client.get(Uri.parse(url));
+    final document = parseHtml(response.body);
 
     List<String> pagesUrl = [];
-    final pages = xpath(
-      res,
-      '//*[@id="all"]/img[@class="img-responsive"]/@data-src',
-    );
-    for (var page in pages) {
-      if (page.startsWith('//')) {
-        pagesUrl.add(page.replaceAll('//', 'https://'));
+    for (var img in document.select('#all img.img-responsive[data-src]')) {
+      String? src = img.attr('data-src');
+      if (src.startsWith('//')) {
+        pagesUrl.add('https:${src}');
       } else {
-        pagesUrl.add(page);
+        pagesUrl.add(src);
       }
     }
 
