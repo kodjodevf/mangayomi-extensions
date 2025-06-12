@@ -5,38 +5,30 @@ class MMRCMS extends MProvider {
   MMRCMS({required this.source});
 
   MSource source;
-
+  static final Set<String> latestTitles = <String>{};
   final Client client = Client();
+
+  MManga mangaFromElement(MElement element) {
+    final anchor = element.selectFirst(".media-heading a, .manga-heading a");
+    final link = anchor?.getHref;
+
+    return MManga()
+      ..name = anchor?.text
+      ..imageUrl = guessCover(link, url: element.selectFirst("img")?.getSrc)
+      ..link = link;
+  }
 
   @override
   Future<MPages> getPopular(int page) async {
-    final res =
-        (await client.get(
-          Uri.parse(
-            "${source.baseUrl}/filterList?page=$page&sortBy=views&asc=false",
-          ),
-        )).body;
-
-    List<MManga> mangaList = [];
-    final urls = xpath(res, '//*[ @class="chart-title"]/@href');
-    final names = xpath(res, '//*[ @class="chart-title"]/text()');
-    List<String> images = [];
-    for (var url in urls) {
-      String slug = substringAfterLast(url, '/');
-      if (source.name == "Manga-FR") {
-        images.add("${source.baseUrl}/uploads/manga/${slug}.jpg");
-      } else {
-        images.add(
-          "${source.baseUrl}/uploads/manga/${slug}/cover/cover_250x350.jpg",
-        );
-      }
-    }
-
-    for (var i = 0; i < names.length; i++) {
-      MManga manga = MManga();
-      manga.name = names[i];
-      manga.imageUrl = images[i];
-      manga.link = urls[i];
+    final res = (await client.get(
+      Uri.parse(
+        "${source.baseUrl}/filterList?page=$page&sortBy=views&asc=false",
+      ),
+    )).body;
+    final document = parseHtml(res);
+    final mangaList = <MManga>[];
+    for (final el in document.select("div.chapter-container, div.media")) {
+      final manga = mangaFromElement(el);
       mangaList.add(manga);
     }
 
@@ -45,32 +37,22 @@ class MMRCMS extends MProvider {
 
   @override
   Future<MPages> getLatestUpdates(int page) async {
-    final res =
-        (await client.get(
-          Uri.parse("${source.baseUrl}/latest-release?page=$page"),
-        )).body;
+    if (page == 1) latestTitles.clear();
 
-    List<MManga> mangaList = [];
-    final urls = xpath(res, '//*[@class="manga-item"]/h3/a/@href');
-    final names = xpath(res, '//*[@class="manga-item"]/h3/a/text()');
-    List<String> images = [];
-    for (var url in urls) {
-      String slug = substringAfterLast(url, '/');
-      if (source.name == "Manga-FR") {
-        images.add("${source.baseUrl}/uploads/manga/${slug}.jpg");
-      } else {
-        images.add(
-          "${source.baseUrl}/uploads/manga/${slug}/cover/cover_250x350.jpg",
-        );
+    final res = (await client.get(
+      Uri.parse("${source.baseUrl}/latest-release?page=$page"),
+    )).body;
+
+    final document = parseHtml(res);
+    final mangaList = <MManga>[];
+
+    for (var el in document.select("div.mangalist div.manga-item")) {
+      final manga = mangaFromElement(el);
+      final link = manga.link;
+
+      if (link != null && latestTitles.add(link)) {
+        mangaList.add(manga);
       }
-    }
-
-    for (var i = 0; i < names.length; i++) {
-      MManga manga = MManga();
-      manga.name = names[i];
-      manga.imageUrl = images[i];
-      manga.link = urls[i];
-      mangaList.add(manga);
     }
 
     return MPages(mangaList, true);
@@ -120,35 +102,21 @@ class MMRCMS extends MProvider {
         String data = da["data"];
         if (source.name == 'Scan VF') {
           urls.add('${source.baseUrl}/$data');
-        } else if (source.name == 'Manga-FR') {
-          urls.add('${source.baseUrl}/lecture-en-ligne/$data');
         } else {
           urls.add('${source.baseUrl}/manga/$data');
         }
         names.add(value);
-        if (source.name == "Manga-FR") {
-          images.add("${source.baseUrl}/uploads/manga/$data.jpg");
-        } else {
-          images.add(
-            "${source.baseUrl}/uploads/manga/$data/cover/cover_250x350.jpg",
-          );
-        }
+        images.add(
+          "${source.baseUrl}/uploads/manga/$data/cover/cover_250x350.jpg",
+        );
       }
     } else {
       urls = xpath(res, '//div/div/div/a/@href');
       names = xpath(res, '//div/div/div/a/text()');
-      for (var url in urls) {
-        String slug = substringAfterLast(url, '/');
-        if (source.name == "Manga-FR") {
-          images.add("${source.baseUrl}/uploads/manga/${slug}.jpg");
-        } else {
-          images.add(
-            "${source.baseUrl}/uploads/manga/${slug}/cover/cover_250x350.jpg",
-          );
-        }
+      for (var mangaUrl in urls) {
+        images.add(guessCover(mangaUrl));
       }
     }
-
     for (var i = 0; i < names.length; i++) {
       MManga manga = MManga();
       manga.name = names[i];
@@ -162,93 +130,87 @@ class MMRCMS extends MProvider {
 
   @override
   Future<MManga> getDetail(String url) async {
-    final statusList = [
-      {
-        "complete": 1,
-        "complet": 1,
-        "completo": 1,
-        "zakończone": 1,
-        "concluído": 1,
-        "مكتملة": 1,
-        "ongoing": 0,
-        "en cours": 0,
-        "em lançamento": 0,
-        "prace w toku": 0,
-        "ativo": 0,
-        "مستمرة": 0,
-        "em andamento": 0,
-      },
-    ];
-    MManga manga = MManga();
     final res = (await client.get(Uri.parse(url))).body;
+    final document = parseHtml(res);
+    final manga = MManga();
 
-    final author = xpath(
-      res,
-      '//*[@class="dl-horizontal"]/dt[contains(text(), "Auteur(s)") or contains(text(), "Author(s)") or contains(text(), "Autor(es)") or contains(text(), "Yazar(lar) or contains(text(), "Mangaka(lar)")]//following-sibling::dd[1]/text()',
-    );
-    if (author.isNotEmpty) {
-      manga.author = author.first;
-    }
-    final status = xpath(
-      res,
-      '//*[@class="dl-horizontal"]/dt[contains(text(), "Statut") or contains(text(), "Status") or contains(text(), "Estado") or contains(text(), "Durum")]/following-sibling::dd[1]/text()',
-    );
-    if (status.isNotEmpty) {
-      manga.status = parseStatus(status.first, statusList);
-    }
+    // Title
+    final mangaTitle = document
+        .selectFirst(".panel-heading, .listmanga-header, .widget-title")
+        ?.text;
+    manga.name = mangaTitle;
 
-    final description = xpath(
-      res,
-      '//*[@class="well" or @class="manga well"]/p/text()',
-    );
-    if (description.isNotEmpty) {
-      manga.description = description.first;
-    }
-
-    manga.genre = xpath(
-      res,
-      '//*[@class="dl-horizontal"]/dt[contains(text(), "Categories") or contains(text(), "Categorias") or contains(text(), "Categorías") or contains(text(), "Catégories") or contains(text(), "Kategoriler" or contains(text(), "Kategorie") or contains(text(), "Kategori") or contains(text(), "Tagi"))]/following-sibling::dd[1]/text()',
+    // Cover
+    manga.imageUrl = guessCover(
+      url,
+      url: document.selectFirst(".row img.img-responsive")?.getSrc,
     );
 
-    var chapUrls = xpath(res, '//*[@class="chapter-title-rtl"]/a/@href');
-    var chaptersNames = xpath(res, '//*[@class="chapter-title-rtl"]/a/text()');
-    var chaptersDates = xpath(
-      res,
-      '//*[@class="date-chapter-title-rtl"]/text()',
-    );
+    // Description
+    manga.description = extractDescription(document);
 
-    var dateUploads = parseDates(
-      chaptersDates,
-      source.dateFormat,
-      source.dateFormatLocale,
-    );
+    document.select('.panel-body h3, .row .dl-horizontal dt').forEach((
+      element,
+    ) {
+      final label = _getOwnText(
+        element,
+      ).toLowerCase().replaceFirst(RegExp(r' :$'), '');
 
+      final valueElement = element.selectFirst('div.text');
+      if (valueElement.text == null)
+        final valueElement = element.nextElementSibling;
+
+      _assignMangaInfo(manga, label, valueElement);
+    });
+
+    // Chapters
     List<MChapter>? chaptersList = [];
-    for (var i = 0; i < chaptersNames.length; i++) {
-      MChapter chapter = MChapter();
-      chapter.name = chaptersNames[i];
-      chapter.url = chapUrls[i];
-      chapter.dateUpload = dateUploads[i];
-      chaptersList.add(chapter);
+    for (var ch in document.select("ul.chapters > li:not(.btn)")) {
+      chaptersList.add(chapterFromElement(ch, mangaTitle));
     }
     manga.chapters = chaptersList;
+
     return manga;
+  }
+
+  MChapter chapterFromElement(MElement element, String mangaTitle) {
+    final chapter = MChapter();
+
+    final titleWrapper = element.selectFirst(".chapter-title-rtl");
+    final anchor = titleWrapper?.selectFirst("a");
+
+    if (anchor != null) {
+      chapter.url = anchor.getHref ?? '';
+      chapter.name = cleanChapterName(titleWrapper.text, mangaTitle);
+
+      final dateElement = element.selectFirst(".date-chapter-title-rtl");
+
+      if (dateElement != null && dateElement.text.isNotEmpty) {
+        chapter.dateUpload = parseDates(
+          [dateElement.text],
+          source.dateFormat,
+          source.dateFormatLocale,
+        )[0];
+      } else {
+        chapter.dateUpload = DateTime.now().millisecondsSinceEpoch.toString();
+      }
+    }
+
+    return chapter;
   }
 
   @override
   Future<List<String>> getPageList(String url) async {
-    final res = (await client.get(Uri.parse(url))).body;
+    final response = await client.get(Uri.parse(url));
+    final document = parseHtml(response.body);
 
     List<String> pagesUrl = [];
-    final pages = xpath(
-      res,
-      '//*[@id="all"]/img[@class="img-responsive"]/@data-src',
-    );
-    for (var page in pages) {
-      if (page.startsWith('//')) {
-        pagesUrl.add(page.replaceAll('//', 'https://'));
+    for (var img in document.select('#all img.img-responsive[data-src]')) {
+      String? src = img.attr('data-src');
+      if (src.startsWith('//')) {
+        pagesUrl.add('https:${src}');
       } else {
-        pagesUrl.add(page);
+        pagesUrl.add(src);
       }
     }
 
@@ -339,6 +301,152 @@ class MMRCMS extends MProvider {
     }
     return "?";
   }
+
+  String guessCover(String mangaUrl, {String? url}) {
+    if (url == null || url?.endsWith("no-image.png")) {
+      String slug = substringAfterLast(mangaUrl, '/');
+      return "${source.baseUrl}/uploads/manga/${slug}/cover/cover_250x350.jpg";
+    } else if (url?.startsWith(source.baseUrl)) {
+      return url;
+    } else {
+      return Uri.parse(source.baseUrl).resolve(url).toString();
+    }
+  }
+
+  String extractDescription(MDocument document) {
+    final container = document.selectFirst(".row .well");
+    if (container == null) return "";
+
+    String text = container.text;
+
+    container.select("h5").forEach((element) {
+      text = text.replaceAll(element.text, "");
+    });
+
+    return text.replaceAll(RegExp(r'\n{3,}'), '\n\n').trim();
+  }
+
+  String _getOwnText(MElement element) {
+    final text = element.text;
+    final childrenText = element.children.map((e) => e.text).join();
+    return text.replaceFirst(childrenText, '').trim();
+  }
+
+  void _assignMangaInfo(MManga manga, String label, MElement valueElement) {
+    if (_detailAuthor.contains(label)) {
+      manga.author = valueElement.text;
+    } else if (_detailArtist.contains(label)) {
+      manga.artist = valueElement.text;
+    } else if (_detailGenre.contains(label)) {
+      manga.genre = valueElement?.select("a").map((e) => e.text).toList;
+    } else if (_detailStatus.contains(label)) {
+      manga.status = parseStatus(valueElement.text, statusList);
+    }
+  }
+
+  String cleanChapterName(String name, String mangaTitle) {
+    const chapterString = "Chapter";
+    const chapterNamePrefix = "";
+
+    try {
+      final initialName = name.replaceFirst(
+        '$chapterNamePrefix$mangaTitle',
+        chapterString,
+      );
+
+      final parts = initialName.split(':');
+
+      if (parts.isEmpty) return name;
+
+      final firstPart = parts[0].trim();
+      if (parts.length == 1) return firstPart;
+
+      final secondPart = parts.sublist(1).join(':').trim();
+
+      return firstPart == secondPart ? firstPart : "$firstPart: $secondPart";
+    } catch (e) {
+      return name;
+    }
+  }
+
+  const _detailAuthor = {
+    'author(s)',
+    'autor(es)',
+    'auteur(s)',
+    '著作',
+    'yazar(lar)',
+    'mangaka(lar)',
+    'pengarang/penulis',
+    'pengarang',
+    'penulis',
+    'autor',
+    'المؤلف',
+    'перевод',
+    'autor/autorzy',
+  };
+
+  const _detailArtist = {
+    'artist(s)',
+    'artiste(s)',
+    'sanatçi(lar)',
+    'artista(s)',
+    'artist(s)/ilustrator',
+    'الرسام',
+    'seniman',
+    'rysownik/rysownicy',
+    'artista',
+  };
+
+  const _detailGenre = {
+    'categories',
+    'categorías',
+    'catégories',
+    'ジャンル',
+    'kategoriler',
+    'categorias',
+    'kategorie',
+    'التصنيفات',
+    'жанр',
+    'kategori',
+    'tagi',
+    'género',
+  };
+
+  const _detailStatus = {
+    'status',
+    'statut',
+    'estado',
+    '状態',
+    'durum',
+    'الحالة',
+    'статус',
+  };
+
+  const statusList = [
+    {
+      // Ongoing Statuses (0)
+      'ongoing': 0,
+      'مستمرة': 0,
+      'en cours': 0,
+      'em lançamento': 0,
+      'prace w toku': 0,
+      'ativo': 0,
+      'em andamento': 0,
+      'activo': 0,
+
+      // Complete Statuses (1)
+      'complete': 1,
+      'مكتملة': 1,
+      'complet': 1,
+      'completo': 1,
+      'zakończone': 1,
+      'concluído': 1,
+      'finalizado': 1,
+
+      // Dropped Statuses (3)
+      'dropped': 3,
+    },
+  ];
 }
 
 MMRCMS main(MSource source) {
