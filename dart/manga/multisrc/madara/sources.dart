@@ -95,6 +95,7 @@ import 'src/wonderlandscan/wonderlandscan.dart';
 import 'src/yuriverso/yuriverso.dart';
 import 'src/manga3asq/manga3asq.dart';
 import 'src/detectiveconanar/detectiveconanar.dart';
+import 'src/mangaxcore/mangaxcore.dart';
 import 'src/grabberzone/grabberzone.dart';
 import 'src/mangalink/mangalink.dart';
 import 'src/mangalek/mangalek.dart';
@@ -380,6 +381,8 @@ List<Source> _madaraSourcesList =
           yuriversoSource,
           //مانجا العاشق (AR)
           manga3asqSource,
+          //Mangax Core (AR)
+          mangaxcoreSource,
           //Grabber Zone (ALL)
           grabberzoneSource,
           //مانجا لينك (AR)
