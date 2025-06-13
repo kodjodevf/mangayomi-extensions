@@ -94,6 +94,7 @@ import 'src/winterscan/winterscan.dart';
 import 'src/wonderlandscan/wonderlandscan.dart';
 import 'src/yuriverso/yuriverso.dart';
 import 'src/manga3asq/manga3asq.dart';
+import 'src/detectiveconanar/detectiveconanar.dart';
 import 'src/grabberzone/grabberzone.dart';
 import 'src/mangalink/mangalink.dart';
 import 'src/mangalek/mangalek.dart';
@@ -397,6 +398,8 @@ List<Source> _madaraSourcesList =
           olaoeSource,
           //Rocks Manga (AR)
           rocksmangaSource,
+          //شبكة كونان العربية (AR)
+          detectiveconanarSource,
           //DragonTea (EN)
           dragonteaSource,
           //Global Bloging (EN)
@@ -563,10 +566,9 @@ List<Source> _madaraSourcesList =
           webtoonhattiSource,
         ]
         .map(
-          (e) =>
-              e
-                ..itemType = ItemType.manga
-                ..sourceCodeUrl = madaraSourceCodeUrl
-                ..version = madaraVersion,
+          (e) => e
+            ..itemType = ItemType.manga
+            ..sourceCodeUrl = madaraSourceCodeUrl
+            ..version = madaraVersion,
         )
         .toList();
