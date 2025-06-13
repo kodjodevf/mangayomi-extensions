@@ -10,20 +10,22 @@ class Madara extends MProvider {
 
   @override
   Future<MPages> getPopular(int page) async {
-    final res =
-        (await client.get(
-          Uri.parse("${source.baseUrl}/manga/page/$page/?m_orderby=views"),
-        )).body;
+    final res = (await client.get(
+      Uri.parse(
+        "${source.baseUrl}/${getMangaSubString()}/page/$page/?m_orderby=views",
+      ),
+    )).body;
     final document = parseHtml(res);
     return mangaFromElements(document.select("div.page-item-detail"));
   }
 
   @override
   Future<MPages> getLatestUpdates(int page) async {
-    final res =
-        (await client.get(
-          Uri.parse("${source.baseUrl}/manga/page/$page/?m_orderby=latest"),
-        )).body;
+    final res = (await client.get(
+      Uri.parse(
+        "${source.baseUrl}/${getMangaSubString()}/page/$page/?m_orderby=latest",
+      ),
+    )).body;
     final document = parseHtml(res);
     return mangaFromElements(document.select("div.page-item-detail"));
   }
@@ -48,9 +50,12 @@ class Madara extends MProvider {
           url += "${ll(url)}release=${Uri.encodeComponent(filter.state)}";
         }
       } else if (filter.type == "StatusFilter") {
-        List<String> status = filter.state.where((item) => item.state).map((item) => item.value.toString()).toList();
+        List<String> status = filter.state
+            .where((item) => item.state)
+            .map((item) => item.value.toString())
+            .toList();
         if (status.isNotEmpty) {
-            url += "${ll(url)}status[]=${status.join('&status[]=')}";
+          url += "${ll(url)}status[]=${status.join('&status[]=')}";
         }
       } else if (filter.type == "OrderByFilter") {
         if (filter.state != 0) {
@@ -101,8 +106,8 @@ class Madara extends MProvider {
               );
               chapter.dateUpload = dates[0];
             } else {
-              chapter.dateUpload =
-                  DateTime.now().millisecondsSinceEpoch.toString();
+              chapter.dateUpload = DateTime.now().millisecondsSinceEpoch
+                  .toString();
             }
           }
           chapters.add(chapter);
@@ -203,11 +208,10 @@ class Madara extends MProvider {
       body: {"action": "manga_get_chapters", "manga": mangaId},
     );
     if (oldXhrChaptersRequest.statusCode == 400) {
-      res =
-          (await client.post(
-            Uri.parse("${url}ajax/chapters"),
-            headers: headers,
-          )).body;
+      res = (await client.post(
+        Uri.parse("${url}ajax/chapters"),
+        headers: headers,
+      )).body;
     } else {
       res = oldXhrChaptersRequest.body;
     }
@@ -215,11 +219,10 @@ class Madara extends MProvider {
     MDocument chapDoc = parseHtml(res);
     manga.chapters = getChapters(chapDoc);
     if (manga.chapters.isEmpty) {
-      res =
-          (await client.post(
-            Uri.parse("${url}ajax/chapters"),
-            headers: headers,
-          )).body;
+      res = (await client.post(
+        Uri.parse("${url}ajax/chapters"),
+        headers: headers,
+      )).body;
       chapDoc = parseHtml(res);
       manga.chapters = getChapters(chapDoc);
     }
@@ -252,8 +255,10 @@ class Madara extends MProvider {
     List<String> pageUrls = [];
 
     if (imgs.length == 1) {
-      final pagesNumber =
-          document.selectFirst("#single-pager").select("option").length;
+      final pagesNumber = document
+          .selectFirst("#single-pager")
+          .select("option")
+          .length;
       final imgUrl = imgs.first;
       for (var i = 0; i < pagesNumber; i++) {
         final val = i + 1;
@@ -325,6 +330,11 @@ class Madara extends MProvider {
       return "&";
     }
     return "?";
+  }
+
+  String getMangaSubString() {
+    const worksSources = {"Olaoe", "Mangax Core"};
+    return worksSources.contains(source.name) ? "works" : "manga";
   }
 }
 
