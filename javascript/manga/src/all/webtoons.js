@@ -133,12 +133,7 @@ class DefaultExtension extends MProvider {
     const res = await new Client().get(url);
     const doc = new Document(res.body);
     const info = doc.selectFirst("div.cont_box");
-    const cover =
-      info
-        .selectFirst("div.detail_body")
-        ?.attr("style")
-        ?.match(/url\(['"]?(.*?)['"]?\)/)?.[1] ??
-      info.selectFirst("span.thmb img")?.attr("src");
+
     const title = info.selectFirst("h1.subj, h3.subj").text.trim();
     const genre =
       Array.from(info.select("p.genre")).map((el) => el.text) != ""
@@ -189,7 +184,6 @@ class DefaultExtension extends MProvider {
       link: url,
       genre: genre,
       description: desc,
-      imageUrl: cover,
       author: author,
       status: status,
       episodes: chapters,
