@@ -25,6 +25,18 @@ class DefaultExtension extends MProvider {
     };
   }
 
+  getBaseUrl() {
+    const preference = new SharedPreferences();
+    var base_url = preference.get("domain_url");
+    if (base_url.length == 0) {
+      return this.source.baseUrl;
+    }
+    if (base_url.endsWith("/")) {
+      return base_url.slice(0, -1);
+    }
+    return base_url;
+  }
+
   mangaFromElement(doc) {
     const list = [];
     for (const el of doc.select(
@@ -40,9 +52,8 @@ class DefaultExtension extends MProvider {
   }
 
   async getPopular(page) {
-    const baseUrl = this.source.baseUrl;
     const res = await new Client().get(
-      `${baseUrl}/${this.langCode()}/originals`,
+      `${this.getBaseUrl()}/${this.langCode()}/originals`,
     );
     const doc = new Document(res.body);
 
@@ -53,9 +64,8 @@ class DefaultExtension extends MProvider {
   }
 
   async getLatestUpdates(page) {
-    const baseUrl = this.source.baseUrl;
     const res = await new Client().get(
-      `${baseUrl}/${this.langCode()}/originals?sortOrder=UPDATE`,
+      `${this.getBaseUrl()}/${this.langCode()}/originals?sortOrder=UPDATE`,
     );
     const doc = new Document(res.body);
 
@@ -67,8 +77,7 @@ class DefaultExtension extends MProvider {
 
   async search(query, page, filters) {
     const keyword = query.trim().replace(/\s+/g, "+");
-    const baseurl = this.source.baseUrl;
-    let url = `${baseurl}/${this.langCode()}`;
+    let url = `${this.getBaseUrl()}/${this.langCode()}`;
     let hasNextPage = false;
 
     const getFilterValue = (type, defaultValue = "") => {
@@ -575,6 +584,21 @@ class DefaultExtension extends MProvider {
             data: "TIPTOON",
           },
         ],
+      },
+    ];
+  }
+  //  Preferences
+  getSourcePreferences() {
+    return [
+      {
+        key: "domain_url",
+        editTextPreference: {
+          title: "Override BaseUrl",
+          summary: "",
+          value: this.source.baseUrl,
+          dialogTitle: "URL",
+          dialogMessage: "",
+        },
       },
     ];
   }
