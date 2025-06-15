@@ -69,20 +69,36 @@ class DefaultExtension extends MProvider {
     const keyword = query.trim().replace(/\s+/g, "+");
     const baseurl = this.source.baseUrl;
     let url = `${baseurl}/${this.langCode()}`;
+    let hasNextPage = false;
 
-    if (query !== "") {
-      url += `/search/${filters[0].values[filters[0].state].value}?keyword=${keyword}&page=${page}`;
-    } else if (filters) {
-      url += `/genres/${filters[2].values[filters[2].state].value}`;
+    const getFilterValue = (type, defaultValue = "") => {
+      const filter = filters.find((f) => f.type === type);
+      return filter?.values?.[filter.state]?.value ?? defaultValue;
+    };
+    if (query) {
+      url += `/search/${getFilterValue("searchType")}?keyword=${keyword}&page=${page}`;
+      hasNextPage = true;
+    } else {
+      const sortOrder = getFilterValue("sortOrder");
+      const rankingType = getFilterValue("rankingType");
+      const weekday = getFilterValue("weekday");
+      const genreType = getFilterValue("genre");
+
+      if (rankingType) {
+        // const genreParam = genreType ? `&subTabGenreCode=${genreType}` : "";
+        url += `/ranking/${rankingType}`;
+      } else if (weekday) {
+        url += `/originals/${weekday}?sortOrder=${sortOrder}`;
+      } else if (genreType) {
+        url += `/genres/${genreType}?sortOrder=${sortOrder}`;
+      }
     }
 
     const res = await new Client().get(url);
     const doc = new Document(res.body);
-    const list = this.mangaFromElement(doc);
-    const hasNextPage = list.length !== 0;
 
     return {
-      list,
+      list: this.mangaFromElement(doc),
       hasNextPage,
     };
   }
@@ -313,113 +329,242 @@ class DefaultExtension extends MProvider {
             value: "canvas",
           },
         ],
+        state: 0,
       },
       {
-        type: "sort",
-        name: "Official or Challenge",
+        type: "separator",
+        type_name: "SeparatorFilter",
+      },
+
+      {
+        type: "rankingType",
+        name: "Ranking Category",
         type_name: "SelectFilter",
         values: [
           {
             type_name: "SelectOption",
-            name: "Any",
-            value: "any",
+            name: "Not Selected",
+            value: "",
           },
           {
             type_name: "SelectOption",
-            name: "Official only",
-            value: "official",
+            name: "Trending",
+            value: "trending",
           },
           {
             type_name: "SelectOption",
-            name: "Challenge only",
-            value: "challenge",
+            name: "Popular",
+            value: "popular",
+          },
+          {
+            type_name: "SelectOption",
+            name: "Originals",
+            value: "originals",
+          },
+          {
+            type_name: "SelectOption",
+            name: "Canvas",
+            value: "canvas",
           },
         ],
       },
       {
-        type: "categories",
+        type: "separator",
+        type_name: "SeparatorFilter",
+      },
+
+      {
+        type: "sortOrder",
+        name: "Sort By (For Schedule & Genres)",
+        type_name: "SelectFilter",
+        values: [
+          { type_name: "SelectOption", name: "Popular (MANA)", value: "MANA" },
+          { type_name: "SelectOption", name: "Likes", value: "LIKEIT" },
+          { type_name: "SelectOption", name: "Newest", value: "UPDATE" },
+        ],
+        state: 0,
+        appliesTo: ["weekday", "genre"],
+      },
+
+      {
+        type: "separator",
+        type_name: "SeparatorFilter",
+      },
+
+      {
+        type: "weekday",
+        name: "Update Schedule",
+        type_name: "SelectFilter",
+        values: [
+          {
+            type_name: "SelectOption",
+            name: "Day",
+            value: "",
+            data: "",
+          },
+          {
+            type_name: "SelectOption",
+            name: "Monday",
+            value: "monday",
+            data: "MONDAY",
+          },
+          {
+            type_name: "SelectOption",
+            name: "Tuesday",
+            value: "tuesday",
+            data: "TUESDAY",
+          },
+          {
+            type_name: "SelectOption",
+            name: "Wednesday",
+            value: "wednesday",
+            data: "WEDNESDAY",
+          },
+          {
+            type_name: "SelectOption",
+            name: "Thursday",
+            value: "thursday",
+            data: "THURSDAY",
+          },
+          {
+            type_name: "SelectOption",
+            name: "Friday",
+            value: "friday",
+            data: "FRIDAY",
+          },
+          {
+            type_name: "SelectOption",
+            name: "Saturday",
+            value: "saturday",
+            data: "SATURDAY",
+          },
+          {
+            type_name: "SelectOption",
+            name: "Sunday",
+            value: "sunday",
+            data: "SUNDAY",
+          },
+          {
+            type_name: "SelectOption",
+            name: "Completed",
+            value: "complete",
+            data: "COMPLETE",
+          },
+        ],
+      },
+
+      {
+        type: "genre",
         name: "Genre",
         type_name: "SelectFilter",
         values: [
           {
             type_name: "SelectOption",
-            name: "All",
+            name: "All Genres",
             value: "",
-          },
-          {
-            type_name: "SelectOption",
-            name: "Action",
-            value: "action",
-          },
-          {
-            type_name: "SelectOption",
-            name: "Comedy",
-            value: "comedy",
+            data: "",
           },
           {
             type_name: "SelectOption",
             name: "Drama",
             value: "drama",
+            data: "DRAMA",
           },
           {
             type_name: "SelectOption",
             name: "Fantasy",
             value: "fantasy",
+            data: "FANTASY",
           },
           {
             type_name: "SelectOption",
-            name: "Heartwarming",
-            value: "heartwarming",
+            name: "Comedy",
+            value: "comedy",
+            data: "COMEDY",
           },
           {
             type_name: "SelectOption",
-            name: "Historical",
-            value: "historical",
+            name: "Action",
+            value: "action",
+            data: "ACTION",
           },
           {
             type_name: "SelectOption",
-            name: "Horror",
-            value: "horror",
-          },
-          {
-            type_name: "SelectOption",
-            name: "Informative",
-            value: "tiptoon",
-          },
-          {
-            type_name: "SelectOption",
-            name: "Mystery",
-            value: "mystery",
+            name: "Slice of Life",
+            value: "slice_of_life",
+            data: "SLICE_OF_LIFE",
           },
           {
             type_name: "SelectOption",
             name: "Romance",
             value: "romance",
-          },
-          {
-            type_name: "SelectOption",
-            name: "Sci-fi",
-            value: "sf",
-          },
-          {
-            type_name: "SelectOption",
-            name: "Slice of life",
-            value: "slice_of_life",
-          },
-          {
-            type_name: "SelectOption",
-            name: "Sports",
-            value: "sports",
+            data: "ROMANCE",
           },
           {
             type_name: "SelectOption",
             name: "Superhero",
             value: "super_hero",
+            data: "SUPER_HERO",
+          },
+          {
+            type_name: "SelectOption",
+            name: "Sci-Fi",
+            value: "sf",
+            data: "SF",
+          },
+          {
+            type_name: "SelectOption",
+            name: "Thriller",
+            value: "thriller",
+            data: "THRILLER",
           },
           {
             type_name: "SelectOption",
             name: "Supernatural",
             value: "supernatural",
+            data: "SUPERNATURAL",
+          },
+          {
+            type_name: "SelectOption",
+            name: "Mystery",
+            value: "mystery",
+            data: "MYSTERY",
+          },
+          {
+            type_name: "SelectOption",
+            name: "Sports",
+            value: "sports",
+            data: "SPORTS",
+          },
+          {
+            type_name: "SelectOption",
+            name: "Historical",
+            value: "historical",
+            data: "HISTORICAL",
+          },
+          {
+            type_name: "SelectOption",
+            name: "Heartwarming",
+            value: "heartwarming",
+            data: "HEARTWARMING",
+          },
+          {
+            type_name: "SelectOption",
+            name: "Horror",
+            value: "horror",
+            data: "HORROR",
+          },
+          {
+            type_name: "SelectOption",
+            name: "Graphic Novel",
+            value: "graphic_novel",
+            data: "GRAPHIC_NOVEL",
+          },
+          {
+            type_name: "SelectOption",
+            name: "Informative",
+            value: "tiptoon",
+            data: "TIPTOON",
           },
         ],
       },
