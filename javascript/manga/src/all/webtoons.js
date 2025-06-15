@@ -25,36 +25,11 @@ class DefaultExtension extends MProvider {
     };
   }
 
-  async getItem(url, selector) {
-    const res = await new Client().get(this.source.baseUrl + url, this.headers);
-    const doc = new Document(res.body);
-    const mangas = [];
-    const elements = doc.select(selector);
-    for (const element of elements) {
-      const linkElement = element.selectFirst("a");
-      const imageElement = linkElement.selectFirst("img");
-      const imageUrl = imageElement.attr("src");
-      const name = element.selectFirst("p.subj").text;
-      const link = linkElement.attr("href");
-      const genre = [];
-      if (element.selectFirst("p.genre").text === "") {
-        genre.push(element.selectFirst("span.genre").text);
-      } else {
-        genre.push(element.selectFirst("p.genre").text);
-      }
-      mangas.push({
-        name: name,
-        imageUrl: imageUrl,
-        link: link,
-        genre: genre,
-      });
-    }
-    return mangas;
-  }
-
   mangaFromElement(doc) {
     const list = [];
-    for (const el of doc.select(`div.webtoon_list_wrap li a`)) {
+    for (const el of doc.select(
+      `div.webtoon_list_wrap li a, ul.webtoon_list li a`,
+    )) {
       const imageUrl = el.selectFirst("img").getSrc;
       const name = el.selectFirst("strong.title").text;
       const link = el.getHref;
@@ -91,41 +66,24 @@ class DefaultExtension extends MProvider {
   }
 
   async search(query, page, filters) {
-    let keyword = query.trim().replace(/\s+/g, "+");
-    let hasNextPage = true;
-    let type_originals = "WEBTOON";
-    let type_canvas = "CHALLENGE";
-    let fetch_originals = "ul.card_lst li";
-    let fetch_canvas = "div.challenge_lst.search li";
-    let list_originals = [];
-    let list_canvas = [];
-    let list = [];
+    const keyword = query.trim().replace(/\s+/g, "+");
+    const baseurl = this.source.baseUrl;
+    let url = `${baseurl}/${this.langCode()}`;
 
     if (query !== "") {
-      list_originals = await this.getItem(
-        `/${this.langCode()}/search?keyword=${keyword}&searchType=` +
-          type_originals +
-          `&page=${page}`,
-        fetch_originals,
-      );
-      list_canvas = await this.getItem(
-        `/${this.langCode()}/search?keyword=${keyword}&searchType=` +
-          type_canvas +
-          `&page=${page}`,
-        fetch_canvas,
-      );
-      if (filters) {
-      }
-      list = list_originals.concat(list_canvas);
-    } else {
+      url += `/search/${filters[0].values[filters[0].state].value}?keyword=${keyword}&page=${page}`;
+    } else if (filters) {
+      url += `/genres/${filters[2].values[filters[2].state].value}`;
     }
 
-    if (list.length === 0) {
-      hasNextPage = false;
-    }
+    const res = await new Client().get(url);
+    const doc = new Document(res.body);
+    const list = this.mangaFromElement(doc);
+    const hasNextPage = list.length !== 0;
+
     return {
-      list: list,
-      hasNextPage: hasNextPage,
+      list,
+      hasNextPage,
     };
   }
 
@@ -339,6 +297,23 @@ class DefaultExtension extends MProvider {
 
   getFilterList() {
     return [
+      {
+        type: "searchType",
+        name: "Search Type",
+        type_name: "SelectFilter",
+        values: [
+          {
+            type_name: "SelectOption",
+            name: "Originals",
+            value: "originals",
+          },
+          {
+            type_name: "SelectOption",
+            name: "Canvas",
+            value: "canvas",
+          },
+        ],
+      },
       {
         type: "sort",
         name: "Official or Challenge",
