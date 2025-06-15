@@ -317,6 +317,16 @@ class DefaultExtension extends MProvider {
   getFilterList() {
     return [
       {
+        type: "header",
+        name: "Filter Priority: Search > Ranking > Day > Genre | Sort applies to Day/Genre",
+        type_name: "HeaderFilter",
+      },
+      {
+        type: "separator",
+        type_name: "SeparatorFilter",
+      },
+
+      {
         type: "searchType",
         name: "Search Type",
         type_name: "SelectFilter",
@@ -387,11 +397,6 @@ class DefaultExtension extends MProvider {
         ],
         state: 0,
         appliesTo: ["weekday", "genre"],
-      },
-
-      {
-        type: "separator",
-        type_name: "SeparatorFilter",
       },
 
       {
