@@ -77,7 +77,6 @@ class DefaultExtension extends MProvider {
     };
     if (query) {
       url += `/search/${getFilterValue("searchType")}?keyword=${keyword}&page=${page}`;
-      hasNextPage = true;
     } else {
       const sortOrder = getFilterValue("sortOrder");
       const rankingType = getFilterValue("rankingType");
@@ -96,9 +95,13 @@ class DefaultExtension extends MProvider {
 
     const res = await new Client().get(url);
     const doc = new Document(res.body);
+    const list = this.mangaFromElement(doc);
+    if (query) {
+      hasNextPage = list.length !== 0;
+    }
 
     return {
-      list: this.mangaFromElement(doc),
+      list,
       hasNextPage,
     };
   }
