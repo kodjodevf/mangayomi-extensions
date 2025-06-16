@@ -8,7 +8,7 @@ const mangayomiSources = [{
     "typeSource": "single",
     "isManga": true,
     "isNsfw": false,
-    "version": "0.0.4",
+    "version": "0.0.45",
     "dateFormat": "",
     "dateFormatLocale": "",
     "pkgPath": "manga/src/all/webtoons.js"
@@ -17,12 +17,24 @@ const mangayomiSources = [{
 class DefaultExtension extends MProvider {
   headers = {
     "User-Agent":
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
+      "Mozilla/5.0 (Linux; Android 13; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Mobile Safari/537.36",
   };
-  getHeaders(url) {
-    return {
-      Referer: this.source.baseUrl,
-    };
+
+  mobileUrl = "https://m.webtoons.com";
+
+  getFormattedUrl(preferenceKey) {
+    const preference = new SharedPreferences();
+    let url = preference.get(preferenceKey) || this.source.baseUrl;
+
+    return url.endsWith("/") ? url.slice(0, -1) : url;
+  }
+
+  getBaseUrl() {
+    return this.getFormattedUrl("domain_url");
+  }
+
+  getMobileUrl() {
+    return this.getFormattedUrl("mobile_url");
   }
 
   mangaFromElement(doc) {
@@ -40,9 +52,8 @@ class DefaultExtension extends MProvider {
   }
 
   async getPopular(page) {
-    const baseUrl = this.source.baseUrl;
     const res = await new Client().get(
-      `${baseUrl}/${this.langCode()}/originals`,
+      `${this.getBaseUrl()}/${this.langCode()}/originals`,
     );
     const doc = new Document(res.body);
 
@@ -53,9 +64,8 @@ class DefaultExtension extends MProvider {
   }
 
   async getLatestUpdates(page) {
-    const baseUrl = this.source.baseUrl;
     const res = await new Client().get(
-      `${baseUrl}/${this.langCode()}/originals?sortOrder=UPDATE`,
+      `${this.getBaseUrl()}/${this.langCode()}/originals?sortOrder=UPDATE`,
     );
     const doc = new Document(res.body);
 
@@ -67,8 +77,7 @@ class DefaultExtension extends MProvider {
 
   async search(query, page, filters) {
     const keyword = query.trim().replace(/\s+/g, "+");
-    const baseurl = this.source.baseUrl;
-    let url = `${baseurl}/${this.langCode()}`;
+    let url = `${this.getBaseUrl()}/${this.langCode()}`;
     let hasNextPage = false;
 
     const getFilterValue = (type, defaultValue = "") => {
@@ -107,11 +116,11 @@ class DefaultExtension extends MProvider {
   }
 
   async getDetail(url) {
-    const res = await new Client().get(url);
-    const doc = new Document(res.body);
-    const info = doc.selectFirst("div.cont_box");
+    let res = await new Client().get(url);
+    let doc = new Document(res.body);
 
-    const title = info.selectFirst("h1.subj, h3.subj").text.trim();
+    const info = doc.selectFirst("div.cont_box");
+    const name = info.selectFirst("h1.subj, h3.subj").text;
     const genre =
       Array.from(info.select("p.genre")).map((el) => el.text) != ""
         ? Array.from(info.select("p.genre")).map((el) => el.text)
@@ -122,47 +131,65 @@ class DefaultExtension extends MProvider {
         .text.replace(/\s+/g, " ")
         .replace(/author info/g, "")
         .trim() ?? info.selectFirst("a.author").text;
-    const status_str = info.selectFirst("p.day_info").text;
-    var status;
-    if (status_str == "COMPLETED") {
-      status = 1;
-    } else {
-      status = 0;
-    }
-    const desc = info.selectFirst("p.summary").text.replace(/\s+/g, " ").trim();
+
+    const dayInfoText = info?.selectFirst("p.day_info")?.text || "";
+    const status =
+      dayInfoText.includes("UP") ||
+      dayInfoText.includes("EVERY") ||
+      dayInfoText.includes("NOUVEAU")
+        ? 0
+        : dayInfoText.includes("END") ||
+            dayInfoText.includes("TERMINÉ") ||
+            dayInfoText.includes("COMPLETED")
+          ? 1
+          : -1; // UNKNOWN
+
+    const description = info
+      .selectFirst("p.summary")
+      .text.replace(/\s+/g, " ")
+      .trim();
+
+    // chapters
     const chapters = [];
-    let tester = "";
-    let page = 1;
-
-    while (tester !== "#1") {
-      const res = await new Client().get(url + `&page=${page}`);
-      const doc = new Document(res.body);
-      const info = doc.selectFirst("div.cont_box");
-      const elements = info.select("div.detail_lst li");
-
-      for (const element of elements) {
-        tester = element.selectFirst("span.tx").text.trim();
-        const dateString = element.selectFirst("span.date").text.trim();
-        const date = new Date(
-          this.formatDateString(dateString, this.source.lang),
-        );
-        const millisecondsSinceEpoch = date.getTime();
-        const millisecondsString = millisecondsSinceEpoch.toString();
-        chapters.push({
-          name: tester + " " + element.selectFirst("span.subj span").text,
-          url: element.selectFirst("a").attr("href"),
-          dateUpload: millisecondsString,
-        });
+    res = await new Client().get(
+      url.replace(this.getBaseUrl(), this.getMobileUrl()),
+      this.headers,
+    );
+    doc = new Document(res.body);
+    for (const el of doc.select("ul#_episodeList li[id*=episode] a")) {
+      const url = el.getHref.replace(this.getMobileUrl(), this.getBaseUrl());
+      let name = el.selectFirst(".sub_title > span.ellipsis")?.text;
+      const chapterElement = el.selectFirst("div.row > div.num");
+      if (chapterElement) {
+        const chapterText = chapterElement.text;
+        const hashIndex = chapterText.indexOf("#");
+        if (hashIndex > -1) {
+          name += " Ch. " + chapterText.substring(hashIndex + 1);
+        }
       }
-      page++;
+      const dateUpload = new Date(
+        this.formatDateString(
+          el.selectFirst(".sub_info .date")?.text,
+          this.source.lang,
+        ),
+      )
+        .getTime()
+        .toString();
+
+      chapters.push({
+        name,
+        url,
+        dateUpload,
+      });
     }
+
     return {
-      name: title,
+      name,
       link: url,
-      genre: genre,
-      description: desc,
-      author: author,
-      status: status,
+      genre,
+      description,
+      author,
+      status,
       episodes: chapters,
     };
   }
@@ -575,6 +602,32 @@ class DefaultExtension extends MProvider {
             data: "TIPTOON",
           },
         ],
+      },
+    ];
+  }
+
+  //  Preferences
+  getSourcePreferences() {
+    return [
+      {
+        key: "domain_url",
+        editTextPreference: {
+          title: "Override BaseUrl",
+          summary: "",
+          value: this.source.baseUrl,
+          dialogTitle: "URL",
+          dialogMessage: "",
+        },
+      },
+      {
+        key: "mobile_url",
+        editTextPreference: {
+          title: "Override mobileUrl",
+          summary: "",
+          value: this.mobileUrl,
+          dialogTitle: "URL",
+          dialogMessage: "",
+        },
       },
     ];
   }
