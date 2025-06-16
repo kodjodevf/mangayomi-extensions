@@ -26,6 +26,7 @@ import 'src/it/animesaturn/source.dart';
 import 'src/pt/animesvision/source.dart';
 import 'src/sq/filma24/source.dart';
 import 'src/tr/diziwatch/source.dart';
+import 'src/en/donghuastream/source.dart';
 
 List<Source> dartAnimesourceList = [
   gogoanimeSource,
@@ -55,4 +56,5 @@ List<Source> dartAnimesourceList = [
   animeonlineninjaSource,
   kisskhSource,
   vumetoSource,
+  donghuastreamSource,
 ];
