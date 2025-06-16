@@ -110,7 +110,6 @@ class DonghuaStream extends MProvider {
         String name = '${servers[i].attr("data-index")}: ${servers[i].text}';
         String valueHtml = utf8.decode(base64Url.decode(servers[i].attr('value')));
         String serverUrl = xpath(valueHtml,'//iframe/@src')[0];
-        print('$name,$serverUrl');
         if(serverUrl.startsWith('https://geo.dailymotion.com/player')){
           String videoId = RegExp(r'[?&]video=([a-zA-Z0-9]+)').firstMatch(serverUrl).group(1)!;
           return dailymotionUrlFetcher(videoId,name);
@@ -121,7 +120,6 @@ class DonghuaStream extends MProvider {
   
   Future<List<MVideo>> dailymotionUrlFetcher(String videoID, String name) async {
     String metaDataUrl = 'https://www.dailymotion.com/player/metadata/video/$videoID';
-    print(metaDataUrl);
     final res = (await client.get(Uri.parse(metaDataUrl))).body;
     final jsonRes = json.decode(res);
     String masterUrl = jsonRes["qualities"]["auto"][0]["url"];
