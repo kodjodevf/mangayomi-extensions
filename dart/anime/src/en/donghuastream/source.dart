@@ -1,7 +1,7 @@
 import '../../../../../model/source.dart';
 
 Source get donghuastreamSource => _donghuastreamSource;
-const _donghuastreamVersion = "0.0.1";
+const _donghuastreamVersion = "0.0.2";
 const _donghuastreamSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/anime/src/en/donghuastream/donghuastream.dart";
 Source _donghuastreamSource = Source(
