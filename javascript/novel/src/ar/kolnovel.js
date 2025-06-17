@@ -27,8 +27,9 @@ class DefaultExtension extends MProvider {
   }
 
   cleanTitle(title) {
-    title = title.replace(/[-@%&]*\b(?:kol|كول)\b[-@%&]*/gi, "");
-    title = title.replace(/[-@%&]+/g, " ");
+    if (!/[-_&@#%^)(*\s]*(كول|kol)/i.test(title)) return title;
+    title = title.replace(/[-_&@#%^)(*\s]*(كول|kol)/i, "");
+    title = title.replace(/[-–_&@#%^)(*+،؛:]+/g, " ");
     title = title.replace(/\s+/g, " ").trim();
     return title;
   }
