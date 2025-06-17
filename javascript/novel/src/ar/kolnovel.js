@@ -14,13 +14,15 @@ const mangayomiSources = [{
 
 class DefaultExtension extends MProvider {
   headers = {
-    Referer: this.source.baseUrl,
-    Origin: this.source.baseUrl,
+    Referer: this.activeSiteUrl,
+    Origin: this.activeSiteUrl,
     "Sec-Fetch-Mode": "cors",
     "Accept-Encoding": "gzip, deflate",
     "User-Agent":
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
   };
+
+  defaultKolBookUrl = "https://kolbook.xyz";
 
   getHeaders(url) {
     throw new Error("getHeaders not implemented");
@@ -50,7 +52,7 @@ class DefaultExtension extends MProvider {
 
   async getPopular(page) {
     const res = await new Client().get(
-      `${this.source.baseUrl}/series/?page=${page}&order=popular`,
+      `${this.activeSiteUrl}/series/?page=${page}&order=popular`,
       this.headers,
     );
     return this.novelFromElement(res);
@@ -58,7 +60,7 @@ class DefaultExtension extends MProvider {
 
   async getLatestUpdates(page) {
     const res = await new Client().get(
-      `${this.source.baseUrl}/series/?page=${page}&order=update`,
+      `${this.activeSiteUrl}/series/?page=${page}&order=update`,
       this.headers,
     );
     return this.novelFromElement(res);
@@ -89,7 +91,60 @@ class DefaultExtension extends MProvider {
   getFilterList() {
     throw new Error("getFilterList not implemented");
   }
+
+  getSanitizedUrl(prefKey) {
+    const preference = new SharedPreferences();
+    let url = preference.get(prefKey) || this.source.baseUrl;
+    return url.endsWith("/") ? url.slice(0, -1) : url;
+  }
+
+  get activeSiteUrl() {
+    return this.getSanitizedUrl("selected_site_url");
+  }
+
+  get kolNovelUrl() {
+    return this.getSanitizedUrl("kolnovel_custom_url");
+  }
+
+  get kolBookUrl() {
+    return this.getSanitizedUrl("kolbook_custom_url");
+  }
+
   getSourcePreferences() {
-    throw new Error("getSourcePreferences not implemented");
+    return [
+      {
+        key: "kolnovel_custom_url",
+        editTextPreference: {
+          title: "المصدر الرئيسي",
+          summary: "يوفر كافة الفصول، لكن بعض المحتوى يتطلب اشتراكًا.",
+          value: this.source.baseUrl,
+          dialogTitle: "URL",
+          dialogMessage: "",
+        },
+      },
+      {
+        key: "kolbook_custom_url",
+        editTextPreference: {
+          title: "المصدر المجاني",
+          summary: "لا يتطلب اشتراكًا، ولكن قد لا بحتوي على كافة الفصول.",
+          value: this.defaultKolBookUrl,
+          dialogTitle: "URL",
+          dialogMessage: "",
+        },
+      },
+      {
+        key: "selected_site_url",
+        listPreference: {
+          title: "أختر المصدر.",
+          summary: "",
+          valueIndex: 0,
+          entries: [
+            "المصدر الرسمي (قد يتطلب اشتراك)",
+            "المصدر المجانية (بدون اشتراك)",
+          ],
+          entryValues: [this.kolNovelUrl, this.kolBookUrl],
+        },
+      },
+    ];
   }
 }
