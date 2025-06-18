@@ -1,7 +1,7 @@
 import '../../../../model/source.dart';
-import 'src/scanvf/scanvf.dart';
-import 'src/onma/onma.dart';
-import 'src/readcomicsonline/readcomicsonline.dart';
+import 'src/fr/scanvf/scanvf.dart';
+import 'src/ar/onma/onma.dart';
+import 'src/en/readcomicsonline/readcomicsonline.dart';
 
 const mmrcmsVersion = "0.0.7";
 const mmrcmsSourceCodeUrl =

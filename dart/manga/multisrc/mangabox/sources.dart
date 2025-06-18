@@ -1,8 +1,8 @@
 import '../../../../model/source.dart';
-import 'src/mangabat/mangabat.dart';
+import 'src/en/mangabat/mangabat.dart';
 import 'src/mangairo/mangaeiro.dart';
-import 'src/mangakakalot/mangakakalot.dart';
-import 'src/manganato/manganato.dart';
+import 'src/en/mangakakalot/mangakakalot.dart';
+import 'src/en/manganato/manganato.dart';
 
 const mangaboxVersion = "0.0.7";
 const mangaboxSourceCodeUrl =
