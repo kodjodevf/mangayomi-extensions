@@ -1,7 +1,7 @@
 import '../../../../model/source.dart';
 
-import 'src/mangasee/mangasee.dart';
-import 'src/mangalife/mangalife.dart';
+import 'src/en/mangasee/mangasee.dart';
+import 'src/en/mangalife/mangalife.dart';
 
 const nepnepVersion = "0.0.7";
 const nepnepSourceCodeUrl =
