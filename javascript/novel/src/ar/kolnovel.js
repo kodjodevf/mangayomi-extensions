@@ -14,8 +14,8 @@ const mangayomiSources = [{
 
 class DefaultExtension extends MProvider {
   headers = {
-    Referer: this.activeSiteUrl,
-    Origin: this.activeSiteUrl,
+    Referer: this.getActiveSiteUrl(),
+    Origin: this.getActiveSiteUrl(),
     "Sec-Fetch-Mode": "cors",
     "Accept-Encoding": "gzip, deflate",
     "User-Agent":
@@ -52,7 +52,7 @@ class DefaultExtension extends MProvider {
 
   async getPopular(page) {
     const res = await new Client().get(
-      `${this.activeSiteUrl}/series/?page=${page}&order=popular`,
+      `${this.getActiveSiteUrl()}/series/?page=${page}&order=popular`,
       this.headers,
     );
     return this.novelFromElement(res);
@@ -60,7 +60,7 @@ class DefaultExtension extends MProvider {
 
   async getLatestUpdates(page) {
     const res = await new Client().get(
-      `${this.activeSiteUrl}/series/?page=${page}&order=update`,
+      `${this.getActiveSiteUrl()}/series/?page=${page}&order=update`,
       this.headers,
     );
     return this.novelFromElement(res);
@@ -98,15 +98,15 @@ class DefaultExtension extends MProvider {
     return url.endsWith("/") ? url.slice(0, -1) : url;
   }
 
-  get activeSiteUrl() {
+  getActiveSiteUrl() {
     return this.getSanitizedUrl("selected_site_url");
   }
 
-  get kolNovelUrl() {
+  getKolNovelUrl() {
     return this.getSanitizedUrl("kolnovel_custom_url");
   }
 
-  get kolBookUrl() {
+  getKolBookUrl() {
     return this.getSanitizedUrl("kolbook_custom_url");
   }
 
@@ -142,7 +142,7 @@ class DefaultExtension extends MProvider {
             "المصدر الرسمي (قد يتطلب اشتراك)",
             "المصدر المجانية (بدون اشتراك)",
           ],
-          entryValues: [this.kolNovelUrl, this.kolBookUrl],
+          entryValues: [this.getKolNovelUrl(), this.getKolBookUrl()],
         },
       },
     ];
