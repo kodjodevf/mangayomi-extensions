@@ -92,22 +92,19 @@ class DefaultExtension extends MProvider {
     throw new Error("getFilterList not implemented");
   }
 
-  getSanitizedUrl(prefKey) {
-    const preference = new SharedPreferences();
-    let url = preference.get(prefKey) || this.source.baseUrl;
-    return url.endsWith("/") ? url.slice(0, -1) : url;
-  }
-
   getActiveSiteUrl() {
-    return this.getSanitizedUrl("selected_site_url");
-  }
+    const preference = new SharedPreferences();
+    const selectedSiteKey =
+      preference.get("selected_site_key") || "kolnovel_custom_url";
+    let url;
+    if (selectedSiteKey === "kolnovel_custom_url") {
+      url = preference.get(selectedSiteKey) || this.source.baseUrl;
+    } else {
+      // kolbook_custom_url
+      url = preference.get(selectedSiteKey) || this.defaultKolBookUrl;
+    }
 
-  getKolNovelUrl() {
-    return this.getSanitizedUrl("kolnovel_custom_url");
-  }
-
-  getKolBookUrl() {
-    return this.getSanitizedUrl("kolbook_custom_url");
+    return url.endsWith("/") ? url.slice(0, -1) : url;
   }
 
   getSourcePreferences() {
@@ -115,21 +112,21 @@ class DefaultExtension extends MProvider {
       {
         key: "kolnovel_custom_url",
         editTextPreference: {
-          title: "المصدر الرئيسي",
-          summary: "يوفر كافة الفصول، لكن بعض المحتوى يتطلب اشتراكًا.",
+          title: "-تعديل الرابط -الرئيسي",
+          summary: "",
           value: this.source.baseUrl,
-          dialogTitle: "URL",
-          dialogMessage: "",
+          dialogTitle: "تعديل",
+          dialogMessage: `Defaul URL ${this.source.baseUrl}`,
         },
       },
       {
         key: "kolbook_custom_url",
         editTextPreference: {
-          title: "المصدر المجاني",
-          summary: "لا يتطلب اشتراكًا، ولكن قد لا بحتوي على كافة الفصول.",
+          title: "-تعديل الرابط -المجاني",
+          summary: "",
           value: this.defaultKolBookUrl,
-          dialogTitle: "URL",
-          dialogMessage: "",
+          dialogTitle: "تعديل",
+          dialogMessage: `Defaul URL ${this.defaultKolBookUrl}`,
         },
       },
       {
@@ -142,7 +139,7 @@ class DefaultExtension extends MProvider {
             "المصدر الرسمي (قد يتطلب اشتراك)",
             "المصدر المجانية (بدون اشتراك)",
           ],
-          entryValues: [this.getKolNovelUrl(), this.getKolBookUrl()],
+          entryValues: ["kolnovel_custom_url", "kolbook_custom_url"],
         },
       },
     ];
