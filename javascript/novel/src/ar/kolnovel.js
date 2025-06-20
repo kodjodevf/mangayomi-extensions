@@ -146,22 +146,27 @@ class DefaultExtension extends MProvider {
     };
   }
 
+  extractIdFromUrl(url) {
+    const match = url.match(/-(\d+)\/?$/);
+    return match ? match[1] : null;
+  }
+
   // For novel html content
   async getHtmlContent(name, url) {
-    throw new Error("getHtmlContent not implemented");
+    const id = this.extractIdFromUrl(url);
+    const res = await new Client().get(
+      `${this.getActiveSiteUrl()}/wp-json/wp/v2/posts/${id}`,
+      this.headers,
+    );
+
+    return this.cleanHtmlContent(JSON.parse(res.body));
   }
+
   // Clean html up for reader
   async cleanHtmlContent(html) {
-    throw new Error("cleanHtmlContent not implemented");
+    return `<h2 style="text-align: center;">${html.title.rendered}</h2><hr><br>${html.content.rendered}`;
   }
-  // For anime episode video list
-  async getVideoList(url) {
-    throw new Error("getVideoList not implemented");
-  }
-  // For manga chapter pages
-  async getPageList(url) {
-    throw new Error("getPageList not implemented");
-  }
+
   getFilterList() {
     throw new Error("getFilterList not implemented");
   }
