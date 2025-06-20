@@ -20,8 +20,6 @@ class DefaultExtension extends MProvider {
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
   };
 
-  defaultKolBookUrl = "https://kolbook.xyz";
-
   getHeaders(url) {
     throw new Error("getHeaders not implemented");
   }
@@ -50,7 +48,7 @@ class DefaultExtension extends MProvider {
 
   async getPopular(page) {
     const res = await new Client().get(
-      `${this.getActiveSiteUrl()}/series/?page=${page}&order=popular`,
+      `${this.getBaseUrl()}/series/?page=${page}&order=popular`,
       this.headers,
     );
     return this.novelFromElement(res);
@@ -58,7 +56,7 @@ class DefaultExtension extends MProvider {
 
   async getLatestUpdates(page) {
     const res = await new Client().get(
-      `${this.getActiveSiteUrl()}/series/?page=${page}&order=update`,
+      `${this.getBaseUrl()}/series/?page=${page}&order=update`,
       this.headers,
     );
     return this.novelFromElement(res);
@@ -155,7 +153,7 @@ class DefaultExtension extends MProvider {
   async getHtmlContent(name, url) {
     const id = this.extractIdFromUrl(url);
     const res = await new Client().get(
-      `${this.getActiveSiteUrl()}/wp-json/wp/v2/posts/${id}`,
+      `${this.getBaseUrl()}/wp-json/wp/v2/posts/${id}`,
       this.headers,
     );
 
@@ -171,54 +169,28 @@ class DefaultExtension extends MProvider {
     throw new Error("getFilterList not implemented");
   }
 
-  getActiveSiteUrl() {
+  getBaseUrl() {
     const preference = new SharedPreferences();
-    const selectedSiteKey =
-      preference.get("selected_site_key") || "kolnovel_custom_url";
-    let url;
-    if (selectedSiteKey === "kolnovel_custom_url") {
-      url = preference.get(selectedSiteKey) || this.source.baseUrl;
-    } else {
-      // kolbook_custom_url
-      url = preference.get(selectedSiteKey) || this.defaultKolBookUrl;
+    var base_url = preference.get("base_url");
+    if (base_url.length == 0) {
+      return this.source.baseUrl;
     }
-
-    return url.endsWith("/") ? url.slice(0, -1) : url;
+    if (base_url.endsWith("/")) {
+      return base_url.slice(0, -1);
+    }
+    return base_url;
   }
 
   getSourcePreferences() {
     return [
       {
-        key: "kolnovel_custom_url",
+        key: "base_url",
         editTextPreference: {
-          title: "-تعديل الرابط -الرئيسي",
+          title: "تعديل الرابط",
           summary: "",
           value: this.source.baseUrl,
           dialogTitle: "تعديل",
           dialogMessage: `Defaul URL ${this.source.baseUrl}`,
-        },
-      },
-      {
-        key: "kolbook_custom_url",
-        editTextPreference: {
-          title: "-تعديل الرابط -المجاني",
-          summary: "",
-          value: this.defaultKolBookUrl,
-          dialogTitle: "تعديل",
-          dialogMessage: `Defaul URL ${this.defaultKolBookUrl}`,
-        },
-      },
-      {
-        key: "selected_site_key",
-        listPreference: {
-          title: "أختر المصدر.",
-          summary: "",
-          valueIndex: 0,
-          entries: [
-            "المصدر الرسمي (قد يتطلب اشتراك)",
-            "المصدر المجانية (بدون اشتراك)",
-          ],
-          entryValues: ["kolnovel_custom_url", "kolbook_custom_url"],
         },
       },
     ];
