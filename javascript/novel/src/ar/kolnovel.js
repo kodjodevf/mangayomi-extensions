@@ -67,9 +67,85 @@ class DefaultExtension extends MProvider {
   async search(query, page, filters) {
     throw new Error("search not implemented");
   }
-  async getDetail(url) {
-    throw new Error("getDetail not implemented");
+
+  toStatus(status) {
+    return (
+      {
+        Ongoing: 0,
+        Completed: 1,
+        Hiatus: 2,
+      }[status] ?? 5 // 5 => unknown
+    );
   }
+
+  async getDetail(url) {
+    const res = await new Client().get(url, this.headers);
+    const doc = new Document(res.body);
+    const info = doc.selectFirst("div.sertoinfo");
+    const subInfo = info.selectFirst("div.sertoauth");
+    const rewName = info.selectFirst("h1.entry-title").text;
+
+    const name = this.cleanTitle(rewName);
+    const imageUrl = doc.selectFirst("img.attachment-post-thumbnail")?.getSrc;
+    const scanlator = subInfo.selectFirst(".serl:contains('المترجم') a").text;
+
+    let description =
+      info.selectFirst("div.sersys.entry-content p").text + "\n\n";
+    const lang = subInfo.selectFirst(
+      ".serl:contains('اللغة الأم') .serval",
+    )?.text;
+    if (lang) description += `اللغة الأم: ${lang}\n`;
+    const releaseYear = subInfo.selectFirst(
+      ".serl:contains('صدر في سنة') .serval",
+    )?.text;
+    if (releaseYear) description += `سنة الصدور: ${releaseYear}\n`;
+    const types = subInfo
+      .select(".serl:contains('نوع') a")
+      .map((el) => el.text)
+      .join(", ");
+    if (types) description += `الانواع: ${types}\n`;
+    const altTitle = this.cleanTitle(info.selectFirst("span.alter")?.text);
+    if (altTitle) description += `اسم آخر للعمل: ${altTitle}\n`;
+
+    const genre = info.select("div.sertogenre a").map((el) => el.text);
+    const author = subInfo.selectFirst(".serl:contains('الكاتب') a").text;
+    const status = this.toStatus(info.selectFirst("div.sertostat span").text);
+
+    const chapters = [];
+    for (const el of doc.select("div.sertobody div.bixbox ul li > a")) {
+      const url = el.getHref;
+      const dateUpload = this.parseDate(el.selectFirst("div.epl-date").text);
+
+      // Chapter name
+      let title = el.selectFirst("div.epl-title").text.trim();
+      const num = el.selectFirst("div.epl-num").text.trim();
+
+      if (title.includes(num)) title = title.replace(num, "").trim();
+      if (title.includes(rewName)) title = title.replace(rewName, "").trim();
+      if (title.includes(name)) title = title.replace(name, "").trim();
+
+      const numMatch = num.match(/(?:الفصل|chapter)\s+(\d+(?:\.\d+)?)/i);
+      if (numMatch)
+        title = title.replace(numMatch[0], "").replace(numMatch[1], "").trim();
+
+      title = title.replace(/\s{2,}/g, " ").trim();
+      const finalName =
+        title && num ? `${num}: ${title}` : title ? title : num ? num : "?";
+
+      chapters.push({ name: finalName, url, dateUpload, scanlator });
+    }
+
+    return {
+      name,
+      imageUrl,
+      description,
+      genre,
+      author,
+      status,
+      chapters,
+    };
+  }
+
   // For novel html content
   async getHtmlContent(name, url) {
     throw new Error("getHtmlContent not implemented");
@@ -141,5 +217,29 @@ class DefaultExtension extends MProvider {
         },
       },
     ];
+  }
+
+  parseDate(date) {
+    const months = {
+      يناير: "January",
+      فبراير: "February",
+      مارس: "March",
+      أبريل: "April",
+      ابريل: "April",
+      مايو: "May",
+      يونيو: "June",
+      يوليو: "July",
+      أغسطس: "August",
+      اغسطس: "August",
+      سبتمبر: "September",
+      أكتوبر: "October",
+      اكتوبر: "October",
+      نوفمبر: "November",
+      ديسمبر: "December",
+    };
+    const [monthAr, day, year] = date.split(/[\s,]+/);
+    const monthEnglish = months[monthAr] || "";
+    if (!monthEnglish) return "";
+    return new Date(`${monthEnglish} ${day}, ${year}`).getTime().toString();
   }
 }
