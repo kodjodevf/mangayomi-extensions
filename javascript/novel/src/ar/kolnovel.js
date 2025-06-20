@@ -46,6 +46,17 @@ class DefaultExtension extends MProvider {
     return { list, hasNextPage };
   }
 
+  novelFromJson(json) {
+    const list = [];
+    for (const el of json.series[0].all) {
+      const name = this.cleanTitle(el.post_title);
+      const imageUrl = el.post_image;
+      const link = el.post_link;
+      list.push({ name, imageUrl, link });
+    }
+    return { list, hasNextPage: false };
+  }
+
   async getPopular(page) {
     const res = await new Client().get(
       `${this.getBaseUrl()}/series/?page=${page}&order=popular`,
@@ -63,7 +74,17 @@ class DefaultExtension extends MProvider {
   }
 
   async search(query, page, filters) {
-    throw new Error("search not implemented");
+    const keyword = query.trim().replace(/\s+/g, "+");
+    if (keyword) {
+      const res = await new Client().post(
+        `${this.getBaseUrl()}/wp-admin/admin-ajax.php`,
+        {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        `action=ts_ac_do_search&ts_ac_query=${keyword}`,
+      );
+      return this.novelFromJson(JSON.parse(res.body));
+    }
   }
 
   toStatus(status) {
