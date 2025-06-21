@@ -85,6 +85,26 @@ class DefaultExtension extends MProvider {
       );
       return this.novelFromJson(JSON.parse(res.body));
     }
+
+    let url = `${this.getBaseUrl()}/series/?page=${page}`;
+    filters.forEach((filter) => {
+      if (filter.type === "GenreFilter") {
+        const genre = filter.state.filter((e) => e.state);
+        genre.forEach((gen) => (url += `${this.ll(url)}genre[]=${gen.value}`));
+      } else if (filter.type === "TypeFilter") {
+        const type = filter.state.filter((e) => e.state);
+        type.forEach((ty) => (url += `${this.ll(url)}type[]=${ty.value}`));
+      } else if (filter.type === "OrderFilter") {
+        if (filter.values?.[filter.state]?.value)
+          url += `${this.ll(url)}order=${filter.values[filter.state].value}`;
+      } else if (filter.type === "StatusFilter") {
+        if (filter.values?.[filter.state]?.value)
+          url += `${this.ll(url)}status=${filter.values[filter.state].value}`;
+      }
+    });
+
+    const res = await new Client().get(url, this.headers);
+    return this.novelFromElement(res);
   }
 
   toStatus(status) {
@@ -187,7 +207,229 @@ class DefaultExtension extends MProvider {
   }
 
   getFilterList() {
-    throw new Error("getFilterList not implemented");
+    return [
+      {
+        type: "StatusFilter",
+        name: "الحالة",
+        type_name: "SelectFilter",
+        values: [
+          {
+            type_name: "SelectOption",
+            name: "الكل",
+            value: "",
+          },
+          {
+            type_name: "SelectOption",
+            name: "مستمر",
+            value: "ongoing",
+          },
+          {
+            type_name: "SelectOption",
+            name: "متوقف مؤقتًا",
+            value: "hiatus",
+          },
+          {
+            type_name: "SelectOption",
+            name: "مكتمل",
+            value: "completed",
+          },
+        ],
+        state: 0,
+      },
+      {
+        type: "OrderFilter",
+        name: "ترتيب حسب",
+        type_name: "SelectFilter",
+        values: [
+          {
+            type_name: "SelectOption",
+            name: "الإعداد الأولي",
+            value: "",
+          },
+          {
+            type_name: "SelectOption",
+            name: "A-Z",
+            value: "title",
+          },
+          {
+            type_name: "SelectOption",
+            name: "Z-A",
+            value: "titlereverse",
+          },
+          {
+            type_name: "SelectOption",
+            name: "أخر التحديثات",
+            value: "update",
+          },
+          {
+            type_name: "SelectOption",
+            name: "أخر ما تم إضافته",
+            value: "latest",
+          },
+          {
+            type_name: "SelectOption",
+            name: "الرائجة",
+            value: "popular",
+          },
+          {
+            type_name: "SelectOption",
+            name: "التقييم",
+            value: "rating",
+          },
+        ],
+        state: 0,
+      },
+      {
+        type_name: "GroupFilter",
+        type: "GenreFilter",
+        name: "تصنيف",
+        state: [
+          ["Romance", "romance"],
+          ["Shounen Ai", "shounen-ai"],
+          ["Wuxia", "wuxia"],
+          ["Xianxia", "xianxia"],
+          ["XUANHUAN", "xuanhuan"],
+          [
+            "أبطال خارقين",
+            "%d8%a3%d8%a8%d8%b7%d8%a7%d9%84-%d8%ae%d8%a7%d8%b1%d9%82%d9%8a%d9%86",
+          ],
+          ["أساطير", "%d8%a3%d8%b3%d8%a7%d8%b7%d9%8a%d8%b1"],
+          ["أشباح", "%d8%a3%d8%b4%d8%a8%d8%a7%d8%ad"],
+          ["أكشن", "action"],
+          ["ألعاب", "%d8%a3%d9%84%d8%b9%d8%a7%d8%a8"],
+          ["إثارة", "excitement"],
+          ["إسلامي", "%d8%a5%d8%b3%d9%84%d8%a7%d9%85%d9%8a"],
+          ["إنتقال الى عالم أخر", "isekai"],
+          ["إيتشي", "etchi"],
+          ["اكاديمي", "%d8%a7%d9%83%d8%a7%d8%af%d9%8a%d9%85%d9%8a"],
+          ["اكشن", "%d8%a7%d9%83%d8%b4%d9%86"],
+          ["الإثارة", "%d8%a7%d9%84%d8%a5%d8%ab%d8%a7%d8%b1%d8%a9"],
+          ["الخيال العلمي", "sci-fi"],
+          ["الدراما", "%d8%a7%d9%84%d8%af%d8%b1%d8%a7%d9%85%d8%a7"],
+          [
+            "المغامرات",
+            "%d8%a7%d9%84%d9%85%d8%ba%d8%a7%d9%85%d8%b1%d8%a7%d8%aa",
+          ],
+          ["انتقام", "%d8%a7%d9%86%d8%aa%d9%82%d8%a7%d9%85"],
+          ["بطل مضاد", "%d8%a8%d8%b7%d9%84-%d9%85%d8%b6%d8%a7%d8%af"],
+          ["بطل ناضج", "%d8%a8%d8%b7%d9%84-%d9%86%d8%a7%d8%b6%d8%ac"],
+          ["بقاء", "%d8%a8%d9%82%d8%a7%d8%a1"],
+          [
+            "بناء مملكة",
+            "%d8%a8%d9%86%d8%a7%d8%a1-%d9%85%d9%85%d9%84%d9%83%d8%a9",
+          ],
+          ["بوليسي", "policy"],
+          ["تاريخ", "%d8%aa%d8%a7%d8%b1%d9%8a%d8%ae"],
+          ["تاريخي", "historical"],
+          ["تحقيقات", "%d8%aa%d8%ad%d9%82%d9%8a%d9%82"],
+          ["تشويق", "%d8%aa%d8%b4%d9%88%d9%8a%d9%82"],
+          ["تقمص شخصيات", "rpg"],
+          ["تلاعب", "%d8%aa%d9%84%d8%a7%d8%b9%d8%a8"],
+          ["تناسخ", "%d8%aa%d9%86%d8%a7%d8%b3%d8%ae"],
+          ["جريمة", "crime"],
+          ["جوسى", "josei"],
+          ["جوسي", "%d8%ac%d9%88%d8%b3%d9%8a"],
+          ["حريم", "harem"],
+          [
+            "حل الألغاز",
+            "%d8%ad%d9%84-%d8%a7%d9%84%d8%a3%d9%84%d8%ba%d8%a7%d8%b2",
+          ],
+          ["حياة مدرسية", "school-life"],
+          [
+            "خارق للطبيعة",
+            "%d8%ae%d8%a7%d8%b1%d9%82-%d9%84%d9%84%d8%b7%d8%a8%d9%8a%d8%b9%d8%a9",
+          ],
+          ["خيال", "%d8%ae%d9%8a%d8%a7%d9%84"],
+          ["خيال علمي", "%d8%ae%d9%8a%d8%a7%d9%84-%d8%b9%d9%84%d9%85%d9%8a"],
+          ["خيالي", "%d8%ae%d9%8a%d8%a7%d9%84%d9%8a"],
+          ["خيالي(فانتازيا)", "fantasy"],
+          ["دراما", "drama"],
+          ["درامي", "%d8%af%d8%b1%d8%a7%d9%85%d9%8a"],
+          ["رعب", "horror"],
+          ["رعب كوني", "%d8%b1%d8%b9%d8%a8-%d9%83%d9%88%d9%86%d9%8a"],
+          ["رعب نفسي", "%d8%b1%d8%b9%d8%a8-%d9%86%d9%81%d8%b3%d9%8a"],
+          ["رومانسي", "romantic"],
+          ["رومانسية", "%d8%b1%d9%88%d9%85%d8%a7%d9%86%d8%b3%d9%8a%d8%a9"],
+          ["رومنسية", "%d8%b1%d9%88%d9%85%d9%86%d8%b3%d9%8a%d8%a9"],
+          ["زنزانة", "%d8%b2%d9%86%d8%b2%d8%a7%d9%86%d8%a9"],
+          ["زيانشيا", "%d8%b2%d9%8a%d8%a7%d9%86%d8%b4%d9%8a%d8%a7"],
+          ["ستيم بانك", "%d8%b3%d8%aa%d9%8a%d9%85-%d8%a8%d8%a7%d9%86%d9%83"],
+          ["سحر", "magic"],
+          [
+            "سفر بالزمن",
+            "%d8%b3%d9%81%d8%b1-%d8%a8%d8%a7%d9%84%d8%b2%d9%85%d9%86",
+          ],
+          [
+            "سفر عبر الزمن",
+            "%d8%b3%d9%81%d8%b1-%d8%b9%d8%a8%d8%b1-%d8%a7%d9%84%d8%b2%d9%85%d9%86",
+          ],
+          ["سياسة", "%d8%b3%d9%8a%d8%a7%d8%b3%d8%a9"],
+          ["سينن", "senen"],
+          ["شريحة من الحياة", "slice-of-life"],
+          ["شعر", "%d8%b4%d8%b9%d8%b1"],
+          ["شوانهوان", "%d8%b4%d9%88%d8%a7%d9%86%d9%87%d9%88%d8%a7%d9%86"],
+          ["شوجو", "shojo"],
+          ["شونين", "shonen"],
+          ["طبي", "medical"],
+          ["ظواهر خارقة للطبيعة", "supernatural"],
+          ["عائلي", "%d8%b9%d8%a7%d8%a6%d9%84%d9%8a"],
+          ["عموض", "%d8%b9%d9%85%d9%88%d8%b6"],
+          ["غموض", "mysteries"],
+          ["فانتازي", "%d9%81%d8%a7%d9%86%d8%aa%d8%a7%d8%b2%d9%8a"],
+          ["فانتازيا", "%d9%81%d8%a7%d9%86%d8%aa%d8%a7%d8%b2%d9%8a%d8%a7"],
+          ["فانفيك", "%d9%81%d8%a7%d9%86%d9%81%d9%8a%d9%83"],
+          ["فنتازيا", "%d9%81%d9%86%d8%aa%d8%a7%d8%b2%d9%8a%d8%a7"],
+          ["فنون القتال", "martial-arts"],
+          ["فنون قتال", "%d9%81%d9%86%d9%88%d9%86-%d9%82%d8%aa%d8%a7%d9%84"],
+          ["قصة قصيرة", "%d9%82%d8%b5%d8%a9-%d9%82%d8%b5%d9%8a%d8%b1%d8%a9"],
+          ["قوة خارقة", "%d9%82%d9%88%d8%a9-%d8%ae%d8%a7%d8%b1%d9%82%d8%a9"],
+          ["قوى خارقة", "superpower"],
+          ["كوميدي", "comedy"],
+          ["كوميديا", "%d9%83%d9%88%d9%85%d9%8a%d8%af%d9%8a%d8%a7"],
+          ["كوميدية", "%d9%83%d9%88%d9%85%d9%8a%d8%af%d9%8a%d8%a9"],
+          ["مأساة", "%d9%85%d8%a3%d8%b3%d8%a7%d8%a9"],
+          ["مأساوي", "tragedy"],
+          ["مؤامرة", "%d9%85%d8%a4%d8%a7%d9%85%d8%b1%d8%a9"],
+          ["ما بعد الكارثة", "after-the-disaster"],
+          [
+            "ما بعد نهاية العالم",
+            "%d9%85%d8%a7-%d8%a8%d8%b9%d8%af-%d9%86%d9%87%d8%a7%d9%8a%d8%a9-%d8%a7%d9%84%d8%b9%d8%a7%d9%84%d9%85",
+          ],
+          [
+            "مضاد البطل",
+            "%d9%85%d8%b6%d8%a7%d8%af-%d8%a7%d9%84%d8%a8%d8%b7%d9%84",
+          ],
+          ["مغامرات", "%d9%85%d8%ba%d8%a7%d9%85%d8%b1%d8%a7%d8%aa"],
+          ["مغامرة", "adventure"],
+          ["ميكا", "mechanical"],
+          ["ناضج", "mature"],
+          ["نظام", "%d9%86%d8%b8%d8%a7%d9%85"],
+          ["نفسي", "psychological"],
+          ["ون شوت", "%d9%88%d9%86-%d8%b4%d9%88%d8%aa"],
+          ["ووكسيا", "%d9%88%d9%88%d9%83%d8%b3%d9%8a%d8%a7"],
+        ].map((x) => ({ type_name: "CheckBox", name: x[0], value: x[1] })),
+      },
+      {
+        type_name: "GroupFilter",
+        type: "TypeFilter",
+        name: "النوع",
+        state: [
+          ["إنجليزية", "english"],
+          ["رواية لايت", "light-novel"],
+          [
+            "رواية مؤلفة",
+            "%d8%b1%d9%88%d8%a7%d9%8a%d8%a9-%d9%85%d8%a4%d9%84%d9%81%d8%a9",
+          ],
+          ["رواية ويب", "web-novel"],
+          ["صينية", "chinese"],
+          ["عربية", "arabic"],
+          ["كورية", "korean"],
+          ["مؤلفة", "%d9%85%d8%a4%d9%84%d9%81%d8%a9"],
+          ["ون شوت", "%d9%88%d9%86-%d8%b4%d9%88%d8%aa"],
+          ["يابانية", "japanese"],
+        ].map((x) => ({ type_name: "CheckBox", name: x[0], value: x[1] })),
+      },
+    ];
   }
 
   getBaseUrl() {
@@ -239,5 +481,9 @@ class DefaultExtension extends MProvider {
     const monthEnglish = months[monthAr] || "";
     if (!monthEnglish) return "";
     return new Date(`${monthEnglish} ${day}, ${year}`).getTime().toString();
+  }
+
+  ll(url) {
+    return url.includes("?") ? "&" : "?";
   }
 }
