@@ -207,7 +207,7 @@ class DefaultExtension extends MProvider {
 
   // Clean html up for reader
   async cleanHtmlContent(html) {
-    return `<h2 style="text-align: center;">${html.title.rendered}</h2><hr><br>${html.content.rendered}`;
+    return `<h2 style="text-align: center;">${this.cleanTitle(html.title.rendered)}</h2><hr><br>${html.content.rendered}`;
   }
 
   getFilterList() {
