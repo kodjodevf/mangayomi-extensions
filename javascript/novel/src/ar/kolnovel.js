@@ -164,8 +164,12 @@ class DefaultExtension extends MProvider {
       if (title.includes(name)) title = title.replace(name, "").trim();
 
       const numMatch = num.match(/(?:الفصل|chapter)\s+(\d+(?:\.\d+)?)/i);
-      if (numMatch)
-        title = title.replace(numMatch[0], "").replace(numMatch[1], "").trim();
+      if (numMatch) {
+        title = title.replace(numMatch[0], "").trim();
+        if (!title.includes(`(${numMatch[1]})`)) {
+          title = title.replace(numMatch[1], "").trim();
+        }
+      }
 
       title = title.replace(/\s{2,}/g, " ").trim();
       const finalName =
