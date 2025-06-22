@@ -178,11 +178,7 @@ class Madara extends MProvider {
         "";
 
     final imageElement = document.selectFirst("div.summary_image img");
-    manga.imageUrl =
-        imageElement?.attr("data-src") ??
-        imageElement?.attr("data-lazy-src") ??
-        imageElement?.attr("srcset")?.split(" ")?.first ??
-        imageElement?.getSrc;
+    manga.imageUrl = extractImageUrl(imageElement);
 
     final id =
         document
@@ -243,11 +239,7 @@ class Madara extends MProvider {
     for (var element in pageElements) {
       try {
         final imgElement = element.selectFirst("img");
-        final img =
-            imgElement.attr("src") ??
-            imgElement.attr("data-src") ??
-            imgElement.attr("data-lazy-src") ??
-            imgElement.attr("srcset");
+        final img = extractImageUrl(imageElement);
         imgs.add(img);
       } catch (_) {}
     }
@@ -280,12 +272,8 @@ class Madara extends MProvider {
     for (var i = 0; i < elements.length; i++) {
       final postTitle = elements[i].selectFirst("div.post-title a");
       final imageElement = elements[i].selectFirst("img");
-      final image =
-          imageElement?.attr("data-src") ??
-          imageElement?.attr("data-lazy-src") ??
-          imageElement?.attr("srcset") ??
-          imageElement?.getSrc ??
-          "";
+      final image = extractImageUrl(imageElement);
+
       MManga manga = MManga();
       manga.name = postTitle.text;
       manga.imageUrl = substringBefore(image, " ");
@@ -330,6 +318,16 @@ class Madara extends MProvider {
       return "&";
     }
     return "?";
+  }
+
+  String? extractImageUrl(Element? imageElement) {
+    if (imageElement == null) return "";
+
+    return imageElement.attr("data-src") ??
+        imageElement.attr("data-lazy-src") ??
+        imageElement.attr("srcset")?.split(" ")?.first ??
+        imageElement.getSrc ??
+        "";
   }
 
   String getMangaSubString() {
