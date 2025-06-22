@@ -121,6 +121,7 @@ class Madara extends MProvider {
   Future<MManga> getDetail(String url) async {
     final statusList = [
       {
+        // Ongoing
         "OnGoing": 0,
         "Продолжается": 0,
         "Updating": 0,
@@ -129,38 +130,77 @@ class Madara extends MProvider {
         "Em andamento": 0,
         "Em Andamento": 0,
         "En cours": 0,
+        "En Cours": 0,
+        "En cours de publication": 0,
         "Ativo": 0,
         "Lançando": 0,
         "Đang Tiến Hành": 0,
         "Devam Ediyor": 0,
         "Devam ediyor": 0,
+        "Devam Ediyo": 0,
+        "Devam Eden": 0,
         "In Corso": 0,
         "In Arrivo": 0,
         "مستمرة": 0,
         "مستمر": 0,
         "En Curso": 0,
         "En curso": 0,
+        "Curso": 0,
         "Emision": 0,
         "En marcha": 0,
         "Publicandose": 0,
+        "Publicándose": 0,
         "En emision": 0,
         "连载中": 0,
+        "Đang làm": 0,
+        "Em postagem": 0,
+        "Em progresso": 0,
+        "Em curso": 0,
+        "Atualizações Semanais": 0,
+
+        // Completed
         "Completed": 1,
         "Completo": 1,
         "Completado": 1,
         "Concluído": 1,
         "Concluido": 1,
         "Finalizado": 1,
+        "Achevé": 1,
         "Terminé": 1,
+        "Complété": 1,
         "Hoàn Thành": 1,
+        "Tamamlandı": 1,
+        "Tamamlanan": 1,
+        "Đã hoàn thành": 1,
+        "Завершено": 1,
         "مكتملة": 1,
         "مكتمل": 1,
         "已完结": 1,
+
+        // On Hold
         "On Hold": 2,
         "Pausado": 2,
         "En espera": 2,
+        "Durduruldu": 2,
+        "Beklemede": 2,
+        "Đang chờ": 2,
+        "متوقف": 2,
+        "En Pause": 2,
+        "Заморожено": 2,
+        "En attente": 2,
+
+        // Canceled
         "Canceled": 3,
         "Cancelado": 3,
+        "İptal Edildi": 3,
+        "Güncel": 3,
+        "Đã hủy": 3,
+        "ملغي": 3,
+        "Abandonné": 3,
+        "Заброшено": 3,
+        "Annulé": 3,
+
+        // Publishing Finished 4
       },
     ];
     MManga manga = MManga();
@@ -201,7 +241,14 @@ class Madara extends MProvider {
     if (id.isNotEmpty) {
       mangaId = id;
     }
-    final status = document.selectFirst("div.summary-content")?.text ?? "";
+    final status =
+        document
+            .selectFirst(
+              ".summary-content > .tags-content, div.summary-content, div.summary-heading:contains(Status) + div",
+            )
+            ?.text ??
+        "";
+
     manga.status = parseStatus(status, statusList);
     manga.genre =
         document.select("div.genres-content a")?.map((e) => e.text).toList() ??
