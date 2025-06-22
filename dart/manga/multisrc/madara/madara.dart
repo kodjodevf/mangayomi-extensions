@@ -169,13 +169,25 @@ class Madara extends MProvider {
     final document = parseHtml(res);
     manga.author = document.selectFirst("div.author-content > a")?.text ?? "";
 
-    manga.description =
-        document
-            .selectFirst(
-              "div.description-summary div.summary__content, div.summary_content div.post-content_item > h5 + div, div.summary_content div.manga-excerpt, div.sinopsis div.contenedor, .description-summary > p",
-            )
-            ?.text ??
-        "";
+    final descriptionElement = document.select(
+      "div.description-summary div.summary__content, div.summary_content div.post-content_item > h5 + div, div.summary_content div.manga-excerpt, .manga-summary",
+    );
+    if (descriptionElement.isNotEmpty) {
+      final paragraphs = descriptionElement
+          .expand((e) => e.select("p"))
+          .toList();
+
+      if (paragraphs.isNotEmpty &&
+          paragraphs.any((p) => p.text.trim().isNotEmpty)) {
+        manga.description = paragraphs
+            .map((p) => p.text.replaceAll("<br>", "\n").trim())
+            .join("\n\n");
+      } else {
+        manga.description = descriptionElement
+            .map((e) => e.text.trim())
+            .join("\n\n");
+      }
+    }
 
     final imageElement = document.selectFirst("div.summary_image img");
     manga.imageUrl = extractImageUrl(imageElement);
