@@ -12,7 +12,7 @@ class Madara extends MProvider {
   Future<MPages> getPopular(int page) async {
     final res = (await client.get(
       Uri.parse(
-        "${source.baseUrl}/${getMangaSubString()}/page/$page/?m_orderby=views",
+        "${getBaseUrl()}/${getMangaSubString()}/page/$page/?m_orderby=views",
       ),
     )).body;
     final document = parseHtml(res);
@@ -23,7 +23,7 @@ class Madara extends MProvider {
   Future<MPages> getLatestUpdates(int page) async {
     final res = (await client.get(
       Uri.parse(
-        "${source.baseUrl}/${getMangaSubString()}/page/$page/?m_orderby=latest",
+        "${getBaseUrl()}/${getMangaSubString()}/page/$page/?m_orderby=latest",
       ),
     )).body;
     final document = parseHtml(res);
@@ -34,7 +34,7 @@ class Madara extends MProvider {
   Future<MPages> search(String query, int page, FilterList filterList) async {
     final filters = filterList.filters;
 
-    String url = "${source.baseUrl}/?s=$query&post_type=wp-manga";
+    String url = "${getBaseUrl()}/?s=$query&post_type=wp-manga";
 
     for (var filter in filters) {
       if (filter.type == "AuthorFilter") {
@@ -195,7 +195,7 @@ class Madara extends MProvider {
         document.select("div.genres-content a")?.map((e) => e.text).toList() ??
         [];
 
-    final baseUrl = "${source.baseUrl}/";
+    final baseUrl = "${getBaseUrl()}/";
     final headers = {"Referer": baseUrl, "X-Requested-With": "XMLHttpRequest"};
 
     final oldXhrChaptersRequest = await client.post(
@@ -311,6 +311,53 @@ class Madara extends MProvider {
         SelectFilterOption("Only", "1"),
       ]),
     ];
+  }
+
+  @override
+  List<dynamic> getSourcePreferences() {
+    return [
+      EditTextPreference(
+        key: "domain_url",
+        title: getTitleByLang(source.lang),
+        summary: "",
+        value: source.baseUrl,
+        dialogTitle: "URL",
+        dialogMessage: "",
+      ),
+    ];
+  }
+
+  String getBaseUrl() {
+    final baseUrl = getPreferenceValue(source.id, "domain_url")?.trim();
+
+    if (baseUrl == null || baseUrl.isEmpty) {
+      return source.baseUrl;
+    }
+
+    return baseUrl.endsWith("/")
+        ? baseUrl.substring(0, baseUrl.length - 1)
+        : baseUrl;
+  }
+
+  String getTitleByLang(String? lang) {
+    const titles = {
+      'ar': 'تحرير الرابط',
+      'en': 'Edit URL',
+      'fr': 'Modifier l’URL',
+      'es': 'Editar URL',
+      'de': 'URL bearbeiten',
+      'tr': 'URL’yi düzenle',
+      'ru': 'Редактировать URL',
+      'id': 'Edit URL',
+      'pt': 'Editar URL',
+      'it': 'Modifica URL',
+      'ja': 'URLを編集',
+      'zh': '编辑网址',
+      'ko': 'URL 편집',
+      'fa': 'ویرایش نشانی',
+    };
+
+    return titles[lang?.toLowerCase()] ?? titles['en']!;
   }
 
   String ll(String url) {
