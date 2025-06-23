@@ -42,7 +42,6 @@ import 'src/en/mangafreakonline/mangafreakonline.dart';
 import 'src/en/mangagreat/mangagreat.dart';
 import 'src/en/mangakomi/mangakomi.dart';
 import 'src/en/mangareadorg/mangareadorg.dart';
-import 'src/en/mangarolls/mangarolls.dart';
 import 'src/en/mangatyrant/mangatyrant.dart';
 import 'src/en/mangaus/mangaus.dart';
 import 'src/en/mangasushi/mangasushi.dart';
@@ -268,8 +267,6 @@ List<Source> _madaraSourcesList =
           mangakomiSource,
           //MangaRead.org (EN)
           mangareadorgSource,
-          //MangaRolls (EN)
-          mangarollsSource,
           //MangaTyrant (EN)
           mangatyrantSource,
           //MangaUS (EN)
