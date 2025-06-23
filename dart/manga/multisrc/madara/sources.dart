@@ -58,7 +58,6 @@ import 'src/pt/mangasoverall/mangasoverall.dart';
 import 'src/es/ragnarokscanlation/ragnarokscanlation.dart';
 import 'src/pt/rainbowfairyscan/rainbowfairyscan.dart';
 import 'src/pt/randomscan/randomscan.dart';
-import 'src/fr/readergen/readergen.dart';
 import 'src/es/richtoscan/richtoscan.dart';
 import 'src/es/rightdarkscan/rightdarkscan.dart';
 import 'src/tr/romantikmanga/romantikmanga.dart';
@@ -280,8 +279,6 @@ List<Source> _madaraSourcesList =
           rainbowfairyscanSource,
           //Random Scan (PT-BR)
           randomscanSource,
-          //ReaderGen (FR)
-          readergenSource,
           //RichtoScan (ES)
           richtoscanSource,
           //Rightdark Scan (ES)
