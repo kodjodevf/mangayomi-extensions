@@ -100,7 +100,6 @@ import 'src/en/tappytoonnet/tappytoonnet.dart';
 import 'src/en/zinmanganet/zinmanganet.dart';
 import 'src/es/bokugentranslation/bokugentranslation.dart';
 import 'src/es/daprob/daprob.dart';
-import 'src/es/demanhuas/demanhuas.dart';
 import 'src/es/herenscan/herenscan.dart';
 import 'src/es/infrafandub/infrafandub.dart';
 import 'src/es/inmoralnofansub/inmoralnofansub.dart';
@@ -368,8 +367,6 @@ List<Source> _madaraSourcesList =
           bokugentranslationSource,
           //DapRob (ES)
           daprobSource,
-          //DeManhuas (ES)
-          demanhuasSource,
           //HerenScan (ES)
           herenscanSource,
           //InfraFandub (ES)
