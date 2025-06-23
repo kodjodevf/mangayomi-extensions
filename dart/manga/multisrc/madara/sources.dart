@@ -105,7 +105,6 @@ import 'src/es/bokugentranslation/bokugentranslation.dart';
 import 'src/es/daprob/daprob.dart';
 import 'src/es/demanhuas/demanhuas.dart';
 import 'src/es/herenscan/herenscan.dart';
-import 'src/es/housemangas/housemangas.dart';
 import 'src/es/infrafandub/infrafandub.dart';
 import 'src/es/inmoralnofansub/inmoralnofansub.dart';
 import 'src/es/jeazscans/jeazscans.dart';
@@ -382,8 +381,6 @@ List<Source> _madaraSourcesList =
           demanhuasSource,
           //HerenScan (ES)
           herenscanSource,
-          //HouseMangas (ES)
-          housemangasSource,
           //InfraFandub (ES)
           infrafandubSource,
           //Inmoral No Fansub (ES)
