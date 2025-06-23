@@ -35,7 +35,6 @@ import 'src/en/lhtranslation/lhtranslation.dart';
 import 'src/pt/ladyestelarscan/ladyestelarscan.dart';
 import 'src/en/leviatanscans/leviatanscans.dart';
 import 'src/en/luffymanga/luffymanga.dart';
-import 'src/pt/maidscan/maidscan.dart';
 import 'src/tr/mangadiyari/mangadiyari.dart';
 import 'src/es/mangafenix/mangafenix.dart';
 import 'src/en/mangagalaxy/mangagalaxy.dart';
@@ -264,8 +263,6 @@ List<Source> _madaraSourcesList =
           leviatanscansSource,
           //Luffy Manga (EN)
           luffymangaSource,
-          //Maid Scan (PT-BR)
-          maidscanSource,
           //Manga Diyari (TR)
           mangadiyariSource,
           //Manga Fenix (ES)
