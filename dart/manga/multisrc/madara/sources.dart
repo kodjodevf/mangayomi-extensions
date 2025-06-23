@@ -260,8 +260,6 @@ List<Source> _madaraSourcesList =
           mangaclashSource,
           //MangaFreak.online (EN)
           mangafreakonlineSource,
-          //MangaGreat (EN)
-          mangagreatSource,
           //MangaKomi (EN)
           mangakomiSource,
           //MangaRead.org (EN)
