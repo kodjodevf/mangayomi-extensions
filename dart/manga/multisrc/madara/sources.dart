@@ -1,6 +1,5 @@
 import '../../../../model/source.dart';
 import 'src/en/firstkissdashmanga/firstkissdashmanga.dart';
-import 'src/en/manhwaworld/manhwaworld.dart';
 import 'src/pt/akumanotenshi/akumanotenshi.dart';
 import 'src/tr/anikiga/anikiga.dart';
 import 'src/tr/araznovel/araznovel.dart';
@@ -177,8 +176,6 @@ List<Source> _madaraSourcesList =
     [
           //1st Kiss-Manga (unoriginal) (EN)
           firstkissdashmangaSource,
-          //AQUA Scans (EN)
-          manhwaworldSource,
           //Akuma no Tenshi (PT-BR)
           akumanotenshiSource,
           //Anikiga (TR)
