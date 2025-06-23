@@ -45,7 +45,6 @@ import 'src/en/mangatyrant/mangatyrant.dart';
 import 'src/en/mangaus/mangaus.dart';
 import 'src/en/mangasushi/mangasushi.dart';
 import 'src/pt/mangananquim/mangananquim.dart';
-import 'src/en/manhuaes/manhuaes.dart';
 import 'src/en/manhuaus/manhuaus.dart';
 import 'src/en/manhuazone/manhuazone.dart';
 import 'src/en/manhwaclan/manhwaclan.dart';
@@ -269,8 +268,6 @@ List<Source> _madaraSourcesList =
           mangasushiSource,
           //Mangá Nanquim (PT-BR)
           mangananquimSource,
-          //Manhua ES (EN)
-          manhuaesSource,
           //ManhuaUS (EN)
           manhuausSource,
           //ManhuaZone (EN)
