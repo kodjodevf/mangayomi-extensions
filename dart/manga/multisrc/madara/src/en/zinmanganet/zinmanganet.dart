@@ -3,7 +3,7 @@ import '../../../../../../../model/source.dart';
 Source get zinmanganetSource => _zinmanganetSource;
 Source _zinmanganetSource = Source(
   name: "Zinmanga.net",
-  baseUrl: "https://zinmanga.net",
+  baseUrl: "https://www.zinmanga.net",
   lang: "en",
   isNsfw: false,
   typeSource: "madara",
