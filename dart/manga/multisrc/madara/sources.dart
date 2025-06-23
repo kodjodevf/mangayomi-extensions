@@ -138,7 +138,6 @@ import 'src/es/unitoon/unitoon.dart';
 import 'src/fr/mangascantrad/mangascantrad.dart';
 import 'src/fr/mangasoriginesfr/mangasoriginesfr.dart';
 import 'src/fr/raijinscans/raijinscans.dart';
-import 'src/en/reaperscans/reaperscans.dart';
 import 'src/fr/softepsilonscan/softepsilonscan.dart';
 import 'src/id/hwago/hwago.dart';
 import 'src/id/klikmanga/klikmanga.dart';
@@ -471,8 +470,6 @@ List<Source> _madaraSourcesList =
           mangasoriginesfrSource,
           //Raijin Scans (FR)
           raijinscansSource,
-          //Reaper Scans (EN)
-          reaperscansSource,
           //Soft Epsilon Scan (FR)
           softepsilonscanSource,
           //Hwago (ID)
