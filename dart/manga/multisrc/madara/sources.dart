@@ -36,7 +36,6 @@ import 'src/en/mangagalaxy/mangagalaxy.dart';
 import 'src/en/mangaread/mangaread.dart';
 import 'src/en/mangatxgg/mangatxgg.dart';
 import 'src/tr/mangasehri/mangasehri.dart';
-import 'src/en/mangatxunoriginal/mangatxunoriginal.dart';
 import 'src/en/mangaclash/mangaclash.dart';
 import 'src/en/mangafreakonline/mangafreakonline.dart';
 import 'src/en/mangagreat/mangagreat.dart';
@@ -254,8 +253,6 @@ List<Source> _madaraSourcesList =
           mangatxggSource,
           //Manga Şehri (TR)
           mangasehriSource,
-          //Manga-TX (EN)
-          mangatxunoriginalSource,
           //MangaClash (EN)
           mangaclashSource,
           //MangaFreak.online (EN)
