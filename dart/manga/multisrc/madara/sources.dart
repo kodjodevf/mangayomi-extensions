@@ -70,7 +70,6 @@ import 'src/pt/sinensis/sinensis.dart';
 import 'src/pt/sweettimescan/sweettimescan.dart';
 import 'src/pt/tatakaescan/tatakaescan.dart';
 import 'src/es/taurusfansub/taurusfansub.dart';
-import 'src/fr/thebeginningaftertheend/thebeginningaftertheend.dart';
 import 'src/tr/tortugaceviri/tortugaceviri.dart';
 import 'src/pt/wickedwitchscan/wickedwitchscan.dart';
 import 'src/pt/winterscan/winterscan.dart';
@@ -305,8 +304,6 @@ List<Source> _madaraSourcesList =
           tatakaescanSource,
           //Taurus Fansub (ES)
           taurusfansubSource,
-          //The Beginning After The End (FR)
-          thebeginningaftertheendSource,
           //Tortuga Ceviri (TR)
           tortugaceviriSource,
           //Wicked Witch Scan (PT-BR)
