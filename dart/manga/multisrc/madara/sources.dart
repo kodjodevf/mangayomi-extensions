@@ -96,7 +96,6 @@ import 'src/ar/mangastarz/mangastarz.dart';
 import 'src/ar/olaoe/olaoe.dart';
 import 'src/ar/rocksmanga/rocksmanga.dart';
 import 'src/en/dragontea/dragontea.dart';
-import 'src/en/manga347/manga347.dart';
 import 'src/en/mangaeffect/mangaeffect.dart';
 import 'src/en/mangaleveling/mangaleveling.dart';
 import 'src/en/nvmanga/nvmanga.dart';
@@ -369,8 +368,6 @@ List<Source> _madaraSourcesList =
           detectiveconanarSource,
           //DragonTea (EN)
           dragonteaSource,
-          //Manga347 (EN)
-          manga347Source,
           //MangaEffect (EN)
           mangaeffectSource,
           //Manga Leveling (EN)
