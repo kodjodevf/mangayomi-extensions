@@ -4,7 +4,7 @@ Source get harimangaSource => _harimangaSource;
 
 Source _harimangaSource = Source(
   name: "Harimanga",
-  baseUrl: "https://harimanga.com",
+  baseUrl: "https://harimanga.me",
   lang: "en",
 
   typeSource: "madara",
