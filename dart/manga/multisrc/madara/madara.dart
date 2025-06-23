@@ -511,6 +511,8 @@ class Madara extends MProvider {
       "Mangax Core": "works",
       "Azora": "series",
       "Manga Crab": "series",
+      "KlikManga": "series",
+      "Hwago": "komik",
     };
 
     return sourceTypeMap[source.name] ?? "manga";
