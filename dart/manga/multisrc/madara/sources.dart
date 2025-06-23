@@ -15,7 +15,6 @@ import 'src/th/doodmanga/doodmanga.dart';
 import 'src/en/elitemanga/elitemanga.dart';
 import 'src/es/emperorscan/emperorscan.dart';
 import 'src/tr/evascans/evascans.dart';
-import 'src/fr/frscan/frscan.dart';
 import 'src/en/freemangatop/freemangatop.dart';
 import 'src/tr/glorymanga/glorymanga.dart';
 import 'src/en/harimanga/harimanga.dart';
@@ -195,8 +194,6 @@ List<Source> _madaraSourcesList =
           emperorscanSource,
           //EvaScans (TR)
           evascansSource,
-          //FR-Scan (FR)
-          frscanSource,
           //FreeMangaTop (EN)
           freemangatopSource,
           //Glory Manga (TR)
