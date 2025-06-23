@@ -73,7 +73,6 @@ import 'src/pt/randomscan/randomscan.dart';
 import 'src/fr/readergen/readergen.dart';
 import 'src/es/richtoscan/richtoscan.dart';
 import 'src/es/rightdarkscan/rightdarkscan.dart';
-import 'src/en/rio2manga/rio2manga.dart';
 import 'src/tr/romantikmanga/romantikmanga.dart';
 import 'src/en/s2manga/s2manga.dart';
 import 'src/es/samuraiscan/samuraiscan.dart';
@@ -338,8 +337,6 @@ List<Source> _madaraSourcesList =
           richtoscanSource,
           //Rightdark Scan (ES)
           rightdarkscanSource,
-          //Rio2 Manga (EN)
-          rio2mangaSource,
           //Romantik Manga (TR)
           romantikmangaSource,
           //S2Manga (EN)
