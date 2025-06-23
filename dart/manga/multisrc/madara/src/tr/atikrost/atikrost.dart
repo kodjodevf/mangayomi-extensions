@@ -3,7 +3,7 @@ import '../../../../../../../model/source.dart';
 Source get atikrostSource => _atikrostSource;
 Source _atikrostSource = Source(
   name: "Atikrost",
-  baseUrl: "https://www.atikrost.com",
+  baseUrl: "https://www.mangaoku.org",
   lang: "tr",
   isNsfw: false,
   typeSource: "madara",
