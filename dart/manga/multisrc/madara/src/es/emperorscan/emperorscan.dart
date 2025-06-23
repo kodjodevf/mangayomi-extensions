@@ -4,7 +4,7 @@ Source get emperorscanSource => _emperorscanSource;
 
 Source _emperorscanSource = Source(
   name: "Emperor Scan",
-  baseUrl: "https://emperorscan.com",
+  baseUrl: "https://emperorscan.mundoalterno.org",
   lang: "es",
 
   typeSource: "madara",
