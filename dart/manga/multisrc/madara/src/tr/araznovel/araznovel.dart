@@ -4,7 +4,7 @@ Source get araznovelSource => _araznovelSource;
 
 Source _araznovelSource = Source(
   name: "ArazNovel",
-  baseUrl: "https://www.araznovel.com",
+  baseUrl: "https://araznovel.com",
   lang: "tr",
 
   typeSource: "madara",
