@@ -30,7 +30,6 @@ import 'src/en/lhtranslation/lhtranslation.dart';
 import 'src/pt/ladyestelarscan/ladyestelarscan.dart';
 import 'src/en/leviatanscans/leviatanscans.dart';
 import 'src/tr/mangadiyari/mangadiyari.dart';
-import 'src/es/mangafenix/mangafenix.dart';
 import 'src/en/mangagalaxy/mangagalaxy.dart';
 import 'src/en/mangaread/mangaread.dart';
 import 'src/en/mangatxgg/mangatxgg.dart';
@@ -233,8 +232,6 @@ List<Source> _madaraSourcesList =
           leviatanscansSource,
           //Manga Diyari (TR)
           mangadiyariSource,
-          //Manga Fenix (ES)
-          mangafenixSource,
           //Manga Galaxy (EN)
           mangagalaxySource,
           //Manga Read (EN)
