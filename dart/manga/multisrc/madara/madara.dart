@@ -502,8 +502,13 @@ class Madara extends MProvider {
   }
 
   String getMangaSubString() {
-    const worksSources = {"Olaoe", "Mangax Core"};
-    return worksSources.contains(source.name) ? "works" : "manga";
+    const sourceTypeMap = {
+      "Olaoe": "works",
+      "Mangax Core": "works",
+      "Azora": "series",
+    };
+
+    return sourceTypeMap[source.name] ?? "manga";
   }
 }
 
