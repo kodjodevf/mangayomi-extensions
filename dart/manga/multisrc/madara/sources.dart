@@ -118,7 +118,6 @@ import 'src/es/mhscans/mhscans.dart';
 import 'src/es/noblessetranslations/noblessetranslations.dart';
 import 'src/es/princediciones/princediciones.dart';
 import 'src/es/sapphirescan/sapphirescan.dart';
-import 'src/es/tresdaosscan/tresdaosscan.dart';
 import 'src/es/unitoon/unitoon.dart';
 import 'src/fr/mangascantrad/mangascantrad.dart';
 import 'src/fr/mangasoriginesfr/mangasoriginesfr.dart';
@@ -413,8 +412,6 @@ List<Source> _madaraSourcesList =
           princedicionesSource,
           //SapphireScan (ES)
           sapphirescanSource,
-          //Tres Daos Scan (ES)
-          tresdaosscanSource,
           //Unitoon (ES)
           unitoonSource,
           //Manga-Scantrad (FR)
