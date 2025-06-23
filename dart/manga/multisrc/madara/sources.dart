@@ -48,7 +48,6 @@ import 'src/en/manhwaclan/manhwaclan.dart';
 import 'src/en/manhwafull/manhwafull.dart';
 import 'src/es/mantrazscan/mantrazscan.dart';
 import 'src/pt/momonohanascan/momonohanascan.dart';
-import 'src/es/monarcamanga/monarcamanga.dart';
 import 'src/pt/moonwitchinlove/moonwitchinlove.dart';
 import 'src/th/nekopostco/nekopostco.dart';
 import 'src/ar/nijitranslations/nijitranslations.dart';
@@ -266,8 +265,6 @@ List<Source> _madaraSourcesList =
           mantrazscanSource,
           //Momo no Hana Scan (PT-BR)
           momonohanascanSource,
-          //MonarcaManga (ES)
-          monarcamangaSource,
           //Moon Witch In Love (PT-BR)
           moonwitchinloveSource,
           //NekoPost.co (unoriginal) (TH)
