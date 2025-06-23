@@ -100,7 +100,6 @@ import 'src/ar/rocksmanga/rocksmanga.dart';
 import 'src/en/dragontea/dragontea.dart';
 import 'src/en/manga347/manga347.dart';
 import 'src/en/mangaeffect/mangaeffect.dart';
-import 'src/en/mangafastcom/mangafastcom.dart';
 import 'src/en/mangaleveling/mangaleveling.dart';
 import 'src/en/neatmanga/neatmanga.dart';
 import 'src/en/nvmanga/nvmanga.dart';
@@ -383,8 +382,6 @@ List<Source> _madaraSourcesList =
           manga347Source,
           //MangaEffect (EN)
           mangaeffectSource,
-          //Manga-fast.com (EN)
-          mangafastcomSource,
           //Manga Leveling (EN)
           mangalevelingSource,
           //NeatManga (EN)
