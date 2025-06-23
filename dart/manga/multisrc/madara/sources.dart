@@ -65,7 +65,6 @@ import 'src/tr/romantikmanga/romantikmanga.dart';
 import 'src/en/s2manga/s2manga.dart';
 import 'src/es/samuraiscan/samuraiscan.dart';
 import 'src/fr/scantradvf/scantradvf.dart';
-import 'src/fr/shadowtrad/shadowtrad.dart';
 import 'src/en/shibamanga/shibamanga.dart';
 import 'src/pt/sinensis/sinensis.dart';
 import 'src/pt/sweettimescan/sweettimescan.dart';
@@ -296,8 +295,6 @@ List<Source> _madaraSourcesList =
           samuraiscanSource,
           //Scantrad-VF (FR)
           scantradvfSource,
-          //Shadowtrad (FR)
-          shadowtradSource,
           //Shiba Manga (EN)
           shibamangaSource,
           //Sinensis Scan (PT-BR)
