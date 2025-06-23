@@ -8,6 +8,24 @@ class Madara extends MProvider {
 
   final Client client = Client();
 
+  MPages mangaFromElements(List<MElement> elements) {
+    List<MManga> mangaList = [];
+
+    for (var i = 0; i < elements.length; i++) {
+      final postTitle = elements[i].selectFirst("div.post-title a");
+      final imageElement = elements[i].selectFirst("img");
+      final image = extractImageUrl(imageElement);
+
+      MManga manga = MManga();
+      manga.name = postTitle.text;
+      manga.imageUrl = substringBefore(image, " ");
+      manga.link = postTitle.getHref;
+      mangaList.add(manga);
+    }
+
+    return MPages(mangaList, true);
+  }
+
   @override
   Future<MPages> getPopular(int page) async {
     final res = (await client.get(
@@ -290,57 +308,103 @@ class Madara extends MProvider {
     final res = (await client.get(Uri.parse(url)));
     final document = parseHtml(res.body);
 
-    final pageElements = document.select(
-      "div.page-break, li.blocks-gallery-item, .reading-content .text-left:not(:has(.blocks-gallery-item)) img",
+    var images = getImagesFromPage(document);
+    if (images.length == 1) {
+      images = buildPageUrls(images, document);
+    }
+
+    return images.isNotEmpty ? images : parseProtectorImage(document);
+  }
+
+  List<String> getImagesFromPage(MDocument doc) {
+    final elements = doc.select(
+      "div.page-break img, li.blocks-gallery-item img, .reading-content .text-left:not(:has(.blocks-gallery-item)) img",
     );
+    return elements.map((e) => extractImageUrl(e)?.trim()).toList();
+  }
 
-    List<String> imgs = [];
-    for (var element in pageElements) {
-      try {
-        final imgElement = element.selectFirst("img");
-        final img = extractImageUrl(imageElement);
-        imgs.add(img);
-      } catch (_) {}
+  List<String> parseProtectorImage(Document doc) {
+    final protectorData = doc.selectFirst(chapterProtectorSelector)?.innerHtml;
+    if (protectorData == null) return [];
+
+    final password = getPasswordFromProtector(protectorData);
+    final chapterDataStr = getChapterDataStr(protectorData);
+
+    if (chapterDataStr == null || password == null) return [];
+
+    final decryptedText = decryptChapterData(chapterDataStr, password);
+    if (decryptedText == null) return [];
+
+    return List<String>.from(jsonDecode(jsonDecode(decryptedText)));
+  }
+
+  // Extract password
+  String? getPasswordFromProtector(String protectorData) {
+    final regex = RegExp(r"wpmangaprotectornonce='(.*?)';");
+    final match = regex.firstMatch(protectorData);
+    return match != null ? match.group(1) : null;
+  }
+
+  // Extract encrypted chapter string
+  String? getChapterDataStr(String protectorData) {
+    final regex = RegExp(r"chapter_data='(.*?)';");
+    final match = regex.firstMatch(protectorData);
+    return match != null ? match.group(1)!.replaceAll(r"\/", "/") : null;
+  }
+
+  // Decrypt AES encrypted string
+  String? decryptChapterData(String chapterDataStr, String password) {
+    try {
+      final Map<String, dynamic> chapterData = jsonDecode(chapterDataStr);
+      final salt = _hexToBytes(chapterData["s"]);
+      final ct = base64Decode(chapterData["ct"]);
+
+      // Prefix with 'Salted__' and salt
+      final completeCipher = Uint8List.fromList([
+        ...utf8.encode('Salted__'),
+        ...salt,
+        ...ct,
+      ]);
+
+      // Encode completeCipher again to base64
+      final base64Cipher = base64Encode(completeCipher);
+
+      // Decrypt
+      final decrypted = decryptAESCryptoJS(base64Cipher, password);
+      return decrypted;
+    } catch (e) {
+      print("Error decrypting chapter data: $e");
+      return null;
     }
+  }
 
+  List<String> buildPageUrls(List<String> imgs, MDocument document) {
     List<String> pageUrls = [];
+    final pagesNumber = document
+        .selectFirst("#single-pager")
+        .select("option")
+        .length;
 
-    if (imgs.length == 1) {
-      final pagesNumber = document
-          .selectFirst("#single-pager")
-          .select("option")
-          .length;
-      final imgUrl = imgs.first;
-      for (var i = 0; i < pagesNumber; i++) {
-        final val = i + 1;
-        if (i.toString().length == 1) {
-          pageUrls.add(imgUrl.replaceAll("01", '0$val'));
-        } else {
-          pageUrls.add(imgUrl.replaceAll("01", val.toString()));
-        }
+    final imgUrl = imgs.first;
+    for (var i = 0; i < pagesNumber; i++) {
+      final val = i + 1;
+      if (i.toString().length == 1) {
+        pageUrls.add(imgUrl.replaceAll("01", '0$val'));
+      } else {
+        pageUrls.add(imgUrl.replaceAll("01", val.toString()));
       }
-    } else {
-      return imgs;
     }
+
     return pageUrls;
   }
 
-  MPages mangaFromElements(List<MElement> elements) {
-    List<MManga> mangaList = [];
-
-    for (var i = 0; i < elements.length; i++) {
-      final postTitle = elements[i].selectFirst("div.post-title a");
-      final imageElement = elements[i].selectFirst("img");
-      final image = extractImageUrl(imageElement);
-
-      MManga manga = MManga();
-      manga.name = postTitle.text;
-      manga.imageUrl = substringBefore(image, " ");
-      manga.link = postTitle.getHref;
-      mangaList.add(manga);
+  // Convert hex string to bytes
+  List<int> _hexToBytes(String hex) {
+    final List<int> result = [];
+    for (var i = 0; i < hex.length; i += 2) {
+      result.add(int.parse(hex.substring(i, i + 2), radix: 16));
     }
-
-    return MPages(mangaList, true);
+    return result;
   }
 
   @override
