@@ -4,7 +4,7 @@ Source get s2mangaSource => _s2mangaSource;
 
 Source _s2mangaSource = Source(
   name: "S2Manga",
-  baseUrl: "https://www.s2manga.com",
+  baseUrl: "https://s2manga.com",
   lang: "en",
 
   typeSource: "madara",
