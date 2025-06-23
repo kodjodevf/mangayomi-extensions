@@ -9,7 +9,6 @@ import 'src/fr/astralmanga/astralmanga.dart';
 import 'src/en/asurascansus/asurascansus.dart';
 import 'src/es/barmanga/barmanga.dart';
 import 'src/ru/bestmanga/bestmanga.dart';
-import 'src/en/chibimanga/chibimanga.dart';
 import 'src/tr/clovermanga/clovermanga.dart';
 import 'src/es/cocorip/cocorip.dart';
 import 'src/en/coffeemanga/coffeemanga.dart';
@@ -205,8 +204,6 @@ List<Source> _madaraSourcesList =
           barmangaSource,
           //BestManga (RU)
           bestmangaSource,
-          //Chibi Manga (EN)
-          chibimangaSource,
           //Clover Manga (TR)
           clovermangaSource,
           //Coco Rip (ES)
