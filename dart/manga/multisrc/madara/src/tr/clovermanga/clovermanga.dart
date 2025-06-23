@@ -4,7 +4,7 @@ Source get clovermangaSource => _clovermangaSource;
 
 Source _clovermangaSource = Source(
   name: "Clover Manga",
-  baseUrl: "https://clover-manga.com",
+  baseUrl: "https://webtoonhatti.me",
   lang: "tr",
 
   typeSource: "madara",
