@@ -42,7 +42,6 @@ import 'src/en/mangagreat/mangagreat.dart';
 import 'src/en/mangakomi/mangakomi.dart';
 import 'src/en/mangareadorg/mangareadorg.dart';
 import 'src/en/mangatyrant/mangatyrant.dart';
-import 'src/en/mangaus/mangaus.dart';
 import 'src/en/mangasushi/mangasushi.dart';
 import 'src/pt/mangananquim/mangananquim.dart';
 import 'src/en/manhuaus/manhuaus.dart';
@@ -260,8 +259,6 @@ List<Source> _madaraSourcesList =
           mangareadorgSource,
           //MangaTyrant (EN)
           mangatyrantSource,
-          //MangaUS (EN)
-          mangausSource,
           //Mangasushi (EN)
           mangasushiSource,
           //Mangá Nanquim (PT-BR)
