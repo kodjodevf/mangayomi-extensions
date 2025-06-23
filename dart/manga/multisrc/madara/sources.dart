@@ -116,7 +116,6 @@ import 'src/id/hwago/hwago.dart';
 import 'src/id/klikmanga/klikmanga.dart';
 import 'src/id/komikuzan/komikuzan.dart';
 import 'src/id/mgkomik/mgkomik.dart';
-import 'src/id/siimanga/siimanga.dart';
 import 'src/id/yubikiri/yubikiri.dart';
 import 'src/pl/mangahona/mangahona.dart';
 import 'src/pt/alonescanlator/alonescanlator.dart';
@@ -397,8 +396,6 @@ List<Source> _madaraSourcesList =
           komikuzanSource,
           //MG Komik (ID)
           mgkomikSource,
-          //Siimanga (ID)
-          siimangaSource,
           //Yubikiri (ID)
           yubikiriSource,
           //MangaHoNa (PL)
