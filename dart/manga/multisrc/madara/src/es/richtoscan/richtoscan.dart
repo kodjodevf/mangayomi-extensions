@@ -4,7 +4,7 @@ Source get richtoscanSource => _richtoscanSource;
 
 Source _richtoscanSource = Source(
   name: "RichtoScan",
-  baseUrl: "https://richtoscan.com",
+  baseUrl: "https://r1.richtoon.top",
   lang: "es",
 
   typeSource: "madara",
