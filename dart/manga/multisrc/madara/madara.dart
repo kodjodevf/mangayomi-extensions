@@ -11,10 +11,11 @@ class Madara extends MProvider {
   MPages mangaFromElements(List<MElement> elements) {
     List<MManga> mangaList = [];
 
-    for (var i = 0; i < elements.length; i++) {
-      final postTitle = elements[i].selectFirst("div.post-title a");
-      final imageElement = elements[i].selectFirst("img");
-      final image = extractImageUrl(imageElement);
+    for (final el in elements) {
+      final postTitle = el.selectFirst(
+        "div.post-title a:not(:has(span.manga-title-badges))",
+      );
+      final image = extractImageUrl(el.selectFirst("img"));
 
       MManga manga = MManga();
       manga.name = postTitle.text;
