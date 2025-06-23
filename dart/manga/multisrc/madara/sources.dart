@@ -64,7 +64,6 @@ import 'src/es/rightdarkscan/rightdarkscan.dart';
 import 'src/tr/romantikmanga/romantikmanga.dart';
 import 'src/en/s2manga/s2manga.dart';
 import 'src/es/samuraiscan/samuraiscan.dart';
-import 'src/es/scambertraslator/scambertraslator.dart';
 import 'src/fr/scantradvf/scantradvf.dart';
 import 'src/fr/shadowtrad/shadowtrad.dart';
 import 'src/en/shibamanga/shibamanga.dart';
@@ -297,8 +296,6 @@ List<Source> _madaraSourcesList =
           s2mangaSource,
           //SamuraiScan (ES)
           samuraiscanSource,
-          //ScamberTraslator (ES)
-          scambertraslatorSource,
           //Scantrad-VF (FR)
           scantradvfSource,
           //Shadowtrad (FR)
