@@ -35,7 +35,9 @@ class Madara extends MProvider {
       ),
     )).body;
     final document = parseHtml(res);
-    return mangaFromElements(document.select("div.page-item-detail"));
+    return mangaFromElements(
+      document.select("div.page-item-detail, div.manga__item"),
+    );
   }
 
   @override
@@ -46,7 +48,9 @@ class Madara extends MProvider {
       ),
     )).body;
     final document = parseHtml(res);
-    return mangaFromElements(document.select("div.page-item-detail"));
+    return mangaFromElements(
+      document.select("div.page-item-detail, div.manga__item"),
+    );
   }
 
   @override
@@ -229,7 +233,7 @@ class Madara extends MProvider {
     manga.author = document.selectFirst("div.author-content > a")?.text ?? "";
 
     final descriptionElement = document.select(
-      "div.description-summary div.summary__content, div.summary_content div.post-content_item > h5 + div, div.summary_content div.manga-excerpt, .manga-summary",
+      "div.description-summary div.summary__content, div.summary_content div.post-content_item > h5 + div, div.summary_content div.manga-excerpt, .manga-summary, div.c-page__content div.modal-contenido",
     );
     if (descriptionElement.isNotEmpty) {
       final paragraphs = descriptionElement
@@ -506,6 +510,7 @@ class Madara extends MProvider {
       "Olaoe": "works",
       "Mangax Core": "works",
       "Azora": "series",
+      "Manga Crab": "series",
     };
 
     return sourceTypeMap[source.name] ?? "manga";
