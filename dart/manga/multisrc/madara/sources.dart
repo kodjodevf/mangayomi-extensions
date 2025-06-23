@@ -29,7 +29,6 @@ import 'src/en/jimanga/jimanga.dart';
 import 'src/en/ksgroupscans/ksgroupscans.dart';
 import 'src/pt/kakuseiproject/kakuseiproject.dart';
 import 'src/pt/kamisamaexplorer/kamisamaexplorer.dart';
-import 'src/en/komikchan/komikchan.dart';
 import 'src/en/lhtranslation/lhtranslation.dart';
 import 'src/pt/ladyestelarscan/ladyestelarscan.dart';
 import 'src/en/leviatanscans/leviatanscans.dart';
@@ -247,8 +246,6 @@ List<Source> _madaraSourcesList =
           kakuseiprojectSource,
           //Kami Sama Explorer (PT-BR)
           kamisamaexplorerSource,
-          //Komik Chan (EN)
-          komikchanSource,
           //LHTranslation (EN)
           lhtranslationSource,
           //Lady Estelar Scan (PT-BR)
