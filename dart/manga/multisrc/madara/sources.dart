@@ -22,7 +22,6 @@ import 'src/en/factmanga/factmanga.dart';
 import 'src/en/freemangatop/freemangatop.dart';
 import 'src/tr/glorymanga/glorymanga.dart';
 import 'src/en/harimanga/harimanga.dart';
-import 'src/en/immortalupdates/immortalupdates.dart';
 import 'src/pt/imperioscans/imperioscans.dart';
 import 'src/es/inmortalscan/inmortalscan.dart';
 import 'src/en/isekaiscanmanga/isekaiscanmanga.dart';
@@ -234,8 +233,6 @@ List<Source> _madaraSourcesList =
           glorymangaSource,
           //Harimanga (EN)
           harimangaSource,
-          //Immortal Updates (EN)
-          immortalupdatesSource,
           //Império Scans (PT-BR)
           imperioscansSource,
           //Inmortal Scan (ES)
