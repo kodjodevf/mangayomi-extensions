@@ -103,7 +103,7 @@ import 'src/es/daprob/daprob.dart';
 import 'src/es/herenscan/herenscan.dart';
 import 'src/es/infrafandub/infrafandub.dart';
 import 'src/es/jeazscans/jeazscans.dart';
-import 'src/es/jobsibe/jobsibe.dart';
+import 'src/es/lmtos/lmtos.dart';
 import 'src/es/legendsnofansub/legendsnofansub.dart';
 import 'src/es/mangacrab/mangacrab.dart';
 import 'src/es/mangasnosekai/mangasnosekai.dart';
@@ -372,8 +372,8 @@ List<Source> _madaraSourcesList =
           infrafandubSource,
           //JeazScans (ES)
           jeazscansSource,
-          //Jobsibe (ES)
-          jobsibeSource,
+          //Lmtos (ES)
+          lmtosSource,
           //LegnMangas (ES)
           legendsnofansubSource,
           //Manga Crab (ES)
