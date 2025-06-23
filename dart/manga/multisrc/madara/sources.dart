@@ -99,7 +99,6 @@ import 'src/en/dragontea/dragontea.dart';
 import 'src/en/manga347/manga347.dart';
 import 'src/en/mangaeffect/mangaeffect.dart';
 import 'src/en/mangaleveling/mangaleveling.dart';
-import 'src/en/neatmanga/neatmanga.dart';
 import 'src/en/nvmanga/nvmanga.dart';
 import 'src/en/pmscans/pmscans.dart';
 import 'src/en/readmanhua/readmanhua.dart';
@@ -376,8 +375,6 @@ List<Source> _madaraSourcesList =
           mangaeffectSource,
           //Manga Leveling (EN)
           mangalevelingSource,
-          //NeatManga (EN)
-          neatmangaSource,
           //NvManga (EN)
           nvmangaSource,
           //PMScans (EN)
