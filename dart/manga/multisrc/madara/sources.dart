@@ -111,7 +111,6 @@ import 'src/es/sapphirescan/sapphirescan.dart';
 import 'src/es/unitoon/unitoon.dart';
 import 'src/fr/mangascantrad/mangascantrad.dart';
 import 'src/fr/mangasoriginesfr/mangasoriginesfr.dart';
-import 'src/fr/raijinscans/raijinscans.dart';
 import 'src/fr/softepsilonscan/softepsilonscan.dart';
 import 'src/id/hwago/hwago.dart';
 import 'src/id/klikmanga/klikmanga.dart';
@@ -388,8 +387,6 @@ List<Source> _madaraSourcesList =
           mangascantradSource,
           //Mangas-Origines.fr (FR)
           mangasoriginesfrSource,
-          //Raijin Scans (FR)
-          raijinscansSource,
           //Soft Epsilon Scan (FR)
           softepsilonscanSource,
           //Hwago (ID)
