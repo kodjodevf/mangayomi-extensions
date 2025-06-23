@@ -40,7 +40,6 @@ import 'src/es/mangafenix/mangafenix.dart';
 import 'src/en/mangagalaxy/mangagalaxy.dart';
 import 'src/en/mangaread/mangaread.dart';
 import 'src/en/mangatxgg/mangatxgg.dart';
-import 'src/en/mangaweebs/mangaweebs.dart';
 import 'src/tr/mangasehri/mangasehri.dart';
 import 'src/en/mangatxunoriginal/mangatxunoriginal.dart';
 import 'src/en/mangaclash/mangaclash.dart';
@@ -273,8 +272,6 @@ List<Source> _madaraSourcesList =
           mangareadSource,
           //Manga Tx.gg (unoriginal) (EN)
           mangatxggSource,
-          //Manga Weebs (EN)
-          mangaweebsSource,
           //Manga Şehri (TR)
           mangasehriSource,
           //Manga-TX (EN)
