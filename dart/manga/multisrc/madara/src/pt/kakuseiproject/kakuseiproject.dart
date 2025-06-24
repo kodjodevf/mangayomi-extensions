@@ -4,7 +4,7 @@ Source get kakuseiprojectSource => _kakuseiprojectSource;
 
 Source _kakuseiprojectSource = Source(
   name: "Kakusei Project",
-  baseUrl: "https://kakuseiproject.com.br",
+  baseUrl: "https://kakuseiproject.com",
   lang: "pt-BR",
 
   typeSource: "madara",
