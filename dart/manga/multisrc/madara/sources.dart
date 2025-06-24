@@ -132,7 +132,6 @@ import 'src/pt/minitwoscan/minitwoscan.dart';
 import 'src/pt/ninjascan/ninjascan.dart';
 import 'src/pt/onepieceteca/onepieceteca.dart';
 import 'src/pt/prismascans/prismascans.dart';
-import 'src/pt/sussyscan/sussyscan.dart';
 import 'src/th/kingsmanga/kingsmanga.dart';
 import 'src/th/mangadeemak/mangadeemak.dart';
 import 'src/th/manhuabug/manhuabug.dart';
@@ -429,8 +428,6 @@ List<Source> _madaraSourcesList =
           onepiecetecaSource,
           //Demon Sect (PT-BR)
           prismascansSource,
-          //Sussy Scan (PT-BR)
-          sussyscanSource,
           //Kings-Manga (TH)
           kingsmangaSource,
           //MangaDeemak (TH)
