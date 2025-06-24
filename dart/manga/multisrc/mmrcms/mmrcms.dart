@@ -64,27 +64,6 @@ class MMRCMS extends MProvider {
     String url = "";
     if (query.isNotEmpty) {
       url = "${source.baseUrl}/search?query=$query";
-    } else {
-      url = "${source.baseUrl}/filterList?page=$page";
-      for (var filter in filters) {
-        if (filter.type == "AuthorFilter") {
-          url += "${ll(url)}author=${Uri.encodeComponent(filter.state)}";
-        } else if (filter.type == "SortFilter") {
-          url += "${ll(url)}sortBy=${filter.values[filter.state.index].value}";
-          final asc = filter.state.ascending ? "asc=true" : "asc=false";
-          url += "${ll(url)}$asc";
-        } else if (filter.type == "CategoryFilter") {
-          if (filter.state != 0) {
-            final cat = filter.values[filter.state].value;
-            url += "${ll(url)}cat=$cat";
-          }
-        } else if (filter.type == "BeginsWithFilter") {
-          if (filter.state != 0) {
-            final a = filter.values[filter.state].value;
-            url += "${ll(url)}alpha=$a";
-          }
-        }
-      }
     }
 
     final res = (await client.get(Uri.parse(url))).body;
@@ -109,12 +88,6 @@ class MMRCMS extends MProvider {
         images.add(
           "${source.baseUrl}/uploads/manga/$data/cover/cover_250x350.jpg",
         );
-      }
-    } else {
-      urls = xpath(res, '//div/div/div/a/@href');
-      names = xpath(res, '//div/div/div/a/text()');
-      for (var mangaUrl in urls) {
-        images.add(guessCover(mangaUrl));
       }
     }
     for (var i = 0; i < names.length; i++) {
@@ -217,82 +190,9 @@ class MMRCMS extends MProvider {
     return pagesUrl;
   }
 
+  @override
   List<dynamic> getFilterList() {
-    return [
-      HeaderFilter("NOTE: Ignored if using text search!"),
-      SeparatorFilter(),
-      TextFilter("AuthorFilter", "Author"),
-      SelectFilter("CategoryFilter", "Category", 0, [
-        SelectFilterOption("Any", ""),
-        SelectFilterOption("Action", "Action"),
-        SelectFilterOption("Adventure", "Adventure"),
-        SelectFilterOption("Comedy", "Comedy"),
-        SelectFilterOption("Doujinshi", "Doujinshi"),
-        SelectFilterOption("Drama", "Drama"),
-        SelectFilterOption("Ecchi", "Ecchi"),
-        SelectFilterOption("Fantasy", "Fantasy"),
-        SelectFilterOption("Gender Bender", "Gender Bender"),
-        SelectFilterOption("Harem", "Harem"),
-        SelectFilterOption("Historical", "Historical"),
-        SelectFilterOption("Horror", "Horror"),
-        SelectFilterOption("Josei", "Josei"),
-        SelectFilterOption("Martial Arts", "Martial Arts"),
-        SelectFilterOption("Mature", "Mature"),
-        SelectFilterOption("Mecha", "Mecha"),
-        SelectFilterOption("Mystery", "Mystery"),
-        SelectFilterOption("One Shot", "One Shot"),
-        SelectFilterOption("Psychological", "Psychological"),
-        SelectFilterOption("Romance", "Romance"),
-        SelectFilterOption("School Life", "School Life"),
-        SelectFilterOption("Sci-fi", "Sci-fi"),
-        SelectFilterOption("Seinen", "Seinen"),
-        SelectFilterOption("Shoujo", "Shoujo"),
-        SelectFilterOption("Shoujo Ai", "Shoujo Ai"),
-        SelectFilterOption("Shounen", "Shounen"),
-        SelectFilterOption("Shounen Ai", "Shounen Ai"),
-        SelectFilterOption("Slice of Life", "Slice of Life"),
-        SelectFilterOption("Sports", "Sports"),
-        SelectFilterOption("Supernatural", "Supernatural"),
-        SelectFilterOption("Tragedy", "Tragedy"),
-        SelectFilterOption("Yaoi", "Yaoi"),
-        SelectFilterOption("Yuri", "Yuri"),
-      ]),
-      SelectFilter("BeginsWithFilter", "Begins with", 0, [
-        SelectFilterOption("Any", ""),
-        SelectFilterOption("#", "#"),
-        SelectFilterOption("A", "A"),
-        SelectFilterOption("B", "B"),
-        SelectFilterOption("C", "C"),
-        SelectFilterOption("D", "D"),
-        SelectFilterOption("E", "E"),
-        SelectFilterOption("F", "F"),
-        SelectFilterOption("G", "G"),
-        SelectFilterOption("H", "H"),
-        SelectFilterOption("I", "I"),
-        SelectFilterOption("J", "J"),
-        SelectFilterOption("K", "K"),
-        SelectFilterOption("L", "L"),
-        SelectFilterOption("M", "M"),
-        SelectFilterOption("N", "N"),
-        SelectFilterOption("O", "O"),
-        SelectFilterOption("P", "P"),
-        SelectFilterOption("Q", "Q"),
-        SelectFilterOption("R", "R"),
-        SelectFilterOption("S", "S"),
-        SelectFilterOption("T", "T"),
-        SelectFilterOption("U", "U"),
-        SelectFilterOption("V", "V"),
-        SelectFilterOption("W", "W"),
-        SelectFilterOption("X", "X"),
-        SelectFilterOption("Y", "Y"),
-        SelectFilterOption("Z", "Z"),
-      ]),
-      SortFilter("SortFilter", "Sort", SortState(0, true), [
-        SelectFilterOption("Name", "name"),
-        SelectFilterOption("Popularity", "views"),
-        SelectFilterOption("Last update", "last_release"),
-      ]),
-    ];
+    return [];
   }
 
   String ll(String url) {
