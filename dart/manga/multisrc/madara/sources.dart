@@ -129,7 +129,6 @@ import 'src/pt/leitordemanga/leitordemanga.dart';
 import 'src/pt/lscans/lscans.dart';
 import 'src/pt/lunarscan/lunarscan.dart';
 import 'src/pt/minitwoscan/minitwoscan.dart';
-import 'src/pt/nexoscans/nexoscans.dart';
 import 'src/pt/ninjascan/ninjascan.dart';
 import 'src/pt/onepieceteca/onepieceteca.dart';
 import 'src/pt/prismascans/prismascans.dart';
@@ -424,8 +423,6 @@ List<Source> _madaraSourcesList =
           lunarscanSource,
           //MiniTwo Scan (PT-BR)
           minitwoscanSource,
-          //Nexo Scans (PT-BR)
-          nexoscansSource,
           //Ninja Scan (PT-BR)
           ninjascanSource,
           //One Piece TECA (PT-BR)
