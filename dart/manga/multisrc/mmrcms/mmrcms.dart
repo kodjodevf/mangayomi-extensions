@@ -58,45 +58,32 @@ class MMRCMS extends MProvider {
 
   @override
   Future<MPages> search(String query, int page, FilterList filterList) async {
-    final filters = filterList.filters;
-    String url = "";
-    if (query.isNotEmpty) {
-      url = "${getBaseUrl()}/search?query=$query";
-    }
-
-    final res = (await client.get(Uri.parse(url))).body;
-
+    String url = getBaseUrl();
     List<MManga> mangaList = [];
 
-    List<String> urls = [];
-    List<String> names = [];
-    List<String> images = [];
-
+    bool hasNextPage = false;
     if (query.isNotEmpty) {
+      url = "$url/search?query=$query";
+      final res = (await client.get(Uri.parse(url))).body;
       final jsonList = json.decode(res)["suggestions"];
+
       for (var da in jsonList) {
         String value = da["value"];
         String data = da["data"];
-        if (source.name == 'Scan VF') {
-          urls.add('${getBaseUrl()}/$data');
-        } else {
-          urls.add('${getBaseUrl()}/manga/$data');
-        }
-        names.add(value);
-        images.add(
-          "${getBaseUrl()}/uploads/manga/$data/cover/cover_250x350.jpg",
+        final mangaSubString = getMangaSubString();
+        final path = mangaSubString.isEmpty ? data : '$mangaSubString/$data';
+
+        mangaList.add(
+          MManga(
+            name: value,
+            link: '${getBaseUrl()}/$path',
+            imageUrl: guessCover('/$path'),
+          ),
         );
       }
     }
-    for (var i = 0; i < names.length; i++) {
-      MManga manga = MManga();
-      manga.name = names[i];
-      manga.imageUrl = images[i];
-      manga.link = urls[i];
-      mangaList.add(manga);
-    }
 
-    return MPages(mangaList, true);
+    return MPages(mangaList, hasNextPage);
   }
 
   @override
@@ -240,6 +227,12 @@ class MMRCMS extends MProvider {
     return titles[lang?.toLowerCase()] ?? titles['en']!;
   }
 
+  String getMangaSubString() {
+    const sourceTypeMap = {'Scan VF': "", "Read Comics Online": "comic"};
+
+    return sourceTypeMap[source.name] ?? "manga";
+  }
+
   String ll(String url) {
     if (url.contains("?")) {
       return "&";
@@ -248,9 +241,9 @@ class MMRCMS extends MProvider {
   }
 
   String guessCover(String mangaUrl, {String? url}) {
+    String baseUrl = getBaseUrl();
     if (url == null || url?.endsWith("no-image.png")) {
       String slug = substringAfterLast(mangaUrl, '/');
-      String baseUrl = getBaseUrl();
       return "${baseUrl}/uploads/manga/${slug}/cover/cover_250x350.jpg";
     } else if (url?.startsWith(baseUrl)) {
       return url;
