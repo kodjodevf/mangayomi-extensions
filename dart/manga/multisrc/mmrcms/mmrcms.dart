@@ -21,9 +21,7 @@ class MMRCMS extends MProvider {
   @override
   Future<MPages> getPopular(int page) async {
     final res = (await client.get(
-      Uri.parse(
-        "${source.baseUrl}/filterList?page=$page&sortBy=views&asc=false",
-      ),
+      Uri.parse("${getBaseUrl()}/filterList?page=$page&sortBy=views&asc=false"),
     )).body;
     final document = parseHtml(res);
     final mangaList = <MManga>[];
@@ -40,7 +38,7 @@ class MMRCMS extends MProvider {
     if (page == 1) latestTitles.clear();
 
     final res = (await client.get(
-      Uri.parse("${source.baseUrl}/latest-release?page=$page"),
+      Uri.parse("${getBaseUrl()}/latest-release?page=$page"),
     )).body;
 
     final document = parseHtml(res);
@@ -63,7 +61,7 @@ class MMRCMS extends MProvider {
     final filters = filterList.filters;
     String url = "";
     if (query.isNotEmpty) {
-      url = "${source.baseUrl}/search?query=$query";
+      url = "${getBaseUrl()}/search?query=$query";
     }
 
     final res = (await client.get(Uri.parse(url))).body;
@@ -80,13 +78,13 @@ class MMRCMS extends MProvider {
         String value = da["value"];
         String data = da["data"];
         if (source.name == 'Scan VF') {
-          urls.add('${source.baseUrl}/$data');
+          urls.add('${getBaseUrl()}/$data');
         } else {
-          urls.add('${source.baseUrl}/manga/$data');
+          urls.add('${getBaseUrl()}/manga/$data');
         }
         names.add(value);
         images.add(
-          "${source.baseUrl}/uploads/manga/$data/cover/cover_250x350.jpg",
+          "${getBaseUrl()}/uploads/manga/$data/cover/cover_250x350.jpg",
         );
       }
     }
@@ -195,6 +193,53 @@ class MMRCMS extends MProvider {
     return [];
   }
 
+  @override
+  List<dynamic> getSourcePreferences() {
+    return [
+      EditTextPreference(
+        key: "domain_url",
+        title: getTitleByLang(source.lang),
+        summary: "",
+        value: source.baseUrl,
+        dialogTitle: "URL",
+        dialogMessage: "",
+      ),
+    ];
+  }
+
+  String getBaseUrl() {
+    final baseUrl = getPreferenceValue(source.id, "domain_url")?.trim();
+
+    if (baseUrl == null || baseUrl.isEmpty) {
+      return source.baseUrl;
+    }
+
+    return baseUrl.endsWith("/")
+        ? baseUrl.substring(0, baseUrl.length - 1)
+        : baseUrl;
+  }
+
+  String getTitleByLang(String? lang) {
+    const titles = {
+      'ar': 'تحرير الرابط',
+      'en': 'Edit URL',
+      'fr': 'Modifier l’URL',
+      'es': 'Editar URL',
+      'de': 'URL bearbeiten',
+      'tr': 'URL’yi düzenle',
+      'ru': 'Редактировать URL',
+      'id': 'Edit URL',
+      'pt': 'Editar URL',
+      'it': 'Modifica URL',
+      'ja': 'URLを編集',
+      'zh': '编辑网址',
+      'ko': 'URL 편집',
+      'fa': 'ویرایش نشانی',
+    };
+
+    return titles[lang?.toLowerCase()] ?? titles['en']!;
+  }
+
   String ll(String url) {
     if (url.contains("?")) {
       return "&";
@@ -205,11 +250,12 @@ class MMRCMS extends MProvider {
   String guessCover(String mangaUrl, {String? url}) {
     if (url == null || url?.endsWith("no-image.png")) {
       String slug = substringAfterLast(mangaUrl, '/');
-      return "${source.baseUrl}/uploads/manga/${slug}/cover/cover_250x350.jpg";
-    } else if (url?.startsWith(source.baseUrl)) {
+      String baseUrl = getBaseUrl();
+      return "${baseUrl}/uploads/manga/${slug}/cover/cover_250x350.jpg";
+    } else if (url?.startsWith(baseUrl)) {
       return url;
     } else {
-      return Uri.parse(source.baseUrl).resolve(url).toString();
+      return Uri.parse(baseUrl).resolve(url).toString();
     }
   }
 
