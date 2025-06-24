@@ -52,7 +52,6 @@ import 'src/th/nekopostco/nekopostco.dart';
 import 'src/ar/nijitranslations/nijitranslations.dart';
 import 'src/fr/pantheonscan/pantheonscan.dart';
 import 'src/id/pojokmanga/pojokmanga.dart';
-import 'src/pt/projetoscanlator/projetoscanlator.dart';
 import 'src/pt/mangasoverall/mangasoverall.dart';
 import 'src/es/ragnarokscanlation/ragnarokscanlation.dart';
 import 'src/pt/rainbowfairyscan/rainbowfairyscan.dart';
@@ -262,8 +261,6 @@ List<Source> _madaraSourcesList =
           pantheonscanSource,
           //Pojok Manga (ID)
           pojokmangaSource,
-          //Projeto Scanlator (PT-BR)
-          projetoscanlatorSource,
           //ROG Mangás (PT-BR)
           mangasoverallSource,
           //Ragnarok Scanlation (ES)
