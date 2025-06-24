@@ -35,7 +35,6 @@ import 'src/en/mangatxgg/mangatxgg.dart';
 import 'src/tr/mangasehri/mangasehri.dart';
 import 'src/en/mangaclash/mangaclash.dart';
 import 'src/en/mangafreakonline/mangafreakonline.dart';
-import 'src/en/mangagreat/mangagreat.dart';
 import 'src/en/mangakomi/mangakomi.dart';
 import 'src/en/mangareadorg/mangareadorg.dart';
 import 'src/en/mangatyrant/mangatyrant.dart';
@@ -359,16 +358,12 @@ List<Source> _madaraSourcesList =
           legendsnofansubSource,
           //Manga Crab (ES)
           mangacrabSource,
-          //MMFenix (ES)
-          mangafenixSource,
           //Mangas No Sekai (ES)
           mangasnosekaiSource,
           //Manhua Online (ES)
           manhuaonlineSource,
           //MHScans (ES)
           mhscansSource,
-          //Visormonarca (ES)
-          monarcamangaSource,
           //Noblesse Translations (ES)
           noblessetranslationsSource,
           //Prince Ediciones (ES)
