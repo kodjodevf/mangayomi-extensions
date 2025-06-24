@@ -3,7 +3,7 @@ import 'src/fr/scanvf/scanvf.dart';
 import 'src/ar/onma/onma.dart';
 import 'src/en/readcomicsonline/readcomicsonline.dart';
 
-const mmrcmsVersion = "0.0.7";
+const mmrcmsVersion = "0.0.8";
 const mmrcmsSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/manga/multisrc/mmrcms/mmrcms.dart";
 
@@ -18,10 +18,9 @@ List<Source> _mmrcmsSourcesList =
           readcomicsonlineSource,
         ]
         .map(
-          (e) =>
-              e
-                ..itemType = ItemType.manga
-                ..sourceCodeUrl = mmrcmsSourceCodeUrl
-                ..version = mmrcmsVersion,
+          (e) => e
+            ..itemType = ItemType.manga
+            ..sourceCodeUrl = mmrcmsSourceCodeUrl
+            ..version = mmrcmsVersion,
         )
         .toList();
