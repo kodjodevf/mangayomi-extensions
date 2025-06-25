@@ -44,17 +44,58 @@ class Nyaa extends MProvider {
     return parseAnimeList(res);
   }
 
+  String extractPanelBody(MDocument document) {
+    final panelBody = document.selectFirst('.panel-body');
+    if (panelBody == null) return "";
+
+    final rows = panelBody.select('.row');
+
+    final Map<String, String> info = {};
+    for (var row in rows) {
+      final labels = row.select('.col-md-1');
+      for (var label in labels) {
+        final key = label.text.replaceAll(":", "").trim();
+        final valueDiv = label.nextElementSibling;
+        if (valueDiv == null) continue;
+
+        final links = valueDiv.select('a');
+        String value;
+        if (links.isNotEmpty) {
+          value = links.map((a) => a.text.trim()).join(' - ');
+        } else {
+          value = valueDiv.text.trim();
+        }
+
+        info[key] = value;
+      }
+    }
+
+    final buffer = StringBuffer();
+    buffer.writeln("Torrent Info:\n");
+    info.forEach((k, v) {
+      buffer.writeln("${k.padRight(11)}: $v");
+    });
+    if (getPreferenceValue(source.id, "torrent_description_visible")) {
+      buffer.writeln("\n\n");
+      buffer.writeln("Torrent Description: \n");
+      buffer.writeln(
+        document
+            .select("#torrent-description")
+            .map((e) => e.text.trim())
+            .join("\n\n"),
+      );
+    }
+
+    return buffer.toString();
+  }
+
   @override
   Future<MManga> getDetail(String url) async {
     MManga anime = MManga();
     final res = (await client.get(Uri.parse(url))).body;
     final document = parseHtml(res);
-    String description =
-        (document.xpathFirst('//div[@class="panel-body"]/text()') ?? "")
-            .replaceAll("\n", "");
-    description +=
-        "\n\n${(document.xpathFirst('//div[@class="panel panel-default"]/text()') ?? "").trim().replaceAll("\n", "")}";
-    anime.description = description;
+
+    anime.description = extractPanelBody(document);
 
     List<MChapter> chapters = [];
     chapters.add(
@@ -103,6 +144,13 @@ class Nyaa extends MProvider {
         valueIndex: 0,
         entries: ["Anime", "Live Action"],
         entryValues: ["1_0", "4_0"],
+      ),
+      SwitchPreferenceCompat(
+        key: "torrent_description_visible",
+        title: "Display Torrent Description",
+        summary:
+            "Enable to show the full torrent description in the details view.",
+        value: false,
       ),
     ];
   }
