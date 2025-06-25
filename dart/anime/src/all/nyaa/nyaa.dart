@@ -11,7 +11,7 @@ class Nyaa extends MProvider {
   Future<MPages> getPopular(int page) async {
     final res = (await client.get(
       Uri.parse(
-        "${source.baseUrl}/?f=0&c=${getPreferenceValue(source.id, "preferred_categorie_page")}&q=&s=downloads&o=desc&p=$page",
+        "${getBaseUrl()}/?f=0&c=${getPreferenceValue(source.id, "preferred_categorie_page")}&q=&s=downloads&o=desc&p=$page",
       ),
     )).body;
     return parseAnimeList(res);
@@ -21,7 +21,7 @@ class Nyaa extends MProvider {
   Future<MPages> getLatestUpdates(int page) async {
     final res = (await client.get(
       Uri.parse(
-        "${source.baseUrl}/?f=0&c=${getPreferenceValue(source.id, "preferred_categorie_page")}&q=$page",
+        "${getBaseUrl()}/?f=0&c=${getPreferenceValue(source.id, "preferred_categorie_page")}&q=$page",
       ),
     )).body;
     return parseAnimeList(res);
@@ -32,7 +32,7 @@ class Nyaa extends MProvider {
     final filters = filterList.filters;
     String url = "";
     url =
-        "${source.baseUrl}/?f=0&c=${getPreferenceValue(source.id, "preferred_categorie_page")}&q=${query.replaceAll(" ", "+")}&p=$page";
+        "${getBaseUrl()}/?f=0&c=${getPreferenceValue(source.id, "preferred_categorie_page")}&q=${query.replaceAll(" ", "+")}&p=$page";
     for (var filter in filters) {
       if (filter.type == "SortFilter") {
         url += "${ll(url)}s=${filter.values[filter.state.index].value}";
@@ -101,8 +101,7 @@ class Nyaa extends MProvider {
     chapters.add(
       MChapter(
         name: "Torrent",
-        url:
-            "${source.baseUrl}/download/${substringAfterLast(url, '/')}.torrent",
+        url: "${getBaseUrl()}/download/${substringAfterLast(url, '/')}.torrent",
       ),
     );
     anime.chapters = chapters;
@@ -152,7 +151,27 @@ class Nyaa extends MProvider {
             "Enable to show the full torrent description in the details view.",
         value: false,
       ),
+      EditTextPreference(
+        key: "domain_url",
+        title: 'Edit URL',
+        summary: "",
+        value: source.baseUrl,
+        dialogTitle: "URL",
+        dialogMessage: "",
+      ),
     ];
+  }
+
+  String getBaseUrl() {
+    final baseUrl = getPreferenceValue(source.id, "domain_url")?.trim();
+
+    if (baseUrl == null || baseUrl.isEmpty) {
+      return source.baseUrl;
+    }
+
+    return baseUrl.endsWith("/")
+        ? baseUrl.substring(0, baseUrl.length - 1)
+        : baseUrl;
   }
 
   MPages parseAnimeList(String res) {
@@ -165,7 +184,7 @@ class Nyaa extends MProvider {
     for (var value in values) {
       MManga anime = MManga();
       anime.imageUrl =
-          "${source.baseUrl}${getUrlWithoutDomain(value.selectFirst("td:nth-child(1) > a > img").getSrc)}";
+          "${getBaseUrl()}${getUrlWithoutDomain(value.selectFirst("td:nth-child(1) > a > img").getSrc)}";
       MElement firstElement = value
           .select("td > a")
           .where(
@@ -176,7 +195,7 @@ class Nyaa extends MProvider {
           .toList()
           .first;
       anime.link =
-          "${source.baseUrl}${getUrlWithoutDomain(firstElement.getHref)}";
+          "${getBaseUrl()}${getUrlWithoutDomain(firstElement.getHref)}";
       anime.name = firstElement.attr("title");
       animeList.add(anime);
     }
