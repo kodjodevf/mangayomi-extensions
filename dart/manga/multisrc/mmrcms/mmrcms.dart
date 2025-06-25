@@ -21,9 +21,7 @@ class MMRCMS extends MProvider {
   @override
   Future<MPages> getPopular(int page) async {
     final res = (await client.get(
-      Uri.parse(
-        "${source.baseUrl}/filterList?page=$page&sortBy=views&asc=false",
-      ),
+      Uri.parse("${getBaseUrl()}/filterList?page=$page&sortBy=views&asc=false"),
     )).body;
     final document = parseHtml(res);
     final mangaList = <MManga>[];
@@ -40,7 +38,7 @@ class MMRCMS extends MProvider {
     if (page == 1) latestTitles.clear();
 
     final res = (await client.get(
-      Uri.parse("${source.baseUrl}/latest-release?page=$page"),
+      Uri.parse("${getBaseUrl()}/latest-release?page=$page"),
     )).body;
 
     final document = parseHtml(res);
@@ -60,72 +58,32 @@ class MMRCMS extends MProvider {
 
   @override
   Future<MPages> search(String query, int page, FilterList filterList) async {
-    final filters = filterList.filters;
-    String url = "";
-    if (query.isNotEmpty) {
-      url = "${source.baseUrl}/search?query=$query";
-    } else {
-      url = "${source.baseUrl}/filterList?page=$page";
-      for (var filter in filters) {
-        if (filter.type == "AuthorFilter") {
-          url += "${ll(url)}author=${Uri.encodeComponent(filter.state)}";
-        } else if (filter.type == "SortFilter") {
-          url += "${ll(url)}sortBy=${filter.values[filter.state.index].value}";
-          final asc = filter.state.ascending ? "asc=true" : "asc=false";
-          url += "${ll(url)}$asc";
-        } else if (filter.type == "CategoryFilter") {
-          if (filter.state != 0) {
-            final cat = filter.values[filter.state].value;
-            url += "${ll(url)}cat=$cat";
-          }
-        } else if (filter.type == "BeginsWithFilter") {
-          if (filter.state != 0) {
-            final a = filter.values[filter.state].value;
-            url += "${ll(url)}alpha=$a";
-          }
-        }
-      }
-    }
-
-    final res = (await client.get(Uri.parse(url))).body;
-
+    String url = getBaseUrl();
     List<MManga> mangaList = [];
 
-    List<String> urls = [];
-    List<String> names = [];
-    List<String> images = [];
-
+    bool hasNextPage = false;
     if (query.isNotEmpty) {
+      url = "$url/search?query=$query";
+      final res = (await client.get(Uri.parse(url))).body;
       final jsonList = json.decode(res)["suggestions"];
+
       for (var da in jsonList) {
         String value = da["value"];
         String data = da["data"];
-        if (source.name == 'Scan VF') {
-          urls.add('${source.baseUrl}/$data');
-        } else {
-          urls.add('${source.baseUrl}/manga/$data');
-        }
-        names.add(value);
-        images.add(
-          "${source.baseUrl}/uploads/manga/$data/cover/cover_250x350.jpg",
+        final mangaSubString = getMangaSubString();
+        final path = mangaSubString.isEmpty ? data : '$mangaSubString/$data';
+
+        mangaList.add(
+          MManga(
+            name: value,
+            link: '${getBaseUrl()}/$path',
+            imageUrl: guessCover('/$path'),
+          ),
         );
       }
-    } else {
-      urls = xpath(res, '//div/div/div/a/@href');
-      names = xpath(res, '//div/div/div/a/text()');
-      for (var mangaUrl in urls) {
-        images.add(guessCover(mangaUrl));
-      }
-    }
-    for (var i = 0; i < names.length; i++) {
-      MManga manga = MManga();
-      manga.name = names[i];
-      manga.imageUrl = images[i];
-      manga.link = urls[i];
-      mangaList.add(manga);
     }
 
-    return MPages(mangaList, true);
+    return MPages(mangaList, hasNextPage);
   }
 
   @override
@@ -217,82 +175,62 @@ class MMRCMS extends MProvider {
     return pagesUrl;
   }
 
+  @override
   List<dynamic> getFilterList() {
+    return [];
+  }
+
+  @override
+  List<dynamic> getSourcePreferences() {
     return [
-      HeaderFilter("NOTE: Ignored if using text search!"),
-      SeparatorFilter(),
-      TextFilter("AuthorFilter", "Author"),
-      SelectFilter("CategoryFilter", "Category", 0, [
-        SelectFilterOption("Any", ""),
-        SelectFilterOption("Action", "Action"),
-        SelectFilterOption("Adventure", "Adventure"),
-        SelectFilterOption("Comedy", "Comedy"),
-        SelectFilterOption("Doujinshi", "Doujinshi"),
-        SelectFilterOption("Drama", "Drama"),
-        SelectFilterOption("Ecchi", "Ecchi"),
-        SelectFilterOption("Fantasy", "Fantasy"),
-        SelectFilterOption("Gender Bender", "Gender Bender"),
-        SelectFilterOption("Harem", "Harem"),
-        SelectFilterOption("Historical", "Historical"),
-        SelectFilterOption("Horror", "Horror"),
-        SelectFilterOption("Josei", "Josei"),
-        SelectFilterOption("Martial Arts", "Martial Arts"),
-        SelectFilterOption("Mature", "Mature"),
-        SelectFilterOption("Mecha", "Mecha"),
-        SelectFilterOption("Mystery", "Mystery"),
-        SelectFilterOption("One Shot", "One Shot"),
-        SelectFilterOption("Psychological", "Psychological"),
-        SelectFilterOption("Romance", "Romance"),
-        SelectFilterOption("School Life", "School Life"),
-        SelectFilterOption("Sci-fi", "Sci-fi"),
-        SelectFilterOption("Seinen", "Seinen"),
-        SelectFilterOption("Shoujo", "Shoujo"),
-        SelectFilterOption("Shoujo Ai", "Shoujo Ai"),
-        SelectFilterOption("Shounen", "Shounen"),
-        SelectFilterOption("Shounen Ai", "Shounen Ai"),
-        SelectFilterOption("Slice of Life", "Slice of Life"),
-        SelectFilterOption("Sports", "Sports"),
-        SelectFilterOption("Supernatural", "Supernatural"),
-        SelectFilterOption("Tragedy", "Tragedy"),
-        SelectFilterOption("Yaoi", "Yaoi"),
-        SelectFilterOption("Yuri", "Yuri"),
-      ]),
-      SelectFilter("BeginsWithFilter", "Begins with", 0, [
-        SelectFilterOption("Any", ""),
-        SelectFilterOption("#", "#"),
-        SelectFilterOption("A", "A"),
-        SelectFilterOption("B", "B"),
-        SelectFilterOption("C", "C"),
-        SelectFilterOption("D", "D"),
-        SelectFilterOption("E", "E"),
-        SelectFilterOption("F", "F"),
-        SelectFilterOption("G", "G"),
-        SelectFilterOption("H", "H"),
-        SelectFilterOption("I", "I"),
-        SelectFilterOption("J", "J"),
-        SelectFilterOption("K", "K"),
-        SelectFilterOption("L", "L"),
-        SelectFilterOption("M", "M"),
-        SelectFilterOption("N", "N"),
-        SelectFilterOption("O", "O"),
-        SelectFilterOption("P", "P"),
-        SelectFilterOption("Q", "Q"),
-        SelectFilterOption("R", "R"),
-        SelectFilterOption("S", "S"),
-        SelectFilterOption("T", "T"),
-        SelectFilterOption("U", "U"),
-        SelectFilterOption("V", "V"),
-        SelectFilterOption("W", "W"),
-        SelectFilterOption("X", "X"),
-        SelectFilterOption("Y", "Y"),
-        SelectFilterOption("Z", "Z"),
-      ]),
-      SortFilter("SortFilter", "Sort", SortState(0, true), [
-        SelectFilterOption("Name", "name"),
-        SelectFilterOption("Popularity", "views"),
-        SelectFilterOption("Last update", "last_release"),
-      ]),
+      EditTextPreference(
+        key: "domain_url",
+        title: getTitleByLang(source.lang),
+        summary: "",
+        value: source.baseUrl,
+        dialogTitle: "URL",
+        dialogMessage: "",
+      ),
     ];
+  }
+
+  String getBaseUrl() {
+    final baseUrl = getPreferenceValue(source.id, "domain_url")?.trim();
+
+    if (baseUrl == null || baseUrl.isEmpty) {
+      return source.baseUrl;
+    }
+
+    return baseUrl.endsWith("/")
+        ? baseUrl.substring(0, baseUrl.length - 1)
+        : baseUrl;
+  }
+
+  String getTitleByLang(String? lang) {
+    const titles = {
+      'ar': 'تحرير الرابط',
+      'en': 'Edit URL',
+      'fr': 'Modifier l’URL',
+      'es': 'Editar URL',
+      'de': 'URL bearbeiten',
+      'tr': 'URL’yi düzenle',
+      'ru': 'Редактировать URL',
+      'id': 'Edit URL',
+      'pt': 'Editar URL',
+      'it': 'Modifica URL',
+      'ja': 'URLを編集',
+      'zh': '编辑网址',
+      'ko': 'URL 편집',
+      'fa': 'ویرایش نشانی',
+    };
+
+    return titles[lang?.toLowerCase()] ?? titles['en']!;
+  }
+
+  String getMangaSubString() {
+    const sourceTypeMap = {'Scan VF': "", "Read Comics Online": "comic"};
+
+    return sourceTypeMap[source.name] ?? "manga";
   }
 
   String ll(String url) {
@@ -303,13 +241,14 @@ class MMRCMS extends MProvider {
   }
 
   String guessCover(String mangaUrl, {String? url}) {
+    String baseUrl = getBaseUrl();
     if (url == null || url?.endsWith("no-image.png")) {
       String slug = substringAfterLast(mangaUrl, '/');
-      return "${source.baseUrl}/uploads/manga/${slug}/cover/cover_250x350.jpg";
-    } else if (url?.startsWith(source.baseUrl)) {
+      return "${baseUrl}/uploads/manga/${slug}/cover/cover_250x350.jpg";
+    } else if (url?.startsWith(baseUrl)) {
       return url;
     } else {
-      return Uri.parse(source.baseUrl).resolve(url).toString();
+      return Uri.parse(baseUrl).resolve(url).toString();
     }
   }
 
