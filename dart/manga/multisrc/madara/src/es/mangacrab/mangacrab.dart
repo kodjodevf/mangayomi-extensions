@@ -3,7 +3,7 @@ import '../../../../../../../model/source.dart';
 Source get mangacrabSource => _mangacrabSource;
 Source _mangacrabSource = Source(
   name: "Manga Crab",
-  baseUrl: "https://visorcrab.com",
+  baseUrl: "https://mangacrab.org",
   lang: "es",
   isNsfw: false,
   typeSource: "madara",

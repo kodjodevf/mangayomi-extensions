@@ -4,7 +4,7 @@ Source get inmortalscanSource => _inmortalscanSource;
 
 Source _inmortalscanSource = Source(
   name: "Inmortal Scan",
-  baseUrl: "https://manga.mundodrama.site",
+  baseUrl: "https://scaninmortal.com",
   lang: "es",
 
   typeSource: "madara",

@@ -4,7 +4,7 @@ Source get firstkissdashmangaSource => _firstkissdashmangaSource;
 
 Source _firstkissdashmangaSource = Source(
   name: "1st Kiss-Manga (unoriginal)",
-  baseUrl: "https://1stkiss-manga.com",
+  baseUrl: "https://1stkissmanga.org",
   lang: "en",
 
   typeSource: "madara",
