@@ -47,6 +47,7 @@ import 'src/es/gremorymangas/gremorymangas.dart';
 import 'src/es/ryujinmanga/ryujinmanga.dart';
 import 'src/es/senpaiediciones/senpaiediciones.dart';
 import 'src/es/skymangas/skymangas.dart';
+import 'src/es/erosscans/erosscans.dart';
 import 'src/fr/flamescansfr/flamescansfr.dart';
 import 'src/fr/mangasscans/mangasscans.dart';
 import 'src/fr/rimuscans/rimuscans.dart';
@@ -177,6 +178,8 @@ List<Source> _mangareaderSourcesList =
           rizzcomicSource,
           //Berserker Scan (ES)
           berserkerscanSource,
+          // Eros Scan (ES)
+          erosscansSource,
           //Cartel de Manhwas (ES)
           carteldemanhwasSource,
           //De Todo Un Poco Scan (ES)
