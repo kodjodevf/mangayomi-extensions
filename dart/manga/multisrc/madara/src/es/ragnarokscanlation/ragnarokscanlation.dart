@@ -4,7 +4,7 @@ Source get ragnarokscanlationSource => _ragnarokscanlationSource;
 
 Source _ragnarokscanlationSource = Source(
   name: "Ragnarok Scanlation",
-  baseUrl: "https://ragnarokscanlation.com",
+  baseUrl: "https://ragnarokscanlation.org",
   lang: "es",
 
   typeSource: "madara",

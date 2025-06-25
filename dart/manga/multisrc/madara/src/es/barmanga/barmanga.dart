@@ -4,7 +4,7 @@ Source get barmangaSource => _barmangaSource;
 
 Source _barmangaSource = Source(
   name: "BarManga",
-  baseUrl: "https://barmanga.com",
+  baseUrl: "https://archiviumbar.com",
   lang: "es",
 
   typeSource: "madara",

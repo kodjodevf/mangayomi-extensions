@@ -3,7 +3,7 @@ import '../../../../../../../model/source.dart';
 Source get prismascansSource => _prismascansSource;
 Source _prismascansSource = Source(
   name: "Demon Sect",
-  baseUrl: "https://dsectcomics.org",
+  baseUrl: "https://seitacelestial.com",
   lang: "pt-br",
   isNsfw: false,
   typeSource: "madara",

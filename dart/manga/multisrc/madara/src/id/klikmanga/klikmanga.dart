@@ -3,7 +3,7 @@ import '../../../../../../../model/source.dart';
 Source get klikmangaSource => _klikmangaSource;
 Source _klikmangaSource = Source(
   name: "KlikManga",
-  baseUrl: "https://klikmanga.id",
+  baseUrl: "https://klikmanga.org",
   lang: "id",
   isNsfw: false,
   typeSource: "madara",

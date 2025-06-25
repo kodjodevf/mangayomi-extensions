@@ -3,7 +3,7 @@ import '../../../../../../../model/source.dart';
 Source get mangaeffectSource => _mangaeffectSource;
 Source _mangaeffectSource = Source(
   name: "MangaEffect",
-  baseUrl: "https://mangaeffect.com",
+  baseUrl: "https://www.mangaread.org",
   lang: "en",
   isNsfw: false,
   typeSource: "madara",

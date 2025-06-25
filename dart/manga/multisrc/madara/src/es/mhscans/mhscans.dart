@@ -3,7 +3,7 @@ import '../../../../../../../model/source.dart';
 Source get mhscansSource => _mhscansSource;
 Source _mhscansSource = Source(
   name: "MHScans",
-  baseUrl: "https://lectormh.com",
+  baseUrl: "https://twobluescans.com",
   lang: "es",
   isNsfw: false,
   typeSource: "madara",

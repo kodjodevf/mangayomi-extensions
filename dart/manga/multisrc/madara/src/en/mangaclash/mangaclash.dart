@@ -4,7 +4,7 @@ Source get mangaclashSource => _mangaclashSource;
 
 Source _mangaclashSource = Source(
   name: "MangaClash",
-  baseUrl: "https://mangaclash.com",
+  baseUrl: "https://toonclash.com",
   lang: "en",
 
   typeSource: "madara",

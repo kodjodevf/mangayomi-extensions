@@ -1,6 +1,5 @@
 import '../../../../model/source.dart';
 import 'src/en/firstkissdashmanga/firstkissdashmanga.dart';
-import 'src/en/manhwaworld/manhwaworld.dart';
 import 'src/pt/akumanotenshi/akumanotenshi.dart';
 import 'src/tr/anikiga/anikiga.dart';
 import 'src/tr/araznovel/araznovel.dart';
@@ -9,7 +8,6 @@ import 'src/fr/astralmanga/astralmanga.dart';
 import 'src/en/asurascansus/asurascansus.dart';
 import 'src/es/barmanga/barmanga.dart';
 import 'src/ru/bestmanga/bestmanga.dart';
-import 'src/en/chibimanga/chibimanga.dart';
 import 'src/tr/clovermanga/clovermanga.dart';
 import 'src/es/cocorip/cocorip.dart';
 import 'src/en/coffeemanga/coffeemanga.dart';
@@ -17,12 +15,9 @@ import 'src/th/doodmanga/doodmanga.dart';
 import 'src/en/elitemanga/elitemanga.dart';
 import 'src/es/emperorscan/emperorscan.dart';
 import 'src/tr/evascans/evascans.dart';
-import 'src/fr/frscan/frscan.dart';
-import 'src/en/factmanga/factmanga.dart';
 import 'src/en/freemangatop/freemangatop.dart';
 import 'src/tr/glorymanga/glorymanga.dart';
 import 'src/en/harimanga/harimanga.dart';
-import 'src/en/immortalupdates/immortalupdates.dart';
 import 'src/pt/imperioscans/imperioscans.dart';
 import 'src/es/inmortalscan/inmortalscan.dart';
 import 'src/en/isekaiscanmanga/isekaiscanmanga.dart';
@@ -30,70 +25,54 @@ import 'src/en/jimanga/jimanga.dart';
 import 'src/en/ksgroupscans/ksgroupscans.dart';
 import 'src/pt/kakuseiproject/kakuseiproject.dart';
 import 'src/pt/kamisamaexplorer/kamisamaexplorer.dart';
-import 'src/en/komikchan/komikchan.dart';
 import 'src/en/lhtranslation/lhtranslation.dart';
 import 'src/pt/ladyestelarscan/ladyestelarscan.dart';
 import 'src/en/leviatanscans/leviatanscans.dart';
-import 'src/en/luffymanga/luffymanga.dart';
-import 'src/pt/maidscan/maidscan.dart';
 import 'src/tr/mangadiyari/mangadiyari.dart';
-import 'src/es/mangafenix/mangafenix.dart';
 import 'src/en/mangagalaxy/mangagalaxy.dart';
 import 'src/en/mangaread/mangaread.dart';
 import 'src/en/mangatxgg/mangatxgg.dart';
-import 'src/en/mangaweebs/mangaweebs.dart';
 import 'src/tr/mangasehri/mangasehri.dart';
-import 'src/en/mangatxunoriginal/mangatxunoriginal.dart';
 import 'src/en/mangaclash/mangaclash.dart';
 import 'src/en/mangafreakonline/mangafreakonline.dart';
-import 'src/en/mangagreat/mangagreat.dart';
 import 'src/en/mangakomi/mangakomi.dart';
 import 'src/en/mangareadorg/mangareadorg.dart';
-import 'src/en/mangarolls/mangarolls.dart';
 import 'src/en/mangatyrant/mangatyrant.dart';
-import 'src/en/mangaus/mangaus.dart';
 import 'src/en/mangasushi/mangasushi.dart';
 import 'src/pt/mangananquim/mangananquim.dart';
-import 'src/en/manhuaes/manhuaes.dart';
 import 'src/en/manhuaus/manhuaus.dart';
 import 'src/en/manhuazone/manhuazone.dart';
 import 'src/en/manhwaclan/manhwaclan.dart';
 import 'src/en/manhwafull/manhwafull.dart';
 import 'src/es/mantrazscan/mantrazscan.dart';
 import 'src/pt/momonohanascan/momonohanascan.dart';
-import 'src/es/monarcamanga/monarcamanga.dart';
 import 'src/pt/moonwitchinlove/moonwitchinlove.dart';
 import 'src/th/nekopostco/nekopostco.dart';
 import 'src/ar/nijitranslations/nijitranslations.dart';
 import 'src/fr/pantheonscan/pantheonscan.dart';
 import 'src/id/pojokmanga/pojokmanga.dart';
-import 'src/pt/projetoscanlator/projetoscanlator.dart';
 import 'src/pt/mangasoverall/mangasoverall.dart';
 import 'src/es/ragnarokscanlation/ragnarokscanlation.dart';
 import 'src/pt/rainbowfairyscan/rainbowfairyscan.dart';
 import 'src/pt/randomscan/randomscan.dart';
-import 'src/fr/readergen/readergen.dart';
 import 'src/es/richtoscan/richtoscan.dart';
 import 'src/es/rightdarkscan/rightdarkscan.dart';
-import 'src/en/rio2manga/rio2manga.dart';
 import 'src/tr/romantikmanga/romantikmanga.dart';
 import 'src/en/s2manga/s2manga.dart';
 import 'src/es/samuraiscan/samuraiscan.dart';
-import 'src/es/scambertraslator/scambertraslator.dart';
 import 'src/fr/scantradvf/scantradvf.dart';
-import 'src/fr/shadowtrad/shadowtrad.dart';
 import 'src/en/shibamanga/shibamanga.dart';
 import 'src/pt/sinensis/sinensis.dart';
 import 'src/pt/sweettimescan/sweettimescan.dart';
 import 'src/pt/tatakaescan/tatakaescan.dart';
 import 'src/es/taurusfansub/taurusfansub.dart';
-import 'src/fr/thebeginningaftertheend/thebeginningaftertheend.dart';
 import 'src/tr/tortugaceviri/tortugaceviri.dart';
 import 'src/pt/wickedwitchscan/wickedwitchscan.dart';
 import 'src/pt/winterscan/winterscan.dart';
 import 'src/pt/wonderlandscan/wonderlandscan.dart';
 import 'src/pt/yuriverso/yuriverso.dart';
 import 'src/ar/manga3asq/manga3asq.dart';
+import 'src/ar/azora/azora.dart';
 import 'src/ar/detectiveconanar/detectiveconanar.dart';
 import 'src/ar/mangaxcore/mangaxcore.dart';
 import 'src/all/grabberzone/grabberzone.dart';
@@ -106,13 +85,8 @@ import 'src/ar/mangastarz/mangastarz.dart';
 import 'src/ar/olaoe/olaoe.dart';
 import 'src/ar/rocksmanga/rocksmanga.dart';
 import 'src/en/dragontea/dragontea.dart';
-import 'src/en/globalbloging/globalbloging.dart';
-import 'src/en/manga347/manga347.dart';
 import 'src/en/mangaeffect/mangaeffect.dart';
-import 'src/en/mangafastcom/mangafastcom.dart';
 import 'src/en/mangaleveling/mangaleveling.dart';
-import 'src/en/neatmanga/neatmanga.dart';
-import 'src/en/nvmanga/nvmanga.dart';
 import 'src/en/pmscans/pmscans.dart';
 import 'src/en/readmanhua/readmanhua.dart';
 import 'src/en/stonescape/stonescape.dart';
@@ -120,13 +94,10 @@ import 'src/en/tappytoonnet/tappytoonnet.dart';
 import 'src/en/zinmanganet/zinmanganet.dart';
 import 'src/es/bokugentranslation/bokugentranslation.dart';
 import 'src/es/daprob/daprob.dart';
-import 'src/es/demanhuas/demanhuas.dart';
 import 'src/es/herenscan/herenscan.dart';
-import 'src/es/housemangas/housemangas.dart';
 import 'src/es/infrafandub/infrafandub.dart';
-import 'src/es/inmoralnofansub/inmoralnofansub.dart';
 import 'src/es/jeazscans/jeazscans.dart';
-import 'src/es/jobsibe/jobsibe.dart';
+import 'src/es/lmtos/lmtos.dart';
 import 'src/es/legendsnofansub/legendsnofansub.dart';
 import 'src/es/mangacrab/mangacrab.dart';
 import 'src/es/mangasnosekai/mangasnosekai.dart';
@@ -135,18 +106,14 @@ import 'src/es/mhscans/mhscans.dart';
 import 'src/es/noblessetranslations/noblessetranslations.dart';
 import 'src/es/princediciones/princediciones.dart';
 import 'src/es/sapphirescan/sapphirescan.dart';
-import 'src/es/tresdaosscan/tresdaosscan.dart';
 import 'src/es/unitoon/unitoon.dart';
 import 'src/fr/mangascantrad/mangascantrad.dart';
 import 'src/fr/mangasoriginesfr/mangasoriginesfr.dart';
-import 'src/fr/raijinscans/raijinscans.dart';
-import 'src/en/reaperscans/reaperscans.dart';
 import 'src/fr/softepsilonscan/softepsilonscan.dart';
 import 'src/id/hwago/hwago.dart';
 import 'src/id/klikmanga/klikmanga.dart';
 import 'src/id/komikuzan/komikuzan.dart';
 import 'src/id/mgkomik/mgkomik.dart';
-import 'src/id/siimanga/siimanga.dart';
 import 'src/id/yubikiri/yubikiri.dart';
 import 'src/pl/mangahona/mangahona.dart';
 import 'src/pt/alonescanlator/alonescanlator.dart';
@@ -160,11 +127,9 @@ import 'src/pt/leitordemanga/leitordemanga.dart';
 import 'src/pt/lscans/lscans.dart';
 import 'src/pt/lunarscan/lunarscan.dart';
 import 'src/pt/minitwoscan/minitwoscan.dart';
-import 'src/pt/nexoscans/nexoscans.dart';
 import 'src/pt/ninjascan/ninjascan.dart';
 import 'src/pt/onepieceteca/onepieceteca.dart';
 import 'src/pt/prismascans/prismascans.dart';
-import 'src/pt/sussyscan/sussyscan.dart';
 import 'src/th/kingsmanga/kingsmanga.dart';
 import 'src/th/mangadeemak/mangadeemak.dart';
 import 'src/th/manhuabug/manhuabug.dart';
@@ -184,7 +149,7 @@ import 'src/tr/ruyamanga/ruyamanga.dart';
 import 'src/tr/turkcemangaoku/turkcemangaoku.dart';
 import 'src/tr/webtoonhatti/webtoonhatti.dart';
 
-const madaraVersion = "0.1.2";
+const madaraVersion = "0.1.3";
 const madaraSourceCodeUrl =
     "https://raw.githubusercontent.com/kodjodevf/mangayomi-extensions/$branchName/dart/manga/multisrc/madara/madara.dart";
 
@@ -193,8 +158,6 @@ List<Source> _madaraSourcesList =
     [
           //1st Kiss-Manga (unoriginal) (EN)
           firstkissdashmangaSource,
-          //AQUA Scans (EN)
-          manhwaworldSource,
           //Akuma no Tenshi (PT-BR)
           akumanotenshiSource,
           //Anikiga (TR)
@@ -211,8 +174,6 @@ List<Source> _madaraSourcesList =
           barmangaSource,
           //BestManga (RU)
           bestmangaSource,
-          //Chibi Manga (EN)
-          chibimangaSource,
           //Clover Manga (TR)
           clovermangaSource,
           //Coco Rip (ES)
@@ -227,18 +188,12 @@ List<Source> _madaraSourcesList =
           emperorscanSource,
           //EvaScans (TR)
           evascansSource,
-          //FR-Scan (FR)
-          frscanSource,
-          //FactManga (EN)
-          factmangaSource,
           //FreeMangaTop (EN)
           freemangatopSource,
           //Glory Manga (TR)
           glorymangaSource,
           //Harimanga (EN)
           harimangaSource,
-          //Immortal Updates (EN)
-          immortalupdatesSource,
           //Império Scans (PT-BR)
           imperioscansSource,
           //Inmortal Scan (ES)
@@ -253,56 +208,36 @@ List<Source> _madaraSourcesList =
           kakuseiprojectSource,
           //Kami Sama Explorer (PT-BR)
           kamisamaexplorerSource,
-          //Komik Chan (EN)
-          komikchanSource,
           //LHTranslation (EN)
           lhtranslationSource,
           //Lady Estelar Scan (PT-BR)
           ladyestelarscanSource,
           //Leviatan Scans (EN)
           leviatanscansSource,
-          //Luffy Manga (EN)
-          luffymangaSource,
-          //Maid Scan (PT-BR)
-          maidscanSource,
           //Manga Diyari (TR)
           mangadiyariSource,
-          //Manga Fenix (ES)
-          mangafenixSource,
           //Manga Galaxy (EN)
           mangagalaxySource,
           //Manga Read (EN)
           mangareadSource,
           //Manga Tx.gg (unoriginal) (EN)
           mangatxggSource,
-          //Manga Weebs (EN)
-          mangaweebsSource,
           //Manga Şehri (TR)
           mangasehriSource,
-          //Manga-TX (EN)
-          mangatxunoriginalSource,
           //MangaClash (EN)
           mangaclashSource,
           //MangaFreak.online (EN)
           mangafreakonlineSource,
-          //MangaGreat (EN)
-          mangagreatSource,
           //MangaKomi (EN)
           mangakomiSource,
           //MangaRead.org (EN)
           mangareadorgSource,
-          //MangaRolls (EN)
-          mangarollsSource,
           //MangaTyrant (EN)
           mangatyrantSource,
-          //MangaUS (EN)
-          mangausSource,
           //Mangasushi (EN)
           mangasushiSource,
           //Mangá Nanquim (PT-BR)
           mangananquimSource,
-          //Manhua ES (EN)
-          manhuaesSource,
           //ManhuaUS (EN)
           manhuausSource,
           //ManhuaZone (EN)
@@ -315,8 +250,6 @@ List<Source> _madaraSourcesList =
           mantrazscanSource,
           //Momo no Hana Scan (PT-BR)
           momonohanascanSource,
-          //MonarcaManga (ES)
-          monarcamangaSource,
           //Moon Witch In Love (PT-BR)
           moonwitchinloveSource,
           //NekoPost.co (unoriginal) (TH)
@@ -327,8 +260,6 @@ List<Source> _madaraSourcesList =
           pantheonscanSource,
           //Pojok Manga (ID)
           pojokmangaSource,
-          //Projeto Scanlator (PT-BR)
-          projetoscanlatorSource,
           //ROG Mangás (PT-BR)
           mangasoverallSource,
           //Ragnarok Scanlation (ES)
@@ -337,26 +268,18 @@ List<Source> _madaraSourcesList =
           rainbowfairyscanSource,
           //Random Scan (PT-BR)
           randomscanSource,
-          //ReaderGen (FR)
-          readergenSource,
           //RichtoScan (ES)
           richtoscanSource,
           //Rightdark Scan (ES)
           rightdarkscanSource,
-          //Rio2 Manga (EN)
-          rio2mangaSource,
           //Romantik Manga (TR)
           romantikmangaSource,
           //S2Manga (EN)
           s2mangaSource,
           //SamuraiScan (ES)
           samuraiscanSource,
-          //ScamberTraslator (ES)
-          scambertraslatorSource,
           //Scantrad-VF (FR)
           scantradvfSource,
-          //Shadowtrad (FR)
-          shadowtradSource,
           //Shiba Manga (EN)
           shibamangaSource,
           //Sinensis Scan (PT-BR)
@@ -367,8 +290,6 @@ List<Source> _madaraSourcesList =
           tatakaescanSource,
           //Taurus Fansub (ES)
           taurusfansubSource,
-          //The Beginning After The End (FR)
-          thebeginningaftertheendSource,
           //Tortuga Ceviri (TR)
           tortugaceviriSource,
           //Wicked Witch Scan (PT-BR)
@@ -381,6 +302,8 @@ List<Source> _madaraSourcesList =
           yuriversoSource,
           //مانجا العاشق (AR)
           manga3asqSource,
+          // Azora (AR)
+          azoraSource,
           //Mangax Core (AR)
           mangaxcoreSource,
           //Grabber Zone (ALL)
@@ -405,20 +328,10 @@ List<Source> _madaraSourcesList =
           detectiveconanarSource,
           //DragonTea (EN)
           dragonteaSource,
-          //Global Bloging (EN)
-          globalblogingSource,
-          //Manga347 (EN)
-          manga347Source,
           //MangaEffect (EN)
           mangaeffectSource,
-          //Manga-fast.com (EN)
-          mangafastcomSource,
           //Manga Leveling (EN)
           mangalevelingSource,
-          //NeatManga (EN)
-          neatmangaSource,
-          //NvManga (EN)
-          nvmangaSource,
           //PMScans (EN)
           pmscansSource,
           //ReadManhua (EN)
@@ -433,52 +346,36 @@ List<Source> _madaraSourcesList =
           bokugentranslationSource,
           //DapRob (ES)
           daprobSource,
-          //DeManhuas (ES)
-          demanhuasSource,
           //HerenScan (ES)
           herenscanSource,
-          //HouseMangas (ES)
-          housemangasSource,
           //InfraFandub (ES)
           infrafandubSource,
-          //Inmoral No Fansub (ES)
-          inmoralnofansubSource,
           //JeazScans (ES)
           jeazscansSource,
-          //Jobsibe (ES)
-          jobsibeSource,
+          //Lmtos (ES)
+          lmtosSource,
           //LegnMangas (ES)
           legendsnofansubSource,
           //Manga Crab (ES)
           mangacrabSource,
-          //MMFenix (ES)
-          mangafenixSource,
           //Mangas No Sekai (ES)
           mangasnosekaiSource,
           //Manhua Online (ES)
           manhuaonlineSource,
           //MHScans (ES)
           mhscansSource,
-          //Visormonarca (ES)
-          monarcamangaSource,
           //Noblesse Translations (ES)
           noblessetranslationsSource,
           //Prince Ediciones (ES)
           princedicionesSource,
           //SapphireScan (ES)
           sapphirescanSource,
-          //Tres Daos Scan (ES)
-          tresdaosscanSource,
           //Unitoon (ES)
           unitoonSource,
           //Manga-Scantrad (FR)
           mangascantradSource,
           //Mangas-Origines.fr (FR)
           mangasoriginesfrSource,
-          //Raijin Scans (FR)
-          raijinscansSource,
-          //Reaper Scans (EN)
-          reaperscansSource,
           //Soft Epsilon Scan (FR)
           softepsilonscanSource,
           //Hwago (ID)
@@ -489,8 +386,6 @@ List<Source> _madaraSourcesList =
           komikuzanSource,
           //MG Komik (ID)
           mgkomikSource,
-          //Siimanga (ID)
-          siimangaSource,
           //Yubikiri (ID)
           yubikiriSource,
           //MangaHoNa (PL)
@@ -519,16 +414,12 @@ List<Source> _madaraSourcesList =
           lunarscanSource,
           //MiniTwo Scan (PT-BR)
           minitwoscanSource,
-          //Nexo Scans (PT-BR)
-          nexoscansSource,
           //Ninja Scan (PT-BR)
           ninjascanSource,
           //One Piece TECA (PT-BR)
           onepiecetecaSource,
           //Demon Sect (PT-BR)
           prismascansSource,
-          //Sussy Scan (PT-BR)
-          sussyscanSource,
           //Kings-Manga (TH)
           kingsmangaSource,
           //MangaDeemak (TH)
