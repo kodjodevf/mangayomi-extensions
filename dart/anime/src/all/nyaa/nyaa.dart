@@ -9,23 +9,21 @@ class Nyaa extends MProvider {
 
   @override
   Future<MPages> getPopular(int page) async {
-    final res =
-        (await client.get(
-          Uri.parse(
-            "${source.baseUrl}/?f=0&c=${getPreferenceValue(source.id, "preferred_categorie_page")}&q=&s=downloads&o=desc&p=$page",
-          ),
-        )).body;
+    final res = (await client.get(
+      Uri.parse(
+        "${source.baseUrl}/?f=0&c=${getPreferenceValue(source.id, "preferred_categorie_page")}&q=&s=downloads&o=desc&p=$page",
+      ),
+    )).body;
     return parseAnimeList(res);
   }
 
   @override
   Future<MPages> getLatestUpdates(int page) async {
-    final res =
-        (await client.get(
-          Uri.parse(
-            "${source.baseUrl}/?f=0&c=${getPreferenceValue(source.id, "preferred_categorie_page")}&q=$page",
-          ),
-        )).body;
+    final res = (await client.get(
+      Uri.parse(
+        "${source.baseUrl}/?f=0&c=${getPreferenceValue(source.id, "preferred_categorie_page")}&q=$page",
+      ),
+    )).body;
     return parseAnimeList(res);
   }
 
@@ -57,11 +55,17 @@ class Nyaa extends MProvider {
     description +=
         "\n\n${(document.xpathFirst('//div[@class="panel panel-default"]/text()') ?? "").trim().replaceAll("\n", "")}";
     anime.description = description;
-    MChapter ep = MChapter();
-    ep.name = "Torrent";
-    ep.url =
-        "${source.baseUrl}/download/${substringAfterLast(url, '/')}.torrent";
-    anime.chapters = [ep];
+
+    List<MChapter> chapters = [];
+    chapters.add(
+      MChapter(
+        name: "Torrent",
+        url:
+            "${source.baseUrl}/download/${substringAfterLast(url, '/')}.torrent",
+      ),
+    );
+    anime.chapters = chapters;
+
     return anime;
   }
 
@@ -114,27 +118,25 @@ class Nyaa extends MProvider {
       MManga anime = MManga();
       anime.imageUrl =
           "${source.baseUrl}${getUrlWithoutDomain(value.selectFirst("td:nth-child(1) > a > img").getSrc)}";
-      MElement firstElement =
-          value
-              .select("td > a")
-              .where(
-                (MElement e) =>
-                    e.outerHtml.contains("/view/") &&
-                    !e.outerHtml.contains("#comments"),
-              )
-              .toList()
-              .first;
+      MElement firstElement = value
+          .select("td > a")
+          .where(
+            (MElement e) =>
+                e.outerHtml.contains("/view/") &&
+                !e.outerHtml.contains("#comments"),
+          )
+          .toList()
+          .first;
       anime.link =
           "${source.baseUrl}${getUrlWithoutDomain(firstElement.getHref)}";
       anime.name = firstElement.attr("title");
       animeList.add(anime);
     }
 
-    final hasNextPage =
-        xpath(
-          res,
-          '//ul[@class="pagination"]/li[contains(text(),"»")]/a/@href',
-        ).isNotEmpty;
+    final hasNextPage = xpath(
+      res,
+      '//ul[@class="pagination"]/li[contains(text(),"»")]/a/@href',
+    ).isNotEmpty;
     return MPages(animeList, hasNextPage);
   }
 
