@@ -4,7 +4,7 @@ Source get suryascansSource => _suryascansSource;
 
 Source _suryascansSource = Source(
   name: "Surya Scans",
-  baseUrl: "https://suryascans.com",
+  baseUrl: "https://suryascans.org",
   lang: "en",
   typeSource: "mangareader",
   iconUrl:
