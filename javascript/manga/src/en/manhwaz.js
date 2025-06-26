@@ -161,7 +161,7 @@ class DefaultExtension extends MProvider {
   }
 
   async getPopular(page) {
-    const url = `${this.source.baseUrl}/genre/manhwa?page=${page}&m_orderby=views`;
+    const url = `${this.getBaseUrl()}/genre/manhwa?page=${page}&m_orderby=views`;
     const res = await new Client().get(url, this.getHeaders());
     return this.mangaListFromPage(res, ".page-item-detail");
   }
@@ -171,7 +171,7 @@ class DefaultExtension extends MProvider {
   }
 
   async getLatestUpdates(page) {
-    const url = `${this.source.baseUrl}/?page=${page}`;
+    const url = `${this.getBaseUrl()}/?page=${page}`;
     const res = await new Client().get(url, this.getHeaders());
     return this.mangaListFromPage(res, ".page-item-detail");
   }
@@ -179,13 +179,13 @@ class DefaultExtension extends MProvider {
   async search(query, page, filters) {
     if (query && query.trim()) {
       // Search with query
-      const url = `${this.source.baseUrl}/search?s=${encodeURIComponent(query)}&page=${page}`;
+      const url = `${this.getBaseUrl()}/search?s=${encodeURIComponent(query)}&page=${page}`;
       const res = await new Client().get(url, this.getHeaders());
       return this.mangaListFromPage(res, ".page-item-detail");
     }
 
     // Filter-based search
-    let url = this.source.baseUrl;
+    let url = this.getBaseUrl();
     let hasGenreFilter = false;
 
     // Process filters
@@ -227,9 +227,7 @@ class DefaultExtension extends MProvider {
 
   async getDetail(url) {
     // Ensure we have the full URL
-    const fullUrl = url.startsWith("http")
-      ? url
-      : `${this.source.baseUrl}${url}`;
+    const fullUrl = url.startsWith("http") ? url : `${this.getBaseUrl()}${url}`;
     const res = await new Client().get(fullUrl, this.getHeaders());
     const doc = new Document(res.body);
 
@@ -302,9 +300,7 @@ class DefaultExtension extends MProvider {
 
   async getPageList(url) {
     // Ensure we have the full URL
-    const fullUrl = url.startsWith("http")
-      ? url
-      : `${this.source.baseUrl}${url}`;
+    const fullUrl = url.startsWith("http") ? url : `${this.getBaseUrl()}${url}`;
     const res = await new Client().get(fullUrl, this.getHeaders());
     const doc = new Document(res.body);
 
@@ -322,7 +318,7 @@ class DefaultExtension extends MProvider {
         if (imageUrl.startsWith("//")) {
           finalUrl = "https:" + imageUrl;
         } else if (imageUrl.startsWith("/")) {
-          finalUrl = this.source.baseUrl + imageUrl;
+          finalUrl = this.getBaseUrl() + imageUrl;
         }
 
         pages.push(finalUrl);
@@ -395,7 +391,30 @@ class DefaultExtension extends MProvider {
     ];
   }
 
+  getBaseUrl() {
+    const preference = new SharedPreferences();
+    var base_url = preference.get("domain_url");
+    if (base_url.length == 0) {
+      return this.source.baseUrl;
+    }
+    if (base_url.endsWith("/")) {
+      return base_url.slice(0, -1);
+    }
+    return base_url;
+  }
+
   getSourcePreferences() {
-    return [];
+    return [
+      {
+        key: "domain_url",
+        editTextPreference: {
+          title: "Edit URL",
+          summary: "",
+          value: this.source.baseUrl,
+          dialogTitle: "URL",
+          dialogMessage: "",
+        },
+      },
+    ];
   }
 }
