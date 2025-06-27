@@ -1,4 +1,5 @@
 import '../../../../model/source.dart';
+import 'src/en/erosscans/erosscans.dart';
 import 'src/fr/lelmanga/lelmanga.dart';
 import 'src/en/komiklab/komiklab.dart';
 import 'src/en/azurescans/azurescans.dart';
@@ -47,7 +48,6 @@ import 'src/es/gremorymangas/gremorymangas.dart';
 import 'src/es/ryujinmanga/ryujinmanga.dart';
 import 'src/es/senpaiediciones/senpaiediciones.dart';
 import 'src/es/skymangas/skymangas.dart';
-import 'src/es/erosscans/erosscans.dart';
 import 'src/fr/flamescansfr/flamescansfr.dart';
 import 'src/fr/mangasscans/mangasscans.dart';
 import 'src/fr/rimuscans/rimuscans.dart';
