@@ -344,15 +344,6 @@ class ZoroTheme extends MProvider {
   Future<String?> getWorkingKey(String dataID) async {
     try {
       final res = await client.get(
-        Uri.parse('https://api.lunaranime.ru/static/key.txt'),
-      );
-      final key = res.body.trim();
-      final sources = await getSource(dataID, key);
-      if (sources != null && sources['sources'] != null) return key;
-    } catch (e) {}
-
-    try {
-      final res = await client.get(
         Uri.parse(
           'https://raw.githubusercontent.com/itzzzme/megacloud-keys/refs/heads/main/key.txt',
         ),
