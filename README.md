@@ -10,7 +10,7 @@ Click on one of the buttons below to add the corresponding repository/repositori
 
 <a href="https://intradeus.github.io/http-protocol-redirector?r=mangayomi://add-repo?repo_name=mangayomi-extensions%26repo_url=https://github.com/kodjodevf/mangayomi-extensions%26manga_url=https://kodjodevf.github.io/mangayomi-extensions/index.json"><img alt="Add manga repository" src="images/add-manga-repository.png" height="35"></a>
 
-<a href="https://intradeus.github.io/http-protocol-redirector?r=mangayomi://add-repo?repo_name=mangayomi-extensions%26repo_url=https://github.com/kodjodevf/mangayomi-extensions%26anime_url=https://kodjodevf.github.io/mangayomi-extensions/anime_index.json"><img alt="Add anime repository" src="images/add-anime-repository.png" height="35"></a>
+<!-- <a href="https://intradeus.github.io/http-protocol-redirector?r=mangayomi://add-repo?repo_name=mangayomi-extensions%26repo_url=https://github.com/kodjodevf/mangayomi-extensions%26anime_url=https://kodjodevf.github.io/mangayomi-extensions/anime_index.json"><img alt="Add anime repository" src="images/add-anime-repository.png" height="35"></a> -->
 
 <a href="https://intradeus.github.io/http-protocol-redirector?r=mangayomi://add-repo?repo_name=mangayomi-extensions%26repo_url=https://github.com/kodjodevf/mangayomi-extensions%26novel_url=https://kodjodevf.github.io/mangayomi-extensions/novel_index.json"><img alt="Add novel repository" src="images/add-novel-repository.png" height="35"></a>
 
