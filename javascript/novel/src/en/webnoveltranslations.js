@@ -90,7 +90,7 @@ class DefaultExtension extends MProvider {
           chapters.push({
             name: chapter.selectFirst("a").text.trim(),
             url: chapter.selectFirst("a").getHref,
-            dateUpload: "",
+            dateUpload: null,
             scanlator: null,
           });
         }
