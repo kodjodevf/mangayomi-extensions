@@ -6,8 +6,8 @@ const mangayomiSources = [{
     "iconUrl": "https://webnoveltranslations.com/wp-content/uploads/2025/03/wnt-logo-4.png",
     "typeSource": "single",
     "itemType": 2,
-    "version": "0.0.1",
-    "pkgPath": "",
+    "version": "1.0.0",
+    "pkgPath": "novel/src/en/webnoveltranslations.js",
     "notes": ""
 }];
 
@@ -64,10 +64,13 @@ class DefaultExtension extends MProvider {
     }
     async getDetail(url) {
         const client = new Client();
-        // const res = await client.get(this.source.baseUrl + url, this.headers);
         const res = await client.get(url, this.headers);
         const doc = new Document(res.body);
         const main = doc.selectFirst('.site-content');
+        
+        const name = doc.selectFirst("div.post-title > h1").text.trim();;
+        
+        const link = url;
         
         let description = "";
         for (const element of doc.select(".summary__content > p")) {
@@ -78,8 +81,13 @@ class DefaultExtension extends MProvider {
         
         const author = doc.selectFirst("div.author-content > a").text.trim();
         
-        //const status = doc.selectFirst("div.post-status > .summary-content")?.text.trim();
-        const status = 5;
+        const status_string = doc.selectFirst("div.post-status > div.summary-content")?.text.trim();
+        let status = -1;
+        if (status_string === "OnGoing") {
+          status = 0;
+        } else {
+          status = 5;
+        }
         
         
         const chapterRes = await client.post(url + "ajax/chapters/?t=1", {"x-requested-with": "XMLHttpRequest"});
@@ -96,6 +104,8 @@ class DefaultExtension extends MProvider {
         }
         
         return {
+          name,
+          link,
           description,
           genre,
           author,
