@@ -27,7 +27,7 @@ jobs:
           git checkout origin/upstream javascript/
           git checkout origin/upstream images/
 
-          git checkout origin/upstream
+          git checkout origin/main
           git add index.json
           git add novel_index.json
           if git diff --cached --quiet; then
