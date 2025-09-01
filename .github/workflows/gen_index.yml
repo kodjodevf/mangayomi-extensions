@@ -22,13 +22,9 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-
-          git fetch origin
-          git checkout origin/upstream javascript/
-          git checkout origin/upstream images/
-
-          git checkout origin/main
+          git checkout main
           git add index.json
+          git add anime_index.json
           git add novel_index.json
           if git diff --cached --quiet; then
             echo "No changes detected, skipping commit."
