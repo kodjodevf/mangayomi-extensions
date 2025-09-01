@@ -24,7 +24,6 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git checkout main
           git add index.json
-          git add anime_index.json
           git add novel_index.json
           if git diff --cached --quiet; then
             echo "No changes detected, skipping commit."
