@@ -4,7 +4,7 @@ This repository contains the available extension catalogues for the Mangayomi ap
 
 ## How to add the extensions
 
-Click on one of the buttons below to add the corresponding repository/repositories:
+Click on one of the buttons below to add the corresponding repository/repositories (Manga & novels only):
 
 <a href="https://intradeus.github.io/http-protocol-redirector?r=mangayomi://add-repo?repo_name=mangayomi-extensions%26repo_url=https://github.com/kodjodevf/mangayomi-extensions%26manga_url=https://kodjodevf.github.io/mangayomi-extensions/index.json%26anime_url=https://kodjodevf.github.io/mangayomi-extensions/anime_index.json%26novel_url=https://kodjodevf.github.io/mangayomi-extensions/novel_index.json"><img alt="Add all repositories" src="images/add-all-repositories.png" height="35"></a>
 
