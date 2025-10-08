@@ -3,7 +3,7 @@ const mangayomiSources = [{
     "lang": "en",
     "baseUrl": "https://webnoveltranslations.com",
     "apiUrl": "",
-    "iconUrl": "https://webnoveltranslations.com/wp-content/uploads/2025/03/wnt-logo-4.png",
+    "iconUrl": "https://raw.githubusercontent.com/entityJY/mangayomi-extensions-eJ/main/javascript/icon/en.webnoveltranslations.png",
     "typeSource": "single",
     "itemType": 2,
     "version": "1.0.0",
